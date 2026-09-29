@@ -23007,6 +23007,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tides_source_datumMsl => '高度基于平均海平面';
 
   @override
+  String get tides_source_siteLocalTime => '时间以潜水点当地时间显示。';
+
+  @override
+  String tides_source_modelResolution(String distance) {
+    return '$distance 海洋模型网格';
+  }
+
+  @override
   String get tides_title => '潮汐';
 
   @override
@@ -24089,6 +24097,243 @@ class AppLocalizationsZh extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count 台呼吸器，最低吸收剂余量 $minutes 分钟';
   }
+
+  @override
+  String get trips_cylinders_title => '气瓶';
+
+  @override
+  String trips_cylinders_summary(int full, int partial, int empty) {
+    return '满瓶 $full · 部分 $partial · 空瓶 $empty';
+  }
+
+  @override
+  String trips_cylinders_summaryUnfilled(int count) {
+    return '尚未充气 $count';
+  }
+
+  @override
+  String get trips_cylinders_setUp => '设置气瓶';
+
+  @override
+  String get trips_cylinders_setUpHint => '记录本次行程中你持有的气瓶：充气、混合气以及每瓶剩余多少。';
+
+  @override
+  String get trips_cylinders_status_full => '满';
+
+  @override
+  String get trips_cylinders_status_partial => '部分';
+
+  @override
+  String get trips_cylinders_status_empty => '空';
+
+  @override
+  String get trips_cylinders_status_unknown => '尚未充气';
+
+  @override
+  String get trips_cylinders_mixAir => '空气';
+
+  @override
+  String get trips_cylinders_segment_board => '看板';
+
+  @override
+  String get trips_cylinders_segment_ledger => '记录';
+
+  @override
+  String get trips_cylinders_action_add => '添加气瓶';
+
+  @override
+  String get trips_cylinders_action_fill => '充气';
+
+  @override
+  String get trips_cylinders_action_fillSeveral => '批量充气';
+
+  @override
+  String get trips_cylinders_action_adjust => '调整';
+
+  @override
+  String trips_cylinders_bottle(String label) {
+    return '瓶号 $label';
+  }
+
+  @override
+  String trips_cylinders_linkedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_last_fillAt(String place, String when) {
+    return '于 $place 充气，$when';
+  }
+
+  @override
+  String trips_cylinders_last_fill(String when) {
+    return '已充气，$when';
+  }
+
+  @override
+  String trips_cylinders_last_adjustment(String when) {
+    return '已调整，$when';
+  }
+
+  @override
+  String trips_cylinders_last_diveAt(String site, String when) {
+    return '在 $site 潜水，$when';
+  }
+
+  @override
+  String trips_cylinders_last_dive(String when) {
+    return '已潜水，$when';
+  }
+
+  @override
+  String get trips_cylinders_boardEmpty => '本次行程还没有气瓶';
+
+  @override
+  String get trips_cylinders_ledgerEmpty => '还没有充气或调整记录';
+
+  @override
+  String get trips_cylinders_kind_fill => '充气';
+
+  @override
+  String get trips_cylinders_kind_adjustment => '调整';
+
+  @override
+  String get trips_cylinders_deleteConfirmUnused => '删除这个气瓶及其充气记录？';
+
+  @override
+  String trips_cylinders_deleteConfirmUsed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '删除这个气瓶及其充气记录？有 $count 次潜水使用过它。这些潜水保留各自的气瓶，只移除关联。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_deleteEventConfirm => '删除这条记录？';
+
+  @override
+  String get trips_cylinders_add_tabRental => '租用';
+
+  @override
+  String get trips_cylinders_add_tabOwned => '我的装备';
+
+  @override
+  String get trips_cylinders_add_count => '数量';
+
+  @override
+  String get trips_cylinders_add_preset => '气瓶类型';
+
+  @override
+  String get trips_cylinders_add_prefix => '名称前缀';
+
+  @override
+  String get trips_cylinders_add_prefixDefault => '车';
+
+  @override
+  String get trips_cylinders_add_noOwned => '你的装备中没有可添加的气瓶了。';
+
+  @override
+  String get trips_cylinders_add_errorCount => '请输入 1 到 20 之间的数字。';
+
+  @override
+  String get trips_cylinders_fill_titleEdit => '编辑充气';
+
+  @override
+  String get trips_cylinders_fill_when => '时间';
+
+  @override
+  String get trips_cylinders_fill_where => '充气站';
+
+  @override
+  String get trips_cylinders_fill_whereNone => '未设置';
+
+  @override
+  String trips_cylinders_fill_pressure(String unit) {
+    return '充气压力（$unit）';
+  }
+
+  @override
+  String get trips_cylinders_fill_o2 => '订购 O2（%）';
+
+  @override
+  String get trips_cylinders_fill_he => '订购 He（%）';
+
+  @override
+  String get trips_cylinders_fill_analyzedO2 => '分析 O2（%）';
+
+  @override
+  String get trips_cylinders_fill_analyzedHe => '分析 He（%）';
+
+  @override
+  String get trips_cylinders_fill_bottle => '瓶号';
+
+  @override
+  String get trips_cylinders_fill_cost => '费用';
+
+  @override
+  String get trips_cylinders_fill_costEach => '每个气瓶的费用';
+
+  @override
+  String get trips_cylinders_fill_currency => '货币';
+
+  @override
+  String get trips_cylinders_fill_package => '包含在套餐中';
+
+  @override
+  String get trips_cylinders_fill_slots => '要充气的气瓶';
+
+  @override
+  String get trips_cylinders_fill_errorMix =>
+      '氧气须为 1 到 100%，氦气为 0 到 99%，两者合计不超过 100。';
+
+  @override
+  String get trips_cylinders_fill_errorNoSlot => '请至少选择一个气瓶。';
+
+  @override
+  String get trips_cylinders_note => '备注';
+
+  @override
+  String get trips_cylinders_adjust_titleEdit => '编辑调整';
+
+  @override
+  String trips_cylinders_adjust_pressure(String unit) {
+    return '压力（$unit）';
+  }
+
+  @override
+  String get trips_cylinders_adjust_markEmpty => '标记为空';
+
+  @override
+  String get trips_cylinders_edit_title => '编辑气瓶';
+
+  @override
+  String get trips_cylinders_edit_label => '名称';
+
+  @override
+  String get trips_cylinders_edit_errorLabel => '请输入名称。';
+
+  @override
+  String get trips_cylinders_edit_errorNeedsPressure => '请同时输入工作压力，以便换算尺寸。';
+
+  @override
+  String trips_cylinders_edit_volume(String unit) {
+    return '尺寸（$unit）';
+  }
+
+  @override
+  String trips_cylinders_edit_workingPressure(String unit) {
+    return '工作压力（$unit）';
+  }
+
+  @override
+  String get trips_cylinders_edit_presetCustom => '自定义';
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => '上船/下船';
@@ -31071,6 +31316,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String dataQuality_msg_pressureRise(String rise) {
     return '潜水途中压力在没有气体切换的情况下上升了 $rise';
   }
+
+  @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '压力传感器记录了 $count 次错误读数（中断或尖峰）',
+      one: '压力传感器记录了 1 次错误读数（中断或尖峰）',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed => '压力序列混合了两个来源的读数';
 
   @override
   String dataQuality_msg_sac(String sac) {
@@ -42471,6 +42730,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_buddies_certifications => '证书';
 
   @override
+  String get query_buddies_dives => '潜水';
+
+  @override
   String get query_buddies_email => '电子邮件';
 
   @override
@@ -42486,25 +42748,55 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_buddies_phone => '电话';
 
   @override
+  String get query_centers_affiliations => '所属机构';
+
+  @override
   String get query_centers_city => '城市';
+
+  @override
+  String get query_centers_coordinates => '坐标';
 
   @override
   String get query_centers_country => '国家';
 
   @override
+  String get query_centers_dives => '潜水';
+
+  @override
   String get query_centers_name => '名称';
+
+  @override
+  String get query_centers_notes => '备注';
+
+  @override
+  String get query_centers_rating => '评分';
+
+  @override
+  String get query_centers_stateProvince => '州 / 省';
 
   @override
   String get query_certifications_agency => '认证机构';
 
   @override
+  String get query_certifications_buddy => '潜伴';
+
+  @override
   String get query_certifications_cardNumber => '卡号';
+
+  @override
+  String get query_certifications_course => '课程';
 
   @override
   String get query_certifications_expiryDate => '到期日期';
 
   @override
+  String get query_certifications_instructor => '教练';
+
+  @override
   String get query_certifications_instructorName => '教练姓名';
+
+  @override
+  String get query_certifications_instructorNumber => '教练编号';
 
   @override
   String get query_certifications_issueDate => '签发日期';
@@ -42514,6 +42806,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get query_certifications_name => '名称';
+
+  @override
+  String get query_certifications_notes => '备注';
 
   @override
   String get query_computers_manufacturer => '制造商';
@@ -42531,10 +42826,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_courses_agency => '认证机构';
 
   @override
+  String get query_courses_certification => '认证';
+
+  @override
   String get query_courses_completionDate => '完成日期';
 
   @override
+  String get query_courses_dives => '潜水';
+
+  @override
+  String get query_courses_instructor => '教练';
+
+  @override
+  String get query_courses_instructorName => '教练姓名';
+
+  @override
+  String get query_courses_location => '地点';
+
+  @override
   String get query_courses_name => '名称';
+
+  @override
+  String get query_courses_notes => '备注';
 
   @override
   String get query_courses_startDate => '开始日期';
@@ -42810,6 +43123,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_equipment_type => '类型';
 
   @override
+  String get query_filter_clear => '清除';
+
+  @override
+  String get query_filter_tooltip => '筛选';
+
+  @override
+  String get query_list_noMatch => '没有与此查询匹配的结果';
+
+  @override
   String get query_media_caption => '说明';
 
   @override
@@ -42873,13 +43195,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_sites_types => '潜水点类型';
 
   @override
+  String get query_species_builtIn => '内置';
+
+  @override
   String get query_species_category => '类别';
+
+  @override
+  String get query_species_description => '描述';
+
+  @override
+  String get query_species_dives => '潜水';
+
+  @override
+  String get query_species_expectedSites => '预期出现的潜点';
 
   @override
   String get query_species_name => '名称';
 
   @override
   String get query_species_scientificName => '学名';
+
+  @override
+  String get query_species_sightings => '观察记录';
+
+  @override
+  String get query_species_taxonomyClass => '分类纲';
 
   @override
   String get query_tags_name => '名称';

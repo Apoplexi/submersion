@@ -16520,7 +16520,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get marineLife_speciesEdit_taxonomyClassHint => 'ex., Actinopterygii';
 
   @override
-  String get marineLife_speciesEdit_taxonomyClassLabel => 'Classe Taxonomica';
+  String get marineLife_speciesEdit_taxonomyClassLabel => 'Classe taxonómica';
 
   @override
   String marineLife_speciesEdit_updatedSnackbar(Object name) {
@@ -24245,6 +24245,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tides_source_datumMsl => 'Alturas relativas ao nível médio do mar';
 
   @override
+  String get tides_source_siteLocalTime =>
+      'Os horários são mostrados na hora local do local de mergulho.';
+
+  @override
+  String tides_source_modelResolution(String distance) {
+    return 'Grade do modelo oceânico de $distance';
+  }
+
+  @override
   String get tides_title => 'Marés';
 
   @override
@@ -25378,6 +25387,254 @@ class AppLocalizationsPt extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count rebreathers, a menor margem de absorvente é de $minutes min';
   }
+
+  @override
+  String get trips_cylinders_title => 'Cilindros';
+
+  @override
+  String trips_cylinders_summary(int full, int partial, int empty) {
+    return 'Cheios $full · Parciais $partial · Vazios $empty';
+  }
+
+  @override
+  String trips_cylinders_summaryUnfilled(int count) {
+    return 'Ainda não enchidos $count';
+  }
+
+  @override
+  String get trips_cylinders_setUp => 'Configurar cilindros';
+
+  @override
+  String get trips_cylinders_setUpHint =>
+      'Acompanhe os cilindros que tem nesta viagem: enchimentos, misturas e o que resta em cada um.';
+
+  @override
+  String get trips_cylinders_status_full => 'Cheio';
+
+  @override
+  String get trips_cylinders_status_partial => 'Parcial';
+
+  @override
+  String get trips_cylinders_status_empty => 'Vazio';
+
+  @override
+  String get trips_cylinders_status_unknown => 'Ainda não enchido';
+
+  @override
+  String get trips_cylinders_mixAir => 'Ar';
+
+  @override
+  String get trips_cylinders_segment_board => 'Quadro';
+
+  @override
+  String get trips_cylinders_segment_ledger => 'Registo';
+
+  @override
+  String get trips_cylinders_action_add => 'Adicionar cilindros';
+
+  @override
+  String get trips_cylinders_action_fill => 'Encher';
+
+  @override
+  String get trips_cylinders_action_fillSeveral => 'Encher vários';
+
+  @override
+  String get trips_cylinders_action_adjust => 'Ajustar';
+
+  @override
+  String trips_cylinders_bottle(String label) {
+    return 'Cilindro $label';
+  }
+
+  @override
+  String trips_cylinders_linkedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos',
+      one: '$count mergulho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_last_fillAt(String place, String when) {
+    return 'Enchido em $place, $when';
+  }
+
+  @override
+  String trips_cylinders_last_fill(String when) {
+    return 'Enchido $when';
+  }
+
+  @override
+  String trips_cylinders_last_adjustment(String when) {
+    return 'Ajustado $when';
+  }
+
+  @override
+  String trips_cylinders_last_diveAt(String site, String when) {
+    return 'Mergulho em $site, $when';
+  }
+
+  @override
+  String trips_cylinders_last_dive(String when) {
+    return 'Mergulho $when';
+  }
+
+  @override
+  String get trips_cylinders_boardEmpty =>
+      'Ainda não há cilindros nesta viagem';
+
+  @override
+  String get trips_cylinders_ledgerEmpty =>
+      'Ainda não há enchimentos nem ajustes';
+
+  @override
+  String get trips_cylinders_kind_fill => 'Enchimento';
+
+  @override
+  String get trips_cylinders_kind_adjustment => 'Ajuste';
+
+  @override
+  String get trips_cylinders_deleteConfirmUnused =>
+      'Eliminar este cilindro e os seus enchimentos?';
+
+  @override
+  String trips_cylinders_deleteConfirmUsed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Eliminar este cilindro e os seus enchimentos? $count mergulhos usaram-no. Esses mergulhos mantêm os seus cilindros; só a ligação é removida.',
+      one:
+          'Eliminar este cilindro e os seus enchimentos? $count mergulho usou-o. Esse mergulho mantém o seu cilindro; só a ligação é removida.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_deleteEventConfirm => 'Eliminar esta entrada?';
+
+  @override
+  String get trips_cylinders_add_tabRental => 'Aluguer';
+
+  @override
+  String get trips_cylinders_add_tabOwned => 'Do meu equipamento';
+
+  @override
+  String get trips_cylinders_add_count => 'Quantos';
+
+  @override
+  String get trips_cylinders_add_preset => 'Tipo de cilindro';
+
+  @override
+  String get trips_cylinders_add_prefix => 'Prefixo do nome';
+
+  @override
+  String get trips_cylinders_add_prefixDefault => 'Carrinha';
+
+  @override
+  String get trips_cylinders_add_noOwned =>
+      'Não restam cilindros do seu equipamento para adicionar.';
+
+  @override
+  String get trips_cylinders_add_errorCount => 'Introduza um número de 1 a 20.';
+
+  @override
+  String get trips_cylinders_fill_titleEdit => 'Editar enchimento';
+
+  @override
+  String get trips_cylinders_fill_when => 'Quando';
+
+  @override
+  String get trips_cylinders_fill_where => 'Posto de enchimento';
+
+  @override
+  String get trips_cylinders_fill_whereNone => 'Não definido';
+
+  @override
+  String trips_cylinders_fill_pressure(String unit) {
+    return 'Pressão de enchimento ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_fill_o2 => 'O2 pedido (%)';
+
+  @override
+  String get trips_cylinders_fill_he => 'He pedido (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedO2 => 'O2 analisado (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedHe => 'He analisado (%)';
+
+  @override
+  String get trips_cylinders_fill_bottle => 'Número do cilindro';
+
+  @override
+  String get trips_cylinders_fill_cost => 'Custo';
+
+  @override
+  String get trips_cylinders_fill_costEach => 'Custo por cilindro';
+
+  @override
+  String get trips_cylinders_fill_currency => 'Moeda';
+
+  @override
+  String get trips_cylinders_fill_package => 'Incluído num pacote';
+
+  @override
+  String get trips_cylinders_fill_slots => 'Cilindros a encher';
+
+  @override
+  String get trips_cylinders_fill_errorMix =>
+      'O oxigénio tem de estar entre 1 e 100 por cento, o hélio entre 0 e 99, e juntos no máximo 100.';
+
+  @override
+  String get trips_cylinders_fill_errorNoSlot =>
+      'Escolha pelo menos um cilindro.';
+
+  @override
+  String get trips_cylinders_note => 'Nota';
+
+  @override
+  String get trips_cylinders_adjust_titleEdit => 'Editar ajuste';
+
+  @override
+  String trips_cylinders_adjust_pressure(String unit) {
+    return 'Pressão ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_adjust_markEmpty => 'Marcar como vazio';
+
+  @override
+  String get trips_cylinders_edit_title => 'Editar cilindro';
+
+  @override
+  String get trips_cylinders_edit_label => 'Nome';
+
+  @override
+  String get trips_cylinders_edit_errorLabel => 'Introduza um nome.';
+
+  @override
+  String get trips_cylinders_edit_errorNeedsPressure =>
+      'Introduza também a pressão de serviço para poder converter o tamanho.';
+
+  @override
+  String trips_cylinders_edit_volume(String unit) {
+    return 'Tamanho ($unit)';
+  }
+
+  @override
+  String trips_cylinders_edit_workingPressure(String unit) {
+    return 'Pressão de serviço ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_edit_presetCustom => 'Personalizado';
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => 'Embark / Disembark';
@@ -32745,6 +33002,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String dataQuality_msg_pressureRise(String rise) {
     return 'A pressão subiu $rise a meio do mergulho sem troca de gás';
   }
+
+  @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'O sensor de pressão registou leituras erradas $count vezes (falhas ou picos)',
+      one:
+          'O sensor de pressão registou uma leitura errada uma vez (falha ou pico)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'A série de pressão mistura as leituras de duas fontes';
 
   @override
   String dataQuality_msg_sac(String sac) {
@@ -45084,6 +45358,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_buddies_certifications => 'Certificações';
 
   @override
+  String get query_buddies_dives => 'Mergulhos';
+
+  @override
   String get query_buddies_email => 'E-mail';
 
   @override
@@ -45099,25 +45376,55 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_buddies_phone => 'Telefone';
 
   @override
+  String get query_centers_affiliations => 'Afiliações';
+
+  @override
   String get query_centers_city => 'Cidade';
+
+  @override
+  String get query_centers_coordinates => 'Coordenadas';
 
   @override
   String get query_centers_country => 'País';
 
   @override
+  String get query_centers_dives => 'Mergulhos';
+
+  @override
   String get query_centers_name => 'Nome';
+
+  @override
+  String get query_centers_notes => 'Notas';
+
+  @override
+  String get query_centers_rating => 'Avaliação';
+
+  @override
+  String get query_centers_stateProvince => 'Estado / Província';
 
   @override
   String get query_certifications_agency => 'Agência';
 
   @override
+  String get query_certifications_buddy => 'Dupla';
+
+  @override
   String get query_certifications_cardNumber => 'Número do cartão';
+
+  @override
+  String get query_certifications_course => 'Curso';
 
   @override
   String get query_certifications_expiryDate => 'Data de validade';
 
   @override
+  String get query_certifications_instructor => 'Instrutor';
+
+  @override
   String get query_certifications_instructorName => 'Nome do instrutor';
+
+  @override
+  String get query_certifications_instructorNumber => 'Número do Instrutor';
 
   @override
   String get query_certifications_issueDate => 'Data de emissão';
@@ -45127,6 +45434,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'Nome';
+
+  @override
+  String get query_certifications_notes => 'Notas';
 
   @override
   String get query_computers_manufacturer => 'Fabricante';
@@ -45144,10 +45454,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_courses_agency => 'Agência';
 
   @override
+  String get query_courses_certification => 'Certificação';
+
+  @override
   String get query_courses_completionDate => 'Data de conclusão';
 
   @override
+  String get query_courses_dives => 'Mergulhos';
+
+  @override
+  String get query_courses_instructor => 'Instrutor';
+
+  @override
+  String get query_courses_instructorName => 'Nome do instrutor';
+
+  @override
+  String get query_courses_location => 'Local';
+
+  @override
   String get query_courses_name => 'Nome';
+
+  @override
+  String get query_courses_notes => 'Notas';
 
   @override
   String get query_courses_startDate => 'Data de início';
@@ -45423,6 +45751,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_equipment_type => 'Tipo';
 
   @override
+  String get query_filter_clear => 'Limpar';
+
+  @override
+  String get query_filter_tooltip => 'Filtro';
+
+  @override
+  String get query_list_noMatch => 'Nada corresponde a esta consulta';
+
+  @override
   String get query_media_caption => 'Legenda';
 
   @override
@@ -45486,13 +45823,31 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_sites_types => 'Tipos de ponto';
 
   @override
+  String get query_species_builtIn => 'Predefinido';
+
+  @override
   String get query_species_category => 'Categoria';
+
+  @override
+  String get query_species_description => 'Descrição';
+
+  @override
+  String get query_species_dives => 'Mergulhos';
+
+  @override
+  String get query_species_expectedSites => 'Esperada em locais';
 
   @override
   String get query_species_name => 'Nome';
 
   @override
   String get query_species_scientificName => 'Nome científico';
+
+  @override
+  String get query_species_sightings => 'Avistamentos';
+
+  @override
+  String get query_species_taxonomyClass => 'Classe taxonómica';
 
   @override
   String get query_tags_name => 'Nome';

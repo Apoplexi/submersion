@@ -24057,6 +24057,15 @@ class AppLocalizationsNl extends AppLocalizations {
       'Hoogten ten opzichte van gemiddeld zeeniveau';
 
   @override
+  String get tides_source_siteLocalTime =>
+      'Tijden worden weergegeven in de lokale tijd van de duikstek.';
+
+  @override
+  String tides_source_modelResolution(String distance) {
+    return 'Oceaanmodelraster van $distance';
+  }
+
+  @override
   String get tides_title => 'Getijden';
 
   @override
@@ -25187,6 +25196,252 @@ class AppLocalizationsNl extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count rebreathers, laagste scrubbermarge $minutes min';
   }
+
+  @override
+  String get trips_cylinders_title => 'Flessen';
+
+  @override
+  String trips_cylinders_summary(int full, int partial, int empty) {
+    return 'Vol $full · Deels $partial · Leeg $empty';
+  }
+
+  @override
+  String trips_cylinders_summaryUnfilled(int count) {
+    return 'Nog niet gevuld $count';
+  }
+
+  @override
+  String get trips_cylinders_setUp => 'Flessen instellen';
+
+  @override
+  String get trips_cylinders_setUpHint =>
+      'Houd de flessen bij die je op deze reis hebt: vullingen, mengsels en wat er in elke fles over is.';
+
+  @override
+  String get trips_cylinders_status_full => 'Vol';
+
+  @override
+  String get trips_cylinders_status_partial => 'Deels vol';
+
+  @override
+  String get trips_cylinders_status_empty => 'Leeg';
+
+  @override
+  String get trips_cylinders_status_unknown => 'Nog niet gevuld';
+
+  @override
+  String get trips_cylinders_mixAir => 'Lucht';
+
+  @override
+  String get trips_cylinders_segment_board => 'Overzicht';
+
+  @override
+  String get trips_cylinders_segment_ledger => 'Logboek';
+
+  @override
+  String get trips_cylinders_action_add => 'Flessen toevoegen';
+
+  @override
+  String get trips_cylinders_action_fill => 'Vullen';
+
+  @override
+  String get trips_cylinders_action_fillSeveral => 'Meerdere vullen';
+
+  @override
+  String get trips_cylinders_action_adjust => 'Bijwerken';
+
+  @override
+  String trips_cylinders_bottle(String label) {
+    return 'Fles $label';
+  }
+
+  @override
+  String trips_cylinders_linkedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken',
+      one: '$count duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_last_fillAt(String place, String when) {
+    return 'Gevuld bij $place, $when';
+  }
+
+  @override
+  String trips_cylinders_last_fill(String when) {
+    return 'Gevuld $when';
+  }
+
+  @override
+  String trips_cylinders_last_adjustment(String when) {
+    return 'Bijgewerkt $when';
+  }
+
+  @override
+  String trips_cylinders_last_diveAt(String site, String when) {
+    return 'Gedoken bij $site, $when';
+  }
+
+  @override
+  String trips_cylinders_last_dive(String when) {
+    return 'Gedoken $when';
+  }
+
+  @override
+  String get trips_cylinders_boardEmpty => 'Nog geen flessen op deze reis';
+
+  @override
+  String get trips_cylinders_ledgerEmpty => 'Nog geen vullingen of correcties';
+
+  @override
+  String get trips_cylinders_kind_fill => 'Vulling';
+
+  @override
+  String get trips_cylinders_kind_adjustment => 'Correctie';
+
+  @override
+  String get trips_cylinders_deleteConfirmUnused =>
+      'Deze fles en haar vullingen verwijderen?';
+
+  @override
+  String trips_cylinders_deleteConfirmUsed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Deze fles en haar vullingen verwijderen? $count duiken gebruikten haar. Die duiken houden hun flessen; alleen de koppeling verdwijnt.',
+      one:
+          'Deze fles en haar vullingen verwijderen? $count duik gebruikte haar. Die duik houdt zijn fles; alleen de koppeling verdwijnt.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_deleteEventConfirm => 'Dit item verwijderen?';
+
+  @override
+  String get trips_cylinders_add_tabRental => 'Huur';
+
+  @override
+  String get trips_cylinders_add_tabOwned => 'Uit mijn uitrusting';
+
+  @override
+  String get trips_cylinders_add_count => 'Aantal';
+
+  @override
+  String get trips_cylinders_add_preset => 'Flestype';
+
+  @override
+  String get trips_cylinders_add_prefix => 'Voorvoegsel voor de naam';
+
+  @override
+  String get trips_cylinders_add_prefixDefault => 'Pick-up';
+
+  @override
+  String get trips_cylinders_add_noOwned =>
+      'Er zijn geen flessen uit je uitrusting meer om toe te voegen.';
+
+  @override
+  String get trips_cylinders_add_errorCount =>
+      'Voer een getal van 1 tot 20 in.';
+
+  @override
+  String get trips_cylinders_fill_titleEdit => 'Vulling bewerken';
+
+  @override
+  String get trips_cylinders_fill_when => 'Wanneer';
+
+  @override
+  String get trips_cylinders_fill_where => 'Vulstation';
+
+  @override
+  String get trips_cylinders_fill_whereNone => 'Niet ingesteld';
+
+  @override
+  String trips_cylinders_fill_pressure(String unit) {
+    return 'Vuldruk ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_fill_o2 => 'O2 besteld (%)';
+
+  @override
+  String get trips_cylinders_fill_he => 'He besteld (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedO2 => 'O2 geanalyseerd (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedHe => 'He geanalyseerd (%)';
+
+  @override
+  String get trips_cylinders_fill_bottle => 'Flesnummer';
+
+  @override
+  String get trips_cylinders_fill_cost => 'Kosten';
+
+  @override
+  String get trips_cylinders_fill_costEach => 'Kosten per fles';
+
+  @override
+  String get trips_cylinders_fill_currency => 'Valuta';
+
+  @override
+  String get trips_cylinders_fill_package => 'Inbegrepen in een pakket';
+
+  @override
+  String get trips_cylinders_fill_slots => 'Te vullen flessen';
+
+  @override
+  String get trips_cylinders_fill_errorMix =>
+      'Zuurstof moet tussen 1 en 100 procent liggen, helium tussen 0 en 99, en samen hoogstens 100.';
+
+  @override
+  String get trips_cylinders_fill_errorNoSlot => 'Kies minstens één fles.';
+
+  @override
+  String get trips_cylinders_note => 'Notitie';
+
+  @override
+  String get trips_cylinders_adjust_titleEdit => 'Correctie bewerken';
+
+  @override
+  String trips_cylinders_adjust_pressure(String unit) {
+    return 'Druk ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_adjust_markEmpty => 'Als leeg markeren';
+
+  @override
+  String get trips_cylinders_edit_title => 'Fles bewerken';
+
+  @override
+  String get trips_cylinders_edit_label => 'Naam';
+
+  @override
+  String get trips_cylinders_edit_errorLabel => 'Voer een naam in.';
+
+  @override
+  String get trips_cylinders_edit_errorNeedsPressure =>
+      'Voer ook de werkdruk in, zodat de grootte kan worden omgerekend.';
+
+  @override
+  String trips_cylinders_edit_volume(String unit) {
+    return 'Grootte ($unit)';
+  }
+
+  @override
+  String trips_cylinders_edit_workingPressure(String unit) {
+    return 'Werkdruk ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_edit_presetCustom => 'Aangepast';
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => 'Embark / Disembark';
@@ -32523,6 +32778,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String dataQuality_msg_pressureRise(String rise) {
     return 'Druk steeg $rise midden in de duik zonder gaswisseling';
   }
+
+  @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'De druksensor gaf $count keer foute metingen (uitval of pieken)',
+      one: 'De druksensor gaf één keer een foute meting (uitval of piek)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'De drukreeks vermengt de metingen van twee bronnen';
 
   @override
   String dataQuality_msg_sac(String sac) {
@@ -44783,6 +45053,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_buddies_certifications => 'Brevetten';
 
   @override
+  String get query_buddies_dives => 'Duiken';
+
+  @override
   String get query_buddies_email => 'E-mail';
 
   @override
@@ -44798,25 +45071,55 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_buddies_phone => 'Telefoon';
 
   @override
+  String get query_centers_affiliations => 'Aangesloten bij';
+
+  @override
   String get query_centers_city => 'Stad';
+
+  @override
+  String get query_centers_coordinates => 'Coördinaten';
 
   @override
   String get query_centers_country => 'Land';
 
   @override
+  String get query_centers_dives => 'Duiken';
+
+  @override
   String get query_centers_name => 'Naam';
+
+  @override
+  String get query_centers_notes => 'Notities';
+
+  @override
+  String get query_centers_rating => 'Beoordeling';
+
+  @override
+  String get query_centers_stateProvince => 'Staat / Provincie';
 
   @override
   String get query_certifications_agency => 'Organisatie';
 
   @override
+  String get query_certifications_buddy => 'Buddy';
+
+  @override
   String get query_certifications_cardNumber => 'Kaartnummer';
+
+  @override
+  String get query_certifications_course => 'Cursus';
 
   @override
   String get query_certifications_expiryDate => 'Vervaldatum';
 
   @override
+  String get query_certifications_instructor => 'Instructeur';
+
+  @override
   String get query_certifications_instructorName => 'Naam instructeur';
+
+  @override
+  String get query_certifications_instructorNumber => 'Instructeurnummer';
 
   @override
   String get query_certifications_issueDate => 'Uitgiftedatum';
@@ -44826,6 +45129,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'Naam';
+
+  @override
+  String get query_certifications_notes => 'Notities';
 
   @override
   String get query_computers_manufacturer => 'Fabrikant';
@@ -44843,10 +45149,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_courses_agency => 'Organisatie';
 
   @override
+  String get query_courses_certification => 'Certificering';
+
+  @override
   String get query_courses_completionDate => 'Voltooiingsdatum';
 
   @override
+  String get query_courses_dives => 'Duiken';
+
+  @override
+  String get query_courses_instructor => 'Instructeur';
+
+  @override
+  String get query_courses_instructorName => 'Naam instructeur';
+
+  @override
+  String get query_courses_location => 'Locatie';
+
+  @override
   String get query_courses_name => 'Naam';
+
+  @override
+  String get query_courses_notes => 'Notities';
 
   @override
   String get query_courses_startDate => 'Startdatum';
@@ -45122,6 +45446,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_equipment_type => 'Type';
 
   @override
+  String get query_filter_clear => 'Wissen';
+
+  @override
+  String get query_filter_tooltip => 'Filter';
+
+  @override
+  String get query_list_noMatch => 'Niets komt overeen met deze query';
+
+  @override
   String get query_media_caption => 'Bijschrift';
 
   @override
@@ -45185,13 +45518,31 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_sites_types => 'Duikstektypes';
 
   @override
+  String get query_species_builtIn => 'Ingebouwd';
+
+  @override
   String get query_species_category => 'Categorie';
+
+  @override
+  String get query_species_description => 'Beschrijving';
+
+  @override
+  String get query_species_dives => 'Duiken';
+
+  @override
+  String get query_species_expectedSites => 'Verwacht op duikplekken';
 
   @override
   String get query_species_name => 'Naam';
 
   @override
   String get query_species_scientificName => 'Wetenschappelijke naam';
+
+  @override
+  String get query_species_sightings => 'Waarnemingen';
+
+  @override
+  String get query_species_taxonomyClass => 'Taxonomische klasse';
 
   @override
   String get query_tags_name => 'Naam';

@@ -24168,6 +24168,15 @@ class AppLocalizationsHu extends AppLocalizations {
       'Magasságok a közepes tengerszinthez képest';
 
   @override
+  String get tides_source_siteLocalTime =>
+      'Az időpontok a merülőhely helyi idejében jelennek meg.';
+
+  @override
+  String tides_source_modelResolution(String distance) {
+    return '$distance felbontású óceánmodell-rács';
+  }
+
+  @override
   String get tides_title => 'Árapály';
 
   @override
@@ -25300,6 +25309,254 @@ class AppLocalizationsHu extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count rebreather, a legkisebb szűrőtartalék $minutes perc';
   }
+
+  @override
+  String get trips_cylinders_title => 'Palackok';
+
+  @override
+  String trips_cylinders_summary(int full, int partial, int empty) {
+    return 'Tele $full · Részben $partial · Üres $empty';
+  }
+
+  @override
+  String trips_cylinders_summaryUnfilled(int count) {
+    return 'Még nincs töltve $count';
+  }
+
+  @override
+  String get trips_cylinders_setUp => 'Palackok beállítása';
+
+  @override
+  String get trips_cylinders_setUpHint =>
+      'Kövesd az úton nálad lévő palackokat: töltések, keverékek és hogy mennyi maradt mindegyikben.';
+
+  @override
+  String get trips_cylinders_status_full => 'Tele';
+
+  @override
+  String get trips_cylinders_status_partial => 'Részben';
+
+  @override
+  String get trips_cylinders_status_empty => 'Üres';
+
+  @override
+  String get trips_cylinders_status_unknown => 'Még nincs töltve';
+
+  @override
+  String get trips_cylinders_mixAir => 'Levegő';
+
+  @override
+  String get trips_cylinders_segment_board => 'Áttekintés';
+
+  @override
+  String get trips_cylinders_segment_ledger => 'Napló';
+
+  @override
+  String get trips_cylinders_action_add => 'Palackok hozzáadása';
+
+  @override
+  String get trips_cylinders_action_fill => 'Töltés';
+
+  @override
+  String get trips_cylinders_action_fillSeveral => 'Több töltése';
+
+  @override
+  String get trips_cylinders_action_adjust => 'Módosítás';
+
+  @override
+  String trips_cylinders_bottle(String label) {
+    return 'Palack $label';
+  }
+
+  @override
+  String trips_cylinders_linkedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés',
+      one: '$count merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_last_fillAt(String place, String when) {
+    return 'Töltve: $place, $when';
+  }
+
+  @override
+  String trips_cylinders_last_fill(String when) {
+    return 'Töltve: $when';
+  }
+
+  @override
+  String trips_cylinders_last_adjustment(String when) {
+    return 'Módosítva: $when';
+  }
+
+  @override
+  String trips_cylinders_last_diveAt(String site, String when) {
+    return 'Merülés: $site, $when';
+  }
+
+  @override
+  String trips_cylinders_last_dive(String when) {
+    return 'Merülés: $when';
+  }
+
+  @override
+  String get trips_cylinders_boardEmpty =>
+      'Ezen az úton még nincsenek palackok';
+
+  @override
+  String get trips_cylinders_ledgerEmpty => 'Még nincs töltés vagy módosítás';
+
+  @override
+  String get trips_cylinders_kind_fill => 'Töltés';
+
+  @override
+  String get trips_cylinders_kind_adjustment => 'Módosítás';
+
+  @override
+  String get trips_cylinders_deleteConfirmUnused =>
+      'Törlöd ezt a palackot és a töltéseit?';
+
+  @override
+  String trips_cylinders_deleteConfirmUsed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Törlöd ezt a palackot és a töltéseit? $count merülés használta. A merülések megtartják a palackjukat, csak a kapcsolat törlődik.',
+      one:
+          'Törlöd ezt a palackot és a töltéseit? $count merülés használta. A merülés megtartja a palackját, csak a kapcsolat törlődik.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_deleteEventConfirm => 'Törlöd ezt a bejegyzést?';
+
+  @override
+  String get trips_cylinders_add_tabRental => 'Bérelt';
+
+  @override
+  String get trips_cylinders_add_tabOwned => 'A felszerelésemből';
+
+  @override
+  String get trips_cylinders_add_count => 'Darabszám';
+
+  @override
+  String get trips_cylinders_add_preset => 'Palacktípus';
+
+  @override
+  String get trips_cylinders_add_prefix => 'Név előtagja';
+
+  @override
+  String get trips_cylinders_add_prefixDefault => 'Pickup';
+
+  @override
+  String get trips_cylinders_add_noOwned =>
+      'A felszerelésedben nincs több hozzáadható palack.';
+
+  @override
+  String get trips_cylinders_add_errorCount =>
+      'Adj meg egy számot 1 és 20 között.';
+
+  @override
+  String get trips_cylinders_fill_titleEdit => 'Töltés szerkesztése';
+
+  @override
+  String get trips_cylinders_fill_when => 'Mikor';
+
+  @override
+  String get trips_cylinders_fill_where => 'Töltőállomás';
+
+  @override
+  String get trips_cylinders_fill_whereNone => 'Nincs megadva';
+
+  @override
+  String trips_cylinders_fill_pressure(String unit) {
+    return 'Töltési nyomás ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_fill_o2 => 'Kért O2 (%)';
+
+  @override
+  String get trips_cylinders_fill_he => 'Kért He (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedO2 => 'Mért O2 (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedHe => 'Mért He (%)';
+
+  @override
+  String get trips_cylinders_fill_bottle => 'Palackszám';
+
+  @override
+  String get trips_cylinders_fill_cost => 'Költség';
+
+  @override
+  String get trips_cylinders_fill_costEach => 'Költség palackonként';
+
+  @override
+  String get trips_cylinders_fill_currency => 'Pénznem';
+
+  @override
+  String get trips_cylinders_fill_package => 'A csomag része';
+
+  @override
+  String get trips_cylinders_fill_slots => 'Töltendő palackok';
+
+  @override
+  String get trips_cylinders_fill_errorMix =>
+      'Az oxigén 1 és 100 százalék között, a hélium 0 és 99 között lehet, együtt legfeljebb 100.';
+
+  @override
+  String get trips_cylinders_fill_errorNoSlot =>
+      'Válassz legalább egy palackot.';
+
+  @override
+  String get trips_cylinders_note => 'Megjegyzés';
+
+  @override
+  String get trips_cylinders_adjust_titleEdit => 'Módosítás szerkesztése';
+
+  @override
+  String trips_cylinders_adjust_pressure(String unit) {
+    return 'Nyomás ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_adjust_markEmpty => 'Megjelölés üresként';
+
+  @override
+  String get trips_cylinders_edit_title => 'Palack szerkesztése';
+
+  @override
+  String get trips_cylinders_edit_label => 'Név';
+
+  @override
+  String get trips_cylinders_edit_errorLabel => 'Adj meg egy nevet.';
+
+  @override
+  String get trips_cylinders_edit_errorNeedsPressure =>
+      'Add meg az üzemi nyomást is, hogy a méret átszámítható legyen.';
+
+  @override
+  String trips_cylinders_edit_volume(String unit) {
+    return 'Méret ($unit)';
+  }
+
+  @override
+  String trips_cylinders_edit_workingPressure(String unit) {
+    return 'Üzemi nyomás ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_edit_presetCustom => 'Egyéni';
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => 'Embark / Disembark';
@@ -32622,6 +32879,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String dataQuality_msg_pressureRise(String rise) {
     return 'A nyomás $rise értékkel emelkedett a merülés közben gázcsere nélkül';
   }
+
+  @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'A nyomásérzékelő $count alkalommal adott hibás értéket (kiesés vagy tüske)',
+      one: 'A nyomásérzékelő egyszer hibás értéket adott (kiesés vagy tüske)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'A nyomássor két forrás mérési adatait keveri';
 
   @override
   String dataQuality_msg_sac(String sac) {
@@ -44897,6 +45170,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_buddies_certifications => 'Minősítések';
 
   @override
+  String get query_buddies_dives => 'Merülések';
+
+  @override
   String get query_buddies_email => 'E-mail';
 
   @override
@@ -44912,25 +45188,55 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_buddies_phone => 'Telefon';
 
   @override
+  String get query_centers_affiliations => 'Tagságok';
+
+  @override
   String get query_centers_city => 'Város';
+
+  @override
+  String get query_centers_coordinates => 'Koordináták';
 
   @override
   String get query_centers_country => 'Ország';
 
   @override
+  String get query_centers_dives => 'Merülések';
+
+  @override
   String get query_centers_name => 'Név';
+
+  @override
+  String get query_centers_notes => 'Jegyzetek';
+
+  @override
+  String get query_centers_rating => 'Értékelés';
+
+  @override
+  String get query_centers_stateProvince => 'Állam / megye';
 
   @override
   String get query_certifications_agency => 'Szervezet';
 
   @override
+  String get query_certifications_buddy => 'Búvártárs';
+
+  @override
   String get query_certifications_cardNumber => 'Kártyaszám';
+
+  @override
+  String get query_certifications_course => 'Tanfolyam';
 
   @override
   String get query_certifications_expiryDate => 'Lejárat dátuma';
 
   @override
+  String get query_certifications_instructor => 'Oktató';
+
+  @override
   String get query_certifications_instructorName => 'Oktató neve';
+
+  @override
+  String get query_certifications_instructorNumber => 'Oktató száma';
 
   @override
   String get query_certifications_issueDate => 'Kiállítás dátuma';
@@ -44940,6 +45246,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'Név';
+
+  @override
+  String get query_certifications_notes => 'Jegyzetek';
 
   @override
   String get query_computers_manufacturer => 'Gyártó';
@@ -44957,10 +45266,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_courses_agency => 'Szervezet';
 
   @override
+  String get query_courses_certification => 'Képesítés';
+
+  @override
   String get query_courses_completionDate => 'Befejezés dátuma';
 
   @override
+  String get query_courses_dives => 'Merülések';
+
+  @override
+  String get query_courses_instructor => 'Oktató';
+
+  @override
+  String get query_courses_instructorName => 'Oktató neve';
+
+  @override
+  String get query_courses_location => 'Helyszín';
+
+  @override
   String get query_courses_name => 'Név';
+
+  @override
+  String get query_courses_notes => 'Jegyzetek';
 
   @override
   String get query_courses_startDate => 'Kezdő dátum';
@@ -45236,6 +45563,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_equipment_type => 'Típus';
 
   @override
+  String get query_filter_clear => 'Törlés';
+
+  @override
+  String get query_filter_tooltip => 'Szűrő';
+
+  @override
+  String get query_list_noMatch => 'Semmi sem felel meg ennek a lekérdezésnek';
+
+  @override
   String get query_media_caption => 'Felirat';
 
   @override
@@ -45299,13 +45635,31 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_sites_types => 'Merülőhely-típusok';
 
   @override
+  String get query_species_builtIn => 'Beépített';
+
+  @override
   String get query_species_category => 'Kategória';
+
+  @override
+  String get query_species_description => 'Leírás';
+
+  @override
+  String get query_species_dives => 'Merülések';
+
+  @override
+  String get query_species_expectedSites => 'Várható helyszíneken';
 
   @override
   String get query_species_name => 'Név';
 
   @override
   String get query_species_scientificName => 'Tudományos név';
+
+  @override
+  String get query_species_sightings => 'Észlelések';
+
+  @override
+  String get query_species_taxonomyClass => 'Taxonómiai osztály';
 
   @override
   String get query_tags_name => 'Név';

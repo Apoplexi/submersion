@@ -6777,6 +6777,8 @@
   "tides_source_sheetTitle": "Source des données de marée",
   "tides_source_datumMllw": "Hauteurs par rapport au MLLW (datum de la station)",
   "tides_source_datumMsl": "Hauteurs par rapport au niveau moyen de la mer",
+  "tides_source_siteLocalTime": "Les heures sont affichées à l'heure locale du site de plongée.",
+  "tides_source_modelResolution": "Grille du modèle océanique de {distance}",
   "tides_title": "Marées",
   "tools_gpsLogger_description": "Enregistrez votre position pendant une journée de plongée et associez automatiquement les plongées importées à des positions GPS.",
   "tools_gpsLogger_subtitle": "Enregistrer une trace de surface",
@@ -7109,6 +7111,182 @@
       }
     }
   },
+  "trips_cylinders_title": "Blocs",
+  "trips_cylinders_summary": "Pleins {full} · Entamés {partial} · Vides {empty}",
+  "@trips_cylinders_summary": {
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "empty": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_summaryUnfilled": "Pas encore gonflés {count}",
+  "@trips_cylinders_summaryUnfilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_setUp": "Configurer les blocs",
+  "trips_cylinders_setUpHint": "Suivez les blocs que vous avez sur ce voyage : gonflages, mélanges et ce qu'il reste dans chacun.",
+  "trips_cylinders_status_full": "Plein",
+  "trips_cylinders_status_partial": "Entamé",
+  "trips_cylinders_status_empty": "Vide",
+  "trips_cylinders_status_unknown": "Pas encore gonflé",
+  "trips_cylinders_mixAir": "Air",
+  "trips_cylinders_segment_board": "Tableau",
+  "trips_cylinders_segment_ledger": "Journal",
+  "trips_cylinders_action_add": "Ajouter des blocs",
+  "trips_cylinders_action_fill": "Gonfler",
+  "trips_cylinders_action_fillSeveral": "Gonfler plusieurs",
+  "trips_cylinders_action_adjust": "Ajuster",
+  "trips_cylinders_bottle": "Bloc {label}",
+  "@trips_cylinders_bottle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_linkedDives": "{count, plural, one{{count} plongée} other{{count} plongées}}",
+  "@trips_cylinders_linkedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_last_fillAt": "Gonflé chez {place}, {when}",
+  "@trips_cylinders_last_fillAt": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_fill": "Gonflé {when}",
+  "@trips_cylinders_last_fill": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_adjustment": "Ajusté {when}",
+  "@trips_cylinders_last_adjustment": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_diveAt": "Plongée à {site}, {when}",
+  "@trips_cylinders_last_diveAt": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_dive": "Plongée {when}",
+  "@trips_cylinders_last_dive": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_boardEmpty": "Aucun bloc sur ce voyage pour l'instant",
+  "trips_cylinders_ledgerEmpty": "Aucun gonflage ni ajustement pour l'instant",
+  "trips_cylinders_kind_fill": "Gonflage",
+  "trips_cylinders_kind_adjustment": "Ajustement",
+  "trips_cylinders_deleteConfirmUnused": "Supprimer ce bloc et ses gonflages ?",
+  "trips_cylinders_deleteConfirmUsed": "{count, plural, one{Supprimer ce bloc et ses gonflages ? {count} plongée l'a utilisé. Elle garde son bloc ; seul le lien est retiré.} other{Supprimer ce bloc et ses gonflages ? {count} plongées l'ont utilisé. Elles gardent leurs blocs ; seul le lien est retiré.}}",
+  "@trips_cylinders_deleteConfirmUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_deleteEventConfirm": "Supprimer cette entrée ?",
+  "trips_cylinders_add_tabRental": "Location",
+  "trips_cylinders_add_tabOwned": "Mon équipement",
+  "trips_cylinders_add_count": "Combien",
+  "trips_cylinders_add_preset": "Type de bloc",
+  "trips_cylinders_add_prefix": "Préfixe du nom",
+  "trips_cylinders_add_prefixDefault": "Pick-up",
+  "trips_cylinders_add_noOwned": "Il ne reste aucun bloc de votre équipement à ajouter.",
+  "trips_cylinders_add_errorCount": "Saisissez un nombre de 1 à 20.",
+  "trips_cylinders_fill_titleEdit": "Modifier le gonflage",
+  "trips_cylinders_fill_when": "Quand",
+  "trips_cylinders_fill_where": "Station de gonflage",
+  "trips_cylinders_fill_whereNone": "Non défini",
+  "trips_cylinders_fill_pressure": "Pression de gonflage ({unit})",
+  "@trips_cylinders_fill_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_fill_o2": "O2 demandé (%)",
+  "trips_cylinders_fill_he": "He demandé (%)",
+  "trips_cylinders_fill_analyzedO2": "O2 analysé (%)",
+  "trips_cylinders_fill_analyzedHe": "He analysé (%)",
+  "trips_cylinders_fill_bottle": "Numéro du bloc",
+  "trips_cylinders_fill_cost": "Coût",
+  "trips_cylinders_fill_costEach": "Coût par bloc",
+  "trips_cylinders_fill_currency": "Devise",
+  "trips_cylinders_fill_package": "Inclus dans un forfait",
+  "trips_cylinders_fill_slots": "Blocs à gonfler",
+  "trips_cylinders_fill_errorMix": "L'oxygène doit être entre 1 et 100 pour cent, l'hélium entre 0 et 99, et les deux ensemble au plus 100.",
+  "trips_cylinders_fill_errorNoSlot": "Choisissez au moins un bloc.",
+  "trips_cylinders_note": "Note",
+  "trips_cylinders_adjust_titleEdit": "Modifier l'ajustement",
+  "trips_cylinders_adjust_pressure": "Pression ({unit})",
+  "@trips_cylinders_adjust_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_adjust_markEmpty": "Marquer vide",
+  "trips_cylinders_edit_title": "Modifier le bloc",
+  "trips_cylinders_edit_label": "Nom",
+  "trips_cylinders_edit_errorLabel": "Saisissez un nom.",
+  "trips_cylinders_edit_errorNeedsPressure": "Saisissez aussi la pression de service pour pouvoir convertir la taille.",
+  "trips_cylinders_edit_volume": "Taille ({unit})",
+  "@trips_cylinders_edit_volume": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_workingPressure": "Pression de service ({unit})",
+  "@trips_cylinders_edit_workingPressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_presetCustom": "Personnalisé",
   "trips_edit_label_disembarkPort": "Disembark Port",
   "trips_edit_label_embarkPort": "Embark Port",
   "trips_edit_label_endDate": "Date de fin",
@@ -9817,6 +9995,8 @@
   "dataQuality_msg_pressureSwap": "La pression de fin {end} est supérieure à la pression de début {start}",
   "dataQuality_msg_pressureEndpoint": "L'enregistrement du bloc indique {record}, mais la série du capteur montre {series}",
   "dataQuality_msg_pressureRise": "La pression a augmenté de {rise} en cours de plongée sans changement de gaz",
+  "dataQuality_msg_pressureDropout": "{count, plural, =1{Le capteur de pression a enregistré une valeur erronée une fois (perte ou pic)} other{Le capteur de pression a enregistré des valeurs erronées {count} fois (pertes ou pics)}}",
+  "dataQuality_msg_pressureMixed": "La série de pression mélange les relevés de deux sources",
   "dataQuality_msg_sac": "La consommation en surface implicite de {sac} est invraisemblable",
   "dataQuality_msg_ppo2": "La ppO2 a atteint {ppo2} avec {gas} à {depth}",
   "dataQuality_msg_hypoxic": "Mélange hypoxique ({gas}) indiqué comme utilisé en surface",
@@ -13325,28 +13505,46 @@
   "diveCenters_rental_noteLabel": "Note",
   "diveCenters_rental_deleteConfirm": "Supprimer cette note de location ?",
   "query_buddies_certifications": "Certifications",
+  "query_buddies_dives": "Plongées",
   "query_buddies_email": "E-mail",
   "query_buddies_favorite": "Favori",
   "query_buddies_name": "Nom",
   "query_buddies_notes": "Notes",
   "query_buddies_phone": "Téléphone",
+  "query_centers_affiliations": "Affiliations",
   "query_centers_city": "Ville",
+  "query_centers_coordinates": "Coordonnées",
   "query_centers_country": "Pays",
+  "query_centers_dives": "Plongées",
   "query_centers_name": "Nom",
+  "query_centers_notes": "Notes",
+  "query_centers_rating": "Note",
+  "query_centers_stateProvince": "État / Province",
   "query_certifications_agency": "Organisme",
+  "query_certifications_buddy": "Binôme",
   "query_certifications_cardNumber": "Numéro de carte",
+  "query_certifications_course": "Formation",
   "query_certifications_expiryDate": "Date d'expiration",
+  "query_certifications_instructor": "Instructeur",
   "query_certifications_instructorName": "Nom de l'instructeur",
+  "query_certifications_instructorNumber": "Numéro d'instructeur",
   "query_certifications_issueDate": "Date de délivrance",
   "query_certifications_level": "Niveau",
   "query_certifications_name": "Nom",
+  "query_certifications_notes": "Notes",
   "query_computers_manufacturer": "Fabricant",
   "query_computers_model": "Modèle",
   "query_computers_name": "Nom",
   "query_computers_serialNumber": "Numéro de série",
   "query_courses_agency": "Organisme",
+  "query_courses_certification": "Certification",
   "query_courses_completionDate": "Date de fin de formation",
+  "query_courses_dives": "Plongées",
+  "query_courses_instructor": "Instructeur",
+  "query_courses_instructorName": "Nom de l'instructeur",
+  "query_courses_location": "Lieu",
   "query_courses_name": "Nom",
+  "query_courses_notes": "Notes",
   "query_courses_startDate": "Date de début",
   "query_customFields_key": "Clé",
   "query_customFields_value": "Valeur",
@@ -13438,6 +13636,9 @@
   "query_equipment_status": "Statut",
   "query_equipment_tags": "Étiquettes",
   "query_equipment_type": "Type",
+  "query_filter_clear": "Effacer",
+  "query_filter_tooltip": "Filtre",
+  "query_list_noMatch": "Rien ne correspond à cette requête",
   "query_media_caption": "Légende",
   "query_media_favorite": "Favori",
   "query_media_type": "Type",
@@ -13459,9 +13660,15 @@
   "query_sites_region": "Région",
   "query_sites_tags": "Étiquettes",
   "query_sites_types": "Types de site",
+  "query_species_builtIn": "Prédéfini",
   "query_species_category": "Catégorie",
+  "query_species_description": "Description",
+  "query_species_dives": "Plongées",
+  "query_species_expectedSites": "Attendue sur les sites",
   "query_species_name": "Nom",
   "query_species_scientificName": "Nom scientifique",
+  "query_species_sightings": "Observations",
+  "query_species_taxonomyClass": "Classe taxonomique",
   "query_tags_name": "Nom",
   "query_tanks_cylinder": "Bloc",
   "query_tanks_endPressure": "Pression de fin",

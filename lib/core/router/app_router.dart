@@ -78,6 +78,7 @@ import 'package:submersion/features/media/presentation/pages/media_section_page.
 import 'package:submersion/features/trips/presentation/pages/trip_list_page.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_detail_page.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_edit_page.dart';
+import 'package:submersion/features/trips/presentation/pages/trip_cylinder_board_page.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_gallery_page.dart';
 import 'package:submersion/features/connections/presentation/connections_links.dart';
 import 'package:submersion/features/connections/presentation/pages/connections_page.dart';
@@ -868,6 +869,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) => TripGalleryPage(
                       tripId: state.pathParameters['tripId']!,
                       initialMediaId: state.uri.queryParameters['mediaId'],
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'cylinders',
+                    name: 'tripCylinders',
+                    builder: (context, state) => TripCylinderBoardPage(
+                      tripId: state.pathParameters['tripId']!,
                     ),
                   ),
                 ],

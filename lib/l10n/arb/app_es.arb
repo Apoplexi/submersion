@@ -6879,6 +6879,8 @@
   "tides_source_sheetTitle": "Fuente de datos de mareas",
   "tides_source_datumMllw": "Alturas relativas a MLLW (datum de la estación)",
   "tides_source_datumMsl": "Alturas relativas al nivel medio del mar",
+  "tides_source_siteLocalTime": "Las horas se muestran en la hora local del punto de buceo.",
+  "tides_source_modelResolution": "Cuadrícula del modelo oceánico de {distance}",
   "tides_title": "Mareas",
   "tools_gpsLogger_description": "Graba tu posición durante un día de buceo y empareja automáticamente las inmersiones importadas con ubicaciones GPS.",
   "tools_gpsLogger_subtitle": "Graba un track de superficie",
@@ -7211,6 +7213,182 @@
       }
     }
   },
+  "trips_cylinders_title": "Botellas",
+  "trips_cylinders_summary": "Llenas {full} · Parciales {partial} · Vacías {empty}",
+  "@trips_cylinders_summary": {
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "empty": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_summaryUnfilled": "Sin llenar {count}",
+  "@trips_cylinders_summaryUnfilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_setUp": "Configurar botellas",
+  "trips_cylinders_setUpHint": "Controla las botellas que tienes en este viaje: cargas, mezclas y lo que queda en cada una.",
+  "trips_cylinders_status_full": "Llena",
+  "trips_cylinders_status_partial": "Parcial",
+  "trips_cylinders_status_empty": "Vacía",
+  "trips_cylinders_status_unknown": "Sin llenar",
+  "trips_cylinders_mixAir": "Aire",
+  "trips_cylinders_segment_board": "Tablero",
+  "trips_cylinders_segment_ledger": "Registro",
+  "trips_cylinders_action_add": "Añadir botellas",
+  "trips_cylinders_action_fill": "Cargar",
+  "trips_cylinders_action_fillSeveral": "Cargar varias",
+  "trips_cylinders_action_adjust": "Ajustar",
+  "trips_cylinders_bottle": "Botella {label}",
+  "@trips_cylinders_bottle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_linkedDives": "{count, plural, one{{count} inmersión} other{{count} inmersiones}}",
+  "@trips_cylinders_linkedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_last_fillAt": "Cargada en {place}, {when}",
+  "@trips_cylinders_last_fillAt": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_fill": "Cargada {when}",
+  "@trips_cylinders_last_fill": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_adjustment": "Ajustada {when}",
+  "@trips_cylinders_last_adjustment": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_diveAt": "Buceo en {site}, {when}",
+  "@trips_cylinders_last_diveAt": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_dive": "Buceo {when}",
+  "@trips_cylinders_last_dive": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_boardEmpty": "Aún no hay botellas en este viaje",
+  "trips_cylinders_ledgerEmpty": "Aún no hay cargas ni ajustes",
+  "trips_cylinders_kind_fill": "Carga",
+  "trips_cylinders_kind_adjustment": "Ajuste",
+  "trips_cylinders_deleteConfirmUnused": "¿Eliminar esta botella y sus cargas?",
+  "trips_cylinders_deleteConfirmUsed": "{count, plural, one{¿Eliminar esta botella y sus cargas? Está enlazada a {count} inmersión, que conserva su botella; solo se quita el vínculo.} other{¿Eliminar esta botella y sus cargas? Está enlazada a {count} inmersiones, que conservan sus botellas; solo se quita el vínculo.}}",
+  "@trips_cylinders_deleteConfirmUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_deleteEventConfirm": "¿Eliminar esta entrada?",
+  "trips_cylinders_add_tabRental": "Alquiler",
+  "trips_cylinders_add_tabOwned": "De mi equipo",
+  "trips_cylinders_add_count": "Cuántas",
+  "trips_cylinders_add_preset": "Tipo de botella",
+  "trips_cylinders_add_prefix": "Prefijo de la etiqueta",
+  "trips_cylinders_add_prefixDefault": "Camioneta",
+  "trips_cylinders_add_noOwned": "No quedan botellas de tu equipo por añadir.",
+  "trips_cylinders_add_errorCount": "Introduce un número del 1 al 20.",
+  "trips_cylinders_fill_titleEdit": "Editar carga",
+  "trips_cylinders_fill_when": "Cuándo",
+  "trips_cylinders_fill_where": "Estación de carga",
+  "trips_cylinders_fill_whereNone": "Sin definir",
+  "trips_cylinders_fill_pressure": "Presión de carga ({unit})",
+  "@trips_cylinders_fill_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_fill_o2": "O2 pedido (%)",
+  "trips_cylinders_fill_he": "He pedido (%)",
+  "trips_cylinders_fill_analyzedO2": "O2 analizado (%)",
+  "trips_cylinders_fill_analyzedHe": "He analizado (%)",
+  "trips_cylinders_fill_bottle": "Número de botella",
+  "trips_cylinders_fill_cost": "Coste",
+  "trips_cylinders_fill_costEach": "Coste por botella",
+  "trips_cylinders_fill_currency": "Moneda",
+  "trips_cylinders_fill_package": "Incluida en un paquete",
+  "trips_cylinders_fill_slots": "Botellas a cargar",
+  "trips_cylinders_fill_errorMix": "El oxígeno debe estar entre 1 y 100 por ciento, el helio entre 0 y 99, y juntos como máximo 100.",
+  "trips_cylinders_fill_errorNoSlot": "Elige al menos una botella.",
+  "trips_cylinders_note": "Nota",
+  "trips_cylinders_adjust_titleEdit": "Editar ajuste",
+  "trips_cylinders_adjust_pressure": "Presión ({unit})",
+  "@trips_cylinders_adjust_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_adjust_markEmpty": "Marcar como vacía",
+  "trips_cylinders_edit_title": "Editar botella",
+  "trips_cylinders_edit_label": "Etiqueta",
+  "trips_cylinders_edit_errorLabel": "Introduce una etiqueta.",
+  "trips_cylinders_edit_errorNeedsPressure": "Introduce también la presión de trabajo para poder convertir el tamaño.",
+  "trips_cylinders_edit_volume": "Tamaño ({unit})",
+  "@trips_cylinders_edit_volume": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_workingPressure": "Presión de trabajo ({unit})",
+  "@trips_cylinders_edit_workingPressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_presetCustom": "Personalizada",
   "trips_edit_label_disembarkPort": "Disembark Port",
   "trips_edit_label_embarkPort": "Embark Port",
   "trips_edit_label_endDate": "Fecha de fin",
@@ -9817,6 +9995,8 @@
   "dataQuality_msg_pressureSwap": "La presión final {end} es mayor que la presión inicial {start}",
   "dataQuality_msg_pressureEndpoint": "El registro del tanque indica {record}, pero la serie del sensor muestra {series}",
   "dataQuality_msg_pressureRise": "La presión subió {rise} a mitad de la inmersión sin cambio de gas",
+  "dataQuality_msg_pressureDropout": "{count, plural, =1{El sensor de presión registró una lectura errónea una vez (pérdida o pico)} other{El sensor de presión registró lecturas erróneas {count} veces (pérdidas o picos)}}",
+  "dataQuality_msg_pressureMixed": "La serie de presión mezcla las lecturas de dos fuentes",
   "dataQuality_msg_sac": "El consumo en superficie implícito de {sac} es inverosímil",
   "dataQuality_msg_ppo2": "La ppO2 alcanzó {ppo2} con {gas} a {depth}",
   "dataQuality_msg_hypoxic": "Mezcla hipóxica ({gas}) mostrada en uso en la superficie",
@@ -13325,28 +13505,46 @@
   "diveCenters_rental_noteLabel": "Nota",
   "diveCenters_rental_deleteConfirm": "¿Eliminar esta nota de alquiler?",
   "query_buddies_certifications": "Certificaciones",
+  "query_buddies_dives": "Inmersiones",
   "query_buddies_email": "Correo electrónico",
   "query_buddies_favorite": "Favorito",
   "query_buddies_name": "Nombre",
   "query_buddies_notes": "Notas",
   "query_buddies_phone": "Teléfono",
+  "query_centers_affiliations": "Afiliaciones",
   "query_centers_city": "Ciudad",
+  "query_centers_coordinates": "Coordenadas",
   "query_centers_country": "País",
+  "query_centers_dives": "Inmersiones",
   "query_centers_name": "Nombre",
+  "query_centers_notes": "Notas",
+  "query_centers_rating": "Valoración",
+  "query_centers_stateProvince": "Estado / Provincia",
   "query_certifications_agency": "Agencia",
+  "query_certifications_buddy": "Compañero",
   "query_certifications_cardNumber": "Número de tarjeta",
+  "query_certifications_course": "Curso",
   "query_certifications_expiryDate": "Fecha de caducidad",
+  "query_certifications_instructor": "Instructor",
   "query_certifications_instructorName": "Nombre del instructor",
+  "query_certifications_instructorNumber": "Número de instructor",
   "query_certifications_issueDate": "Fecha de emisión",
   "query_certifications_level": "Nivel",
   "query_certifications_name": "Nombre",
+  "query_certifications_notes": "Notas",
   "query_computers_manufacturer": "Fabricante",
   "query_computers_model": "Modelo",
   "query_computers_name": "Nombre",
   "query_computers_serialNumber": "Número de serie",
   "query_courses_agency": "Agencia",
+  "query_courses_certification": "Certificación",
   "query_courses_completionDate": "Fecha de finalización",
+  "query_courses_dives": "Inmersiones",
+  "query_courses_instructor": "Instructor",
+  "query_courses_instructorName": "Nombre del instructor",
+  "query_courses_location": "Ubicación",
   "query_courses_name": "Nombre",
+  "query_courses_notes": "Notas",
   "query_courses_startDate": "Fecha de inicio",
   "query_customFields_key": "Clave",
   "query_customFields_value": "Valor",
@@ -13438,6 +13636,9 @@
   "query_equipment_status": "Estado",
   "query_equipment_tags": "Etiquetas",
   "query_equipment_type": "Tipo",
+  "query_filter_clear": "Borrar",
+  "query_filter_tooltip": "Filtro",
+  "query_list_noMatch": "Nada coincide con esta consulta",
   "query_media_caption": "Descripción",
   "query_media_favorite": "Favorito",
   "query_media_type": "Tipo",
@@ -13459,9 +13660,15 @@
   "query_sites_region": "Región",
   "query_sites_tags": "Etiquetas",
   "query_sites_types": "Tipos de punto",
+  "query_species_builtIn": "Predefinido",
   "query_species_category": "Categoría",
+  "query_species_description": "Descripción",
+  "query_species_dives": "Inmersiones",
+  "query_species_expectedSites": "Esperada en sitios",
   "query_species_name": "Nombre",
   "query_species_scientificName": "Nombre científico",
+  "query_species_sightings": "Avistamientos",
+  "query_species_taxonomyClass": "Clase taxonómica",
   "query_tags_name": "Nombre",
   "query_tanks_cylinder": "Botella",
   "query_tanks_endPressure": "Presión final",

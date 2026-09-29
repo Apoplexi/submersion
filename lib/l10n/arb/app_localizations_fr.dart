@@ -24331,6 +24331,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Hauteurs par rapport au niveau moyen de la mer';
 
   @override
+  String get tides_source_siteLocalTime =>
+      'Les heures sont affichées à l\'heure locale du site de plongée.';
+
+  @override
+  String tides_source_modelResolution(String distance) {
+    return 'Grille du modèle océanique de $distance';
+  }
+
+  @override
   String get tides_title => 'Marées';
 
   @override
@@ -25472,6 +25481,253 @@ class AppLocalizationsFr extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count recycleurs, la plus faible marge de chaux est de $minutes min';
   }
+
+  @override
+  String get trips_cylinders_title => 'Blocs';
+
+  @override
+  String trips_cylinders_summary(int full, int partial, int empty) {
+    return 'Pleins $full · Entamés $partial · Vides $empty';
+  }
+
+  @override
+  String trips_cylinders_summaryUnfilled(int count) {
+    return 'Pas encore gonflés $count';
+  }
+
+  @override
+  String get trips_cylinders_setUp => 'Configurer les blocs';
+
+  @override
+  String get trips_cylinders_setUpHint =>
+      'Suivez les blocs que vous avez sur ce voyage : gonflages, mélanges et ce qu\'il reste dans chacun.';
+
+  @override
+  String get trips_cylinders_status_full => 'Plein';
+
+  @override
+  String get trips_cylinders_status_partial => 'Entamé';
+
+  @override
+  String get trips_cylinders_status_empty => 'Vide';
+
+  @override
+  String get trips_cylinders_status_unknown => 'Pas encore gonflé';
+
+  @override
+  String get trips_cylinders_mixAir => 'Air';
+
+  @override
+  String get trips_cylinders_segment_board => 'Tableau';
+
+  @override
+  String get trips_cylinders_segment_ledger => 'Journal';
+
+  @override
+  String get trips_cylinders_action_add => 'Ajouter des blocs';
+
+  @override
+  String get trips_cylinders_action_fill => 'Gonfler';
+
+  @override
+  String get trips_cylinders_action_fillSeveral => 'Gonfler plusieurs';
+
+  @override
+  String get trips_cylinders_action_adjust => 'Ajuster';
+
+  @override
+  String trips_cylinders_bottle(String label) {
+    return 'Bloc $label';
+  }
+
+  @override
+  String trips_cylinders_linkedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées',
+      one: '$count plongée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_last_fillAt(String place, String when) {
+    return 'Gonflé chez $place, $when';
+  }
+
+  @override
+  String trips_cylinders_last_fill(String when) {
+    return 'Gonflé $when';
+  }
+
+  @override
+  String trips_cylinders_last_adjustment(String when) {
+    return 'Ajusté $when';
+  }
+
+  @override
+  String trips_cylinders_last_diveAt(String site, String when) {
+    return 'Plongée à $site, $when';
+  }
+
+  @override
+  String trips_cylinders_last_dive(String when) {
+    return 'Plongée $when';
+  }
+
+  @override
+  String get trips_cylinders_boardEmpty =>
+      'Aucun bloc sur ce voyage pour l\'instant';
+
+  @override
+  String get trips_cylinders_ledgerEmpty =>
+      'Aucun gonflage ni ajustement pour l\'instant';
+
+  @override
+  String get trips_cylinders_kind_fill => 'Gonflage';
+
+  @override
+  String get trips_cylinders_kind_adjustment => 'Ajustement';
+
+  @override
+  String get trips_cylinders_deleteConfirmUnused =>
+      'Supprimer ce bloc et ses gonflages ?';
+
+  @override
+  String trips_cylinders_deleteConfirmUsed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Supprimer ce bloc et ses gonflages ? $count plongées l\'ont utilisé. Elles gardent leurs blocs ; seul le lien est retiré.',
+      one:
+          'Supprimer ce bloc et ses gonflages ? $count plongée l\'a utilisé. Elle garde son bloc ; seul le lien est retiré.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_deleteEventConfirm => 'Supprimer cette entrée ?';
+
+  @override
+  String get trips_cylinders_add_tabRental => 'Location';
+
+  @override
+  String get trips_cylinders_add_tabOwned => 'Mon équipement';
+
+  @override
+  String get trips_cylinders_add_count => 'Combien';
+
+  @override
+  String get trips_cylinders_add_preset => 'Type de bloc';
+
+  @override
+  String get trips_cylinders_add_prefix => 'Préfixe du nom';
+
+  @override
+  String get trips_cylinders_add_prefixDefault => 'Pick-up';
+
+  @override
+  String get trips_cylinders_add_noOwned =>
+      'Il ne reste aucun bloc de votre équipement à ajouter.';
+
+  @override
+  String get trips_cylinders_add_errorCount => 'Saisissez un nombre de 1 à 20.';
+
+  @override
+  String get trips_cylinders_fill_titleEdit => 'Modifier le gonflage';
+
+  @override
+  String get trips_cylinders_fill_when => 'Quand';
+
+  @override
+  String get trips_cylinders_fill_where => 'Station de gonflage';
+
+  @override
+  String get trips_cylinders_fill_whereNone => 'Non défini';
+
+  @override
+  String trips_cylinders_fill_pressure(String unit) {
+    return 'Pression de gonflage ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_fill_o2 => 'O2 demandé (%)';
+
+  @override
+  String get trips_cylinders_fill_he => 'He demandé (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedO2 => 'O2 analysé (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedHe => 'He analysé (%)';
+
+  @override
+  String get trips_cylinders_fill_bottle => 'Numéro du bloc';
+
+  @override
+  String get trips_cylinders_fill_cost => 'Coût';
+
+  @override
+  String get trips_cylinders_fill_costEach => 'Coût par bloc';
+
+  @override
+  String get trips_cylinders_fill_currency => 'Devise';
+
+  @override
+  String get trips_cylinders_fill_package => 'Inclus dans un forfait';
+
+  @override
+  String get trips_cylinders_fill_slots => 'Blocs à gonfler';
+
+  @override
+  String get trips_cylinders_fill_errorMix =>
+      'L\'oxygène doit être entre 1 et 100 pour cent, l\'hélium entre 0 et 99, et les deux ensemble au plus 100.';
+
+  @override
+  String get trips_cylinders_fill_errorNoSlot => 'Choisissez au moins un bloc.';
+
+  @override
+  String get trips_cylinders_note => 'Note';
+
+  @override
+  String get trips_cylinders_adjust_titleEdit => 'Modifier l\'ajustement';
+
+  @override
+  String trips_cylinders_adjust_pressure(String unit) {
+    return 'Pression ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_adjust_markEmpty => 'Marquer vide';
+
+  @override
+  String get trips_cylinders_edit_title => 'Modifier le bloc';
+
+  @override
+  String get trips_cylinders_edit_label => 'Nom';
+
+  @override
+  String get trips_cylinders_edit_errorLabel => 'Saisissez un nom.';
+
+  @override
+  String get trips_cylinders_edit_errorNeedsPressure =>
+      'Saisissez aussi la pression de service pour pouvoir convertir la taille.';
+
+  @override
+  String trips_cylinders_edit_volume(String unit) {
+    return 'Taille ($unit)';
+  }
+
+  @override
+  String trips_cylinders_edit_workingPressure(String unit) {
+    return 'Pression de service ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_edit_presetCustom => 'Personnalisé';
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => 'Embark / Disembark';
@@ -32856,6 +33112,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String dataQuality_msg_pressureRise(String rise) {
     return 'La pression a augmenté de $rise en cours de plongée sans changement de gaz';
   }
+
+  @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Le capteur de pression a enregistré des valeurs erronées $count fois (pertes ou pics)',
+      one:
+          'Le capteur de pression a enregistré une valeur erronée une fois (perte ou pic)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'La série de pression mélange les relevés de deux sources';
 
   @override
   String dataQuality_msg_sac(String sac) {
@@ -45186,6 +45459,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_buddies_certifications => 'Certifications';
 
   @override
+  String get query_buddies_dives => 'Plongées';
+
+  @override
   String get query_buddies_email => 'E-mail';
 
   @override
@@ -45201,25 +45477,55 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_buddies_phone => 'Téléphone';
 
   @override
+  String get query_centers_affiliations => 'Affiliations';
+
+  @override
   String get query_centers_city => 'Ville';
+
+  @override
+  String get query_centers_coordinates => 'Coordonnées';
 
   @override
   String get query_centers_country => 'Pays';
 
   @override
+  String get query_centers_dives => 'Plongées';
+
+  @override
   String get query_centers_name => 'Nom';
+
+  @override
+  String get query_centers_notes => 'Notes';
+
+  @override
+  String get query_centers_rating => 'Note';
+
+  @override
+  String get query_centers_stateProvince => 'État / Province';
 
   @override
   String get query_certifications_agency => 'Organisme';
 
   @override
+  String get query_certifications_buddy => 'Binôme';
+
+  @override
   String get query_certifications_cardNumber => 'Numéro de carte';
+
+  @override
+  String get query_certifications_course => 'Formation';
 
   @override
   String get query_certifications_expiryDate => 'Date d\'expiration';
 
   @override
+  String get query_certifications_instructor => 'Instructeur';
+
+  @override
   String get query_certifications_instructorName => 'Nom de l\'instructeur';
+
+  @override
+  String get query_certifications_instructorNumber => 'Numéro d\'instructeur';
 
   @override
   String get query_certifications_issueDate => 'Date de délivrance';
@@ -45229,6 +45535,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'Nom';
+
+  @override
+  String get query_certifications_notes => 'Notes';
 
   @override
   String get query_computers_manufacturer => 'Fabricant';
@@ -45246,10 +45555,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_courses_agency => 'Organisme';
 
   @override
+  String get query_courses_certification => 'Certification';
+
+  @override
   String get query_courses_completionDate => 'Date de fin de formation';
 
   @override
+  String get query_courses_dives => 'Plongées';
+
+  @override
+  String get query_courses_instructor => 'Instructeur';
+
+  @override
+  String get query_courses_instructorName => 'Nom de l\'instructeur';
+
+  @override
+  String get query_courses_location => 'Lieu';
+
+  @override
   String get query_courses_name => 'Nom';
+
+  @override
+  String get query_courses_notes => 'Notes';
 
   @override
   String get query_courses_startDate => 'Date de début';
@@ -45525,6 +45852,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_equipment_type => 'Type';
 
   @override
+  String get query_filter_clear => 'Effacer';
+
+  @override
+  String get query_filter_tooltip => 'Filtre';
+
+  @override
+  String get query_list_noMatch => 'Rien ne correspond à cette requête';
+
+  @override
   String get query_media_caption => 'Légende';
 
   @override
@@ -45588,13 +45924,31 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_sites_types => 'Types de site';
 
   @override
+  String get query_species_builtIn => 'Prédéfini';
+
+  @override
   String get query_species_category => 'Catégorie';
+
+  @override
+  String get query_species_description => 'Description';
+
+  @override
+  String get query_species_dives => 'Plongées';
+
+  @override
+  String get query_species_expectedSites => 'Attendue sur les sites';
 
   @override
   String get query_species_name => 'Nom';
 
   @override
   String get query_species_scientificName => 'Nom scientifique';
+
+  @override
+  String get query_species_sightings => 'Observations';
+
+  @override
+  String get query_species_taxonomyClass => 'Classe taxonomique';
 
   @override
   String get query_tags_name => 'Nom';

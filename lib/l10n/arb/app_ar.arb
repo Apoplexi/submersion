@@ -6879,6 +6879,8 @@
   "tides_source_sheetTitle": "مصدر بيانات المد والجزر",
   "tides_source_datumMllw": "الارتفاعات نسبة إلى MLLW (مرجع المحطة)",
   "tides_source_datumMsl": "الارتفاعات نسبة إلى متوسط مستوى سطح البحر",
+  "tides_source_siteLocalTime": "تُعرض الأوقات بالتوقيت المحلي لموقع الغوص.",
+  "tides_source_modelResolution": "شبكة نموذج المحيط بدقة {distance}",
   "tides_title": "المد والجزر",
   "tools_gpsLogger_description": "سجّل موقعك خلال يوم الغطس وتتم مطابقة الغطسات المستوردة مع مواقع GPS تلقائيًا.",
   "tools_gpsLogger_subtitle": "تسجيل مسار السطح",
@@ -7211,6 +7213,182 @@
       }
     }
   },
+  "trips_cylinders_title": "الأسطوانات",
+  "trips_cylinders_summary": "ممتلئة {full} · جزئية {partial} · فارغة {empty}",
+  "@trips_cylinders_summary": {
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "empty": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_summaryUnfilled": "لم تُعبّأ بعد {count}",
+  "@trips_cylinders_summaryUnfilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_setUp": "إعداد الأسطوانات",
+  "trips_cylinders_setUpHint": "تتبّع الأسطوانات التي معك في هذه الرحلة: التعبئات والخلطات وما تبقّى في كل منها.",
+  "trips_cylinders_status_full": "ممتلئة",
+  "trips_cylinders_status_partial": "جزئية",
+  "trips_cylinders_status_empty": "فارغة",
+  "trips_cylinders_status_unknown": "لم تُعبّأ بعد",
+  "trips_cylinders_mixAir": "هواء",
+  "trips_cylinders_segment_board": "اللوحة",
+  "trips_cylinders_segment_ledger": "السجل",
+  "trips_cylinders_action_add": "إضافة أسطوانات",
+  "trips_cylinders_action_fill": "تعبئة",
+  "trips_cylinders_action_fillSeveral": "تعبئة عدة أسطوانات",
+  "trips_cylinders_action_adjust": "تعديل",
+  "trips_cylinders_bottle": "الأسطوانة {label}",
+  "@trips_cylinders_bottle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_linkedDives": "{count, plural, one{{count} غطسة} other{{count} غطسات}}",
+  "@trips_cylinders_linkedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_last_fillAt": "عُبّئت في {place}، {when}",
+  "@trips_cylinders_last_fillAt": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_fill": "عُبّئت {when}",
+  "@trips_cylinders_last_fill": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_adjustment": "عُدّلت {when}",
+  "@trips_cylinders_last_adjustment": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_diveAt": "غطسة في {site}، {when}",
+  "@trips_cylinders_last_diveAt": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_dive": "غطسة {when}",
+  "@trips_cylinders_last_dive": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_boardEmpty": "لا توجد أسطوانات في هذه الرحلة بعد",
+  "trips_cylinders_ledgerEmpty": "لا توجد تعبئات أو تعديلات بعد",
+  "trips_cylinders_kind_fill": "تعبئة",
+  "trips_cylinders_kind_adjustment": "تعديل",
+  "trips_cylinders_deleteConfirmUnused": "حذف هذه الأسطوانة وتعبئاتها؟",
+  "trips_cylinders_deleteConfirmUsed": "{count, plural, one{حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها {count} غطسة. تحتفظ الغطسة بأسطوانتها ويُزال الربط فقط.} other{حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها {count} غطسات. تحتفظ الغطسات بأسطواناتها ويُزال الربط فقط.}}",
+  "@trips_cylinders_deleteConfirmUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_deleteEventConfirm": "حذف هذا الإدخال؟",
+  "trips_cylinders_add_tabRental": "مستأجرة",
+  "trips_cylinders_add_tabOwned": "من معداتي",
+  "trips_cylinders_add_count": "العدد",
+  "trips_cylinders_add_preset": "نوع الأسطوانة",
+  "trips_cylinders_add_prefix": "بادئة الاسم",
+  "trips_cylinders_add_prefixDefault": "الشاحنة",
+  "trips_cylinders_add_noOwned": "لم تعد هناك أسطوانات في معداتك لإضافتها.",
+  "trips_cylinders_add_errorCount": "أدخل رقمًا من 1 إلى 20.",
+  "trips_cylinders_fill_titleEdit": "تعديل التعبئة",
+  "trips_cylinders_fill_when": "متى",
+  "trips_cylinders_fill_where": "محطة التعبئة",
+  "trips_cylinders_fill_whereNone": "غير محددة",
+  "trips_cylinders_fill_pressure": "ضغط التعبئة ({unit})",
+  "@trips_cylinders_fill_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_fill_o2": "O2 المطلوب (%)",
+  "trips_cylinders_fill_he": "He المطلوب (%)",
+  "trips_cylinders_fill_analyzedO2": "O2 المقاس (%)",
+  "trips_cylinders_fill_analyzedHe": "He المقاس (%)",
+  "trips_cylinders_fill_bottle": "رقم الأسطوانة",
+  "trips_cylinders_fill_cost": "التكلفة",
+  "trips_cylinders_fill_costEach": "التكلفة لكل أسطوانة",
+  "trips_cylinders_fill_currency": "العملة",
+  "trips_cylinders_fill_package": "ضمن باقة",
+  "trips_cylinders_fill_slots": "الأسطوانات المراد تعبئتها",
+  "trips_cylinders_fill_errorMix": "يجب أن يكون الأكسجين بين 1 و100 بالمئة، والهيليوم بين 0 و99، ومجموعهما 100 على الأكثر.",
+  "trips_cylinders_fill_errorNoSlot": "اختر أسطوانة واحدة على الأقل.",
+  "trips_cylinders_note": "ملاحظة",
+  "trips_cylinders_adjust_titleEdit": "تعديل التصحيح",
+  "trips_cylinders_adjust_pressure": "الضغط ({unit})",
+  "@trips_cylinders_adjust_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_adjust_markEmpty": "تعليم كفارغة",
+  "trips_cylinders_edit_title": "تعديل الأسطوانة",
+  "trips_cylinders_edit_label": "الاسم",
+  "trips_cylinders_edit_errorLabel": "أدخل اسمًا.",
+  "trips_cylinders_edit_errorNeedsPressure": "أدخل ضغط العمل أيضًا حتى يمكن تحويل الحجم.",
+  "trips_cylinders_edit_volume": "الحجم ({unit})",
+  "@trips_cylinders_edit_volume": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_workingPressure": "ضغط العمل ({unit})",
+  "@trips_cylinders_edit_workingPressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_presetCustom": "مخصص",
   "trips_edit_label_disembarkPort": "Disembark Port",
   "trips_edit_label_embarkPort": "Embark Port",
   "trips_edit_label_endDate": "تاريخ الانتهاء",
@@ -9817,6 +9995,8 @@
   "dataQuality_msg_pressureSwap": "ضغط النهاية {end} أعلى من ضغط البداية {start}",
   "dataQuality_msg_pressureEndpoint": "يذكر سجل الأسطوانة {record} لكن سلسلة المستشعر تُظهر {series}",
   "dataQuality_msg_pressureRise": "ارتفع الضغط {rise} في منتصف الغوصة دون تبديل للغاز",
+  "dataQuality_msg_pressureDropout": "{count, plural, =1{سجّل مستشعر الضغط قراءة خاطئة مرة واحدة (انقطاع أو قفزة)} other{سجّل مستشعر الضغط قراءات خاطئة {count} مرات (انقطاعات أو قفزات)}}",
+  "dataQuality_msg_pressureMixed": "تمزج سلسلة الضغط قراءات مصدرين",
   "dataQuality_msg_sac": "معدل الاستهلاك السطحي الضمني {sac} غير معقول",
   "dataQuality_msg_ppo2": "بلغ ppO2 القيمة {ppo2} على {gas} عند {depth}",
   "dataQuality_msg_hypoxic": "يظهر خليط ناقص الأكسجين ({gas}) قيد الاستخدام عند السطح",
@@ -13325,28 +13505,46 @@
   "diveCenters_rental_noteLabel": "ملاحظة",
   "diveCenters_rental_deleteConfirm": "حذف ملاحظة التأجير هذه؟",
   "query_buddies_certifications": "الشهادات",
+  "query_buddies_dives": "الغطسات",
   "query_buddies_email": "البريد الإلكتروني",
   "query_buddies_favorite": "مفضّل",
   "query_buddies_name": "الاسم",
   "query_buddies_notes": "ملاحظات",
   "query_buddies_phone": "الهاتف",
+  "query_centers_affiliations": "الانتماءات",
   "query_centers_city": "المدينة",
+  "query_centers_coordinates": "الإحداثيات",
   "query_centers_country": "البلد",
+  "query_centers_dives": "الغطسات",
   "query_centers_name": "الاسم",
+  "query_centers_notes": "ملاحظات",
+  "query_centers_rating": "التقييم",
+  "query_centers_stateProvince": "الولاية / المقاطعة",
   "query_certifications_agency": "الهيئة",
+  "query_certifications_buddy": "زميل الغوص",
   "query_certifications_cardNumber": "رقم البطاقة",
+  "query_certifications_course": "الدورة",
   "query_certifications_expiryDate": "تاريخ الانتهاء",
+  "query_certifications_instructor": "المدرب",
   "query_certifications_instructorName": "اسم المدرب",
+  "query_certifications_instructorNumber": "رقم المدرب",
   "query_certifications_issueDate": "تاريخ الإصدار",
   "query_certifications_level": "المستوى",
   "query_certifications_name": "الاسم",
+  "query_certifications_notes": "ملاحظات",
   "query_computers_manufacturer": "الشركة المصنعة",
   "query_computers_model": "الطراز",
   "query_computers_name": "الاسم",
   "query_computers_serialNumber": "الرقم التسلسلي",
   "query_courses_agency": "الهيئة",
+  "query_courses_certification": "الاعتماد",
   "query_courses_completionDate": "تاريخ الإكمال",
+  "query_courses_dives": "الغطسات",
+  "query_courses_instructor": "المدرب",
+  "query_courses_instructorName": "اسم المدرب",
+  "query_courses_location": "الموقع",
   "query_courses_name": "الاسم",
+  "query_courses_notes": "ملاحظات",
   "query_courses_startDate": "تاريخ البدء",
   "query_customFields_key": "المفتاح",
   "query_customFields_value": "القيمة",
@@ -13438,6 +13636,9 @@
   "query_equipment_status": "الحالة",
   "query_equipment_tags": "الوسوم",
   "query_equipment_type": "النوع",
+  "query_filter_clear": "مسح",
+  "query_filter_tooltip": "التصفية",
+  "query_list_noMatch": "لا شيء يطابق هذا الاستعلام",
   "query_media_caption": "التعليق",
   "query_media_favorite": "مفضّل",
   "query_media_type": "النوع",
@@ -13459,9 +13660,15 @@
   "query_sites_region": "المنطقة",
   "query_sites_tags": "الوسوم",
   "query_sites_types": "أنواع الموقع",
+  "query_species_builtIn": "مدمج",
   "query_species_category": "الفئة",
+  "query_species_description": "الوصف",
+  "query_species_dives": "الغطسات",
+  "query_species_expectedSites": "متوقع في المواقع",
   "query_species_name": "الاسم",
   "query_species_scientificName": "الاسم العلمي",
+  "query_species_sightings": "المشاهدات",
+  "query_species_taxonomyClass": "الصنف التصنيفي",
   "query_tags_name": "الاسم",
   "query_tanks_cylinder": "الأسطوانة",
   "query_tanks_endPressure": "ضغط النهاية",

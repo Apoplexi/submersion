@@ -24193,6 +24193,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Höhen relativ zum mittleren Meeresspiegel';
 
   @override
+  String get tides_source_siteLocalTime =>
+      'Zeiten werden in der Ortszeit des Tauchplatzes angezeigt.';
+
+  @override
+  String tides_source_modelResolution(String distance) {
+    return 'Ozeanmodell-Raster mit $distance';
+  }
+
+  @override
   String get tides_title => 'Gezeiten';
 
   @override
@@ -25327,6 +25336,255 @@ class AppLocalizationsDe extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count Rebreather, niedrigste Atemkalkreserve $minutes min';
   }
+
+  @override
+  String get trips_cylinders_title => 'Flaschen';
+
+  @override
+  String trips_cylinders_summary(int full, int partial, int empty) {
+    return 'Voll $full · Teilweise $partial · Leer $empty';
+  }
+
+  @override
+  String trips_cylinders_summaryUnfilled(int count) {
+    return 'Noch nicht gefüllt $count';
+  }
+
+  @override
+  String get trips_cylinders_setUp => 'Flaschen einrichten';
+
+  @override
+  String get trips_cylinders_setUpHint =>
+      'Verfolge die Flaschen, die du auf dieser Reise hast: Füllungen, Gemische und was in jeder übrig ist.';
+
+  @override
+  String get trips_cylinders_status_full => 'Voll';
+
+  @override
+  String get trips_cylinders_status_partial => 'Teilweise';
+
+  @override
+  String get trips_cylinders_status_empty => 'Leer';
+
+  @override
+  String get trips_cylinders_status_unknown => 'Noch nicht gefüllt';
+
+  @override
+  String get trips_cylinders_mixAir => 'Luft';
+
+  @override
+  String get trips_cylinders_segment_board => 'Übersicht';
+
+  @override
+  String get trips_cylinders_segment_ledger => 'Verlauf';
+
+  @override
+  String get trips_cylinders_action_add => 'Flaschen hinzufügen';
+
+  @override
+  String get trips_cylinders_action_fill => 'Füllen';
+
+  @override
+  String get trips_cylinders_action_fillSeveral => 'Mehrere füllen';
+
+  @override
+  String get trips_cylinders_action_adjust => 'Anpassen';
+
+  @override
+  String trips_cylinders_bottle(String label) {
+    return 'Flasche $label';
+  }
+
+  @override
+  String trips_cylinders_linkedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge',
+      one: '$count Tauchgang',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_last_fillAt(String place, String when) {
+    return 'Gefüllt bei $place, $when';
+  }
+
+  @override
+  String trips_cylinders_last_fill(String when) {
+    return 'Gefüllt $when';
+  }
+
+  @override
+  String trips_cylinders_last_adjustment(String when) {
+    return 'Angepasst $when';
+  }
+
+  @override
+  String trips_cylinders_last_diveAt(String site, String when) {
+    return 'Getaucht bei $site, $when';
+  }
+
+  @override
+  String trips_cylinders_last_dive(String when) {
+    return 'Getaucht $when';
+  }
+
+  @override
+  String get trips_cylinders_boardEmpty =>
+      'Noch keine Flaschen auf dieser Reise';
+
+  @override
+  String get trips_cylinders_ledgerEmpty =>
+      'Noch keine Füllungen oder Anpassungen';
+
+  @override
+  String get trips_cylinders_kind_fill => 'Füllung';
+
+  @override
+  String get trips_cylinders_kind_adjustment => 'Anpassung';
+
+  @override
+  String get trips_cylinders_deleteConfirmUnused =>
+      'Diese Flasche und ihre Füllungen löschen?';
+
+  @override
+  String trips_cylinders_deleteConfirmUsed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Diese Flasche und ihre Füllungen löschen? $count Tauchgänge haben sie benutzt. Sie behalten ihre Flaschen; nur die Verknüpfung wird entfernt.',
+      one:
+          'Diese Flasche und ihre Füllungen löschen? $count Tauchgang hat sie benutzt. Er behält seine Flasche; nur die Verknüpfung wird entfernt.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_deleteEventConfirm => 'Diesen Eintrag löschen?';
+
+  @override
+  String get trips_cylinders_add_tabRental => 'Leihflaschen';
+
+  @override
+  String get trips_cylinders_add_tabOwned => 'Aus meiner Ausrüstung';
+
+  @override
+  String get trips_cylinders_add_count => 'Anzahl';
+
+  @override
+  String get trips_cylinders_add_preset => 'Flaschentyp';
+
+  @override
+  String get trips_cylinders_add_prefix => 'Namenspräfix';
+
+  @override
+  String get trips_cylinders_add_prefixDefault => 'Pick-up';
+
+  @override
+  String get trips_cylinders_add_noOwned =>
+      'In deiner Ausrüstung sind keine Flaschen mehr zum Hinzufügen.';
+
+  @override
+  String get trips_cylinders_add_errorCount =>
+      'Gib eine Zahl von 1 bis 20 ein.';
+
+  @override
+  String get trips_cylinders_fill_titleEdit => 'Füllung bearbeiten';
+
+  @override
+  String get trips_cylinders_fill_when => 'Wann';
+
+  @override
+  String get trips_cylinders_fill_where => 'Füllstation';
+
+  @override
+  String get trips_cylinders_fill_whereNone => 'Nicht festgelegt';
+
+  @override
+  String trips_cylinders_fill_pressure(String unit) {
+    return 'Fülldruck ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_fill_o2 => 'O2 bestellt (%)';
+
+  @override
+  String get trips_cylinders_fill_he => 'He bestellt (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedO2 => 'O2 analysiert (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedHe => 'He analysiert (%)';
+
+  @override
+  String get trips_cylinders_fill_bottle => 'Flaschennummer';
+
+  @override
+  String get trips_cylinders_fill_cost => 'Kosten';
+
+  @override
+  String get trips_cylinders_fill_costEach => 'Kosten pro Flasche';
+
+  @override
+  String get trips_cylinders_fill_currency => 'Währung';
+
+  @override
+  String get trips_cylinders_fill_package => 'Im Paket enthalten';
+
+  @override
+  String get trips_cylinders_fill_slots => 'Zu füllende Flaschen';
+
+  @override
+  String get trips_cylinders_fill_errorMix =>
+      'Sauerstoff muss 1 bis 100 Prozent sein, Helium 0 bis 99, zusammen höchstens 100.';
+
+  @override
+  String get trips_cylinders_fill_errorNoSlot =>
+      'Wähle mindestens eine Flasche.';
+
+  @override
+  String get trips_cylinders_note => 'Notiz';
+
+  @override
+  String get trips_cylinders_adjust_titleEdit => 'Anpassung bearbeiten';
+
+  @override
+  String trips_cylinders_adjust_pressure(String unit) {
+    return 'Druck ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_adjust_markEmpty => 'Als leer markieren';
+
+  @override
+  String get trips_cylinders_edit_title => 'Flasche bearbeiten';
+
+  @override
+  String get trips_cylinders_edit_label => 'Bezeichnung';
+
+  @override
+  String get trips_cylinders_edit_errorLabel => 'Gib eine Bezeichnung ein.';
+
+  @override
+  String get trips_cylinders_edit_errorNeedsPressure =>
+      'Gib auch den Betriebsdruck ein, damit die Größe umgerechnet werden kann.';
+
+  @override
+  String trips_cylinders_edit_volume(String unit) {
+    return 'Größe ($unit)';
+  }
+
+  @override
+  String trips_cylinders_edit_workingPressure(String unit) {
+    return 'Betriebsdruck ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_edit_presetCustom => 'Benutzerdefiniert';
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => 'Embark / Disembark';
@@ -32697,6 +32955,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String dataQuality_msg_pressureRise(String rise) {
     return 'Druck stieg mitten im Tauchgang um $rise ohne Gaswechsel';
   }
+
+  @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Der Drucksensor lieferte $count-mal Fehlwerte (Aussetzer oder Ausreisser)',
+      one:
+          'Der Drucksensor lieferte einmal Fehlwerte (Aussetzer oder Ausreisser)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'Die Druckreihe vermischt die Messwerte zweier Quellen';
 
   @override
   String dataQuality_msg_sac(String sac) {
@@ -44988,6 +45263,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get query_buddies_certifications => 'Zertifizierungen';
 
   @override
+  String get query_buddies_dives => 'Tauchgänge';
+
+  @override
   String get query_buddies_email => 'E-Mail';
 
   @override
@@ -45003,25 +45281,55 @@ class AppLocalizationsDe extends AppLocalizations {
   String get query_buddies_phone => 'Telefon';
 
   @override
+  String get query_centers_affiliations => 'Verbindungen';
+
+  @override
   String get query_centers_city => 'Stadt';
+
+  @override
+  String get query_centers_coordinates => 'Koordinaten';
 
   @override
   String get query_centers_country => 'Land';
 
   @override
+  String get query_centers_dives => 'Tauchgänge';
+
+  @override
   String get query_centers_name => 'Name';
+
+  @override
+  String get query_centers_notes => 'Notizen';
+
+  @override
+  String get query_centers_rating => 'Bewertung';
+
+  @override
+  String get query_centers_stateProvince => 'Bundesland / Provinz';
 
   @override
   String get query_certifications_agency => 'Verband';
 
   @override
+  String get query_certifications_buddy => 'Tauchpartner';
+
+  @override
   String get query_certifications_cardNumber => 'Kartennummer';
+
+  @override
+  String get query_certifications_course => 'Kurs';
 
   @override
   String get query_certifications_expiryDate => 'Ablaufdatum';
 
   @override
+  String get query_certifications_instructor => 'Tauchlehrer';
+
+  @override
   String get query_certifications_instructorName => 'Name des Instructors';
+
+  @override
+  String get query_certifications_instructorNumber => 'Tauchlehrernummer';
 
   @override
   String get query_certifications_issueDate => 'Ausstellungsdatum';
@@ -45031,6 +45339,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'Name';
+
+  @override
+  String get query_certifications_notes => 'Notizen';
 
   @override
   String get query_computers_manufacturer => 'Hersteller';
@@ -45048,10 +45359,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get query_courses_agency => 'Verband';
 
   @override
+  String get query_courses_certification => 'Zertifizierung';
+
+  @override
   String get query_courses_completionDate => 'Abschlussdatum';
 
   @override
+  String get query_courses_dives => 'Tauchgänge';
+
+  @override
+  String get query_courses_instructor => 'Tauchlehrer';
+
+  @override
+  String get query_courses_instructorName => 'Name des Instructors';
+
+  @override
+  String get query_courses_location => 'Ort';
+
+  @override
   String get query_courses_name => 'Name';
+
+  @override
+  String get query_courses_notes => 'Notizen';
 
   @override
   String get query_courses_startDate => 'Startdatum';
@@ -45327,6 +45656,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get query_equipment_type => 'Typ';
 
   @override
+  String get query_filter_clear => 'Löschen';
+
+  @override
+  String get query_filter_tooltip => 'Filter';
+
+  @override
+  String get query_list_noMatch => 'Nichts entspricht dieser Abfrage';
+
+  @override
   String get query_media_caption => 'Bildunterschrift';
 
   @override
@@ -45390,13 +45728,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String get query_sites_types => 'Tauchplatztypen';
 
   @override
+  String get query_species_builtIn => 'Vordefiniert';
+
+  @override
   String get query_species_category => 'Kategorie';
+
+  @override
+  String get query_species_description => 'Beschreibung';
+
+  @override
+  String get query_species_dives => 'Tauchgänge';
+
+  @override
+  String get query_species_expectedSites => 'Erwartet an Tauchplätzen';
 
   @override
   String get query_species_name => 'Name';
 
   @override
   String get query_species_scientificName => 'Wissenschaftlicher Name';
+
+  @override
+  String get query_species_sightings => 'Sichtungen';
+
+  @override
+  String get query_species_taxonomyClass => 'Taxonomische Klasse';
 
   @override
   String get query_tags_name => 'Name';

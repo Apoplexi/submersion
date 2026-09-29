@@ -6777,6 +6777,8 @@
   "tides_source_sheetTitle": "Árapályadatok forrása",
   "tides_source_datumMllw": "Magasságok az MLLW-hez képest (állomási alapszint)",
   "tides_source_datumMsl": "Magasságok a közepes tengerszinthez képest",
+  "tides_source_siteLocalTime": "Az időpontok a merülőhely helyi idejében jelennek meg.",
+  "tides_source_modelResolution": "{distance} felbontású óceánmodell-rács",
   "tides_title": "Árapály",
   "tools_gpsLogger_description": "Rögzítsd a pozíciódat a merülőnap során, és párosítsd automatikusan az importált merüléseket GPS-helyekhez.",
   "tools_gpsLogger_subtitle": "Felszíni útvonal rögzítése",
@@ -7109,6 +7111,182 @@
       }
     }
   },
+  "trips_cylinders_title": "Palackok",
+  "trips_cylinders_summary": "Tele {full} · Részben {partial} · Üres {empty}",
+  "@trips_cylinders_summary": {
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "empty": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_summaryUnfilled": "Még nincs töltve {count}",
+  "@trips_cylinders_summaryUnfilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_setUp": "Palackok beállítása",
+  "trips_cylinders_setUpHint": "Kövesd az úton nálad lévő palackokat: töltések, keverékek és hogy mennyi maradt mindegyikben.",
+  "trips_cylinders_status_full": "Tele",
+  "trips_cylinders_status_partial": "Részben",
+  "trips_cylinders_status_empty": "Üres",
+  "trips_cylinders_status_unknown": "Még nincs töltve",
+  "trips_cylinders_mixAir": "Levegő",
+  "trips_cylinders_segment_board": "Áttekintés",
+  "trips_cylinders_segment_ledger": "Napló",
+  "trips_cylinders_action_add": "Palackok hozzáadása",
+  "trips_cylinders_action_fill": "Töltés",
+  "trips_cylinders_action_fillSeveral": "Több töltése",
+  "trips_cylinders_action_adjust": "Módosítás",
+  "trips_cylinders_bottle": "Palack {label}",
+  "@trips_cylinders_bottle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_linkedDives": "{count, plural, one{{count} merülés} other{{count} merülés}}",
+  "@trips_cylinders_linkedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_last_fillAt": "Töltve: {place}, {when}",
+  "@trips_cylinders_last_fillAt": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_fill": "Töltve: {when}",
+  "@trips_cylinders_last_fill": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_adjustment": "Módosítva: {when}",
+  "@trips_cylinders_last_adjustment": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_diveAt": "Merülés: {site}, {when}",
+  "@trips_cylinders_last_diveAt": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_dive": "Merülés: {when}",
+  "@trips_cylinders_last_dive": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_boardEmpty": "Ezen az úton még nincsenek palackok",
+  "trips_cylinders_ledgerEmpty": "Még nincs töltés vagy módosítás",
+  "trips_cylinders_kind_fill": "Töltés",
+  "trips_cylinders_kind_adjustment": "Módosítás",
+  "trips_cylinders_deleteConfirmUnused": "Törlöd ezt a palackot és a töltéseit?",
+  "trips_cylinders_deleteConfirmUsed": "{count, plural, one{Törlöd ezt a palackot és a töltéseit? {count} merülés használta. A merülés megtartja a palackját, csak a kapcsolat törlődik.} other{Törlöd ezt a palackot és a töltéseit? {count} merülés használta. A merülések megtartják a palackjukat, csak a kapcsolat törlődik.}}",
+  "@trips_cylinders_deleteConfirmUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_deleteEventConfirm": "Törlöd ezt a bejegyzést?",
+  "trips_cylinders_add_tabRental": "Bérelt",
+  "trips_cylinders_add_tabOwned": "A felszerelésemből",
+  "trips_cylinders_add_count": "Darabszám",
+  "trips_cylinders_add_preset": "Palacktípus",
+  "trips_cylinders_add_prefix": "Név előtagja",
+  "trips_cylinders_add_prefixDefault": "Pickup",
+  "trips_cylinders_add_noOwned": "A felszerelésedben nincs több hozzáadható palack.",
+  "trips_cylinders_add_errorCount": "Adj meg egy számot 1 és 20 között.",
+  "trips_cylinders_fill_titleEdit": "Töltés szerkesztése",
+  "trips_cylinders_fill_when": "Mikor",
+  "trips_cylinders_fill_where": "Töltőállomás",
+  "trips_cylinders_fill_whereNone": "Nincs megadva",
+  "trips_cylinders_fill_pressure": "Töltési nyomás ({unit})",
+  "@trips_cylinders_fill_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_fill_o2": "Kért O2 (%)",
+  "trips_cylinders_fill_he": "Kért He (%)",
+  "trips_cylinders_fill_analyzedO2": "Mért O2 (%)",
+  "trips_cylinders_fill_analyzedHe": "Mért He (%)",
+  "trips_cylinders_fill_bottle": "Palackszám",
+  "trips_cylinders_fill_cost": "Költség",
+  "trips_cylinders_fill_costEach": "Költség palackonként",
+  "trips_cylinders_fill_currency": "Pénznem",
+  "trips_cylinders_fill_package": "A csomag része",
+  "trips_cylinders_fill_slots": "Töltendő palackok",
+  "trips_cylinders_fill_errorMix": "Az oxigén 1 és 100 százalék között, a hélium 0 és 99 között lehet, együtt legfeljebb 100.",
+  "trips_cylinders_fill_errorNoSlot": "Válassz legalább egy palackot.",
+  "trips_cylinders_note": "Megjegyzés",
+  "trips_cylinders_adjust_titleEdit": "Módosítás szerkesztése",
+  "trips_cylinders_adjust_pressure": "Nyomás ({unit})",
+  "@trips_cylinders_adjust_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_adjust_markEmpty": "Megjelölés üresként",
+  "trips_cylinders_edit_title": "Palack szerkesztése",
+  "trips_cylinders_edit_label": "Név",
+  "trips_cylinders_edit_errorLabel": "Adj meg egy nevet.",
+  "trips_cylinders_edit_errorNeedsPressure": "Add meg az üzemi nyomást is, hogy a méret átszámítható legyen.",
+  "trips_cylinders_edit_volume": "Méret ({unit})",
+  "@trips_cylinders_edit_volume": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_workingPressure": "Üzemi nyomás ({unit})",
+  "@trips_cylinders_edit_workingPressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_presetCustom": "Egyéni",
   "trips_edit_label_disembarkPort": "Disembark Port",
   "trips_edit_label_embarkPort": "Embark Port",
   "trips_edit_label_endDate": "Befejezés dátuma",
@@ -9817,6 +9995,8 @@
   "dataQuality_msg_pressureSwap": "A {end} végnyomás magasabb, mint a {start} kezdőnyomás",
   "dataQuality_msg_pressureEndpoint": "A palack rekordja {record} értéket jelez, de az érzékelősorozat {series} értéket mutat",
   "dataQuality_msg_pressureRise": "A nyomás {rise} értékkel emelkedett a merülés közben gázcsere nélkül",
+  "dataQuality_msg_pressureDropout": "{count, plural, =1{A nyomásérzékelő egyszer hibás értéket adott (kiesés vagy tüske)} other{A nyomásérzékelő {count} alkalommal adott hibás értéket (kiesés vagy tüske)}}",
+  "dataQuality_msg_pressureMixed": "A nyomássor két forrás mérési adatait keveri",
   "dataQuality_msg_sac": "A becsült felszíni fogyasztás ({sac}) nem hihető",
   "dataQuality_msg_ppo2": "A ppO2 elérte a(z) {ppo2} értéket {gas} gázzal {depth} mélységben",
   "dataQuality_msg_hypoxic": "Hipoxikus keverék ({gas}) használatban a felszínen",
@@ -13325,28 +13505,46 @@
   "diveCenters_rental_noteLabel": "Jegyzet",
   "diveCenters_rental_deleteConfirm": "Törlöd ezt a bérlési jegyzetet?",
   "query_buddies_certifications": "Minősítések",
+  "query_buddies_dives": "Merülések",
   "query_buddies_email": "E-mail",
   "query_buddies_favorite": "Kedvenc",
   "query_buddies_name": "Név",
   "query_buddies_notes": "Jegyzetek",
   "query_buddies_phone": "Telefon",
+  "query_centers_affiliations": "Tagságok",
   "query_centers_city": "Város",
+  "query_centers_coordinates": "Koordináták",
   "query_centers_country": "Ország",
+  "query_centers_dives": "Merülések",
   "query_centers_name": "Név",
+  "query_centers_notes": "Jegyzetek",
+  "query_centers_rating": "Értékelés",
+  "query_centers_stateProvince": "Állam / megye",
   "query_certifications_agency": "Szervezet",
+  "query_certifications_buddy": "Búvártárs",
   "query_certifications_cardNumber": "Kártyaszám",
+  "query_certifications_course": "Tanfolyam",
   "query_certifications_expiryDate": "Lejárat dátuma",
+  "query_certifications_instructor": "Oktató",
   "query_certifications_instructorName": "Oktató neve",
+  "query_certifications_instructorNumber": "Oktató száma",
   "query_certifications_issueDate": "Kiállítás dátuma",
   "query_certifications_level": "Szint",
   "query_certifications_name": "Név",
+  "query_certifications_notes": "Jegyzetek",
   "query_computers_manufacturer": "Gyártó",
   "query_computers_model": "Modell",
   "query_computers_name": "Név",
   "query_computers_serialNumber": "Sorozatszám",
   "query_courses_agency": "Szervezet",
+  "query_courses_certification": "Képesítés",
   "query_courses_completionDate": "Befejezés dátuma",
+  "query_courses_dives": "Merülések",
+  "query_courses_instructor": "Oktató",
+  "query_courses_instructorName": "Oktató neve",
+  "query_courses_location": "Helyszín",
   "query_courses_name": "Név",
+  "query_courses_notes": "Jegyzetek",
   "query_courses_startDate": "Kezdő dátum",
   "query_customFields_key": "Kulcs",
   "query_customFields_value": "Érték",
@@ -13438,6 +13636,9 @@
   "query_equipment_status": "Állapot",
   "query_equipment_tags": "Címkék",
   "query_equipment_type": "Típus",
+  "query_filter_clear": "Törlés",
+  "query_filter_tooltip": "Szűrő",
+  "query_list_noMatch": "Semmi sem felel meg ennek a lekérdezésnek",
   "query_media_caption": "Felirat",
   "query_media_favorite": "Kedvenc",
   "query_media_type": "Típus",
@@ -13459,9 +13660,15 @@
   "query_sites_region": "Régió",
   "query_sites_tags": "Címkék",
   "query_sites_types": "Merülőhely-típusok",
+  "query_species_builtIn": "Beépített",
   "query_species_category": "Kategória",
+  "query_species_description": "Leírás",
+  "query_species_dives": "Merülések",
+  "query_species_expectedSites": "Várható helyszíneken",
   "query_species_name": "Név",
   "query_species_scientificName": "Tudományos név",
+  "query_species_sightings": "Észlelések",
+  "query_species_taxonomyClass": "Taxonómiai osztály",
   "query_tags_name": "Név",
   "query_tanks_cylinder": "Palack",
   "query_tanks_endPressure": "Végnyomás",

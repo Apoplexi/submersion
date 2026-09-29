@@ -23650,6 +23650,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tides_source_datumMsl => 'גבהים ביחס לגובה פני הים הממוצע';
 
   @override
+  String get tides_source_siteLocalTime =>
+      'השעות מוצגות לפי השעה המקומית של אתר הצלילה.';
+
+  @override
+  String tides_source_modelResolution(String distance) {
+    return 'רשת מודל אוקיינוס של $distance';
+  }
+
+  @override
   String get tides_title => 'גאות';
 
   @override
@@ -24764,6 +24773,250 @@ class AppLocalizationsHe extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count ריברידרים, מרווח הסופג הנמוך ביותר $minutes דק\'';
   }
+
+  @override
+  String get trips_cylinders_title => 'מכלים';
+
+  @override
+  String trips_cylinders_summary(int full, int partial, int empty) {
+    return 'מלאים $full · חלקיים $partial · ריקים $empty';
+  }
+
+  @override
+  String trips_cylinders_summaryUnfilled(int count) {
+    return 'טרם מולאו $count';
+  }
+
+  @override
+  String get trips_cylinders_setUp => 'הגדרת מכלים';
+
+  @override
+  String get trips_cylinders_setUpHint =>
+      'עקבו אחר המכלים שיש לכם בטיול הזה: מילויים, תערובות וכמה נשאר בכל אחד.';
+
+  @override
+  String get trips_cylinders_status_full => 'מלא';
+
+  @override
+  String get trips_cylinders_status_partial => 'חלקי';
+
+  @override
+  String get trips_cylinders_status_empty => 'ריק';
+
+  @override
+  String get trips_cylinders_status_unknown => 'טרם מולא';
+
+  @override
+  String get trips_cylinders_mixAir => 'אוויר';
+
+  @override
+  String get trips_cylinders_segment_board => 'לוח';
+
+  @override
+  String get trips_cylinders_segment_ledger => 'יומן';
+
+  @override
+  String get trips_cylinders_action_add => 'הוספת מכלים';
+
+  @override
+  String get trips_cylinders_action_fill => 'מילוי';
+
+  @override
+  String get trips_cylinders_action_fillSeveral => 'מילוי כמה מכלים';
+
+  @override
+  String get trips_cylinders_action_adjust => 'תיקון';
+
+  @override
+  String trips_cylinders_bottle(String label) {
+    return 'מכל $label';
+  }
+
+  @override
+  String trips_cylinders_linkedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות',
+      one: '$count צלילה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_last_fillAt(String place, String when) {
+    return 'מולא אצל $place, $when';
+  }
+
+  @override
+  String trips_cylinders_last_fill(String when) {
+    return 'מולא $when';
+  }
+
+  @override
+  String trips_cylinders_last_adjustment(String when) {
+    return 'תוקן $when';
+  }
+
+  @override
+  String trips_cylinders_last_diveAt(String site, String when) {
+    return 'צלילה באתר $site, $when';
+  }
+
+  @override
+  String trips_cylinders_last_dive(String when) {
+    return 'צלילה $when';
+  }
+
+  @override
+  String get trips_cylinders_boardEmpty => 'עדיין אין מכלים בטיול הזה';
+
+  @override
+  String get trips_cylinders_ledgerEmpty => 'עדיין אין מילויים או תיקונים';
+
+  @override
+  String get trips_cylinders_kind_fill => 'מילוי';
+
+  @override
+  String get trips_cylinders_kind_adjustment => 'תיקון';
+
+  @override
+  String get trips_cylinders_deleteConfirmUnused =>
+      'למחוק את המכל הזה ואת המילויים שלו?';
+
+  @override
+  String trips_cylinders_deleteConfirmUsed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'למחוק את המכל הזה ואת המילויים שלו? $count צלילות השתמשו בו. הצלילות שומרות את המכלים שלהן; רק הקישור מוסר.',
+      one:
+          'למחוק את המכל הזה ואת המילויים שלו? $count צלילה השתמשה בו. הצלילה שומרת את המכל שלה; רק הקישור מוסר.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_deleteEventConfirm => 'למחוק את הרשומה הזו?';
+
+  @override
+  String get trips_cylinders_add_tabRental => 'שכור';
+
+  @override
+  String get trips_cylinders_add_tabOwned => 'מהציוד שלי';
+
+  @override
+  String get trips_cylinders_add_count => 'כמה';
+
+  @override
+  String get trips_cylinders_add_preset => 'סוג מכל';
+
+  @override
+  String get trips_cylinders_add_prefix => 'קידומת לשם';
+
+  @override
+  String get trips_cylinders_add_prefixDefault => 'טנדר';
+
+  @override
+  String get trips_cylinders_add_noOwned => 'לא נותרו מכלים בציוד שלך להוספה.';
+
+  @override
+  String get trips_cylinders_add_errorCount => 'הזינו מספר בין 1 ל-20.';
+
+  @override
+  String get trips_cylinders_fill_titleEdit => 'עריכת מילוי';
+
+  @override
+  String get trips_cylinders_fill_when => 'מתי';
+
+  @override
+  String get trips_cylinders_fill_where => 'תחנת מילוי';
+
+  @override
+  String get trips_cylinders_fill_whereNone => 'לא הוגדר';
+
+  @override
+  String trips_cylinders_fill_pressure(String unit) {
+    return 'לחץ מילוי ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_fill_o2 => 'O2 שהוזמן (%)';
+
+  @override
+  String get trips_cylinders_fill_he => 'He שהוזמן (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedO2 => 'O2 שנמדד (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedHe => 'He שנמדד (%)';
+
+  @override
+  String get trips_cylinders_fill_bottle => 'מספר מכל';
+
+  @override
+  String get trips_cylinders_fill_cost => 'עלות';
+
+  @override
+  String get trips_cylinders_fill_costEach => 'עלות לכל מכל';
+
+  @override
+  String get trips_cylinders_fill_currency => 'מטבע';
+
+  @override
+  String get trips_cylinders_fill_package => 'כלול בחבילה';
+
+  @override
+  String get trips_cylinders_fill_slots => 'מכלים למילוי';
+
+  @override
+  String get trips_cylinders_fill_errorMix =>
+      'החמצן חייב להיות בין 1 ל-100 אחוז, ההליום בין 0 ל-99, ויחד לכל היותר 100.';
+
+  @override
+  String get trips_cylinders_fill_errorNoSlot => 'בחרו לפחות מכל אחד.';
+
+  @override
+  String get trips_cylinders_note => 'הערה';
+
+  @override
+  String get trips_cylinders_adjust_titleEdit => 'עריכת תיקון';
+
+  @override
+  String trips_cylinders_adjust_pressure(String unit) {
+    return 'לחץ ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_adjust_markEmpty => 'סימון כריק';
+
+  @override
+  String get trips_cylinders_edit_title => 'עריכת מכל';
+
+  @override
+  String get trips_cylinders_edit_label => 'שם';
+
+  @override
+  String get trips_cylinders_edit_errorLabel => 'הזינו שם.';
+
+  @override
+  String get trips_cylinders_edit_errorNeedsPressure =>
+      'הזינו גם לחץ עבודה כדי שאפשר יהיה להמיר את הגודל.';
+
+  @override
+  String trips_cylinders_edit_volume(String unit) {
+    return 'גודל ($unit)';
+  }
+
+  @override
+  String trips_cylinders_edit_workingPressure(String unit) {
+    return 'לחץ עבודה ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_edit_presetCustom => 'מותאם אישית';
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => 'Embark / Disembark';
@@ -31982,6 +32235,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String dataQuality_msg_pressureRise(String rise) {
     return 'הלחץ עלה ב-$rise באמצע הצלילה ללא החלפת גז';
   }
+
+  @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'חיישן הלחץ רשם קריאות שגויות $count פעמים (נפילות או קפיצות)',
+      one: 'חיישן הלחץ רשם קריאה שגויה פעם אחת (נפילה או קפיצה)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'סדרת הלחץ מערבבת קריאות משני מקורות';
 
   @override
   String dataQuality_msg_sac(String sac) {
@@ -44177,6 +44445,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get query_buddies_certifications => 'הסמכות';
 
   @override
+  String get query_buddies_dives => 'צלילות';
+
+  @override
   String get query_buddies_email => 'דוא\"ל';
 
   @override
@@ -44192,25 +44463,55 @@ class AppLocalizationsHe extends AppLocalizations {
   String get query_buddies_phone => 'טלפון';
 
   @override
+  String get query_centers_affiliations => 'השתייכויות';
+
+  @override
   String get query_centers_city => 'עיר';
+
+  @override
+  String get query_centers_coordinates => 'קואורדינטות';
 
   @override
   String get query_centers_country => 'מדינה';
 
   @override
+  String get query_centers_dives => 'צלילות';
+
+  @override
   String get query_centers_name => 'שם';
+
+  @override
+  String get query_centers_notes => 'הערות';
+
+  @override
+  String get query_centers_rating => 'דירוג';
+
+  @override
+  String get query_centers_stateProvince => 'מדינה / מחוז';
 
   @override
   String get query_certifications_agency => 'ארגון';
 
   @override
+  String get query_certifications_buddy => 'שותף';
+
+  @override
   String get query_certifications_cardNumber => 'מספר כרטיס';
+
+  @override
+  String get query_certifications_course => 'קורס';
 
   @override
   String get query_certifications_expiryDate => 'תאריך תפוגה';
 
   @override
+  String get query_certifications_instructor => 'מדריך';
+
+  @override
   String get query_certifications_instructorName => 'שם המדריך';
+
+  @override
+  String get query_certifications_instructorNumber => 'מספר המדריך';
 
   @override
   String get query_certifications_issueDate => 'תאריך הנפקה';
@@ -44220,6 +44521,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'שם';
+
+  @override
+  String get query_certifications_notes => 'הערות';
 
   @override
   String get query_computers_manufacturer => 'יצרן';
@@ -44237,10 +44541,28 @@ class AppLocalizationsHe extends AppLocalizations {
   String get query_courses_agency => 'ארגון';
 
   @override
+  String get query_courses_certification => 'הסמכה';
+
+  @override
   String get query_courses_completionDate => 'תאריך סיום';
 
   @override
+  String get query_courses_dives => 'צלילות';
+
+  @override
+  String get query_courses_instructor => 'מדריך';
+
+  @override
+  String get query_courses_instructorName => 'שם המדריך';
+
+  @override
+  String get query_courses_location => 'מיקום';
+
+  @override
   String get query_courses_name => 'שם';
+
+  @override
+  String get query_courses_notes => 'הערות';
 
   @override
   String get query_courses_startDate => 'תאריך התחלה';
@@ -44516,6 +44838,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get query_equipment_type => 'סוג';
 
   @override
+  String get query_filter_clear => 'נקה';
+
+  @override
+  String get query_filter_tooltip => 'סינון';
+
+  @override
+  String get query_list_noMatch => 'אין תוצאות התואמות לשאילתה זו';
+
+  @override
   String get query_media_caption => 'כיתוב';
 
   @override
@@ -44579,13 +44910,31 @@ class AppLocalizationsHe extends AppLocalizations {
   String get query_sites_types => 'סוגי אתר';
 
   @override
+  String get query_species_builtIn => 'מובנה';
+
+  @override
   String get query_species_category => 'קטגוריה';
+
+  @override
+  String get query_species_description => 'תיאור';
+
+  @override
+  String get query_species_dives => 'צלילות';
+
+  @override
+  String get query_species_expectedSites => 'צפוי באתרים';
 
   @override
   String get query_species_name => 'שם';
 
   @override
   String get query_species_scientificName => 'שם מדעי';
+
+  @override
+  String get query_species_sightings => 'תצפיות';
+
+  @override
+  String get query_species_taxonomyClass => 'מחלקה טקסונומית';
 
   @override
   String get query_tags_name => 'שם';

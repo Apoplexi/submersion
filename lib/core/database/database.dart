@@ -971,6 +971,15 @@ class AppDatabase extends _$AppDatabase {
     // to 240. Renumbered from 233 and then 235: main shipped 233 (#1921),
     // 234 (#2046) and 239 (#2275) while this was open.
     240,
+    // v241: tank_pressure_series.source_id (issue #2440), backfilled where
+    // the source is unambiguous. Additive nullable column, so the floor
+    // stays at 240. Renumbered from 232 and then 240 while in review: main
+    // shipped 232 to 234, 239 (#2275) and 240 (#1926) while this was open.
+    // Kept below v242, which main shipped with 241 left for this rung: a
+    // database already at 242 skips this step, the beforeOpen backstop
+    // adds the column there, and its series stay unattributed, which every
+    // reader already handles.
+    241,
     // v242: equipment_service_status, the local service-due cache the
     // query language's serviceDue field reads (issue #2365, PR 3). A table
     // with no hlc, never synced, so the floor does not move. 241 was held
@@ -983,12 +992,16 @@ class AppDatabase extends _$AppDatabase {
     // Renumbered from 241: #2493 took it, main shipped 242 (#2541) and
     // an open branch claims 243 (#2409).
     244,
+    // v245: idx_certifications_buddy_id (issue #2365, PR 4). Index-only;
+    // the floor does not move. 243 was held by #2409 and 244 went to
+    // #2086 when this was taken.
+    245,
     // v246: metadata-only profile revision history over existing
     // dive_profile_series rows (#1197). No profile samples are copied:
     // history rows point at existing series ids and track parent/branch
     // relations. Local-only table, so the floor stays. Renumbered from 228
     // and 229, which main shipped, and from 243, which main passed with 244;
-    // #2572 claims 245.
+    // main then shipped 245 (#2572).
     246,
   ];
 

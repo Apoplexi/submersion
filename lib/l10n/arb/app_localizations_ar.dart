@@ -23943,6 +23943,15 @@ class AppLocalizationsAr extends AppLocalizations {
       'الارتفاعات نسبة إلى متوسط مستوى سطح البحر';
 
   @override
+  String get tides_source_siteLocalTime =>
+      'تُعرض الأوقات بالتوقيت المحلي لموقع الغوص.';
+
+  @override
+  String tides_source_modelResolution(String distance) {
+    return 'شبكة نموذج المحيط بدقة $distance';
+  }
+
+  @override
   String get tides_title => 'المد والجزر';
 
   @override
@@ -25070,6 +25079,252 @@ class AppLocalizationsAr extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count أجهزة، أدنى هامش منظّف $minutes دقيقة';
   }
+
+  @override
+  String get trips_cylinders_title => 'الأسطوانات';
+
+  @override
+  String trips_cylinders_summary(int full, int partial, int empty) {
+    return 'ممتلئة $full · جزئية $partial · فارغة $empty';
+  }
+
+  @override
+  String trips_cylinders_summaryUnfilled(int count) {
+    return 'لم تُعبّأ بعد $count';
+  }
+
+  @override
+  String get trips_cylinders_setUp => 'إعداد الأسطوانات';
+
+  @override
+  String get trips_cylinders_setUpHint =>
+      'تتبّع الأسطوانات التي معك في هذه الرحلة: التعبئات والخلطات وما تبقّى في كل منها.';
+
+  @override
+  String get trips_cylinders_status_full => 'ممتلئة';
+
+  @override
+  String get trips_cylinders_status_partial => 'جزئية';
+
+  @override
+  String get trips_cylinders_status_empty => 'فارغة';
+
+  @override
+  String get trips_cylinders_status_unknown => 'لم تُعبّأ بعد';
+
+  @override
+  String get trips_cylinders_mixAir => 'هواء';
+
+  @override
+  String get trips_cylinders_segment_board => 'اللوحة';
+
+  @override
+  String get trips_cylinders_segment_ledger => 'السجل';
+
+  @override
+  String get trips_cylinders_action_add => 'إضافة أسطوانات';
+
+  @override
+  String get trips_cylinders_action_fill => 'تعبئة';
+
+  @override
+  String get trips_cylinders_action_fillSeveral => 'تعبئة عدة أسطوانات';
+
+  @override
+  String get trips_cylinders_action_adjust => 'تعديل';
+
+  @override
+  String trips_cylinders_bottle(String label) {
+    return 'الأسطوانة $label';
+  }
+
+  @override
+  String trips_cylinders_linkedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غطسات',
+      one: '$count غطسة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_last_fillAt(String place, String when) {
+    return 'عُبّئت في $place، $when';
+  }
+
+  @override
+  String trips_cylinders_last_fill(String when) {
+    return 'عُبّئت $when';
+  }
+
+  @override
+  String trips_cylinders_last_adjustment(String when) {
+    return 'عُدّلت $when';
+  }
+
+  @override
+  String trips_cylinders_last_diveAt(String site, String when) {
+    return 'غطسة في $site، $when';
+  }
+
+  @override
+  String trips_cylinders_last_dive(String when) {
+    return 'غطسة $when';
+  }
+
+  @override
+  String get trips_cylinders_boardEmpty => 'لا توجد أسطوانات في هذه الرحلة بعد';
+
+  @override
+  String get trips_cylinders_ledgerEmpty => 'لا توجد تعبئات أو تعديلات بعد';
+
+  @override
+  String get trips_cylinders_kind_fill => 'تعبئة';
+
+  @override
+  String get trips_cylinders_kind_adjustment => 'تعديل';
+
+  @override
+  String get trips_cylinders_deleteConfirmUnused =>
+      'حذف هذه الأسطوانة وتعبئاتها؟';
+
+  @override
+  String trips_cylinders_deleteConfirmUsed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها $count غطسات. تحتفظ الغطسات بأسطواناتها ويُزال الربط فقط.',
+      one:
+          'حذف هذه الأسطوانة وتعبئاتها؟ استخدمتها $count غطسة. تحتفظ الغطسة بأسطوانتها ويُزال الربط فقط.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_deleteEventConfirm => 'حذف هذا الإدخال؟';
+
+  @override
+  String get trips_cylinders_add_tabRental => 'مستأجرة';
+
+  @override
+  String get trips_cylinders_add_tabOwned => 'من معداتي';
+
+  @override
+  String get trips_cylinders_add_count => 'العدد';
+
+  @override
+  String get trips_cylinders_add_preset => 'نوع الأسطوانة';
+
+  @override
+  String get trips_cylinders_add_prefix => 'بادئة الاسم';
+
+  @override
+  String get trips_cylinders_add_prefixDefault => 'الشاحنة';
+
+  @override
+  String get trips_cylinders_add_noOwned =>
+      'لم تعد هناك أسطوانات في معداتك لإضافتها.';
+
+  @override
+  String get trips_cylinders_add_errorCount => 'أدخل رقمًا من 1 إلى 20.';
+
+  @override
+  String get trips_cylinders_fill_titleEdit => 'تعديل التعبئة';
+
+  @override
+  String get trips_cylinders_fill_when => 'متى';
+
+  @override
+  String get trips_cylinders_fill_where => 'محطة التعبئة';
+
+  @override
+  String get trips_cylinders_fill_whereNone => 'غير محددة';
+
+  @override
+  String trips_cylinders_fill_pressure(String unit) {
+    return 'ضغط التعبئة ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_fill_o2 => 'O2 المطلوب (%)';
+
+  @override
+  String get trips_cylinders_fill_he => 'He المطلوب (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedO2 => 'O2 المقاس (%)';
+
+  @override
+  String get trips_cylinders_fill_analyzedHe => 'He المقاس (%)';
+
+  @override
+  String get trips_cylinders_fill_bottle => 'رقم الأسطوانة';
+
+  @override
+  String get trips_cylinders_fill_cost => 'التكلفة';
+
+  @override
+  String get trips_cylinders_fill_costEach => 'التكلفة لكل أسطوانة';
+
+  @override
+  String get trips_cylinders_fill_currency => 'العملة';
+
+  @override
+  String get trips_cylinders_fill_package => 'ضمن باقة';
+
+  @override
+  String get trips_cylinders_fill_slots => 'الأسطوانات المراد تعبئتها';
+
+  @override
+  String get trips_cylinders_fill_errorMix =>
+      'يجب أن يكون الأكسجين بين 1 و100 بالمئة، والهيليوم بين 0 و99، ومجموعهما 100 على الأكثر.';
+
+  @override
+  String get trips_cylinders_fill_errorNoSlot =>
+      'اختر أسطوانة واحدة على الأقل.';
+
+  @override
+  String get trips_cylinders_note => 'ملاحظة';
+
+  @override
+  String get trips_cylinders_adjust_titleEdit => 'تعديل التصحيح';
+
+  @override
+  String trips_cylinders_adjust_pressure(String unit) {
+    return 'الضغط ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_adjust_markEmpty => 'تعليم كفارغة';
+
+  @override
+  String get trips_cylinders_edit_title => 'تعديل الأسطوانة';
+
+  @override
+  String get trips_cylinders_edit_label => 'الاسم';
+
+  @override
+  String get trips_cylinders_edit_errorLabel => 'أدخل اسمًا.';
+
+  @override
+  String get trips_cylinders_edit_errorNeedsPressure =>
+      'أدخل ضغط العمل أيضًا حتى يمكن تحويل الحجم.';
+
+  @override
+  String trips_cylinders_edit_volume(String unit) {
+    return 'الحجم ($unit)';
+  }
+
+  @override
+  String trips_cylinders_edit_workingPressure(String unit) {
+    return 'ضغط العمل ($unit)';
+  }
+
+  @override
+  String get trips_cylinders_edit_presetCustom => 'مخصص';
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => 'Embark / Disembark';
@@ -32341,6 +32596,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String dataQuality_msg_pressureRise(String rise) {
     return 'ارتفع الضغط $rise في منتصف الغوصة دون تبديل للغاز';
   }
+
+  @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'سجّل مستشعر الضغط قراءات خاطئة $count مرات (انقطاعات أو قفزات)',
+      one: 'سجّل مستشعر الضغط قراءة خاطئة مرة واحدة (انقطاع أو قفزة)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed => 'تمزج سلسلة الضغط قراءات مصدرين';
 
   @override
   String dataQuality_msg_sac(String sac) {
@@ -44730,6 +44999,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_buddies_certifications => 'الشهادات';
 
   @override
+  String get query_buddies_dives => 'الغطسات';
+
+  @override
   String get query_buddies_email => 'البريد الإلكتروني';
 
   @override
@@ -44745,25 +45017,55 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_buddies_phone => 'الهاتف';
 
   @override
+  String get query_centers_affiliations => 'الانتماءات';
+
+  @override
   String get query_centers_city => 'المدينة';
+
+  @override
+  String get query_centers_coordinates => 'الإحداثيات';
 
   @override
   String get query_centers_country => 'البلد';
 
   @override
+  String get query_centers_dives => 'الغطسات';
+
+  @override
   String get query_centers_name => 'الاسم';
+
+  @override
+  String get query_centers_notes => 'ملاحظات';
+
+  @override
+  String get query_centers_rating => 'التقييم';
+
+  @override
+  String get query_centers_stateProvince => 'الولاية / المقاطعة';
 
   @override
   String get query_certifications_agency => 'الهيئة';
 
   @override
+  String get query_certifications_buddy => 'زميل الغوص';
+
+  @override
   String get query_certifications_cardNumber => 'رقم البطاقة';
+
+  @override
+  String get query_certifications_course => 'الدورة';
 
   @override
   String get query_certifications_expiryDate => 'تاريخ الانتهاء';
 
   @override
+  String get query_certifications_instructor => 'المدرب';
+
+  @override
   String get query_certifications_instructorName => 'اسم المدرب';
+
+  @override
+  String get query_certifications_instructorNumber => 'رقم المدرب';
 
   @override
   String get query_certifications_issueDate => 'تاريخ الإصدار';
@@ -44773,6 +45075,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'الاسم';
+
+  @override
+  String get query_certifications_notes => 'ملاحظات';
 
   @override
   String get query_computers_manufacturer => 'الشركة المصنعة';
@@ -44790,10 +45095,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_courses_agency => 'الهيئة';
 
   @override
+  String get query_courses_certification => 'الاعتماد';
+
+  @override
   String get query_courses_completionDate => 'تاريخ الإكمال';
 
   @override
+  String get query_courses_dives => 'الغطسات';
+
+  @override
+  String get query_courses_instructor => 'المدرب';
+
+  @override
+  String get query_courses_instructorName => 'اسم المدرب';
+
+  @override
+  String get query_courses_location => 'الموقع';
+
+  @override
   String get query_courses_name => 'الاسم';
+
+  @override
+  String get query_courses_notes => 'ملاحظات';
 
   @override
   String get query_courses_startDate => 'تاريخ البدء';
@@ -45069,6 +45392,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_equipment_type => 'النوع';
 
   @override
+  String get query_filter_clear => 'مسح';
+
+  @override
+  String get query_filter_tooltip => 'التصفية';
+
+  @override
+  String get query_list_noMatch => 'لا شيء يطابق هذا الاستعلام';
+
+  @override
   String get query_media_caption => 'التعليق';
 
   @override
@@ -45132,13 +45464,31 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_sites_types => 'أنواع الموقع';
 
   @override
+  String get query_species_builtIn => 'مدمج';
+
+  @override
   String get query_species_category => 'الفئة';
+
+  @override
+  String get query_species_description => 'الوصف';
+
+  @override
+  String get query_species_dives => 'الغطسات';
+
+  @override
+  String get query_species_expectedSites => 'متوقع في المواقع';
 
   @override
   String get query_species_name => 'الاسم';
 
   @override
   String get query_species_scientificName => 'الاسم العلمي';
+
+  @override
+  String get query_species_sightings => 'المشاهدات';
+
+  @override
+  String get query_species_taxonomyClass => 'الصنف التصنيفي';
 
   @override
   String get query_tags_name => 'الاسم';

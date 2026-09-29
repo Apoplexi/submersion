@@ -6773,6 +6773,8 @@
   "tides_source_sheetTitle": "Fonte dei dati di marea",
   "tides_source_datumMllw": "Altezze rispetto al MLLW (datum della stazione)",
   "tides_source_datumMsl": "Altezze rispetto al livello medio del mare",
+  "tides_source_siteLocalTime": "Gli orari sono mostrati nell'ora locale del sito di immersione.",
+  "tides_source_modelResolution": "Griglia del modello oceanico di {distance}",
   "tides_title": "Maree",
   "tools_gpsLogger_description": "Registra la tua posizione durante una giornata di immersioni e abbina automaticamente le immersioni importate alle posizioni GPS.",
   "tools_gpsLogger_subtitle": "Registra una traccia di superficie",
@@ -7105,6 +7107,182 @@
       }
     }
   },
+  "trips_cylinders_title": "Bombole",
+  "trips_cylinders_summary": "Piene {full} · Parziali {partial} · Vuote {empty}",
+  "@trips_cylinders_summary": {
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "empty": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_summaryUnfilled": "Non ancora caricate {count}",
+  "@trips_cylinders_summaryUnfilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_setUp": "Configura le bombole",
+  "trips_cylinders_setUpHint": "Tieni traccia delle bombole che hai in questo viaggio: ricariche, miscele e quanto resta in ciascuna.",
+  "trips_cylinders_status_full": "Piena",
+  "trips_cylinders_status_partial": "Parziale",
+  "trips_cylinders_status_empty": "Vuota",
+  "trips_cylinders_status_unknown": "Non ancora caricata",
+  "trips_cylinders_mixAir": "Aria",
+  "trips_cylinders_segment_board": "Quadro",
+  "trips_cylinders_segment_ledger": "Registro",
+  "trips_cylinders_action_add": "Aggiungi bombole",
+  "trips_cylinders_action_fill": "Ricarica",
+  "trips_cylinders_action_fillSeveral": "Ricarica più bombole",
+  "trips_cylinders_action_adjust": "Correggi",
+  "trips_cylinders_bottle": "Bombola {label}",
+  "@trips_cylinders_bottle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_linkedDives": "{count, plural, one{{count} immersione} other{{count} immersioni}}",
+  "@trips_cylinders_linkedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_last_fillAt": "Ricaricata da {place}, {when}",
+  "@trips_cylinders_last_fillAt": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_fill": "Ricaricata {when}",
+  "@trips_cylinders_last_fill": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_adjustment": "Corretta {when}",
+  "@trips_cylinders_last_adjustment": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_diveAt": "Immersione a {site}, {when}",
+  "@trips_cylinders_last_diveAt": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_dive": "Immersione {when}",
+  "@trips_cylinders_last_dive": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_boardEmpty": "Ancora nessuna bombola in questo viaggio",
+  "trips_cylinders_ledgerEmpty": "Ancora nessuna ricarica o correzione",
+  "trips_cylinders_kind_fill": "Ricarica",
+  "trips_cylinders_kind_adjustment": "Correzione",
+  "trips_cylinders_deleteConfirmUnused": "Eliminare questa bombola e le sue ricariche?",
+  "trips_cylinders_deleteConfirmUsed": "{count, plural, one{Eliminare questa bombola e le sue ricariche? {count} immersione l'ha usata. L'immersione conserva la sua bombola; viene rimosso solo il collegamento.} other{Eliminare questa bombola e le sue ricariche? {count} immersioni l'hanno usata. Le immersioni conservano le loro bombole; viene rimosso solo il collegamento.}}",
+  "@trips_cylinders_deleteConfirmUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_deleteEventConfirm": "Eliminare questa voce?",
+  "trips_cylinders_add_tabRental": "Noleggio",
+  "trips_cylinders_add_tabOwned": "Dalla mia attrezzatura",
+  "trips_cylinders_add_count": "Quante",
+  "trips_cylinders_add_preset": "Tipo di bombola",
+  "trips_cylinders_add_prefix": "Prefisso del nome",
+  "trips_cylinders_add_prefixDefault": "Pick-up",
+  "trips_cylinders_add_noOwned": "Non restano bombole della tua attrezzatura da aggiungere.",
+  "trips_cylinders_add_errorCount": "Inserisci un numero da 1 a 20.",
+  "trips_cylinders_fill_titleEdit": "Modifica ricarica",
+  "trips_cylinders_fill_when": "Quando",
+  "trips_cylinders_fill_where": "Stazione di ricarica",
+  "trips_cylinders_fill_whereNone": "Non impostata",
+  "trips_cylinders_fill_pressure": "Pressione di ricarica ({unit})",
+  "@trips_cylinders_fill_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_fill_o2": "O2 richiesto (%)",
+  "trips_cylinders_fill_he": "He richiesto (%)",
+  "trips_cylinders_fill_analyzedO2": "O2 analizzato (%)",
+  "trips_cylinders_fill_analyzedHe": "He analizzato (%)",
+  "trips_cylinders_fill_bottle": "Numero della bombola",
+  "trips_cylinders_fill_cost": "Costo",
+  "trips_cylinders_fill_costEach": "Costo per bombola",
+  "trips_cylinders_fill_currency": "Valuta",
+  "trips_cylinders_fill_package": "Incluso in un pacchetto",
+  "trips_cylinders_fill_slots": "Bombole da ricaricare",
+  "trips_cylinders_fill_errorMix": "L'ossigeno deve essere tra 1 e 100 per cento, l'elio tra 0 e 99, e insieme al massimo 100.",
+  "trips_cylinders_fill_errorNoSlot": "Scegli almeno una bombola.",
+  "trips_cylinders_note": "Nota",
+  "trips_cylinders_adjust_titleEdit": "Modifica correzione",
+  "trips_cylinders_adjust_pressure": "Pressione ({unit})",
+  "@trips_cylinders_adjust_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_adjust_markEmpty": "Segna come vuota",
+  "trips_cylinders_edit_title": "Modifica bombola",
+  "trips_cylinders_edit_label": "Nome",
+  "trips_cylinders_edit_errorLabel": "Inserisci un nome.",
+  "trips_cylinders_edit_errorNeedsPressure": "Inserisci anche la pressione di esercizio per poter convertire la dimensione.",
+  "trips_cylinders_edit_volume": "Dimensione ({unit})",
+  "@trips_cylinders_edit_volume": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_workingPressure": "Pressione di esercizio ({unit})",
+  "@trips_cylinders_edit_workingPressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_presetCustom": "Personalizzata",
   "trips_edit_label_disembarkPort": "Disembark Port",
   "trips_edit_label_embarkPort": "Embark Port",
   "trips_edit_label_endDate": "Data di fine",
@@ -9817,6 +9995,8 @@
   "dataQuality_msg_pressureSwap": "La pressione finale {end} è superiore alla pressione iniziale {start}",
   "dataQuality_msg_pressureEndpoint": "Il record della bombola indica {record}, ma la serie del sensore mostra {series}",
   "dataQuality_msg_pressureRise": "La pressione è aumentata di {rise} durante l'immersione senza cambio gas",
+  "dataQuality_msg_pressureDropout": "{count, plural, =1{Il sensore di pressione ha registrato una lettura errata una volta (interruzione o picco)} other{Il sensore di pressione ha registrato letture errate {count} volte (interruzioni o picchi)}}",
+  "dataQuality_msg_pressureMixed": "La serie di pressione mescola le letture di due fonti",
   "dataQuality_msg_sac": "Il consumo in superficie implicito di {sac} non è plausibile",
   "dataQuality_msg_ppo2": "La ppO2 ha raggiunto {ppo2} con {gas} a {depth}",
   "dataQuality_msg_hypoxic": "Miscela ipossica ({gas}) indicata in uso in superficie",
@@ -13325,28 +13505,46 @@
   "diveCenters_rental_noteLabel": "Nota",
   "diveCenters_rental_deleteConfirm": "Eliminare questa nota sul noleggio?",
   "query_buddies_certifications": "Brevetti",
+  "query_buddies_dives": "Immersioni",
   "query_buddies_email": "E-mail",
   "query_buddies_favorite": "Preferita",
   "query_buddies_name": "Nome",
   "query_buddies_notes": "Note",
   "query_buddies_phone": "Telefono",
+  "query_centers_affiliations": "Affiliazioni",
   "query_centers_city": "Città",
+  "query_centers_coordinates": "Coordinate",
   "query_centers_country": "Paese",
+  "query_centers_dives": "Immersioni",
   "query_centers_name": "Nome",
+  "query_centers_notes": "Note",
+  "query_centers_rating": "Valutazione",
+  "query_centers_stateProvince": "Stato / Provincia",
   "query_certifications_agency": "Didattica",
+  "query_certifications_buddy": "Compagno",
   "query_certifications_cardNumber": "Numero tessera",
+  "query_certifications_course": "Corso",
   "query_certifications_expiryDate": "Data di scadenza",
+  "query_certifications_instructor": "Istruttore",
   "query_certifications_instructorName": "Nome dell'istruttore",
+  "query_certifications_instructorNumber": "Numero istruttore",
   "query_certifications_issueDate": "Data di rilascio",
   "query_certifications_level": "Livello",
   "query_certifications_name": "Nome",
+  "query_certifications_notes": "Note",
   "query_computers_manufacturer": "Produttore",
   "query_computers_model": "Modello",
   "query_computers_name": "Nome",
   "query_computers_serialNumber": "Numero di serie",
   "query_courses_agency": "Didattica",
+  "query_courses_certification": "Certificazione",
   "query_courses_completionDate": "Data di completamento",
+  "query_courses_dives": "Immersioni",
+  "query_courses_instructor": "Istruttore",
+  "query_courses_instructorName": "Nome dell'istruttore",
+  "query_courses_location": "Località",
   "query_courses_name": "Nome",
+  "query_courses_notes": "Note",
   "query_courses_startDate": "Data di inizio",
   "query_customFields_key": "Chiave",
   "query_customFields_value": "Valore",
@@ -13438,6 +13636,9 @@
   "query_equipment_status": "Stato",
   "query_equipment_tags": "Tag",
   "query_equipment_type": "Tipo",
+  "query_filter_clear": "Cancella",
+  "query_filter_tooltip": "Filtro",
+  "query_list_noMatch": "Nessun risultato corrisponde a questa query",
   "query_media_caption": "Didascalia",
   "query_media_favorite": "Preferita",
   "query_media_type": "Tipo",
@@ -13459,9 +13660,15 @@
   "query_sites_region": "Regione",
   "query_sites_tags": "Tag",
   "query_sites_types": "Tipi di sito",
+  "query_species_builtIn": "Predefinito",
   "query_species_category": "Categoria",
+  "query_species_description": "Descrizione",
+  "query_species_dives": "Immersioni",
+  "query_species_expectedSites": "Prevista nei siti",
   "query_species_name": "Nome",
   "query_species_scientificName": "Nome scientifico",
+  "query_species_sightings": "Avvistamenti",
+  "query_species_taxonomyClass": "Classe tassonomica",
   "query_tags_name": "Nome",
   "query_tanks_cylinder": "Bombola",
   "query_tanks_endPressure": "Pressione finale",

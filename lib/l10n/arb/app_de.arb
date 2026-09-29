@@ -6982,6 +6982,8 @@
   "tides_source_sheetTitle": "Quelle der Gezeitendaten",
   "tides_source_datumMllw": "Höhen relativ zu MLLW (Stationsdatum)",
   "tides_source_datumMsl": "Höhen relativ zum mittleren Meeresspiegel",
+  "tides_source_siteLocalTime": "Zeiten werden in der Ortszeit des Tauchplatzes angezeigt.",
+  "tides_source_modelResolution": "Ozeanmodell-Raster mit {distance}",
   "tides_title": "Gezeiten",
   "tools_gpsLogger_description": "Zeichne deine Position während eines Tauchtags auf und ordne importierte Tauchgänge automatisch GPS-Positionen zu.",
   "tools_gpsLogger_subtitle": "Oberflächen-Track aufzeichnen",
@@ -7314,6 +7316,182 @@
       }
     }
   },
+  "trips_cylinders_title": "Flaschen",
+  "trips_cylinders_summary": "Voll {full} · Teilweise {partial} · Leer {empty}",
+  "@trips_cylinders_summary": {
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "empty": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_summaryUnfilled": "Noch nicht gefüllt {count}",
+  "@trips_cylinders_summaryUnfilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_setUp": "Flaschen einrichten",
+  "trips_cylinders_setUpHint": "Verfolge die Flaschen, die du auf dieser Reise hast: Füllungen, Gemische und was in jeder übrig ist.",
+  "trips_cylinders_status_full": "Voll",
+  "trips_cylinders_status_partial": "Teilweise",
+  "trips_cylinders_status_empty": "Leer",
+  "trips_cylinders_status_unknown": "Noch nicht gefüllt",
+  "trips_cylinders_mixAir": "Luft",
+  "trips_cylinders_segment_board": "Übersicht",
+  "trips_cylinders_segment_ledger": "Verlauf",
+  "trips_cylinders_action_add": "Flaschen hinzufügen",
+  "trips_cylinders_action_fill": "Füllen",
+  "trips_cylinders_action_fillSeveral": "Mehrere füllen",
+  "trips_cylinders_action_adjust": "Anpassen",
+  "trips_cylinders_bottle": "Flasche {label}",
+  "@trips_cylinders_bottle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_linkedDives": "{count, plural, one{{count} Tauchgang} other{{count} Tauchgänge}}",
+  "@trips_cylinders_linkedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_last_fillAt": "Gefüllt bei {place}, {when}",
+  "@trips_cylinders_last_fillAt": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_fill": "Gefüllt {when}",
+  "@trips_cylinders_last_fill": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_adjustment": "Angepasst {when}",
+  "@trips_cylinders_last_adjustment": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_diveAt": "Getaucht bei {site}, {when}",
+  "@trips_cylinders_last_diveAt": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_dive": "Getaucht {when}",
+  "@trips_cylinders_last_dive": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_boardEmpty": "Noch keine Flaschen auf dieser Reise",
+  "trips_cylinders_ledgerEmpty": "Noch keine Füllungen oder Anpassungen",
+  "trips_cylinders_kind_fill": "Füllung",
+  "trips_cylinders_kind_adjustment": "Anpassung",
+  "trips_cylinders_deleteConfirmUnused": "Diese Flasche und ihre Füllungen löschen?",
+  "trips_cylinders_deleteConfirmUsed": "{count, plural, one{Diese Flasche und ihre Füllungen löschen? {count} Tauchgang hat sie benutzt. Er behält seine Flasche; nur die Verknüpfung wird entfernt.} other{Diese Flasche und ihre Füllungen löschen? {count} Tauchgänge haben sie benutzt. Sie behalten ihre Flaschen; nur die Verknüpfung wird entfernt.}}",
+  "@trips_cylinders_deleteConfirmUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_deleteEventConfirm": "Diesen Eintrag löschen?",
+  "trips_cylinders_add_tabRental": "Leihflaschen",
+  "trips_cylinders_add_tabOwned": "Aus meiner Ausrüstung",
+  "trips_cylinders_add_count": "Anzahl",
+  "trips_cylinders_add_preset": "Flaschentyp",
+  "trips_cylinders_add_prefix": "Namenspräfix",
+  "trips_cylinders_add_prefixDefault": "Pick-up",
+  "trips_cylinders_add_noOwned": "In deiner Ausrüstung sind keine Flaschen mehr zum Hinzufügen.",
+  "trips_cylinders_add_errorCount": "Gib eine Zahl von 1 bis 20 ein.",
+  "trips_cylinders_fill_titleEdit": "Füllung bearbeiten",
+  "trips_cylinders_fill_when": "Wann",
+  "trips_cylinders_fill_where": "Füllstation",
+  "trips_cylinders_fill_whereNone": "Nicht festgelegt",
+  "trips_cylinders_fill_pressure": "Fülldruck ({unit})",
+  "@trips_cylinders_fill_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_fill_o2": "O2 bestellt (%)",
+  "trips_cylinders_fill_he": "He bestellt (%)",
+  "trips_cylinders_fill_analyzedO2": "O2 analysiert (%)",
+  "trips_cylinders_fill_analyzedHe": "He analysiert (%)",
+  "trips_cylinders_fill_bottle": "Flaschennummer",
+  "trips_cylinders_fill_cost": "Kosten",
+  "trips_cylinders_fill_costEach": "Kosten pro Flasche",
+  "trips_cylinders_fill_currency": "Währung",
+  "trips_cylinders_fill_package": "Im Paket enthalten",
+  "trips_cylinders_fill_slots": "Zu füllende Flaschen",
+  "trips_cylinders_fill_errorMix": "Sauerstoff muss 1 bis 100 Prozent sein, Helium 0 bis 99, zusammen höchstens 100.",
+  "trips_cylinders_fill_errorNoSlot": "Wähle mindestens eine Flasche.",
+  "trips_cylinders_note": "Notiz",
+  "trips_cylinders_adjust_titleEdit": "Anpassung bearbeiten",
+  "trips_cylinders_adjust_pressure": "Druck ({unit})",
+  "@trips_cylinders_adjust_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_adjust_markEmpty": "Als leer markieren",
+  "trips_cylinders_edit_title": "Flasche bearbeiten",
+  "trips_cylinders_edit_label": "Bezeichnung",
+  "trips_cylinders_edit_errorLabel": "Gib eine Bezeichnung ein.",
+  "trips_cylinders_edit_errorNeedsPressure": "Gib auch den Betriebsdruck ein, damit die Größe umgerechnet werden kann.",
+  "trips_cylinders_edit_volume": "Größe ({unit})",
+  "@trips_cylinders_edit_volume": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_workingPressure": "Betriebsdruck ({unit})",
+  "@trips_cylinders_edit_workingPressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_presetCustom": "Benutzerdefiniert",
   "trips_edit_label_disembarkPort": "Disembark Port",
   "trips_edit_label_embarkPort": "Embark Port",
   "trips_edit_label_endDate": "Enddatum",
@@ -9929,6 +10107,8 @@
   "dataQuality_msg_pressureSwap": "Enddruck {end} liegt über dem Anfangsdruck {start}",
   "dataQuality_msg_pressureEndpoint": "Der Flaschendatensatz nennt {record}, aber die Sensorreihe zeigt {series}",
   "dataQuality_msg_pressureRise": "Druck stieg mitten im Tauchgang um {rise} ohne Gaswechsel",
+  "dataQuality_msg_pressureDropout": "{count, plural, =1{Der Drucksensor lieferte einmal Fehlwerte (Aussetzer oder Ausreisser)} other{Der Drucksensor lieferte {count}-mal Fehlwerte (Aussetzer oder Ausreisser)}}",
+  "dataQuality_msg_pressureMixed": "Die Druckreihe vermischt die Messwerte zweier Quellen",
   "dataQuality_msg_sac": "Der abgeleitete Oberflächenverbrauch von {sac} ist unplausibel",
   "dataQuality_msg_ppo2": "ppO2 erreichte {ppo2} mit {gas} auf {depth}",
   "dataQuality_msg_hypoxic": "Hypoxisches Gemisch ({gas}) an der Oberfläche in Verwendung angezeigt",
@@ -13425,28 +13605,46 @@
   "diveCenters_rental_noteLabel": "Notiz",
   "diveCenters_rental_deleteConfirm": "Diese Leihnotiz löschen?",
   "query_buddies_certifications": "Zertifizierungen",
+  "query_buddies_dives": "Tauchgänge",
   "query_buddies_email": "E-Mail",
   "query_buddies_favorite": "Favorit",
   "query_buddies_name": "Name",
   "query_buddies_notes": "Notizen",
   "query_buddies_phone": "Telefon",
+  "query_centers_affiliations": "Verbindungen",
   "query_centers_city": "Stadt",
+  "query_centers_coordinates": "Koordinaten",
   "query_centers_country": "Land",
+  "query_centers_dives": "Tauchgänge",
   "query_centers_name": "Name",
+  "query_centers_notes": "Notizen",
+  "query_centers_rating": "Bewertung",
+  "query_centers_stateProvince": "Bundesland / Provinz",
   "query_certifications_agency": "Verband",
+  "query_certifications_buddy": "Tauchpartner",
   "query_certifications_cardNumber": "Kartennummer",
+  "query_certifications_course": "Kurs",
   "query_certifications_expiryDate": "Ablaufdatum",
+  "query_certifications_instructor": "Tauchlehrer",
   "query_certifications_instructorName": "Name des Instructors",
+  "query_certifications_instructorNumber": "Tauchlehrernummer",
   "query_certifications_issueDate": "Ausstellungsdatum",
   "query_certifications_level": "Stufe",
   "query_certifications_name": "Name",
+  "query_certifications_notes": "Notizen",
   "query_computers_manufacturer": "Hersteller",
   "query_computers_model": "Modell",
   "query_computers_name": "Name",
   "query_computers_serialNumber": "Seriennummer",
   "query_courses_agency": "Verband",
+  "query_courses_certification": "Zertifizierung",
   "query_courses_completionDate": "Abschlussdatum",
+  "query_courses_dives": "Tauchgänge",
+  "query_courses_instructor": "Tauchlehrer",
+  "query_courses_instructorName": "Name des Instructors",
+  "query_courses_location": "Ort",
   "query_courses_name": "Name",
+  "query_courses_notes": "Notizen",
   "query_courses_startDate": "Startdatum",
   "query_customFields_key": "Schlüssel",
   "query_customFields_value": "Wert",
@@ -13538,6 +13736,9 @@
   "query_equipment_status": "Status",
   "query_equipment_tags": "Tags",
   "query_equipment_type": "Typ",
+  "query_filter_clear": "Löschen",
+  "query_filter_tooltip": "Filter",
+  "query_list_noMatch": "Nichts entspricht dieser Abfrage",
   "query_media_caption": "Bildunterschrift",
   "query_media_favorite": "Favorit",
   "query_media_type": "Typ",
@@ -13559,9 +13760,15 @@
   "query_sites_region": "Region",
   "query_sites_tags": "Tags",
   "query_sites_types": "Tauchplatztypen",
+  "query_species_builtIn": "Vordefiniert",
   "query_species_category": "Kategorie",
+  "query_species_description": "Beschreibung",
+  "query_species_dives": "Tauchgänge",
+  "query_species_expectedSites": "Erwartet an Tauchplätzen",
   "query_species_name": "Name",
   "query_species_scientificName": "Wissenschaftlicher Name",
+  "query_species_sightings": "Sichtungen",
+  "query_species_taxonomyClass": "Taxonomische Klasse",
   "query_tags_name": "Name",
   "query_tanks_cylinder": "Flasche",
   "query_tanks_endPressure": "Enddruck",

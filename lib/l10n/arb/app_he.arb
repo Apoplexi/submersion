@@ -6879,6 +6879,8 @@
   "tides_source_sheetTitle": "מקור נתוני הגאות",
   "tides_source_datumMllw": "גבהים ביחס ל-MLLW (ייחוס התחנה)",
   "tides_source_datumMsl": "גבהים ביחס לגובה פני הים הממוצע",
+  "tides_source_siteLocalTime": "השעות מוצגות לפי השעה המקומית של אתר הצלילה.",
+  "tides_source_modelResolution": "רשת מודל אוקיינוס של {distance}",
   "tides_title": "גאות",
   "tools_gpsLogger_description": "הקלט את מיקומך במהלך יום צלילה והתאם אוטומטית צלילות מיובאות למיקומי GPS.",
   "tools_gpsLogger_subtitle": "הקלטת מסלול פני המים",
@@ -7211,6 +7213,182 @@
       }
     }
   },
+  "trips_cylinders_title": "מכלים",
+  "trips_cylinders_summary": "מלאים {full} · חלקיים {partial} · ריקים {empty}",
+  "@trips_cylinders_summary": {
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "empty": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_summaryUnfilled": "טרם מולאו {count}",
+  "@trips_cylinders_summaryUnfilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_setUp": "הגדרת מכלים",
+  "trips_cylinders_setUpHint": "עקבו אחר המכלים שיש לכם בטיול הזה: מילויים, תערובות וכמה נשאר בכל אחד.",
+  "trips_cylinders_status_full": "מלא",
+  "trips_cylinders_status_partial": "חלקי",
+  "trips_cylinders_status_empty": "ריק",
+  "trips_cylinders_status_unknown": "טרם מולא",
+  "trips_cylinders_mixAir": "אוויר",
+  "trips_cylinders_segment_board": "לוח",
+  "trips_cylinders_segment_ledger": "יומן",
+  "trips_cylinders_action_add": "הוספת מכלים",
+  "trips_cylinders_action_fill": "מילוי",
+  "trips_cylinders_action_fillSeveral": "מילוי כמה מכלים",
+  "trips_cylinders_action_adjust": "תיקון",
+  "trips_cylinders_bottle": "מכל {label}",
+  "@trips_cylinders_bottle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_linkedDives": "{count, plural, one{{count} צלילה} other{{count} צלילות}}",
+  "@trips_cylinders_linkedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_last_fillAt": "מולא אצל {place}, {when}",
+  "@trips_cylinders_last_fillAt": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_fill": "מולא {when}",
+  "@trips_cylinders_last_fill": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_adjustment": "תוקן {when}",
+  "@trips_cylinders_last_adjustment": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_diveAt": "צלילה באתר {site}, {when}",
+  "@trips_cylinders_last_diveAt": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_last_dive": "צלילה {when}",
+  "@trips_cylinders_last_dive": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_boardEmpty": "עדיין אין מכלים בטיול הזה",
+  "trips_cylinders_ledgerEmpty": "עדיין אין מילויים או תיקונים",
+  "trips_cylinders_kind_fill": "מילוי",
+  "trips_cylinders_kind_adjustment": "תיקון",
+  "trips_cylinders_deleteConfirmUnused": "למחוק את המכל הזה ואת המילויים שלו?",
+  "trips_cylinders_deleteConfirmUsed": "{count, plural, one{למחוק את המכל הזה ואת המילויים שלו? {count} צלילה השתמשה בו. הצלילה שומרת את המכל שלה; רק הקישור מוסר.} other{למחוק את המכל הזה ואת המילויים שלו? {count} צלילות השתמשו בו. הצלילות שומרות את המכלים שלהן; רק הקישור מוסר.}}",
+  "@trips_cylinders_deleteConfirmUsed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_cylinders_deleteEventConfirm": "למחוק את הרשומה הזו?",
+  "trips_cylinders_add_tabRental": "שכור",
+  "trips_cylinders_add_tabOwned": "מהציוד שלי",
+  "trips_cylinders_add_count": "כמה",
+  "trips_cylinders_add_preset": "סוג מכל",
+  "trips_cylinders_add_prefix": "קידומת לשם",
+  "trips_cylinders_add_prefixDefault": "טנדר",
+  "trips_cylinders_add_noOwned": "לא נותרו מכלים בציוד שלך להוספה.",
+  "trips_cylinders_add_errorCount": "הזינו מספר בין 1 ל-20.",
+  "trips_cylinders_fill_titleEdit": "עריכת מילוי",
+  "trips_cylinders_fill_when": "מתי",
+  "trips_cylinders_fill_where": "תחנת מילוי",
+  "trips_cylinders_fill_whereNone": "לא הוגדר",
+  "trips_cylinders_fill_pressure": "לחץ מילוי ({unit})",
+  "@trips_cylinders_fill_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_fill_o2": "O2 שהוזמן (%)",
+  "trips_cylinders_fill_he": "He שהוזמן (%)",
+  "trips_cylinders_fill_analyzedO2": "O2 שנמדד (%)",
+  "trips_cylinders_fill_analyzedHe": "He שנמדד (%)",
+  "trips_cylinders_fill_bottle": "מספר מכל",
+  "trips_cylinders_fill_cost": "עלות",
+  "trips_cylinders_fill_costEach": "עלות לכל מכל",
+  "trips_cylinders_fill_currency": "מטבע",
+  "trips_cylinders_fill_package": "כלול בחבילה",
+  "trips_cylinders_fill_slots": "מכלים למילוי",
+  "trips_cylinders_fill_errorMix": "החמצן חייב להיות בין 1 ל-100 אחוז, ההליום בין 0 ל-99, ויחד לכל היותר 100.",
+  "trips_cylinders_fill_errorNoSlot": "בחרו לפחות מכל אחד.",
+  "trips_cylinders_note": "הערה",
+  "trips_cylinders_adjust_titleEdit": "עריכת תיקון",
+  "trips_cylinders_adjust_pressure": "לחץ ({unit})",
+  "@trips_cylinders_adjust_pressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_adjust_markEmpty": "סימון כריק",
+  "trips_cylinders_edit_title": "עריכת מכל",
+  "trips_cylinders_edit_label": "שם",
+  "trips_cylinders_edit_errorLabel": "הזינו שם.",
+  "trips_cylinders_edit_errorNeedsPressure": "הזינו גם לחץ עבודה כדי שאפשר יהיה להמיר את הגודל.",
+  "trips_cylinders_edit_volume": "גודל ({unit})",
+  "@trips_cylinders_edit_volume": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_workingPressure": "לחץ עבודה ({unit})",
+  "@trips_cylinders_edit_workingPressure": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_cylinders_edit_presetCustom": "מותאם אישית",
   "trips_edit_label_disembarkPort": "Disembark Port",
   "trips_edit_label_embarkPort": "Embark Port",
   "trips_edit_label_endDate": "תאריך סיום",
@@ -9817,6 +9995,8 @@
   "dataQuality_msg_pressureSwap": "לחץ הסיום {end} גבוה מלחץ ההתחלה {start}",
   "dataQuality_msg_pressureEndpoint": "רשומת הבלון מציינת {record}, אך סדרת החיישן מציגה {series}",
   "dataQuality_msg_pressureRise": "הלחץ עלה ב-{rise} באמצע הצלילה ללא החלפת גז",
+  "dataQuality_msg_pressureDropout": "{count, plural, =1{חיישן הלחץ רשם קריאה שגויה פעם אחת (נפילה או קפיצה)} other{חיישן הלחץ רשם קריאות שגויות {count} פעמים (נפילות או קפיצות)}}",
+  "dataQuality_msg_pressureMixed": "סדרת הלחץ מערבבת קריאות משני מקורות",
   "dataQuality_msg_sac": "צריכת פני השטח המשתמעת של {sac} אינה סבירה",
   "dataQuality_msg_ppo2": "ה-ppO2 הגיע ל-{ppo2} עם {gas} בעומק {depth}",
   "dataQuality_msg_hypoxic": "תערובת היפוקסית ({gas}) מוצגת כבשימוש בפני השטח",
@@ -13325,28 +13505,46 @@
   "diveCenters_rental_noteLabel": "הערה",
   "diveCenters_rental_deleteConfirm": "למחוק את הערת ההשכרה הזו?",
   "query_buddies_certifications": "הסמכות",
+  "query_buddies_dives": "צלילות",
   "query_buddies_email": "דוא\"ל",
   "query_buddies_favorite": "מועדף",
   "query_buddies_name": "שם",
   "query_buddies_notes": "הערות",
   "query_buddies_phone": "טלפון",
+  "query_centers_affiliations": "השתייכויות",
   "query_centers_city": "עיר",
+  "query_centers_coordinates": "קואורדינטות",
   "query_centers_country": "מדינה",
+  "query_centers_dives": "צלילות",
   "query_centers_name": "שם",
+  "query_centers_notes": "הערות",
+  "query_centers_rating": "דירוג",
+  "query_centers_stateProvince": "מדינה / מחוז",
   "query_certifications_agency": "ארגון",
+  "query_certifications_buddy": "שותף",
   "query_certifications_cardNumber": "מספר כרטיס",
+  "query_certifications_course": "קורס",
   "query_certifications_expiryDate": "תאריך תפוגה",
+  "query_certifications_instructor": "מדריך",
   "query_certifications_instructorName": "שם המדריך",
+  "query_certifications_instructorNumber": "מספר המדריך",
   "query_certifications_issueDate": "תאריך הנפקה",
   "query_certifications_level": "רמה",
   "query_certifications_name": "שם",
+  "query_certifications_notes": "הערות",
   "query_computers_manufacturer": "יצרן",
   "query_computers_model": "דגם",
   "query_computers_name": "שם",
   "query_computers_serialNumber": "מספר סידורי",
   "query_courses_agency": "ארגון",
+  "query_courses_certification": "הסמכה",
   "query_courses_completionDate": "תאריך סיום",
+  "query_courses_dives": "צלילות",
+  "query_courses_instructor": "מדריך",
+  "query_courses_instructorName": "שם המדריך",
+  "query_courses_location": "מיקום",
   "query_courses_name": "שם",
+  "query_courses_notes": "הערות",
   "query_courses_startDate": "תאריך התחלה",
   "query_customFields_key": "מפתח",
   "query_customFields_value": "ערך",
@@ -13438,6 +13636,9 @@
   "query_equipment_status": "מצב",
   "query_equipment_tags": "תגיות",
   "query_equipment_type": "סוג",
+  "query_filter_clear": "נקה",
+  "query_filter_tooltip": "סינון",
+  "query_list_noMatch": "אין תוצאות התואמות לשאילתה זו",
   "query_media_caption": "כיתוב",
   "query_media_favorite": "מועדף",
   "query_media_type": "סוג",
@@ -13459,9 +13660,15 @@
   "query_sites_region": "אזור",
   "query_sites_tags": "תגיות",
   "query_sites_types": "סוגי אתר",
+  "query_species_builtIn": "מובנה",
   "query_species_category": "קטגוריה",
+  "query_species_description": "תיאור",
+  "query_species_dives": "צלילות",
+  "query_species_expectedSites": "צפוי באתרים",
   "query_species_name": "שם",
   "query_species_scientificName": "שם מדעי",
+  "query_species_sightings": "תצפיות",
+  "query_species_taxonomyClass": "מחלקה טקסונומית",
   "query_tags_name": "שם",
   "query_tanks_cylinder": "מיכל",
   "query_tanks_endPressure": "לחץ סופי",
