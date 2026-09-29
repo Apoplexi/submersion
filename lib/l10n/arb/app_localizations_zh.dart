@@ -43260,6 +43260,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_dives_rating => '评分';
 
   @override
+  String get query_dives_findings => '安全发现';
+
+  @override
+  String get query_dives_sac => 'SAC';
+
+  @override
+  String get query_dives_sacTrend => 'SAC 趋势';
+
+  @override
+  String get query_dives_sacTrend_rising => '上升';
+
+  @override
+  String get query_dives_sacTrend_steady => '平稳';
+
+  @override
+  String get query_dives_sacTrend_falling => '下降';
+
+  @override
+  String get query_dives_sacChange => 'SAC 变化';
+
+  @override
+  String get query_dives_finalStop => '最后停留';
+
+  @override
+  String get query_dives_finalStop_stable => '稳定';
+
+  @override
+  String get query_dives_finalStop_unstable => '不稳定';
+
+  @override
+  String get query_dives_finalStop_noStop => '无停留';
+
+  @override
+  String get query_dives_finalStopExcursion => '最后停留偏差';
+
+  @override
+  String get query_dives_finalStopDuration => '最后停留时长';
+
+  @override
   String get query_dives_runtime => '总时长';
 
   @override
@@ -43336,6 +43375,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get query_entity_equipmentAttributes => '装备属性';
+
+  @override
+  String get query_entity_findings => '安全发现';
+
+  @override
+  String get query_findings_rule => '规则';
 
   @override
   String get query_entity_media => '媒体';

@@ -45805,6 +45805,45 @@ class AppLocalizationsDe extends AppLocalizations {
   String get query_dives_rating => 'Bewertung';
 
   @override
+  String get query_dives_findings => 'Sicherheitsbefunde';
+
+  @override
+  String get query_dives_sac => 'AMV';
+
+  @override
+  String get query_dives_sacTrend => 'AMV-Trend';
+
+  @override
+  String get query_dives_sacTrend_rising => 'Steigend';
+
+  @override
+  String get query_dives_sacTrend_steady => 'Gleichbleibend';
+
+  @override
+  String get query_dives_sacTrend_falling => 'Fallend';
+
+  @override
+  String get query_dives_sacChange => 'AMV-Änderung';
+
+  @override
+  String get query_dives_finalStop => 'Letzter Stopp';
+
+  @override
+  String get query_dives_finalStop_stable => 'Stabil';
+
+  @override
+  String get query_dives_finalStop_unstable => 'Instabil';
+
+  @override
+  String get query_dives_finalStop_noStop => 'Kein Stopp';
+
+  @override
+  String get query_dives_finalStopExcursion => 'Abweichung beim letzten Stopp';
+
+  @override
+  String get query_dives_finalStopDuration => 'Dauer des letzten Stopps';
+
+  @override
   String get query_dives_runtime => 'Gesamtzeit';
 
   @override
@@ -45881,6 +45920,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get query_entity_equipmentAttributes => 'Ausrüstungsmerkmale';
+
+  @override
+  String get query_entity_findings => 'Sicherheitsbefunde';
+
+  @override
+  String get query_findings_rule => 'Regel';
 
   @override
   String get query_entity_media => 'Medien';

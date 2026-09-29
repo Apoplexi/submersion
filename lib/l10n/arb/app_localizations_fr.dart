@@ -45998,6 +45998,45 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_dives_rating => 'Note';
 
   @override
+  String get query_dives_findings => 'Constats de sécurité';
+
+  @override
+  String get query_dives_sac => 'SAC';
+
+  @override
+  String get query_dives_sacTrend => 'Tendance du SAC';
+
+  @override
+  String get query_dives_sacTrend_rising => 'En hausse';
+
+  @override
+  String get query_dives_sacTrend_steady => 'Stable';
+
+  @override
+  String get query_dives_sacTrend_falling => 'En baisse';
+
+  @override
+  String get query_dives_sacChange => 'Variation du SAC';
+
+  @override
+  String get query_dives_finalStop => 'Dernier palier';
+
+  @override
+  String get query_dives_finalStop_stable => 'Stable';
+
+  @override
+  String get query_dives_finalStop_unstable => 'Instable';
+
+  @override
+  String get query_dives_finalStop_noStop => 'Aucun palier';
+
+  @override
+  String get query_dives_finalStopExcursion => 'Écart au dernier palier';
+
+  @override
+  String get query_dives_finalStopDuration => 'Durée du dernier palier';
+
+  @override
   String get query_dives_runtime => 'Durée totale';
 
   @override
@@ -46074,6 +46113,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get query_entity_equipmentAttributes => 'Attributs de l\'équipement';
+
+  @override
+  String get query_entity_findings => 'Constats de sécurité';
+
+  @override
+  String get query_findings_rule => 'Règle';
 
   @override
   String get query_entity_media => 'Médias';

@@ -45877,6 +45877,45 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_dives_rating => 'Valutazione';
 
   @override
+  String get query_dives_findings => 'Rilievi di sicurezza';
+
+  @override
+  String get query_dives_sac => 'SAC';
+
+  @override
+  String get query_dives_sacTrend => 'Andamento del SAC';
+
+  @override
+  String get query_dives_sacTrend_rising => 'In aumento';
+
+  @override
+  String get query_dives_sacTrend_steady => 'Stabile';
+
+  @override
+  String get query_dives_sacTrend_falling => 'In calo';
+
+  @override
+  String get query_dives_sacChange => 'Variazione del SAC';
+
+  @override
+  String get query_dives_finalStop => 'Ultima sosta';
+
+  @override
+  String get query_dives_finalStop_stable => 'Stabile';
+
+  @override
+  String get query_dives_finalStop_unstable => 'Instabile';
+
+  @override
+  String get query_dives_finalStop_noStop => 'Nessuna sosta';
+
+  @override
+  String get query_dives_finalStopExcursion => 'Scostamento all\'ultima sosta';
+
+  @override
+  String get query_dives_finalStopDuration => 'Durata dell\'ultima sosta';
+
+  @override
   String get query_dives_runtime => 'Durata totale';
 
   @override
@@ -45953,6 +45992,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get query_entity_equipmentAttributes => 'Attributi dell\'attrezzatura';
+
+  @override
+  String get query_entity_findings => 'Rilievi di sicurezza';
+
+  @override
+  String get query_findings_rule => 'Regola';
 
   @override
   String get query_entity_media => 'Media';

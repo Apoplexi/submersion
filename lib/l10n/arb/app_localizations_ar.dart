@@ -45533,6 +45533,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_dives_rating => 'التقييم';
 
   @override
+  String get query_dives_findings => 'نتائج السلامة';
+
+  @override
+  String get query_dives_sac => 'SAC';
+
+  @override
+  String get query_dives_sacTrend => 'اتجاه SAC';
+
+  @override
+  String get query_dives_sacTrend_rising => 'متزايد';
+
+  @override
+  String get query_dives_sacTrend_steady => 'ثابت';
+
+  @override
+  String get query_dives_sacTrend_falling => 'متناقص';
+
+  @override
+  String get query_dives_sacChange => 'تغير SAC';
+
+  @override
+  String get query_dives_finalStop => 'التوقف الأخير';
+
+  @override
+  String get query_dives_finalStop_stable => 'مستقر';
+
+  @override
+  String get query_dives_finalStop_unstable => 'غير مستقر';
+
+  @override
+  String get query_dives_finalStop_noStop => 'بلا توقف';
+
+  @override
+  String get query_dives_finalStopExcursion => 'الانحراف في التوقف الأخير';
+
+  @override
+  String get query_dives_finalStopDuration => 'مدة التوقف الأخير';
+
+  @override
   String get query_dives_runtime => 'المدة الكلية';
 
   @override
@@ -45609,6 +45648,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_entity_equipmentAttributes => 'خصائص المعدات';
+
+  @override
+  String get query_entity_findings => 'نتائج السلامة';
+
+  @override
+  String get query_findings_rule => 'القاعدة';
 
   @override
   String get query_entity_media => 'الوسائط';
