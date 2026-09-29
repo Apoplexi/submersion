@@ -72341,6 +72341,12 @@ abstract class AppLocalizations {
   /// **'Certifications'**
   String get query_buddies_certifications;
 
+  /// Query builder: a buddy's dives
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get query_buddies_dives;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
@@ -72371,11 +72377,23 @@ abstract class AppLocalizations {
   /// **'Phone'**
   String get query_buddies_phone;
 
+  /// Query builder: a dive center's agency affiliations
+  ///
+  /// In en, this message translates to:
+  /// **'Affiliations'**
+  String get query_centers_affiliations;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
   /// **'City'**
   String get query_centers_city;
+
+  /// Query builder: whether a dive center has a map position
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get query_centers_coordinates;
 
   /// Field label in the query builder
   ///
@@ -72383,11 +72401,35 @@ abstract class AppLocalizations {
   /// **'Country'**
   String get query_centers_country;
 
+  /// Query builder: dives made with a dive center
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get query_centers_dives;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
   /// **'Name'**
   String get query_centers_name;
+
+  /// Query builder: a dive center's notes
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get query_centers_notes;
+
+  /// Query builder: a dive center's rating
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get query_centers_rating;
+
+  /// Query builder: a dive center's state or province
+  ///
+  /// In en, this message translates to:
+  /// **'State / Province'**
+  String get query_centers_stateProvince;
 
   /// Field label in the query builder
   ///
@@ -72395,11 +72437,23 @@ abstract class AppLocalizations {
   /// **'Agency'**
   String get query_certifications_agency;
 
+  /// Query builder: the buddy a certification belongs to
+  ///
+  /// In en, this message translates to:
+  /// **'Buddy'**
+  String get query_certifications_buddy;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
   /// **'Card number'**
   String get query_certifications_cardNumber;
+
+  /// Query builder: the course a certification came from
+  ///
+  /// In en, this message translates to:
+  /// **'Course'**
+  String get query_certifications_course;
 
   /// Field label in the query builder
   ///
@@ -72407,11 +72461,23 @@ abstract class AppLocalizations {
   /// **'Expiry date'**
   String get query_certifications_expiryDate;
 
+  /// Query builder: a certification's instructor
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor'**
+  String get query_certifications_instructor;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
   /// **'Instructor name'**
   String get query_certifications_instructorName;
+
+  /// Query builder: the instructor number on a certification
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor number'**
+  String get query_certifications_instructorNumber;
 
   /// Field label in the query builder
   ///
@@ -72430,6 +72496,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name'**
   String get query_certifications_name;
+
+  /// Query builder: a certification's notes
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get query_certifications_notes;
 
   /// Field label in the query builder
   ///
@@ -72461,17 +72533,53 @@ abstract class AppLocalizations {
   /// **'Agency'**
   String get query_courses_agency;
 
+  /// Query builder: the certification a course led to
+  ///
+  /// In en, this message translates to:
+  /// **'Certification'**
+  String get query_courses_certification;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
   /// **'Completion date'**
   String get query_courses_completionDate;
 
+  /// Query builder: a course's dives
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get query_courses_dives;
+
+  /// Query builder: a course's instructor (a buddy)
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor'**
+  String get query_courses_instructor;
+
+  /// Query builder: a course's instructor name
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor name'**
+  String get query_courses_instructorName;
+
+  /// Query builder: where a course was taken
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get query_courses_location;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
   /// **'Name'**
   String get query_courses_name;
+
+  /// Query builder: a course's notes
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get query_courses_notes;
 
   /// Field label in the query builder
   ///
@@ -73019,6 +73127,24 @@ abstract class AppLocalizations {
   /// **'Type'**
   String get query_equipment_type;
 
+  /// Clears a list's query, in its chip bar, filter sheet and no-match state
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get query_filter_clear;
+
+  /// Tooltip of the filter icon that opens a list's query filter sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get query_filter_tooltip;
+
+  /// Shown when a list's query hides every row
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches this query'**
+  String get query_list_noMatch;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
@@ -73145,11 +73271,35 @@ abstract class AppLocalizations {
   /// **'Site types'**
   String get query_sites_types;
 
+  /// Query builder: whether a species comes from the built-in catalog
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in'**
+  String get query_species_builtIn;
+
   /// Field label in the query builder
   ///
   /// In en, this message translates to:
   /// **'Category'**
   String get query_species_category;
+
+  /// Query builder: a species' description
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get query_species_description;
+
+  /// Query builder: the dives a species was sighted on
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get query_species_dives;
+
+  /// Query builder: the dive sites a species is curated as expected at (not where it was seen)
+  ///
+  /// In en, this message translates to:
+  /// **'Expected at sites'**
+  String get query_species_expectedSites;
 
   /// Field label in the query builder
   ///
@@ -73162,6 +73312,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scientific name'**
   String get query_species_scientificName;
+
+  /// Query builder: a species' sightings
+  ///
+  /// In en, this message translates to:
+  /// **'Sightings'**
+  String get query_species_sightings;
+
+  /// Query builder: a species' taxonomy class
+  ///
+  /// In en, this message translates to:
+  /// **'Taxonomy class'**
+  String get query_species_taxonomyClass;
 
   /// Field label in the query builder
   ///

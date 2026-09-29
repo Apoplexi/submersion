@@ -45397,6 +45397,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_buddies_certifications => 'Certifications';
 
   @override
+  String get query_buddies_dives => 'Plongées';
+
+  @override
   String get query_buddies_email => 'E-mail';
 
   @override
@@ -45412,25 +45415,55 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_buddies_phone => 'Téléphone';
 
   @override
+  String get query_centers_affiliations => 'Affiliations';
+
+  @override
   String get query_centers_city => 'Ville';
+
+  @override
+  String get query_centers_coordinates => 'Coordonnées';
 
   @override
   String get query_centers_country => 'Pays';
 
   @override
+  String get query_centers_dives => 'Plongées';
+
+  @override
   String get query_centers_name => 'Nom';
+
+  @override
+  String get query_centers_notes => 'Notes';
+
+  @override
+  String get query_centers_rating => 'Note';
+
+  @override
+  String get query_centers_stateProvince => 'État / Province';
 
   @override
   String get query_certifications_agency => 'Organisme';
 
   @override
+  String get query_certifications_buddy => 'Binôme';
+
+  @override
   String get query_certifications_cardNumber => 'Numéro de carte';
+
+  @override
+  String get query_certifications_course => 'Formation';
 
   @override
   String get query_certifications_expiryDate => 'Date d\'expiration';
 
   @override
+  String get query_certifications_instructor => 'Instructeur';
+
+  @override
   String get query_certifications_instructorName => 'Nom de l\'instructeur';
+
+  @override
+  String get query_certifications_instructorNumber => 'Numéro d\'instructeur';
 
   @override
   String get query_certifications_issueDate => 'Date de délivrance';
@@ -45440,6 +45473,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'Nom';
+
+  @override
+  String get query_certifications_notes => 'Notes';
 
   @override
   String get query_computers_manufacturer => 'Fabricant';
@@ -45457,10 +45493,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_courses_agency => 'Organisme';
 
   @override
+  String get query_courses_certification => 'Certification';
+
+  @override
   String get query_courses_completionDate => 'Date de fin de formation';
 
   @override
+  String get query_courses_dives => 'Plongées';
+
+  @override
+  String get query_courses_instructor => 'Instructeur';
+
+  @override
+  String get query_courses_instructorName => 'Nom de l\'instructeur';
+
+  @override
+  String get query_courses_location => 'Lieu';
+
+  @override
   String get query_courses_name => 'Nom';
+
+  @override
+  String get query_courses_notes => 'Notes';
 
   @override
   String get query_courses_startDate => 'Date de début';
@@ -45736,6 +45790,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_equipment_type => 'Type';
 
   @override
+  String get query_filter_clear => 'Effacer';
+
+  @override
+  String get query_filter_tooltip => 'Filtre';
+
+  @override
+  String get query_list_noMatch => 'Rien ne correspond à cette requête';
+
+  @override
   String get query_media_caption => 'Légende';
 
   @override
@@ -45799,13 +45862,31 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_sites_types => 'Types de site';
 
   @override
+  String get query_species_builtIn => 'Prédéfini';
+
+  @override
   String get query_species_category => 'Catégorie';
+
+  @override
+  String get query_species_description => 'Description';
+
+  @override
+  String get query_species_dives => 'Plongées';
+
+  @override
+  String get query_species_expectedSites => 'Attendue sur les sites';
 
   @override
   String get query_species_name => 'Nom';
 
   @override
   String get query_species_scientificName => 'Nom scientifique';
+
+  @override
+  String get query_species_sightings => 'Observations';
+
+  @override
+  String get query_species_taxonomyClass => 'Classe taxonomique';
 
   @override
   String get query_tags_name => 'Nom';

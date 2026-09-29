@@ -223,7 +223,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 244;
+  static const int currentSchemaVersion = 245;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -992,6 +992,10 @@ class AppDatabase extends _$AppDatabase {
     // Renumbered from 241: #2493 took it, main shipped 242 (#2541) and
     // an open branch claims 243 (#2409).
     244,
+    // v245: idx_certifications_buddy_id (issue #2365, PR 4). Index-only;
+    // the floor does not move. 243 was held by #2409 and 244 went to
+    // #2086 when this was taken.
+    245,
   ];
 
   /// Returns the number of migration steps that will execute when upgrading

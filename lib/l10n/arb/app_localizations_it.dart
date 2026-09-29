@@ -45276,6 +45276,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_buddies_certifications => 'Brevetti';
 
   @override
+  String get query_buddies_dives => 'Immersioni';
+
+  @override
   String get query_buddies_email => 'E-mail';
 
   @override
@@ -45291,25 +45294,55 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_buddies_phone => 'Telefono';
 
   @override
+  String get query_centers_affiliations => 'Affiliazioni';
+
+  @override
   String get query_centers_city => 'Città';
+
+  @override
+  String get query_centers_coordinates => 'Coordinate';
 
   @override
   String get query_centers_country => 'Paese';
 
   @override
+  String get query_centers_dives => 'Immersioni';
+
+  @override
   String get query_centers_name => 'Nome';
+
+  @override
+  String get query_centers_notes => 'Note';
+
+  @override
+  String get query_centers_rating => 'Valutazione';
+
+  @override
+  String get query_centers_stateProvince => 'Stato / Provincia';
 
   @override
   String get query_certifications_agency => 'Didattica';
 
   @override
+  String get query_certifications_buddy => 'Compagno';
+
+  @override
   String get query_certifications_cardNumber => 'Numero tessera';
+
+  @override
+  String get query_certifications_course => 'Corso';
 
   @override
   String get query_certifications_expiryDate => 'Data di scadenza';
 
   @override
+  String get query_certifications_instructor => 'Istruttore';
+
+  @override
   String get query_certifications_instructorName => 'Nome dell\'istruttore';
+
+  @override
+  String get query_certifications_instructorNumber => 'Numero istruttore';
 
   @override
   String get query_certifications_issueDate => 'Data di rilascio';
@@ -45319,6 +45352,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get query_certifications_name => 'Nome';
+
+  @override
+  String get query_certifications_notes => 'Note';
 
   @override
   String get query_computers_manufacturer => 'Produttore';
@@ -45336,10 +45372,28 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_courses_agency => 'Didattica';
 
   @override
+  String get query_courses_certification => 'Certificazione';
+
+  @override
   String get query_courses_completionDate => 'Data di completamento';
 
   @override
+  String get query_courses_dives => 'Immersioni';
+
+  @override
+  String get query_courses_instructor => 'Istruttore';
+
+  @override
+  String get query_courses_instructorName => 'Nome dell\'istruttore';
+
+  @override
+  String get query_courses_location => 'Località';
+
+  @override
   String get query_courses_name => 'Nome';
+
+  @override
+  String get query_courses_notes => 'Note';
 
   @override
   String get query_courses_startDate => 'Data di inizio';
@@ -45615,6 +45669,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_equipment_type => 'Tipo';
 
   @override
+  String get query_filter_clear => 'Cancella';
+
+  @override
+  String get query_filter_tooltip => 'Filtro';
+
+  @override
+  String get query_list_noMatch =>
+      'Nessun risultato corrisponde a questa query';
+
+  @override
   String get query_media_caption => 'Didascalia';
 
   @override
@@ -45678,13 +45742,31 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_sites_types => 'Tipi di sito';
 
   @override
+  String get query_species_builtIn => 'Predefinito';
+
+  @override
   String get query_species_category => 'Categoria';
+
+  @override
+  String get query_species_description => 'Descrizione';
+
+  @override
+  String get query_species_dives => 'Immersioni';
+
+  @override
+  String get query_species_expectedSites => 'Prevista nei siti';
 
   @override
   String get query_species_name => 'Nome';
 
   @override
   String get query_species_scientificName => 'Nome scientifico';
+
+  @override
+  String get query_species_sightings => 'Avvistamenti';
+
+  @override
+  String get query_species_taxonomyClass => 'Classe tassonomica';
 
   @override
   String get query_tags_name => 'Nome';
