@@ -12672,6 +12672,39 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get passport_fill_fromTag => 'De la etiqueta';
+
+  @override
+  String get passport_fill_analyseBeforeDiving =>
+      'Analiza el gas antes de bucear';
+
+  @override
+  String get passport_fill_writeToTagTitle => 'Carga registrada';
+
+  @override
+  String get passport_fill_writeToTagBody =>
+      '¿Escribirla en la etiqueta de la botella?';
+
+  @override
+  String get passport_fill_writeToTag => 'Escribir en la etiqueta';
+
+  @override
+  String get passport_fill_notNow => 'Ahora no';
+
+  @override
+  String get passport_foreign_lastFill => 'Último llenado en la etiqueta';
+
+  @override
+  String passport_foreign_fillSummary(String fill, String date) {
+    return '$fill · $date';
+  }
+
+  @override
+  String passport_fill_addedFromTag(String fill) {
+    return 'Llenado de la etiqueta añadido: $fill';
+  }
+
+  @override
   String passport_fill_analyzer(String analyzer) {
     return 'Analizada con $analyzer';
   }
@@ -12685,9 +12718,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String passport_fill_temperature(String temperature) {
     return 'Temperatura del gas $temperature';
   }
-
-  @override
-  String get passport_fill_unsigned => 'Sin firmar';
 
   @override
   String get passport_history_title => 'Historial de cargas';
@@ -12905,6 +12935,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get passport_nfc_fieldO2Clean => 'Limpia para O2';
 
   @override
+  String get passport_nfc_fieldFillAnalyzer => 'Analizador del llenado';
+
+  @override
+  String get passport_nfc_fieldFilledBy => 'Llenado por';
+
+  @override
+  String get passport_nfc_fieldFillTemperature => 'Temperatura del llenado';
+
+  @override
+  String get passport_nfc_fieldFill => 'Último llenado';
+
+  @override
+  String get passport_nfc_fillIncluded =>
+      'El último llenado también está en la etiqueta';
+
+  @override
   String passport_foreign_serial(String serial) {
     return 'N.º de serie $serial';
   }
@@ -12932,6 +12978,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get passport_logFill_analyzer => 'Analizador';
+
+  @override
+  String get passport_logFill_analysedHint =>
+      'Introduce los valores que analizaste';
 
   @override
   String get passport_logFill_notes => 'Notas';
@@ -15719,6 +15769,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_procedure => 'Procedimiento de llenado';
+
+  @override
+  String get gasCalculators_blender_logFill => 'Registrar esta carga';
+
+  @override
+  String get gasCalculators_blender_chooseCylinder => 'Elegir cilindro';
+
+  @override
+  String get gasCalculators_blender_scanTag => 'Escanear etiqueta';
+
+  @override
+  String get gasCalculators_blender_notYourCylinder =>
+      'Ese cilindro no figura en tu equipo';
+
+  @override
+  String get gasCalculators_blender_cylinderFailed =>
+      'No se pudo abrir ese cilindro. Inténtalo de nuevo.';
+
+  @override
+  String gasCalculators_blender_filledFrom(String name, String mix) {
+    return '$name: $mix';
+  }
 
   @override
   String get gasCalculators_blender_amounts => 'Gas a añadir';

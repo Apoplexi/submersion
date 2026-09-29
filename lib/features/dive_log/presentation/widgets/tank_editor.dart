@@ -26,6 +26,7 @@ import 'package:submersion/features/tank_presets/domain/services/tank_preset_vis
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tank_enum_display.dart';
+import 'package:submersion/features/cylinder_passports/presentation/utils/import_tag_fill.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_status_indicator.dart';
@@ -1084,6 +1085,11 @@ class _TankEditorState extends ConsumerState<TankEditor> {
           final item = await ref
               .read(equipmentRepositoryProvider)
               .getEquipmentById(equipmentId);
+          if (!mounted) return;
+          // A fill the tag carries joins the history first, so a newer one
+          // is the mix used below (spec section 11).
+          await importTagFill(ref, tag: tag, equipmentId: equipmentId);
+          if (!mounted) return;
           final fills = await ref
               .read(cylinderFillRepositoryProvider)
               .getForCylinder(
@@ -1114,7 +1120,7 @@ class _TankEditorState extends ConsumerState<TankEditor> {
             volumeL: tag.volumeL,
             workingPressureBar: tag.workingPressureBar?.toDouble(),
             material: tag.material,
-            mix: null,
+            mix: tag.fill?.gasMix,
           );
           messenger.showSnackBar(
             SnackBar(

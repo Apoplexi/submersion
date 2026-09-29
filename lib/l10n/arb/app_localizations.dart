@@ -20932,6 +20932,60 @@ abstract class AppLocalizations {
   /// **'Filled by {station}'**
   String passport_fill_station(String station);
 
+  /// No description provided for @passport_fill_fromTag.
+  ///
+  /// In en, this message translates to:
+  /// **'From tag'**
+  String get passport_fill_fromTag;
+
+  /// No description provided for @passport_fill_analyseBeforeDiving.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyse the gas yourself before you dive it'**
+  String get passport_fill_analyseBeforeDiving;
+
+  /// No description provided for @passport_fill_writeToTagTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill logged'**
+  String get passport_fill_writeToTagTitle;
+
+  /// No description provided for @passport_fill_writeToTagBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Write it to the tank\'s tag?'**
+  String get passport_fill_writeToTagBody;
+
+  /// No description provided for @passport_fill_writeToTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Write to tag'**
+  String get passport_fill_writeToTag;
+
+  /// No description provided for @passport_fill_notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get passport_fill_notNow;
+
+  /// No description provided for @passport_foreign_lastFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Last fill on the tag'**
+  String get passport_foreign_lastFill;
+
+  /// The last fill on a tag: its mix, with the pressure after a middle dot when the tag has one, then the date.
+  ///
+  /// In en, this message translates to:
+  /// **'{fill} · {date}'**
+  String passport_foreign_fillSummary(String fill, String date);
+
+  /// After scanning a tag: its fill was added. fill is the mix, with the pressure after a middle dot when the tag has one.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill from the tag added: {fill}'**
+  String passport_fill_addedFromTag(String fill);
+
   /// No description provided for @passport_fill_analyzer.
   ///
   /// In en, this message translates to:
@@ -20949,12 +21003,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gas temperature {temperature}'**
   String passport_fill_temperature(String temperature);
-
-  /// No description provided for @passport_fill_unsigned.
-  ///
-  /// In en, this message translates to:
-  /// **'Unsigned'**
-  String get passport_fill_unsigned;
 
   /// No description provided for @passport_history_title.
   ///
@@ -21298,6 +21346,36 @@ abstract class AppLocalizations {
   /// **'O2 clean'**
   String get passport_nfc_fieldO2Clean;
 
+  /// No description provided for @passport_nfc_fieldFillAnalyzer.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill analyzer'**
+  String get passport_nfc_fieldFillAnalyzer;
+
+  /// No description provided for @passport_nfc_fieldFilledBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Filled by'**
+  String get passport_nfc_fieldFilledBy;
+
+  /// No description provided for @passport_nfc_fieldFillTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill temperature'**
+  String get passport_nfc_fieldFillTemperature;
+
+  /// No description provided for @passport_nfc_fieldFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest fill'**
+  String get passport_nfc_fieldFill;
+
+  /// No description provided for @passport_nfc_fillIncluded.
+  ///
+  /// In en, this message translates to:
+  /// **'The newest fill is on the tag too'**
+  String get passport_nfc_fillIncluded;
+
   /// No description provided for @passport_foreign_serial.
   ///
   /// In en, this message translates to:
@@ -21351,6 +21429,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Analyzer'**
   String get passport_logFill_analyzer;
+
+  /// No description provided for @passport_logFill_analysedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your analysed values'**
+  String get passport_logFill_analysedHint;
 
   /// No description provided for @passport_logFill_notes.
   ///
@@ -25769,6 +25853,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fill procedure'**
   String get gasCalculators_blender_procedure;
+
+  /// No description provided for @gasCalculators_blender_logFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Log this fill'**
+  String get gasCalculators_blender_logFill;
+
+  /// No description provided for @gasCalculators_blender_chooseCylinder.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose cylinder'**
+  String get gasCalculators_blender_chooseCylinder;
+
+  /// No description provided for @gasCalculators_blender_scanTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan tag'**
+  String get gasCalculators_blender_scanTag;
+
+  /// No description provided for @gasCalculators_blender_notYourCylinder.
+  ///
+  /// In en, this message translates to:
+  /// **'That cylinder is not in your gear'**
+  String get gasCalculators_blender_notYourCylinder;
+
+  /// No description provided for @gasCalculators_blender_cylinderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open that cylinder. Try again.'**
+  String get gasCalculators_blender_cylinderFailed;
+
+  /// After Choose cylinder: the cylinder chosen and the mix of its last fill, now what is in it.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {mix}'**
+  String gasCalculators_blender_filledFrom(String name, String mix);
 
   /// No description provided for @gasCalculators_blender_amounts.
   ///

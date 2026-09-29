@@ -7129,6 +7129,34 @@
       "station": {"type": "String"}
     }
   },
+  "passport_fill_fromTag": "From tag",
+  "passport_fill_analyseBeforeDiving": "Analyse the gas yourself before you dive it",
+  "passport_fill_writeToTagTitle": "Fill logged",
+  "passport_fill_writeToTagBody": "Write it to the tank's tag?",
+  "passport_fill_writeToTag": "Write to tag",
+  "passport_fill_notNow": "Not now",
+  "passport_foreign_lastFill": "Last fill on the tag",
+  "passport_foreign_fillSummary": "{fill} · {date}",
+  "@passport_foreign_fillSummary": {
+    "description": "The last fill on a tag: its mix, with the pressure after a middle dot when the tag has one, then the date.",
+    "placeholders": {
+      "fill": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "passport_fill_addedFromTag": "Fill from the tag added: {fill}",
+  "@passport_fill_addedFromTag": {
+    "description": "After scanning a tag: its fill was added. fill is the mix, with the pressure after a middle dot when the tag has one.",
+    "placeholders": {
+      "fill": {
+        "type": "String"
+      }
+    }
+  },
   "passport_fill_analyzer": "Analyzed with {analyzer}",
   "@passport_fill_analyzer": {
     "placeholders": {
@@ -7148,7 +7176,6 @@
       "temperature": {"type": "String"}
     }
   },
-  "passport_fill_unsigned": "Unsigned",
   "passport_history_title": "Fill history",
   "passport_history_sinceHydro": "{count, plural, =0{No fills since the last hydro} =1{{count} fill since the last hydro} other{{count} fills since the last hydro}}",
   "@passport_history_sinceHydro": {
@@ -7252,6 +7279,11 @@
   "passport_nfc_fieldName": "Name",
   "passport_nfc_fieldSerial": "Serial number",
   "passport_nfc_fieldO2Clean": "O2 clean",
+  "passport_nfc_fieldFillAnalyzer": "Fill analyzer",
+  "passport_nfc_fieldFilledBy": "Filled by",
+  "passport_nfc_fieldFillTemperature": "Fill temperature",
+  "passport_nfc_fieldFill": "Newest fill",
+  "passport_nfc_fillIncluded": "The newest fill is on the tag too",
   "passport_foreign_serial": "Serial {serial}",
   "@passport_foreign_serial": {
     "placeholders": {
@@ -7266,6 +7298,7 @@
   "passport_logFill_temperature": "Gas temperature",
   "passport_logFill_station": "Fill station",
   "passport_logFill_analyzer": "Analyzer",
+  "passport_logFill_analysedHint": "Enter your analysed values",
   "passport_logFill_notes": "Notes",
   "passport_logFill_invalidMix": "O2 and He must each be 0 to 100 and total 100 or less",
   "passport_logFill_saveFailed": "Could not save the fill. Try again.",
@@ -9148,6 +9181,23 @@
     }
   },
   "gasCalculators_blender_procedure": "Fill procedure",
+  "gasCalculators_blender_logFill": "Log this fill",
+  "gasCalculators_blender_chooseCylinder": "Choose cylinder",
+  "gasCalculators_blender_scanTag": "Scan tag",
+  "gasCalculators_blender_notYourCylinder": "That cylinder is not in your gear",
+  "gasCalculators_blender_cylinderFailed": "Could not open that cylinder. Try again.",
+  "gasCalculators_blender_filledFrom": "{name}: {mix}",
+  "@gasCalculators_blender_filledFrom": {
+    "description": "After Choose cylinder: the cylinder chosen and the mix of its last fill, now what is in it.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "mix": {
+        "type": "String"
+      }
+    }
+  },
   "gasCalculators_blender_amounts": "Gas to add",
   "gasCalculators_blender_stepStart": "Start with {pressure} {gas}",
   "@gasCalculators_blender_stepStart": {

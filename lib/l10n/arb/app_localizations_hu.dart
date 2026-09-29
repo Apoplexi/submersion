@@ -12645,6 +12645,38 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get passport_fill_fromTag => 'Címkéről';
+
+  @override
+  String get passport_fill_analyseBeforeDiving =>
+      'Merülés előtt elemezd a gázt magad';
+
+  @override
+  String get passport_fill_writeToTagTitle => 'Töltés rögzítve';
+
+  @override
+  String get passport_fill_writeToTagBody => 'Felírod a palack címkéjére?';
+
+  @override
+  String get passport_fill_writeToTag => 'Írás a címkére';
+
+  @override
+  String get passport_fill_notNow => 'Most nem';
+
+  @override
+  String get passport_foreign_lastFill => 'Utolsó töltés a címkén';
+
+  @override
+  String passport_foreign_fillSummary(String fill, String date) {
+    return '$fill · $date';
+  }
+
+  @override
+  String passport_fill_addedFromTag(String fill) {
+    return 'A címke töltése hozzáadva: $fill';
+  }
+
+  @override
   String passport_fill_analyzer(String analyzer) {
     return 'Elemezve: $analyzer';
   }
@@ -12658,9 +12690,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String passport_fill_temperature(String temperature) {
     return 'Gázhőmérséklet: $temperature';
   }
-
-  @override
-  String get passport_fill_unsigned => 'Aláíratlan';
 
   @override
   String get passport_history_title => 'Töltési előzmények';
@@ -12876,6 +12905,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get passport_nfc_fieldO2Clean => 'O2-tiszta';
 
   @override
+  String get passport_nfc_fieldFillAnalyzer => 'Töltés analizátora';
+
+  @override
+  String get passport_nfc_fieldFilledBy => 'Töltötte';
+
+  @override
+  String get passport_nfc_fieldFillTemperature => 'Töltés hőmérséklete';
+
+  @override
+  String get passport_nfc_fieldFill => 'Legutóbbi töltés';
+
+  @override
+  String get passport_nfc_fillIncluded => 'A legutóbbi töltés is a címkén van';
+
+  @override
   String passport_foreign_serial(String serial) {
     return 'Sorozatszám: $serial';
   }
@@ -12903,6 +12947,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get passport_logFill_analyzer => 'Elemző';
+
+  @override
+  String get passport_logFill_analysedHint => 'Add meg a mért értékeket';
 
   @override
   String get passport_logFill_notes => 'Jegyzetek';
@@ -15687,6 +15734,28 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_procedure => 'Töltési sorrend';
+
+  @override
+  String get gasCalculators_blender_logFill => 'E töltés rögzítése';
+
+  @override
+  String get gasCalculators_blender_chooseCylinder => 'Palack kiválasztása';
+
+  @override
+  String get gasCalculators_blender_scanTag => 'Címke beolvasása';
+
+  @override
+  String get gasCalculators_blender_notYourCylinder =>
+      'Ez a palack nem szerepel a felszerelésedben';
+
+  @override
+  String get gasCalculators_blender_cylinderFailed =>
+      'Nem sikerült megnyitni a palackot. Próbáld újra.';
+
+  @override
+  String gasCalculators_blender_filledFrom(String name, String mix) {
+    return '$name: $mix';
+  }
 
   @override
   String get gasCalculators_blender_amounts => 'Hozzáadandó gáz';

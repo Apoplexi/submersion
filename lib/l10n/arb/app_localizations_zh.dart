@@ -12110,6 +12110,37 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get passport_fill_fromTag => '来自标签';
+
+  @override
+  String get passport_fill_analyseBeforeDiving => '潜水前请亲自分析气体';
+
+  @override
+  String get passport_fill_writeToTagTitle => '充气已记录';
+
+  @override
+  String get passport_fill_writeToTagBody => '要写入气瓶的标签吗？';
+
+  @override
+  String get passport_fill_writeToTag => '写入标签';
+
+  @override
+  String get passport_fill_notNow => '暂不';
+
+  @override
+  String get passport_foreign_lastFill => '标签上的最近一次充气';
+
+  @override
+  String passport_foreign_fillSummary(String fill, String date) {
+    return '$fill · $date';
+  }
+
+  @override
+  String passport_fill_addedFromTag(String fill) {
+    return '已添加标签上的充气：$fill';
+  }
+
+  @override
   String passport_fill_analyzer(String analyzer) {
     return '使用 $analyzer 分析';
   }
@@ -12123,9 +12154,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String passport_fill_temperature(String temperature) {
     return '气体温度 $temperature';
   }
-
-  @override
-  String get passport_fill_unsigned => '未签名';
 
   @override
   String get passport_history_title => '充气历史';
@@ -12324,6 +12352,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passport_nfc_fieldO2Clean => '氧气清洁';
 
   @override
+  String get passport_nfc_fieldFillAnalyzer => '充气分析仪';
+
+  @override
+  String get passport_nfc_fieldFilledBy => '充气人';
+
+  @override
+  String get passport_nfc_fieldFillTemperature => '充气温度';
+
+  @override
+  String get passport_nfc_fieldFill => '最新充气';
+
+  @override
+  String get passport_nfc_fillIncluded => '最新充气也已写入标签';
+
+  @override
   String passport_foreign_serial(String serial) {
     return '序列号 $serial';
   }
@@ -12351,6 +12394,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get passport_logFill_analyzer => '分析仪';
+
+  @override
+  String get passport_logFill_analysedHint => '请输入你实测的数值';
 
   @override
   String get passport_logFill_notes => '备注';
@@ -15012,6 +15058,26 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_procedure => '充填步骤';
+
+  @override
+  String get gasCalculators_blender_logFill => '记录本次充气';
+
+  @override
+  String get gasCalculators_blender_chooseCylinder => '选择气瓶';
+
+  @override
+  String get gasCalculators_blender_scanTag => '扫描标签';
+
+  @override
+  String get gasCalculators_blender_notYourCylinder => '该气瓶不在你的装备中';
+
+  @override
+  String get gasCalculators_blender_cylinderFailed => '无法打开该气瓶，请重试。';
+
+  @override
+  String gasCalculators_blender_filledFrom(String name, String mix) {
+    return '$name：$mix';
+  }
 
   @override
   String get gasCalculators_blender_amounts => '需充入的气体';

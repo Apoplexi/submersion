@@ -12475,6 +12475,39 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get passport_fill_fromTag => 'من الوسم';
+
+  @override
+  String get passport_fill_analyseBeforeDiving =>
+      'حلّل الغاز بنفسك قبل الغوص به';
+
+  @override
+  String get passport_fill_writeToTagTitle => 'تم تسجيل التعبئة';
+
+  @override
+  String get passport_fill_writeToTagBody =>
+      'هل تريد كتابتها على وسم الأسطوانة؟';
+
+  @override
+  String get passport_fill_writeToTag => 'الكتابة على الوسم';
+
+  @override
+  String get passport_fill_notNow => 'ليس الآن';
+
+  @override
+  String get passport_foreign_lastFill => 'آخر تعبئة على الوسم';
+
+  @override
+  String passport_foreign_fillSummary(String fill, String date) {
+    return '$fill · $date';
+  }
+
+  @override
+  String passport_fill_addedFromTag(String fill) {
+    return 'أُضيفت التعبئة من الوسم: $fill';
+  }
+
+  @override
   String passport_fill_analyzer(String analyzer) {
     return 'حُلِّلت بجهاز $analyzer';
   }
@@ -12488,9 +12521,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String passport_fill_temperature(String temperature) {
     return 'درجة حرارة الغاز $temperature';
   }
-
-  @override
-  String get passport_fill_unsigned => 'غير موقَّعة';
 
   @override
   String get passport_history_title => 'سجل التعبئة';
@@ -12702,6 +12732,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get passport_nfc_fieldO2Clean => 'نظيفة للأكسجين';
 
   @override
+  String get passport_nfc_fieldFillAnalyzer => 'محلل التعبئة';
+
+  @override
+  String get passport_nfc_fieldFilledBy => 'عبّأها';
+
+  @override
+  String get passport_nfc_fieldFillTemperature => 'درجة حرارة التعبئة';
+
+  @override
+  String get passport_nfc_fieldFill => 'أحدث تعبئة';
+
+  @override
+  String get passport_nfc_fillIncluded => 'أحدث تعبئة موجودة على الوسم أيضًا';
+
+  @override
   String passport_foreign_serial(String serial) {
     return 'الرقم التسلسلي $serial';
   }
@@ -12729,6 +12774,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get passport_logFill_analyzer => 'جهاز التحليل';
+
+  @override
+  String get passport_logFill_analysedHint => 'أدخل القيم التي حللتها';
 
   @override
   String get passport_logFill_notes => 'ملاحظات';
@@ -15507,6 +15555,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_procedure => 'خطوات التعبئة';
+
+  @override
+  String get gasCalculators_blender_logFill => 'تسجيل هذه التعبئة';
+
+  @override
+  String get gasCalculators_blender_chooseCylinder => 'اختيار الأسطوانة';
+
+  @override
+  String get gasCalculators_blender_scanTag => 'مسح الوسم';
+
+  @override
+  String get gasCalculators_blender_notYourCylinder =>
+      'هذه الأسطوانة ليست ضمن معداتك';
+
+  @override
+  String get gasCalculators_blender_cylinderFailed =>
+      'تعذر فتح هذه الأسطوانة. حاول مرة أخرى.';
+
+  @override
+  String gasCalculators_blender_filledFrom(String name, String mix) {
+    return '$name: $mix';
+  }
 
   @override
   String get gasCalculators_blender_amounts => 'الغاز المطلوب إضافته';

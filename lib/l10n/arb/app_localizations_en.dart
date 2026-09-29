@@ -12480,6 +12480,38 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get passport_fill_fromTag => 'From tag';
+
+  @override
+  String get passport_fill_analyseBeforeDiving =>
+      'Analyse the gas yourself before you dive it';
+
+  @override
+  String get passport_fill_writeToTagTitle => 'Fill logged';
+
+  @override
+  String get passport_fill_writeToTagBody => 'Write it to the tank\'s tag?';
+
+  @override
+  String get passport_fill_writeToTag => 'Write to tag';
+
+  @override
+  String get passport_fill_notNow => 'Not now';
+
+  @override
+  String get passport_foreign_lastFill => 'Last fill on the tag';
+
+  @override
+  String passport_foreign_fillSummary(String fill, String date) {
+    return '$fill · $date';
+  }
+
+  @override
+  String passport_fill_addedFromTag(String fill) {
+    return 'Fill from the tag added: $fill';
+  }
+
+  @override
   String passport_fill_analyzer(String analyzer) {
     return 'Analyzed with $analyzer';
   }
@@ -12493,9 +12525,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String passport_fill_temperature(String temperature) {
     return 'Gas temperature $temperature';
   }
-
-  @override
-  String get passport_fill_unsigned => 'Unsigned';
 
   @override
   String get passport_history_title => 'Fill history';
@@ -12709,6 +12738,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passport_nfc_fieldO2Clean => 'O2 clean';
 
   @override
+  String get passport_nfc_fieldFillAnalyzer => 'Fill analyzer';
+
+  @override
+  String get passport_nfc_fieldFilledBy => 'Filled by';
+
+  @override
+  String get passport_nfc_fieldFillTemperature => 'Fill temperature';
+
+  @override
+  String get passport_nfc_fieldFill => 'Newest fill';
+
+  @override
+  String get passport_nfc_fillIncluded => 'The newest fill is on the tag too';
+
+  @override
   String passport_foreign_serial(String serial) {
     return 'Serial $serial';
   }
@@ -12736,6 +12780,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passport_logFill_analyzer => 'Analyzer';
+
+  @override
+  String get passport_logFill_analysedHint => 'Enter your analysed values';
 
   @override
   String get passport_logFill_notes => 'Notes';
@@ -15495,6 +15542,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_procedure => 'Fill procedure';
+
+  @override
+  String get gasCalculators_blender_logFill => 'Log this fill';
+
+  @override
+  String get gasCalculators_blender_chooseCylinder => 'Choose cylinder';
+
+  @override
+  String get gasCalculators_blender_scanTag => 'Scan tag';
+
+  @override
+  String get gasCalculators_blender_notYourCylinder =>
+      'That cylinder is not in your gear';
+
+  @override
+  String get gasCalculators_blender_cylinderFailed =>
+      'Could not open that cylinder. Try again.';
+
+  @override
+  String gasCalculators_blender_filledFrom(String name, String mix) {
+    return '$name: $mix';
+  }
 
   @override
   String get gasCalculators_blender_amounts => 'Gas to add';

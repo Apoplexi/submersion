@@ -12671,6 +12671,39 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get passport_fill_fromTag => 'Vom Tag';
+
+  @override
+  String get passport_fill_analyseBeforeDiving =>
+      'Analysiere das Gas selbst, bevor du damit tauchst';
+
+  @override
+  String get passport_fill_writeToTagTitle => 'Füllung erfasst';
+
+  @override
+  String get passport_fill_writeToTagBody =>
+      'Auf den Tag der Flasche schreiben?';
+
+  @override
+  String get passport_fill_writeToTag => 'Auf den Tag schreiben';
+
+  @override
+  String get passport_fill_notNow => 'Nicht jetzt';
+
+  @override
+  String get passport_foreign_lastFill => 'Letzte Füllung auf dem Tag';
+
+  @override
+  String passport_foreign_fillSummary(String fill, String date) {
+    return '$fill · $date';
+  }
+
+  @override
+  String passport_fill_addedFromTag(String fill) {
+    return 'Füllung vom Tag hinzugefügt: $fill';
+  }
+
+  @override
   String passport_fill_analyzer(String analyzer) {
     return 'Analysiert mit $analyzer';
   }
@@ -12684,9 +12717,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String passport_fill_temperature(String temperature) {
     return 'Gastemperatur $temperature';
   }
-
-  @override
-  String get passport_fill_unsigned => 'Unsigniert';
 
   @override
   String get passport_history_title => 'Füllhistorie';
@@ -12904,6 +12934,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get passport_nfc_fieldO2Clean => 'O2-rein';
 
   @override
+  String get passport_nfc_fieldFillAnalyzer => 'Analysator der Füllung';
+
+  @override
+  String get passport_nfc_fieldFilledBy => 'Gefüllt von';
+
+  @override
+  String get passport_nfc_fieldFillTemperature => 'Temperatur der Füllung';
+
+  @override
+  String get passport_nfc_fieldFill => 'Neueste Füllung';
+
+  @override
+  String get passport_nfc_fillIncluded =>
+      'Die neueste Füllung ist auch auf dem Tag';
+
+  @override
   String passport_foreign_serial(String serial) {
     return 'Seriennummer $serial';
   }
@@ -12931,6 +12977,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get passport_logFill_analyzer => 'Analysegerät';
+
+  @override
+  String get passport_logFill_analysedHint =>
+      'Gib deine analysierten Werte ein';
 
   @override
   String get passport_logFill_notes => 'Notizen';
@@ -15717,6 +15767,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_procedure => 'Füllreihenfolge';
+
+  @override
+  String get gasCalculators_blender_logFill => 'Diese Füllung erfassen';
+
+  @override
+  String get gasCalculators_blender_chooseCylinder => 'Flasche wählen';
+
+  @override
+  String get gasCalculators_blender_scanTag => 'Tag scannen';
+
+  @override
+  String get gasCalculators_blender_notYourCylinder =>
+      'Diese Flasche gehört nicht zu deiner Ausrüstung';
+
+  @override
+  String get gasCalculators_blender_cylinderFailed =>
+      'Die Flasche konnte nicht geöffnet werden. Versuche es erneut.';
+
+  @override
+  String gasCalculators_blender_filledFrom(String name, String mix) {
+    return '$name: $mix';
+  }
 
   @override
   String get gasCalculators_blender_amounts => 'Zuzuführendes Gas';
