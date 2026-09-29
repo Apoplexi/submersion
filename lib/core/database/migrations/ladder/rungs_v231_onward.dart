@@ -76,13 +76,20 @@ extension RungsFromV231 on AppDatabase {
       await _assertEquipmentServiceStatusTable();
     }
     if (from < 242) await reportProgress();
-    // v243: metadata-only profile revision history over existing series
+    // v244: DPV mission planner (issue #2086). Table-only rung, no
+    // backfill: a plan without a mission row has no mission. Re-asserted
+    // in beforeOpen.
+    if (from < 244) {
+      await _assertDivePlanMissionSchema();
+    }
+    if (from < 244) await reportProgress();
+    // v246: metadata-only profile revision history over existing series
     // rows (#1197). One history row per series id, no sample/blob
     // duplication. Re-asserted in beforeOpen.
-    if (from < 243) {
+    if (from < 246) {
       await _assertProfileSeriesHistorySchema();
       await _backfillProfileSeriesHistoryRows();
     }
-    if (from < 243) await reportProgress();
+    if (from < 246) await reportProgress();
   }
 }

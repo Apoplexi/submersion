@@ -7,7 +7,7 @@ part of 'app_database_migrations.dart';
 /// asserted again here.
 extension BeforeOpenBackstops on AppDatabase {
   Future<void> _beforeOpen(OpeningDetails details) async {
-    // v243 backstop: metadata-only profile revision history over existing
+    // v246 backstop: metadata-only profile revision history over existing
     // series rows. Safe to re-run: INSERT OR IGNORE keeps existing
     // revisions untouched and only fills missing pointer rows.
     await _assertProfileSeriesHistorySchema();
@@ -629,6 +629,10 @@ extension BeforeOpenBackstops on AppDatabase {
     await Migrator(this).createTable(divePlans);
     await Migrator(this).createTable(divePlanTanks);
     await Migrator(this).createTable(divePlanSegments);
+
+    // v244 backstop: re-assert the DPV mission tables. A database that
+    // arrives by restore or sync-adopt never runs onUpgrade.
+    await _assertDivePlanMissionSchema();
 
     // v103 backstop: dive_roles table + built-in seed + dives.diver_role
     // column (same collision disease; all DDL idempotent). The seed is

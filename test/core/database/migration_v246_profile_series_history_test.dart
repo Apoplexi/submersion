@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// v243 adds dive_profile_series_history: metadata-only revision pointers
+/// v246 adds dive_profile_series_history: metadata-only revision pointers
 /// over existing dive_profile_series rows (#1197). Local-only table, so the
 /// sync floor stays at 240.
 
@@ -15,12 +15,12 @@ Future<Set<String>> _names(AppDatabase db, String type) async {
 }
 
 void main() {
-  test('v243 is the current schema version and is in the ladder', () {
+  test('v246 is the current schema version and is in the ladder', () {
     // The newest rung owns the exact assertion; relax it to
     // greaterThanOrEqualTo when the next one lands.
-    expect(AppDatabase.currentSchemaVersion, 243);
-    expect(AppDatabase.migrationVersions, contains(243));
-    expect(AppDatabase.migrationStepCount(242), 1);
+    expect(AppDatabase.currentSchemaVersion, 246);
+    expect(AppDatabase.migrationVersions, contains(246));
+    expect(AppDatabase.migrationStepCount(244), 1);
   });
 
   test('this rung is additive and did not move the sync floor', () {
