@@ -9237,6 +9237,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tank_regulatorNone => 'Nincs';
 
   @override
+  String get diveLog_tank_tripCylinderLabel => 'Az utazás palackja';
+
+  @override
+  String get diveLog_tank_tripCylinderNone => 'Nincs';
+
+  @override
+  String get diveLog_tank_tripCylinderMissing => 'Már nincs ezen az utazáson';
+
+  @override
+  String get diveLog_tank_tripCylinderSuggested =>
+      'Javaslat az utazás teli palackjai közül';
+
+  @override
   String get diveLog_tissue_title => 'Szövettelítődés';
 
   @override
@@ -25653,6 +25666,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get trips_cylinders_action_adjust => 'Módosítás';
+
+  @override
+  String get trips_cylinders_action_logDive => 'Merülés rögzítése';
 
   @override
   String trips_cylinders_bottle(String label) {

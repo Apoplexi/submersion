@@ -9256,6 +9256,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_tank_regulatorNone => 'Nessuno';
 
   @override
+  String get diveLog_tank_tripCylinderLabel => 'Bombola del viaggio';
+
+  @override
+  String get diveLog_tank_tripCylinderNone => 'Nessuna';
+
+  @override
+  String get diveLog_tank_tripCylinderMissing => 'Non più in questo viaggio';
+
+  @override
+  String get diveLog_tank_tripCylinderSuggested =>
+      'Suggerita tra le bombole piene del viaggio';
+
+  @override
   String get diveLog_tissue_title => 'Carico tissutale';
 
   @override
@@ -25723,6 +25736,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get trips_cylinders_action_adjust => 'Correggi';
+
+  @override
+  String get trips_cylinders_action_logDive => 'Registra immersione';
 
   @override
   String trips_cylinders_bottle(String label) {
