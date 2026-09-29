@@ -32709,6 +32709,21 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'De druksensor gaf $count keer foute metingen (uitval of pieken)',
+      one: 'De druksensor gaf één keer een foute meting (uitval of piek)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'De drukreeks vermengt de metingen van twee bronnen';
+
+  @override
   String dataQuality_msg_sac(String sac) {
     return 'Het afgeleide oppervlakteverbruik van $sac is onaannemelijk';
   }

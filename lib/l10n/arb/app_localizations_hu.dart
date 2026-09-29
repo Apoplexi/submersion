@@ -32810,6 +32810,22 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'A nyomásérzékelő $count alkalommal adott hibás értéket (kiesés vagy tüske)',
+      one: 'A nyomásérzékelő egyszer hibás értéket adott (kiesés vagy tüske)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'A nyomássor két forrás mérési adatait keveri';
+
+  @override
   String dataQuality_msg_sac(String sac) {
     return 'A becsült felszíni fogyasztás ($sac) nem hihető';
   }

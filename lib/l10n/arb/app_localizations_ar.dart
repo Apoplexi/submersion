@@ -32528,6 +32528,20 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'سجّل مستشعر الضغط قراءات خاطئة $count مرات (انقطاعات أو قفزات)',
+      one: 'سجّل مستشعر الضغط قراءة خاطئة مرة واحدة (انقطاع أو قفزة)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed => 'تمزج سلسلة الضغط قراءات مصدرين';
+
+  @override
   String dataQuality_msg_sac(String sac) {
     return 'معدل الاستهلاك السطحي الضمني $sac غير معقول';
   }

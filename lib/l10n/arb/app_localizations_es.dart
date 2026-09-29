@@ -32956,6 +32956,23 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'El sensor de presión registró lecturas erróneas $count veces (pérdidas o picos)',
+      one:
+          'El sensor de presión registró una lectura errónea una vez (pérdida o pico)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed =>
+      'La serie de presión mezcla las lecturas de dos fuentes';
+
+  @override
   String dataQuality_msg_sac(String sac) {
     return 'El consumo en superficie implícito de $sac es inverosímil';
   }

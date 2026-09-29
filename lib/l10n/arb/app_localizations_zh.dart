@@ -31255,6 +31255,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String dataQuality_msg_pressureDropout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '压力传感器记录了 $count 次错误读数（中断或尖峰）',
+      one: '压力传感器记录了 1 次错误读数（中断或尖峰）',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataQuality_msg_pressureMixed => '压力序列混合了两个来源的读数';
+
+  @override
   String dataQuality_msg_sac(String sac) {
     return '推算的水面消耗量 $sac 不合理';
   }
