@@ -13012,6 +13012,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get passport_logFill_analysedHint => 'הזינו את הערכים שניתחתם';
 
   @override
+  String get passport_trip_title => 'טיולים';
+
+  @override
+  String get passport_trip_none => 'לא נארז לאף טיול';
+
+  @override
+  String passport_trip_packedFor(String trip) {
+    return 'נארז עבור $trip';
+  }
+
+  @override
+  String passport_trip_more(int count) {
+    return '+$count';
+  }
+
+  @override
+  String get passport_trip_assign => 'אריזה לטיול';
+
+  @override
+  String get passport_trip_unassign => 'הסרה מהטיול הזה';
+
+  @override
+  String get passport_trip_onBoard => 'בלוח המיכלים של הטיול';
+
+  @override
+  String get passport_trip_failed => 'לא ניתן לשנות את הטיול. נסו שוב.';
+
+  @override
   String get passport_logFill_notes => 'הערות';
 
   @override
@@ -25121,6 +25149,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count ריברידרים, מרווח הסופג הנמוך ביותר $minutes דק\'';
   }
+
+  @override
+  String get trips_gear_title => 'ציוד';
+
+  @override
+  String get trips_gear_none => 'עדיין לא נארז ציוד';
+
+  @override
+  String get trips_gear_add => 'הוספת ציוד';
+
+  @override
+  String get trips_gear_remove => 'הסרה';
+
+  @override
+  String get trips_gear_failed => 'לא ניתן לשנות את הציוד. נסו שוב.';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {

@@ -4317,6 +4317,14 @@
   "passport_logFill_station": "充气站",
   "passport_logFill_analyzer": "分析仪",
   "passport_logFill_analysedHint": "请输入你实测的数值",
+  "passport_trip_title": "行程",
+  "passport_trip_none": "未打包到任何行程",
+  "passport_trip_packedFor": "已为 {trip} 打包",
+  "passport_trip_more": "+{count}",
+  "passport_trip_assign": "打包到行程",
+  "passport_trip_unassign": "从此行程移除",
+  "passport_trip_onBoard": "在行程的气瓶看板上",
+  "passport_trip_failed": "无法更改行程，请重试。",
   "passport_logFill_notes": "备注",
   "passport_logFill_invalidMix": "O2 和 He 须各在 0 到 100 之间，且总和不超过 100",
   "passport_logFill_saveFailed": "无法保存充气记录。请重试。",
@@ -7499,6 +7507,11 @@
       }
     }
   },
+  "trips_gear_title": "装备",
+  "trips_gear_none": "尚未打包任何装备",
+  "trips_gear_add": "添加装备",
+  "trips_gear_remove": "移除",
+  "trips_gear_failed": "无法更改装备，请重试。",
   "trips_cylinders_forecast_todayShort": "今天需要 {needed} 个，你有 {full} 个满瓶。",
   "@trips_cylinders_forecast_todayShort": {
     "placeholders": {

@@ -13209,6 +13209,35 @@ class AppLocalizationsNl extends AppLocalizations {
   String get passport_logFill_analysedHint => 'Vul je geanalyseerde waarden in';
 
   @override
+  String get passport_trip_title => 'Reizen';
+
+  @override
+  String get passport_trip_none => 'Niet ingepakt voor een reis';
+
+  @override
+  String passport_trip_packedFor(String trip) {
+    return 'Ingepakt voor $trip';
+  }
+
+  @override
+  String passport_trip_more(int count) {
+    return '+$count';
+  }
+
+  @override
+  String get passport_trip_assign => 'Inpakken voor een reis';
+
+  @override
+  String get passport_trip_unassign => 'Van deze reis halen';
+
+  @override
+  String get passport_trip_onBoard => 'Op het flessenbord van de reis';
+
+  @override
+  String get passport_trip_failed =>
+      'Kan de reis niet wijzigen. Probeer het opnieuw.';
+
+  @override
   String get passport_logFill_notes => 'Notities';
 
   @override
@@ -25548,6 +25577,22 @@ class AppLocalizationsNl extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count rebreathers, laagste scrubbermarge $minutes min';
   }
+
+  @override
+  String get trips_gear_title => 'Uitrusting';
+
+  @override
+  String get trips_gear_none => 'Nog geen uitrusting ingepakt';
+
+  @override
+  String get trips_gear_add => 'Uitrusting toevoegen';
+
+  @override
+  String get trips_gear_remove => 'Eruit halen';
+
+  @override
+  String get trips_gear_failed =>
+      'Kan de uitrusting niet wijzigen. Probeer het opnieuw.';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {

@@ -13093,6 +13093,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get passport_logFill_analysedHint => 'أدخل القيم التي حللتها';
 
   @override
+  String get passport_trip_title => 'الرحلات';
+
+  @override
+  String get passport_trip_none => 'غير مجهزة لأي رحلة';
+
+  @override
+  String passport_trip_packedFor(String trip) {
+    return 'مجهزة لرحلة $trip';
+  }
+
+  @override
+  String passport_trip_more(int count) {
+    return '+$count';
+  }
+
+  @override
+  String get passport_trip_assign => 'تجهيز لرحلة';
+
+  @override
+  String get passport_trip_unassign => 'إزالة من هذه الرحلة';
+
+  @override
+  String get passport_trip_onBoard => 'على لوحة أسطوانات الرحلة';
+
+  @override
+  String get passport_trip_failed => 'تعذر تغيير الرحلة. حاول مرة أخرى.';
+
+  @override
   String get passport_logFill_notes => 'ملاحظات';
 
   @override
@@ -25426,6 +25454,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count أجهزة، أدنى هامش منظّف $minutes دقيقة';
   }
+
+  @override
+  String get trips_gear_title => 'المعدات';
+
+  @override
+  String get trips_gear_none => 'لم تُجهز أي معدات بعد';
+
+  @override
+  String get trips_gear_add => 'إضافة معدات';
+
+  @override
+  String get trips_gear_remove => 'إزالة';
+
+  @override
+  String get trips_gear_failed => 'تعذر تغيير المعدات. حاول مرة أخرى.';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {

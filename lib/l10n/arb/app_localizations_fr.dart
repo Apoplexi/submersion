@@ -13352,6 +13352,35 @@ class AppLocalizationsFr extends AppLocalizations {
   String get passport_logFill_analysedHint => 'Saisissez les valeurs analysées';
 
   @override
+  String get passport_trip_title => 'Voyages';
+
+  @override
+  String get passport_trip_none => 'Prévu pour aucun voyage';
+
+  @override
+  String passport_trip_packedFor(String trip) {
+    return 'Prévu pour $trip';
+  }
+
+  @override
+  String passport_trip_more(int count) {
+    return '+$count';
+  }
+
+  @override
+  String get passport_trip_assign => 'Prévoir pour un voyage';
+
+  @override
+  String get passport_trip_unassign => 'Retirer de ce voyage';
+
+  @override
+  String get passport_trip_onBoard => 'Sur le tableau des blocs du voyage';
+
+  @override
+  String get passport_trip_failed =>
+      'Impossible de modifier le voyage. Réessayez.';
+
+  @override
   String get passport_logFill_notes => 'Notes';
 
   @override
@@ -25834,6 +25863,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count recycleurs, la plus faible marge de chaux est de $minutes min';
   }
+
+  @override
+  String get trips_gear_title => 'Matériel';
+
+  @override
+  String get trips_gear_none => 'Aucun matériel prévu pour l\'instant';
+
+  @override
+  String get trips_gear_add => 'Ajouter du matériel';
+
+  @override
+  String get trips_gear_remove => 'Retirer';
+
+  @override
+  String get trips_gear_failed =>
+      'Impossible de modifier le matériel. Réessayez.';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {

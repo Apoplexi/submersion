@@ -12705,6 +12705,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passport_logFill_analysedHint => '请输入你实测的数值';
 
   @override
+  String get passport_trip_title => '行程';
+
+  @override
+  String get passport_trip_none => '未打包到任何行程';
+
+  @override
+  String passport_trip_packedFor(String trip) {
+    return '已为 $trip 打包';
+  }
+
+  @override
+  String passport_trip_more(int count) {
+    return '+$count';
+  }
+
+  @override
+  String get passport_trip_assign => '打包到行程';
+
+  @override
+  String get passport_trip_unassign => '从此行程移除';
+
+  @override
+  String get passport_trip_onBoard => '在行程的气瓶看板上';
+
+  @override
+  String get passport_trip_failed => '无法更改行程，请重试。';
+
+  @override
   String get passport_logFill_notes => '备注';
 
   @override
@@ -24435,6 +24463,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count 台呼吸器，最低吸收剂余量 $minutes 分钟';
   }
+
+  @override
+  String get trips_gear_title => '装备';
+
+  @override
+  String get trips_gear_none => '尚未打包任何装备';
+
+  @override
+  String get trips_gear_add => '添加装备';
+
+  @override
+  String get trips_gear_remove => '移除';
+
+  @override
+  String get trips_gear_failed => '无法更改装备，请重试。';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {

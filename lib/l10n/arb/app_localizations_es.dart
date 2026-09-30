@@ -13306,6 +13306,35 @@ class AppLocalizationsEs extends AppLocalizations {
       'Introduce los valores que analizaste';
 
   @override
+  String get passport_trip_title => 'Viajes';
+
+  @override
+  String get passport_trip_none => 'Sin viaje asignado';
+
+  @override
+  String passport_trip_packedFor(String trip) {
+    return 'Preparado para $trip';
+  }
+
+  @override
+  String passport_trip_more(int count) {
+    return '+$count';
+  }
+
+  @override
+  String get passport_trip_assign => 'Preparar para un viaje';
+
+  @override
+  String get passport_trip_unassign => 'Quitar de este viaje';
+
+  @override
+  String get passport_trip_onBoard => 'En el tablero de botellas del viaje';
+
+  @override
+  String get passport_trip_failed =>
+      'No se pudo cambiar el viaje. Inténtalo de nuevo.';
+
+  @override
   String get passport_logFill_notes => 'Notas';
 
   @override
@@ -25763,6 +25792,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count rebreathers, el menor con $minutes min de margen de absorbente';
   }
+
+  @override
+  String get trips_gear_title => 'Equipo';
+
+  @override
+  String get trips_gear_none => 'Aún no hay equipo preparado';
+
+  @override
+  String get trips_gear_add => 'Añadir equipo';
+
+  @override
+  String get trips_gear_remove => 'Quitar';
+
+  @override
+  String get trips_gear_failed =>
+      'No se pudo cambiar el equipo. Inténtalo de nuevo.';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {

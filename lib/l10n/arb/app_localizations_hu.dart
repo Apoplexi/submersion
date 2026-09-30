@@ -13276,6 +13276,35 @@ class AppLocalizationsHu extends AppLocalizations {
   String get passport_logFill_analysedHint => 'Add meg a mért értékeket';
 
   @override
+  String get passport_trip_title => 'Utak';
+
+  @override
+  String get passport_trip_none => 'Nincs útra bepakolva';
+
+  @override
+  String passport_trip_packedFor(String trip) {
+    return 'Bepakolva: $trip';
+  }
+
+  @override
+  String passport_trip_more(int count) {
+    return '+$count';
+  }
+
+  @override
+  String get passport_trip_assign => 'Bepakolás egy útra';
+
+  @override
+  String get passport_trip_unassign => 'Kivétel ebből az útból';
+
+  @override
+  String get passport_trip_onBoard => 'Az út palacktábláján';
+
+  @override
+  String get passport_trip_failed =>
+      'Nem sikerült módosítani az utat. Próbáld újra.';
+
+  @override
   String get passport_logFill_notes => 'Jegyzetek';
 
   @override
@@ -25663,6 +25692,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String trips_scrubber_bannerCount(int count, String minutes) {
     return '$count rebreather, a legkisebb szűrőtartalék $minutes perc';
   }
+
+  @override
+  String get trips_gear_title => 'Felszerelés';
+
+  @override
+  String get trips_gear_none => 'Még nincs bepakolt felszerelés';
+
+  @override
+  String get trips_gear_add => 'Felszerelés hozzáadása';
+
+  @override
+  String get trips_gear_remove => 'Kivétel';
+
+  @override
+  String get trips_gear_failed =>
+      'Nem sikerült módosítani a felszerelést. Próbáld újra.';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {
