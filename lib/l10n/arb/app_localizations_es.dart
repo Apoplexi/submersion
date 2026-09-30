@@ -24712,6 +24712,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Exportar inventario de equipos e información de servicio';
 
   @override
+  String get transfer_csvExport_descriptionFills =>
+      'Cada llenado registrado en un pasaporte de botella, con su análisis, presión y estación';
+
+  @override
   String get transfer_csvExport_descriptionObservations =>
       'Cada revisión OK y cada problema notificado, con su inmersión, etiquetas y nota';
 
@@ -24732,6 +24736,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'CSV de equipos';
 
   @override
+  String get transfer_csvExport_optionFillsTitle =>
+      'CSV de llenados de botella';
+
+  @override
   String get transfer_csvExport_optionObservationsTitle =>
       'CSV de revisiones de equipo';
 
@@ -24748,6 +24756,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'Equipos';
+
+  @override
+  String get transfer_csvExport_typeFills => 'Llenados de botella';
 
   @override
   String get transfer_csvExport_typeObservations => 'Revisiones de equipo';
@@ -28242,6 +28253,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveImport_uddf_media => 'Fotos';
+
+  @override
+  String get diveImport_uddf_fills => 'Llenados';
 
   @override
   String get diveImport_uddf_title => 'Importar desde UDDF';
@@ -43119,6 +43133,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Exportando revisiones de equipo a CSV...';
 
   @override
+  String get settings_export_progress_fillsCsv =>
+      'Exportando llenados de botella a CSV...';
+
+  @override
   String get settings_export_progress_pdf => 'Generando registro PDF...';
 
   @override
@@ -43190,6 +43208,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Preparando CSV de revisiones de equipo...';
 
   @override
+  String get settings_export_progress_preparingFillsCsv =>
+      'Preparando CSV de llenados de botella...';
+
+  @override
   String get settings_export_progress_preparingUddf =>
       'Preparando el archivo UDDF...';
 
@@ -43209,6 +43231,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_export_empty_observations =>
       'No hay revisiones de equipo para exportar';
+
+  @override
+  String get settings_export_empty_fills =>
+      'No hay llenados de botella para exportar';
 
   @override
   String get settings_export_empty_data => 'No hay datos para exportar';
@@ -43237,6 +43263,9 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_export_success_observations =>
       'Revisiones de equipo exportadas';
+
+  @override
+  String get settings_export_success_fills => 'Llenados de botella exportados';
 
   @override
   String get settings_export_success_pdf =>
@@ -43299,6 +43328,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'CSV de revisiones de equipo guardado';
 
   @override
+  String get settings_export_saved_fillsCsv =>
+      'CSV de llenados de botella guardado';
+
+  @override
   String get settings_export_saved_uddf =>
       'Archivo UDDF guardado correctamente';
 
@@ -43326,6 +43359,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_export_saveObservationsCsvDialogTitle =>
       'Guardar CSV de revisiones de equipo';
+
+  @override
+  String get settings_export_saveFillsCsvDialogTitle =>
+      'Guardar CSV de llenados de botella';
 
   @override
   String backup_operation_created(String size) {

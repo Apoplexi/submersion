@@ -24389,6 +24389,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تصدير جرد المعدات ومعلومات الصيانة';
 
   @override
+  String get transfer_csvExport_descriptionFills =>
+      'كل تعبئة مسجلة على جواز أسطوانة، مع التحليل والضغط ومحطة التعبئة';
+
+  @override
   String get transfer_csvExport_descriptionObservations =>
       'كل فحص سليم وكل مشكلة مُبلَّغ عنها مع الغطسة والوسوم والملاحظة';
 
@@ -24409,6 +24413,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'المعدات CSV';
 
   @override
+  String get transfer_csvExport_optionFillsTitle => 'CSV تعبئات الأسطوانات';
+
+  @override
   String get transfer_csvExport_optionObservationsTitle =>
       'ملف CSV لفحوصات المعدات';
 
@@ -24425,6 +24432,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'المعدات';
+
+  @override
+  String get transfer_csvExport_typeFills => 'تعبئات الأسطوانات';
 
   @override
   String get transfer_csvExport_typeObservations => 'فحوصات المعدات';
@@ -27877,6 +27887,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveImport_uddf_media => 'الصور';
+
+  @override
+  String get diveImport_uddf_fills => 'التعبئات';
 
   @override
   String get diveImport_uddf_title => 'استيراد من UDDF';
@@ -42763,6 +42776,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'جارٍ تصدير فحوصات المعدات إلى CSV...';
 
   @override
+  String get settings_export_progress_fillsCsv =>
+      'جارٍ تصدير تعبئات الأسطوانات إلى CSV...';
+
+  @override
   String get settings_export_progress_pdf =>
       'جارٍ إنشاء سجل الغوص بصيغة PDF...';
 
@@ -42833,6 +42850,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'جارٍ تحضير ملف CSV لفحوصات المعدات...';
 
   @override
+  String get settings_export_progress_preparingFillsCsv =>
+      'جارٍ تجهيز CSV تعبئات الأسطوانات...';
+
+  @override
   String get settings_export_progress_preparingUddf => 'جارٍ تحضير ملف UDDF...';
 
   @override
@@ -42849,6 +42870,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_export_empty_observations => 'لا فحوصات معدات للتصدير';
+
+  @override
+  String get settings_export_empty_fills => 'لا تعبئات أسطوانات للتصدير';
 
   @override
   String get settings_export_empty_data => 'لا توجد بيانات للتصدير';
@@ -42872,6 +42896,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_export_success_observations => 'تم تصدير فحوصات المعدات';
+
+  @override
+  String get settings_export_success_fills => 'تم تصدير تعبئات الأسطوانات';
 
   @override
   String get settings_export_success_pdf =>
@@ -42931,6 +42958,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'تم حفظ ملف CSV لفحوصات المعدات';
 
   @override
+  String get settings_export_saved_fillsCsv => 'تم حفظ CSV تعبئات الأسطوانات';
+
+  @override
   String get settings_export_saved_uddf => 'تم حفظ ملف UDDF بنجاح';
 
   @override
@@ -42955,6 +42985,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_export_saveObservationsCsvDialogTitle =>
       'حفظ ملف CSV لفحوصات المعدات';
+
+  @override
+  String get settings_export_saveFillsCsvDialogTitle =>
+      'حفظ CSV تعبئات الأسطوانات';
 
   @override
   String backup_operation_created(String size) {

@@ -24691,6 +24691,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Esporta inventario attrezzatura e informazioni sulla manutenzione';
 
   @override
+  String get transfer_csvExport_descriptionFills =>
+      'Ogni ricarica registrata su un passaporto bombola, con analisi, pressione e stazione';
+
+  @override
   String get transfer_csvExport_descriptionObservations =>
       'Ogni controllo OK e ogni problema segnalato, con immersione, etichette e nota';
 
@@ -24711,6 +24715,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'CSV Attrezzatura';
 
   @override
+  String get transfer_csvExport_optionFillsTitle =>
+      'CSV delle ricariche bombola';
+
+  @override
   String get transfer_csvExport_optionObservationsTitle =>
       'CSV dei controlli attrezzatura';
 
@@ -24727,6 +24735,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'Attrezzatura';
+
+  @override
+  String get transfer_csvExport_typeFills => 'Ricariche bombola';
 
   @override
   String get transfer_csvExport_typeObservations => 'Controlli attrezzatura';
@@ -28213,6 +28224,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveImport_uddf_media => 'Foto';
+
+  @override
+  String get diveImport_uddf_fills => 'Ricariche';
 
   @override
   String get diveImport_uddf_title => 'Importa da UDDF';
@@ -43075,6 +43089,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Esportazione dei controlli attrezzatura in CSV...';
 
   @override
+  String get settings_export_progress_fillsCsv =>
+      'Esportazione delle ricariche bombola in CSV...';
+
+  @override
   String get settings_export_progress_pdf => 'Generazione del logbook PDF...';
 
   @override
@@ -43148,6 +43166,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Preparazione del CSV dei controlli attrezzatura...';
 
   @override
+  String get settings_export_progress_preparingFillsCsv =>
+      'Preparazione del CSV delle ricariche bombola...';
+
+  @override
   String get settings_export_progress_preparingUddf =>
       'Preparazione del file UDDF...';
 
@@ -43167,6 +43189,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_export_empty_observations =>
       'Nessun controllo attrezzatura da esportare';
+
+  @override
+  String get settings_export_empty_fills =>
+      'Nessuna ricarica bombola da esportare';
 
   @override
   String get settings_export_empty_data => 'Nessun dato da esportare';
@@ -43194,6 +43220,9 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_export_success_observations =>
       'Controlli attrezzatura esportati';
+
+  @override
+  String get settings_export_success_fills => 'Ricariche bombola esportate';
 
   @override
   String get settings_export_success_pdf => 'Logbook PDF generato con successo';
@@ -43250,6 +43279,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'CSV dei controlli attrezzatura salvato';
 
   @override
+  String get settings_export_saved_fillsCsv =>
+      'CSV delle ricariche bombola salvato';
+
+  @override
   String get settings_export_saved_uddf => 'File UDDF salvato con successo';
 
   @override
@@ -43274,6 +43307,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_export_saveObservationsCsvDialogTitle =>
       'Salva CSV dei controlli attrezzatura';
+
+  @override
+  String get settings_export_saveFillsCsvDialogTitle =>
+      'Salva CSV delle ricariche bombola';
 
   @override
   String backup_operation_created(String size) {

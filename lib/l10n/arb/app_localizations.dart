@@ -39462,6 +39462,12 @@ abstract class AppLocalizations {
   /// **'Export equipment inventory and service info'**
   String get transfer_csvExport_descriptionEquipment;
 
+  /// Subtitle of the cylinder fills option in the CSV export sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Every fill logged on a cylinder passport, with its analysis, pressure and filler'**
+  String get transfer_csvExport_descriptionFills;
+
   /// No description provided for @transfer_csvExport_descriptionObservations.
   ///
   /// In en, this message translates to:
@@ -39498,6 +39504,12 @@ abstract class AppLocalizations {
   /// **'Equipment CSV'**
   String get transfer_csvExport_optionEquipmentTitle;
 
+  /// Title of the share-or-save sheet for the cylinder fills CSV
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder fills CSV'**
+  String get transfer_csvExport_optionFillsTitle;
+
   /// No description provided for @transfer_csvExport_optionObservationsTitle.
   ///
   /// In en, this message translates to:
@@ -39527,6 +39539,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Equipment'**
   String get transfer_csvExport_typeEquipment;
+
+  /// Name of the cylinder fills option in the CSV export sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder fills'**
+  String get transfer_csvExport_typeFills;
 
   /// No description provided for @transfer_csvExport_typeObservations.
   ///
@@ -44983,6 +45001,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Photos'**
   String get diveImport_uddf_media;
+
+  /// Entity type label for cylinder fills in the import wizard
+  ///
+  /// In en, this message translates to:
+  /// **'Fills'**
+  String get diveImport_uddf_fills;
 
   /// No description provided for @diveImport_uddf_title.
   ///
@@ -69035,6 +69059,12 @@ abstract class AppLocalizations {
   /// **'Exporting gear check-ins to CSV...'**
   String get settings_export_progress_observationsCsv;
 
+  /// Progress message while the cylinder fills CSV is generated for sharing
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting cylinder fills to CSV...'**
+  String get settings_export_progress_fillsCsv;
+
   /// No description provided for @settings_export_progress_pdf.
   ///
   /// In en, this message translates to:
@@ -69149,6 +69179,12 @@ abstract class AppLocalizations {
   /// **'Preparing gear check-ins CSV...'**
   String get settings_export_progress_preparingObservationsCsv;
 
+  /// Progress message while the cylinder fills CSV is generated for saving
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing cylinder fills CSV...'**
+  String get settings_export_progress_preparingFillsCsv;
+
   /// No description provided for @settings_export_progress_preparingUddf.
   ///
   /// In en, this message translates to:
@@ -69184,6 +69220,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No gear check-ins to export'**
   String get settings_export_empty_observations;
+
+  /// Shown when the diver has no fills to put in the CSV
+  ///
+  /// In en, this message translates to:
+  /// **'No cylinder fills to export'**
+  String get settings_export_empty_fills;
 
   /// No description provided for @settings_export_empty_data.
   ///
@@ -69226,6 +69268,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gear check-ins exported'**
   String get settings_export_success_observations;
+
+  /// Shown after the cylinder fills CSV was shared
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder fills exported'**
+  String get settings_export_success_fills;
 
   /// No description provided for @settings_export_success_pdf.
   ///
@@ -69287,6 +69335,12 @@ abstract class AppLocalizations {
   /// **'Gear check-ins CSV saved'**
   String get settings_export_saved_observationsCsv;
 
+  /// Shown after the cylinder fills CSV was saved to a chosen location
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder fills CSV saved'**
+  String get settings_export_saved_fillsCsv;
+
   /// No description provided for @settings_export_saved_uddf.
   ///
   /// In en, this message translates to:
@@ -69334,6 +69388,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Gear Check-ins CSV'**
   String get settings_export_saveObservationsCsvDialogTitle;
+
+  /// Title of the system save dialog for the cylinder fills CSV
+  ///
+  /// In en, this message translates to:
+  /// **'Save Cylinder Fills CSV'**
+  String get settings_export_saveFillsCsvDialogTitle;
 
   /// No description provided for @backup_operation_created.
   ///

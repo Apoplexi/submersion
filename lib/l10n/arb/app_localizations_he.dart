@@ -24098,6 +24098,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'ייצא מלאי ציוד ופרטי תחזוקה';
 
   @override
+  String get transfer_csvExport_descriptionFills =>
+      'כל מילוי שנרשם בדרכון מכל, עם הניתוח, הלחץ ותחנת המילוי';
+
+  @override
   String get transfer_csvExport_descriptionObservations =>
       'כל בדיקה תקינה וכל בעיה שדווחה, עם הצלילה, התגיות וההערה';
 
@@ -24118,6 +24122,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'CSV ציוד';
 
   @override
+  String get transfer_csvExport_optionFillsTitle => 'CSV מילויי מכלים';
+
+  @override
   String get transfer_csvExport_optionObservationsTitle => 'CSV של בדיקות ציוד';
 
   @override
@@ -24133,6 +24140,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'ציוד';
+
+  @override
+  String get transfer_csvExport_typeFills => 'מילויי מכלים';
 
   @override
   String get transfer_csvExport_typeObservations => 'בדיקות ציוד';
@@ -27552,6 +27562,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveImport_uddf_media => 'תמונות';
+
+  @override
+  String get diveImport_uddf_fills => 'מילויים';
 
   @override
   String get diveImport_uddf_title => 'ייבוא מ-UDDF';
@@ -42247,6 +42260,9 @@ class AppLocalizationsHe extends AppLocalizations {
       'מייצא בדיקות ציוד ל-CSV...';
 
   @override
+  String get settings_export_progress_fillsCsv => 'מייצא מילויי מכלים ל-CSV...';
+
+  @override
   String get settings_export_progress_pdf => 'יוצר יומן צלילות בפורמט PDF...';
 
   @override
@@ -42312,6 +42328,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'מכין CSV של בדיקות ציוד...';
 
   @override
+  String get settings_export_progress_preparingFillsCsv =>
+      'מכין CSV מילויי מכלים...';
+
+  @override
   String get settings_export_progress_preparingUddf => 'מכין קובץ UDDF...';
 
   @override
@@ -42328,6 +42348,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_export_empty_observations => 'אין בדיקות ציוד לייצוא';
+
+  @override
+  String get settings_export_empty_fills => 'אין מילויי מכלים לייצוא';
 
   @override
   String get settings_export_empty_data => 'אין נתונים לייצוא';
@@ -42351,6 +42374,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_export_success_observations => 'בדיקות הציוד יוצאו';
+
+  @override
+  String get settings_export_success_fills => 'מילויי המכלים יוצאו';
 
   @override
   String get settings_export_success_pdf =>
@@ -42407,6 +42433,9 @@ class AppLocalizationsHe extends AppLocalizations {
       'קובץ ה-CSV של בדיקות הציוד נשמר';
 
   @override
+  String get settings_export_saved_fillsCsv => 'CSV מילויי המכלים נשמר';
+
+  @override
   String get settings_export_saved_uddf => 'קובץ UDDF נשמר בהצלחה';
 
   @override
@@ -42431,6 +42460,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_export_saveObservationsCsvDialogTitle =>
       'שמירת קובץ ה-CSV של בדיקות הציוד';
+
+  @override
+  String get settings_export_saveFillsCsvDialogTitle =>
+      'שמירת CSV מילויי מכלים';
 
   @override
   String backup_operation_created(String size) {

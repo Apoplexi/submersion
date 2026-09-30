@@ -24651,6 +24651,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ausrüstungsinventar und Serviceinformationen exportieren';
 
   @override
+  String get transfer_csvExport_descriptionFills =>
+      'Jede auf einem Flaschenpass protokollierte Füllung mit Analyse, Druck und Füllstation';
+
+  @override
   String get transfer_csvExport_descriptionObservations =>
       'Jede OK-Prüfung und jedes gemeldete Problem mit Tauchgang, Schlagwörtern und Notiz';
 
@@ -24671,6 +24675,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'Ausrüstung CSV';
 
   @override
+  String get transfer_csvExport_optionFillsTitle => 'CSV der Flaschenfüllungen';
+
+  @override
   String get transfer_csvExport_optionObservationsTitle =>
       'Ausrüstungs-Check-ins als CSV';
 
@@ -24687,6 +24694,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'Ausrüstung';
+
+  @override
+  String get transfer_csvExport_typeFills => 'Flaschenfüllungen';
 
   @override
   String get transfer_csvExport_typeObservations => 'Ausrüstungs-Check-ins';
@@ -28181,6 +28191,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveImport_uddf_media => 'Fotos';
+
+  @override
+  String get diveImport_uddf_fills => 'Füllungen';
 
   @override
   String get diveImport_uddf_title => 'Aus UDDF importieren';
@@ -42997,6 +43010,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ausrüstungs-Check-ins werden als CSV exportiert...';
 
   @override
+  String get settings_export_progress_fillsCsv =>
+      'Flaschenfüllungen werden als CSV exportiert...';
+
+  @override
   String get settings_export_progress_pdf => 'PDF-Logbuch wird erstellt...';
 
   @override
@@ -43069,6 +43086,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'CSV der Ausrüstungs-Check-ins wird vorbereitet...';
 
   @override
+  String get settings_export_progress_preparingFillsCsv =>
+      'CSV der Flaschenfüllungen wird vorbereitet...';
+
+  @override
   String get settings_export_progress_preparingUddf =>
       'UDDF-Datei wird vorbereitet...';
 
@@ -43088,6 +43109,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_export_empty_observations =>
       'Keine Ausrüstungs-Check-ins zum Exportieren';
+
+  @override
+  String get settings_export_empty_fills =>
+      'Keine Flaschenfüllungen zum Exportieren';
 
   @override
   String get settings_export_empty_data => 'Keine Daten zum Exportieren';
@@ -43116,6 +43141,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_export_success_observations =>
       'Ausrüstungs-Check-ins exportiert';
+
+  @override
+  String get settings_export_success_fills => 'Flaschenfüllungen exportiert';
 
   @override
   String get settings_export_success_pdf => 'PDF-Logbuch erfolgreich erstellt';
@@ -43176,6 +43204,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'CSV der Ausrüstungs-Check-ins gespeichert';
 
   @override
+  String get settings_export_saved_fillsCsv =>
+      'CSV der Flaschenfüllungen gespeichert';
+
+  @override
   String get settings_export_saved_uddf => 'UDDF-Datei erfolgreich gespeichert';
 
   @override
@@ -43202,6 +43234,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_export_saveObservationsCsvDialogTitle =>
       'CSV der Ausrüstungs-Check-ins speichern';
+
+  @override
+  String get settings_export_saveFillsCsvDialogTitle =>
+      'CSV der Flaschenfüllungen speichern';
 
   @override
   String backup_operation_created(String size) {
