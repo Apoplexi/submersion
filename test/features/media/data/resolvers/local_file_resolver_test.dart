@@ -4,6 +4,9 @@ import 'dart:typed_data';
 import 'dart:ui' show Size;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:submersion/features/media/data/resolvers/local_file_resolver.dart';
 import 'package:submersion/features/media/data/resolvers/media_fetch_gate.dart';
 import 'package:submersion/features/media/data/services/exif_extractor.dart';
@@ -14,6 +17,10 @@ import 'package:submersion/features/media/domain/value_objects/verify_result.dar
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
+import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
+
+import '../../../../helpers/fake_path_provider.dart';
+import '../../../../helpers/media_container_fixtures.dart';
 
 /// Stub that bypasses keychain I/O. Always returns null from [read].
 class _NullBookmarkStorage extends LocalBookmarkStorage {
@@ -71,10 +78,49 @@ class _StubPlatform implements LocalMediaPlatform {
       throw UnimplementedError('${invocation.memberName} should not be called');
 }
 
+/// Real extractor that records every file it is handed, and can park the
+/// first call until [releaseFirst] completes so a test can interleave a
+/// second call inside it.
+class _SpyExifExtractor extends ExifExtractor {
+  _SpyExifExtractor({this.holdFirst = false, this.failWith});
+
+  final bool holdFirst;
+
+  /// When set, every call records its file and then throws this.
+  final Object? failWith;
+  final List<File> files = [];
+  final Completer<void> firstEntered = Completer<void>();
+  final Completer<void> releaseFirst = Completer<void>();
+
+  @override
+  Future<MediaSourceMetadata?> extract(File file) async {
+    files.add(file);
+    if (holdFirst && files.length == 1) {
+      firstEntered.complete();
+      await releaseFirst.future;
+    }
+    final failure = failWith;
+    if (failure != null) throw failure;
+    return super.extract(file);
+  }
+}
+
+/// Path provider whose app temp directory is [tempPath], so a test can see
+/// everything written there.
+class _TempPathProvider extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
+  _TempPathProvider(this.tempPath);
+  final String tempPath;
+
+  @override
+  Future<String?> getTemporaryPath() async => tempPath;
+}
+
 MediaItem _localFile({
   String? localPath,
   String? bookmarkRef,
   String? originDeviceId,
+  String? originalFilename,
 }) => MediaItem(
   id: 'x',
   mediaType: MediaType.photo,
@@ -82,6 +128,7 @@ MediaItem _localFile({
   localPath: localPath,
   bookmarkRef: bookmarkRef,
   originDeviceId: originDeviceId,
+  originalFilename: originalFilename,
   takenAt: DateTime.utc(2024, 1, 1),
   createdAt: DateTime.utc(2024, 1, 1),
   updatedAt: DateTime.utc(2024, 1, 1),
@@ -100,10 +147,11 @@ LocalFileResolver _resolver() => LocalFileResolver(
 LocalFileResolver _bookmarkResolver({
   required LocalBookmarkStorage bookmarkStorage,
   required LocalMediaPlatform platform,
+  ExifExtractor? exifExtractor,
 }) => LocalFileResolver(
   bookmarkStorage: bookmarkStorage,
   platform: platform,
-  exifExtractor: ExifExtractor(),
+  exifExtractor: exifExtractor ?? ExifExtractor(),
   usesSecurityScopedBookmarks: () => true,
 );
 
@@ -353,18 +401,109 @@ void main() {
     },
   );
 
-  test('extractMetadata cleans up the temp file after BytesData run', () async {
+  group('extractMetadata over BytesData', () {
+    late Directory appTemp;
+    late _StubPlatform platform;
+
+    setUp(() {
+      // The app's own temp directory, not systemTemp: a hardened-runtime
+      // macOS build is denied /tmp (issue #509), and BytesData is exactly
+      // what the macOS bookmark path produces.
+      appTemp = Directory(p.join(tempDir.path, 'app_tmp'))..createSync();
+      useFakePathProvider(_TempPathProvider(appTemp.path));
+      platform = _StubPlatform()
+        ..onReadBookmarkBytes = ((blob) async =>
+            Uint8List.fromList([0, 1, 2, 3]));
+    });
+
+    LocalFileResolver resolver(ExifExtractor extractor) => _bookmarkResolver(
+      bookmarkStorage: _StubBookmarkStorage(Uint8List.fromList([1, 2])),
+      platform: platform,
+      exifExtractor: extractor,
+    );
+
+    test(
+      'works in a directory of its own under the app temp dir and removes it',
+      () async {
+        final extractor = _SpyExifExtractor();
+
+        await resolver(
+          extractor,
+        ).extractMetadata(_localFile(bookmarkRef: 'ref-cleanup'));
+
+        // Check the exact location this call used, rather than rebuilding a
+        // name: a rebuilt path passes trivially the moment the name changes.
+        expect(extractor.files, hasLength(1));
+        final scratchDir = extractor.files.single.parent;
+        expect(p.equals(scratchDir.parent.path, appTemp.path), isTrue);
+        expect(scratchDir.existsSync(), isFalse);
+        expect(appTemp.listSync(), isEmpty);
+      },
+    );
+
+    test('removes its directory when the extractor throws', () async {
+      final extractor = _SpyExifExtractor(
+        failWith: const FileSystemException('unreadable'),
+      );
+
+      await expectLater(
+        resolver(
+          extractor,
+        ).extractMetadata(_localFile(bookmarkRef: 'ref-throws')),
+        throwsA(isA<FileSystemException>()),
+      );
+
+      expect(extractor.files, hasLength(1));
+      expect(extractor.files.single.parent.existsSync(), isFalse);
+      expect(appTemp.listSync(), isEmpty);
+    });
+
+    test('names the scratch file with the item extension so EXIF is read '
+        'from the bytes', () async {
+      // The extractor picks its readers by extension. A neutral name made
+      // every capture read as application/octet-stream and fall back to
+      // the scratch file's own mtime, which is the time of the call.
+      platform.onReadBookmarkBytes = ((blob) async => jpegWithExif(
+        (exif) => exif.exifIfd['DateTimeOriginal'] = '2025:12:27 12:08:19',
+      ));
+
+      final meta = await resolver(ExifExtractor()).extractMetadata(
+        _localFile(bookmarkRef: 'ref-jpeg', originalFilename: 'reef.jpg'),
+      );
+
+      expect(meta, isNotNull);
+      expect(meta!.mimeType, 'image/jpeg');
+      expect(meta.takenAt, DateTime.utc(2025, 12, 27, 12, 8, 19));
+    });
+  });
+
+  test('concurrent extractMetadata calls for the same BytesData item both '
+      'return metadata', () async {
     final platform = _StubPlatform()
       ..onReadBookmarkBytes = ((blob) async =>
           Uint8List.fromList([0, 1, 2, 3]));
-    final item = _localFile(bookmarkRef: 'ref-cleanup');
+    final extractor = _SpyExifExtractor(holdFirst: true);
     final r = _bookmarkResolver(
       bookmarkStorage: _StubBookmarkStorage(Uint8List.fromList([1, 2])),
       platform: platform,
+      exifExtractor: extractor,
     );
-    await r.extractMetadata(item);
-    final tmp = File('${Directory.systemTemp.path}/exif_${item.id}.bin');
-    expect(tmp.existsSync(), isFalse);
+    final item = _localFile(bookmarkRef: 'ref-concurrent');
+
+    // Park the first call inside the extractor, after it has written its
+    // scratch file. The second call then writes, extracts and cleans up
+    // in full before the first one reads.
+    final first = r.extractMetadata(item);
+    // Bounded, so a first call that never reaches the extractor fails here
+    // with a reason instead of hanging until the suite's per-test cap.
+    await extractor.firstEntered.future.timeout(const Duration(seconds: 10));
+    final second = await r.extractMetadata(item);
+    extractor.releaseFirst.complete();
+    final firstResult = await first;
+
+    expect(second, isNotNull);
+    expect(firstResult, isNotNull);
+    expect(firstResult!.takenAt, isNotNull);
   });
   // Regression: a sandboxed macOS build can STAT a user file (~/Downloads)
   // but not OPEN it — File.exists() returns true while any read throws
