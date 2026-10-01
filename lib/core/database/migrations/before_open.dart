@@ -7,18 +7,18 @@ part of 'app_database_migrations.dart';
 /// asserted again here.
 extension BeforeOpenBackstops on AppDatabase {
   Future<void> _beforeOpen(OpeningDetails details) async {
-  // v255 backstop: metadata-only profile revision history over existing
-  // dive_profile_series rows. Safe to re-run: INSERT OR IGNORE keeps
-  // existing revisions untouched and only fills missing pointer rows.
-  await _assertProfileSeriesHistorySchema();
-  await _backfillProfileSeriesHistoryRows();
+    // v255 backstop: metadata-only profile revision history over existing
+    // dive_profile_series rows. Safe to re-run: INSERT OR IGNORE keeps
+    // existing revisions untouched and only fills missing pointer rows.
+    await _assertProfileSeriesHistorySchema();
+    await _backfillProfileSeriesHistoryRows();
 
-  // v252 backstop: nav_tracks.diver_id. Column only; the backfill stays
-  // in the rung.
-  await _assertNavTrackDiverIdColumn();
+    // v252 backstop: nav_tracks.diver_id. Column only; the backfill stays
+    // in the rung.
+    await _assertNavTrackDiverIdColumn();
 
-  // v249 backstop: the trip fill forecast's columns.
-  await _assertTripFillForecastColumns();
+    // v249 backstop: the trip fill forecast's columns.
+    await _assertTripFillForecastColumns();
 
     // v240 backstop: the events-by-dive index.
     await _assertProfileEventsDiveIdIndex();

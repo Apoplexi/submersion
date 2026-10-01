@@ -44023,6 +44023,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_profileEditor_mode_trim => 'Rogner';
 
   @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'Basculer vers la révision active. Ce changement prend effet immédiatement et toutes les futures éditions seront basées sur cette révision.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

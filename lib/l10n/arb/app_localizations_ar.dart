@@ -43572,6 +43572,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_profileEditor_mode_trim => 'قص';
 
   @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'تبديل المراجعة النشطة. هذا التغيير يسري مفعوله فوراً وسيتم أساس جميع التعديلات المستقبلية على هذه المراجعة.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

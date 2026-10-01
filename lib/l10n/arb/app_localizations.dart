@@ -69951,6 +69951,12 @@ abstract class AppLocalizations {
   /// **'Trim'**
   String get diveLog_profileEditor_mode_trim;
 
+  /// No description provided for @diveLog_profileEditor_revisionSelectorTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch active revision. This takes effect immediately and all future edits will be based on this revision.'**
+  String get diveLog_profileEditor_revisionSelectorTooltip;
+
   /// Header of the dive-detail section listing where a dive's data came from (dive computers, imported files, manual entry).
   ///
   /// In en, this message translates to:

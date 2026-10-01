@@ -43833,6 +43833,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_profileEditor_mode_trim => 'Zuschneiden';
 
   @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'Aktive Revision wechseln. Diese Änderung wird sofort wirksam und alle zukünftigen Bearbeitungen basieren auf dieser Revision.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -27,6 +27,12 @@ void main() {
       final base = await getBaseOverrides();
       final mockRepo = MockDiveRepository();
 
+      // Use larger viewport for popup menu visibility
+      tester.view.physicalSize = const Size(1600, 4000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       when(mockRepo.setActiveProfileSeries(any, any)).thenAnswer((_) async {});
 
       final revisions = [
@@ -85,8 +91,23 @@ void main() {
       // Verify alternative revision is shown in menu
       expect(find.text('Computer Import'), findsOneWidget);
 
-      // Select different revision
-      await tester.tap(find.text('Computer Import').last);
+      // Select different revision by tapping on the menu item widget
+      final computerImportFinder = find.ancestor(
+        of: find.text('Computer Import'),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget.runtimeType.toString() == 'CheckedPopupMenuItem<String>',
+        ),
+      );
+      if (computerImportFinder.evaluate().isEmpty) {
+        // Fallback: try to tap the text with warnIfMissed: false
+        await tester.tap(
+          find.text('Computer Import').last,
+          warnIfMissed: false,
+        );
+      } else {
+        await tester.tap(computerImportFinder);
+      }
       await tester.pumpAndSettle();
 
       // Verify setActiveProfileSeries was called

@@ -43734,6 +43734,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_profileEditor_mode_trim => 'Vágás';
 
   @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'Aktív verzió cseréje. Ez a módosítás azonnal érvénybe lép, és az összes jövőbeli szerkesztés ezen a verziót fogja alapul venni.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

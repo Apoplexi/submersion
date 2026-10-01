@@ -43631,6 +43631,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_profileEditor_mode_trim => 'Bijsnijden';
 
   @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'Wissel naar actieve revisie. Deze wijziging treedt onmiddellijk in werking en alle toekomstige bewerkingen zijn gebaseerd op deze revisie.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

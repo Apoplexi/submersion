@@ -13032,6 +13032,7 @@
   "diveLog_profileEditor_mode_outlier": "Kiugró érték",
   "diveLog_profileEditor_mode_draw": "Rajzolás",
   "diveLog_profileEditor_mode_trim": "Vágás",
+  "diveLog_profileEditor_revisionSelectorTooltip": "Aktív verzió cseréje. Ez a módosítás azonnal érvénybe lép, és az összes jövőbeli szerkesztés ezen a verziót fogja alapul venni.",
   "diveLog_sources_sectionTitle": "{count, plural, =0{Adatforrás} one{Adatforrás} other{Adatforrások}}",
   "diveLog_sources_badge_manual": "Kézi",
   "diveLog_sources_badge_viewing": "Megtekintve",

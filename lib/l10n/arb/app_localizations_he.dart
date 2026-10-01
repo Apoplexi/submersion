@@ -43058,6 +43058,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_profileEditor_mode_trim => 'חיתוך';
 
   @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'החלף גרסה פעילה. שינוי זה יוצא לפועל מיד וכל העריכות הבאות יהיו מבוססות על גרסה זו.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

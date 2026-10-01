@@ -41402,6 +41402,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_profileEditor_mode_trim => '修剪';
 
   @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      '切换活跃版本。此更改立即生效，所有未来编辑都将基于此版本。';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

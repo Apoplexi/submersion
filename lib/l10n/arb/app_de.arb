@@ -13144,6 +13144,7 @@
   "diveLog_profileEditor_mode_outlier": "Ausreißer",
   "diveLog_profileEditor_mode_draw": "Zeichnen",
   "diveLog_profileEditor_mode_trim": "Zuschneiden",
+  "diveLog_profileEditor_revisionSelectorTooltip": "Aktive Revision wechseln. Diese Änderung wird sofort wirksam und alle zukünftigen Bearbeitungen basieren auf dieser Revision.",
   "diveLog_sources_sectionTitle": "{count, plural, =0{Datenquelle} =1{Datenquelle} other{Datenquellen}}",
   "diveLog_sources_badge_manual": "Manuell",
   "diveLog_sources_badge_viewing": "Angezeigt",
