@@ -197,11 +197,7 @@ _ResolvedCylinders _resolveCylinders(
     // even though the role is known. The O2-heuristic inputs below don't
     // matter for that case: DC_USAGE_OXYGEN short-circuits _inferRole before
     // they're consulted.
-    final role = _inferRole(
-      tank.usage,
-      gas?.o2Percent ?? 21.0,
-      gas?.hePercent ?? 0.0,
-    );
+    final role = _inferRole(tank.usage, gas?.o2Percent ?? 21.0);
     // No gas mixes (e.g. gauge mode): default to air rather than mislabel,
     // except a CCR oxygen supply cylinder, which is pure O2 by definition
     // (#726) -- unlike air, that default isn't a guess.
@@ -276,23 +272,33 @@ _ResolvedCylinders _resolveCylinders(
   return _ResolvedCylinders(result, gasIndexToTankIndex);
 }
 
-/// Infer a cylinder [TankRole] (returned as its `.name`). The computer's tank
-/// [usage] (libdivecomputer `dc_usage_t`: 1=oxygen, 2=diluent) is authoritative
-/// when present; otherwise fall back to an open-circuit gas heuristic where a
-/// nitrox mix of 41% O2 or more is a deco gas. Everything else is back gas.
 /// The native layer sends zero for "no transmitter"; keep that out of the
 /// stored identity so two serial-less tanks never look like the same cylinder.
 String? _transmitterSerial(int? serial) =>
     serial == null || serial <= 0 ? null : '$serial';
 
-String _inferRole(int? usage, double o2Percent, double hePercent) {
+/// The O2 percentage at or above which a gas with no reported usage is a deco
+/// gas. Shared by [_inferRole] and [_inferSensorlessRoles] so the two never
+/// disagree on it.
+const double _decoMinO2Percent = 41.0;
+
+/// Infer a cylinder [TankRole] (returned as its `.name`). The computer's tank
+/// [usage] (libdivecomputer `dc_usage_t`: 1=oxygen, 2=diluent) is authoritative
+/// when present; otherwise fall back to an open-circuit gas heuristic where a
+/// mix of [_decoMinO2Percent] O2 or more is a deco gas. Everything else is
+/// back gas.
+///
+/// Helium does not change the answer: an accelerated-deco gas is often a
+/// trimix such as 50/20, blended to soften the helium swing at the switch,
+/// and it is still a deco gas (#1905).
+String _inferRole(int? usage, double o2Percent) {
   switch (usage) {
     case 1: // DC_USAGE_OXYGEN
       return TankRole.oxygenSupply.name;
     case 2: // DC_USAGE_DILUENT
       return TankRole.diluent.name;
   }
-  if (hePercent == 0.0 && o2Percent >= 41.0) {
+  if (o2Percent >= _decoMinO2Percent) {
     return TankRole.deco.name;
   }
   return TankRole.backGas.name;
@@ -320,7 +326,8 @@ String _inferRole(int? usage, double o2Percent, double hePercent) {
 ///    only loses the helium tie-break gets no automatic Bailout role and
 ///    falls through to the next rule.
 /// 2. Deco: every still-unassigned gas at or above the same 41% O2
-///    threshold [_inferRole] uses for open circuit becomes [TankRole.deco].
+///    threshold [_inferRole] uses for open circuit ([_decoMinO2Percent])
+///    becomes [TankRole.deco].
 /// 3. Stage: everything still unassigned becomes [TankRole.stage].
 ///
 /// On any other recognized dive mode, a gas with no reported usage keeps
@@ -349,8 +356,7 @@ Map<int, String> _inferSensorlessRoles(
 
   if (diveMode != 'ccr') {
     for (final i in unranked) {
-      final g = gasMixes[i];
-      roles[i] = _inferRole(null, g.o2Percent, g.hePercent);
+      roles[i] = _inferRole(null, gasMixes[i].o2Percent);
     }
     return roles;
   }
@@ -381,7 +387,7 @@ Map<int, String> _inferSensorlessRoles(
     }
     for (final i in unranked) {
       if (roles.containsKey(i)) continue;
-      roles[i] = gasMixes[i].o2Percent >= 41.0
+      roles[i] = gasMixes[i].o2Percent >= _decoMinO2Percent
           ? TankRole.deco.name
           : TankRole.stage.name;
     }
