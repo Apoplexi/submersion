@@ -137,21 +137,37 @@ extension RungsFromV231 on AppDatabase {
       await _backfillNavTrackDiverIds();
     }
     if (from < 252) await reportProgress();
+    // v253: the settings a safety review was computed from (issue #2592).
+    // Column only, no backfill; re-asserted in beforeOpen, which is what reaches a
+    // database already at 254 (#2595 merged first).
+    if (from < 253) {
+      await _assertSafetyReviewInputsHashColumn();
+    }
+    if (from < 253) await reportProgress();
     // v254: dive_tanks.role_source, where a cylinder's role came from
     // (issue #2595). Column only, no backfill: a stored role's origin is
     // unknown, and a re-parse fills it. Re-asserted in beforeOpen. 253 is
-    // held by an open branch.
+    // the safety review inputs (#2592).
     if (from < 254) {
       await _assertTankRoleSourceColumn();
     }
     if (from < 254) await reportProgress();
-    // v255: metadata-only profile revision history over existing
+    // v255: a safety stop is no decompression ceiling (issue #2550). Drops
+    // the ceilings safety stop samples carried from every stored series.
+    // Rung only: new imports no longer write them, and every reader ignores
+    // one that still arrives from an older peer. 254 is dive_tanks.role_source
+    // (#2595), 253 safety review inputs (#2592).
+    if (from < 255) {
+      await _scrubSafetyStopCeilings();
+    }
+    if (from < 255) await reportProgress();
+    // v256: metadata-only profile revision history over existing
     // dive_profile_series rows (#1197). One history row per series id,
     // no sample/blob duplication. Re-asserted in beforeOpen.
-    if (from < 255) {
+    if (from < 256) {
       await _assertProfileSeriesHistorySchema();
       await _backfillProfileSeriesHistoryRows();
     }
-    if (from < 255) await reportProgress();
+    if (from < 256) await reportProgress();
   }
 }

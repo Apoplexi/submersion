@@ -7,7 +7,11 @@ part of 'app_database_migrations.dart';
 /// asserted again here.
 extension BeforeOpenBackstops on AppDatabase {
   Future<void> _beforeOpen(OpeningDetails details) async {
-    // v255 backstop: metadata-only profile revision history over existing
+    // v255 backstop: a safety stop is no decompression ceiling. Safe to
+    // re-run: it rewrites only the series that still carry one.
+    await _scrubSafetyStopCeilings();
+
+    // v256 backstop: metadata-only profile revision history over existing
     // dive_profile_series rows. Safe to re-run: INSERT OR IGNORE keeps
     // existing revisions untouched and only fills missing pointer rows.
     await _assertProfileSeriesHistorySchema();
@@ -206,6 +210,8 @@ extension BeforeOpenBackstops on AppDatabase {
     // v123 backstop: re-assert safety review tables + settings columns
     // (parallel-branch collision self-heal).
     await _assertSafetyReviewSchema();
+    // v253 backstop: the review's inputs fingerprint, after the table above.
+    await _assertSafetyReviewInputsHashColumn();
 
     // v124 backstop: re-assert the equipment_attributes table (schema
     // only -- the legacy-column copy must NOT run here, it would
