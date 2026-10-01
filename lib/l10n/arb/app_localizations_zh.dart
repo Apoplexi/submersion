@@ -14618,6 +14618,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_list_filterAll => '全部装备';
 
   @override
+  String get equipment_list_filterCurrent => '当前装备';
+
+  @override
   String get equipment_list_filterServiceDue => '需要维护';
 
   @override

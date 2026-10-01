@@ -15299,6 +15299,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_list_filterAll => 'Todos os Equipamentos';
 
   @override
+  String get equipment_list_filterCurrent => 'Equipamentos Atuais';
+
+  @override
   String get equipment_list_filterServiceDue => 'Manutenção Pendente';
 
   @override

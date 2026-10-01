@@ -15198,6 +15198,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_list_filterAll => 'Alle uitrusting';
 
   @override
+  String get equipment_list_filterCurrent => 'Huidige uitrusting';
+
+  @override
   String get equipment_list_filterServiceDue => 'Service nodig';
 
   @override

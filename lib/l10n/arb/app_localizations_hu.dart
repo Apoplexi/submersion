@@ -15260,6 +15260,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_list_filterAll => 'Összes felszerelés';
 
   @override
+  String get equipment_list_filterCurrent => 'Jelenlegi felszerelés';
+
+  @override
   String get equipment_list_filterServiceDue => 'Szerviz esedékes';
 
   @override

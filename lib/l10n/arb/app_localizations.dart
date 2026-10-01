@@ -24842,11 +24842,17 @@ abstract class AppLocalizations {
   /// **'Error loading equipment: {error}'**
   String equipment_list_errorLoading(Object error);
 
-  /// No description provided for @equipment_list_filterAll.
+  /// Status chip that narrows by no status. On the Equipment list it shows every item, retired and sold included; in the dive gear picker, every item the picker offers.
   ///
   /// In en, this message translates to:
   /// **'All Equipment'**
   String get equipment_list_filterAll;
+
+  /// Equipment filter status chip for the default view: every item except retired and sold gear
+  ///
+  /// In en, this message translates to:
+  /// **'Current Equipment'**
+  String get equipment_list_filterCurrent;
 
   /// No description provided for @equipment_list_filterServiceDue.
   ///
