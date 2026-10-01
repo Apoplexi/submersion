@@ -66000,6 +66000,12 @@ abstract class AppLocalizations {
   /// **'Decompression dive'**
   String get explore_chip_deco;
 
+  /// No description provided for @explore_chip_fieldPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'{field}: {period}'**
+  String explore_chip_fieldPeriod(String field, String period);
+
   /// No description provided for @explore_chip_noDeco.
   ///
   /// In en, this message translates to:
@@ -66059,6 +66065,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Before {end}'**
   String explore_chip_timeBefore(Object end);
+
+  /// No description provided for @explore_chip_viaDives.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives: {label}'**
+  String explore_chip_viaDives(String label);
+
+  /// No description provided for @explore_chip_withinDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{{field} within {days} day} other{{field} within {days} days}}'**
+  String explore_chip_withinDays(int days, String field);
 
   /// No description provided for @explore_count.
   ///
@@ -66234,6 +66252,12 @@ abstract class AppLocalizations {
   /// **'Open in Insights'**
   String get explore_handoff_insights;
 
+  /// No description provided for @explore_handoff_list.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in list'**
+  String get explore_handoff_list;
+
   /// No description provided for @explore_hint.
   ///
   /// In en, this message translates to:
@@ -66294,6 +66318,24 @@ abstract class AppLocalizations {
   /// **'Recent'**
   String get explore_recent_title;
 
+  /// No description provided for @explore_results_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} result} other{{count} results}}'**
+  String explore_results_count(num count);
+
+  /// No description provided for @explore_results_subjectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Matches'**
+  String get explore_results_subjectTitle;
+
+  /// No description provided for @explore_results_subjectTruncated.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing the first {count}. Open in the list for all of them.'**
+  String explore_results_subjectTruncated(Object count);
+
   /// No description provided for @explore_results_title.
   ///
   /// In en, this message translates to:
@@ -66312,12 +66354,6 @@ abstract class AppLocalizations {
   /// **'Explore needs the on-device model, which is not ready on this device.'**
   String get explore_shortcut_unavailable;
 
-  /// No description provided for @explore_subjectNotSupported.
-  ///
-  /// In en, this message translates to:
-  /// **'Only dives can be searched for now.'**
-  String get explore_subjectNotSupported;
-
   /// No description provided for @explore_title.
   ///
   /// In en, this message translates to:
@@ -66329,6 +66365,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Understood'**
   String get explore_understood_title;
+
+  /// No description provided for @explore_unplaced_reason_aggregateWithScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t be combined with conditions on the dives yet'**
+  String get explore_unplaced_reason_aggregateWithScope;
 
   /// No description provided for @explore_unplaced_reason_invalid.
   ///
@@ -73583,6 +73625,12 @@ abstract class AppLocalizations {
   /// **'Certifications'**
   String get query_buddies_certifications;
 
+  /// Field label in the query builder: how many counted dives the diver made with this buddy
+  ///
+  /// In en, this message translates to:
+  /// **'Dives together'**
+  String get query_buddies_diveCount;
+
   /// Query builder: a buddy's dives
   ///
   /// In en, this message translates to:
@@ -73600,6 +73648,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Favorite'**
   String get query_buddies_favorite;
+
+  /// Field label in the query builder: the date of the newest counted dive with this buddy
+  ///
+  /// In en, this message translates to:
+  /// **'Last dived together'**
+  String get query_buddies_lastDived;
 
   /// Field label in the query builder
   ///
@@ -73643,11 +73697,23 @@ abstract class AppLocalizations {
   /// **'Country'**
   String get query_centers_country;
 
+  /// Field label in the query builder: how many counted dives were made with the center
+  ///
+  /// In en, this message translates to:
+  /// **'Dive count'**
+  String get query_centers_diveCount;
+
   /// Query builder: dives made with a dive center
   ///
   /// In en, this message translates to:
   /// **'Dives'**
   String get query_centers_dives;
+
+  /// Field label in the query builder: the date of the newest counted dive with the center
+  ///
+  /// In en, this message translates to:
+  /// **'Last dived'**
+  String get query_centers_lastDived;
 
   /// Field label in the query builder
   ///
@@ -74393,11 +74459,23 @@ abstract class AppLocalizations {
   /// **'Brand'**
   String get query_equipment_brand;
 
+  /// Field label in the query builder: how many counted dives the item was used on
+  ///
+  /// In en, this message translates to:
+  /// **'Dives used'**
+  String get query_equipment_diveCount;
+
   /// Relation label in the query builder: the dives an item was used on
   ///
   /// In en, this message translates to:
   /// **'Dives'**
   String get query_equipment_dives;
+
+  /// Field label in the query builder: the date of the newest counted dive the item was used on
+  ///
+  /// In en, this message translates to:
+  /// **'Last used'**
+  String get query_equipment_lastDived;
 
   /// Field label in the query builder
   ///
@@ -74410,6 +74488,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name'**
   String get query_equipment_name;
+
+  /// Field label in the query builder: the date the item's next service falls due
+  ///
+  /// In en, this message translates to:
+  /// **'Next service due'**
+  String get query_equipment_nextServiceDue;
 
   /// Field label in the query builder
   ///
@@ -74549,6 +74633,12 @@ abstract class AppLocalizations {
   /// **'Difficulty'**
   String get query_sites_difficulty;
 
+  /// Field label in the query builder: how many counted dives the site has
+  ///
+  /// In en, this message translates to:
+  /// **'Dive count'**
+  String get query_sites_diveCount;
+
   /// Relation label in the query builder: the dives at a site
   ///
   /// In en, this message translates to:
@@ -74560,6 +74650,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Island'**
   String get query_sites_island;
+
+  /// Field label in the query builder: the date of the site's newest counted dive
+  ///
+  /// In en, this message translates to:
+  /// **'Last dived'**
+  String get query_sites_lastDived;
 
   /// Field label in the query builder
   ///
@@ -74621,6 +74717,12 @@ abstract class AppLocalizations {
   /// **'Description'**
   String get query_species_description;
 
+  /// Field label in the query builder: how many counted dives the species was seen on
+  ///
+  /// In en, this message translates to:
+  /// **'Dives seen on'**
+  String get query_species_diveCount;
+
   /// Query builder: the dives a species was sighted on
   ///
   /// In en, this message translates to:
@@ -74632,6 +74734,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expected at sites'**
   String get query_species_expectedSites;
+
+  /// Field label in the query builder: the date of the first counted dive the species was seen on
+  ///
+  /// In en, this message translates to:
+  /// **'First seen'**
+  String get query_species_firstSeen;
+
+  /// Field label in the query builder: the date of the newest counted dive the species was seen on
+  ///
+  /// In en, this message translates to:
+  /// **'Last seen'**
+  String get query_species_lastSeen;
 
   /// Field label in the query builder
   ///
@@ -74704,6 +74818,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Volume'**
   String get query_tanks_volume;
+
+  /// Field label in the query builder: how many counted dives the trip has
+  ///
+  /// In en, this message translates to:
+  /// **'Dive count'**
+  String get query_trips_diveCount;
 
   /// Relation label in the query builder: the dives on a trip
   ///

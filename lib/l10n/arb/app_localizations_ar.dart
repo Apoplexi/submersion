@@ -40629,6 +40629,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get explore_chip_deco => 'غطسة تخفيف ضغط';
 
   @override
+  String explore_chip_fieldPeriod(String field, String period) {
+    return '$field: $period';
+  }
+
+  @override
   String get explore_chip_noDeco => 'بدون تخفيف ضغط';
 
   @override
@@ -40672,6 +40677,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String explore_chip_timeBefore(Object end) {
     return 'قبل $end';
+  }
+
+  @override
+  String explore_chip_viaDives(String label) {
+    return 'الغطسات: $label';
+  }
+
+  @override
+  String explore_chip_withinDays(int days, String field) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$field خلال $days يوم',
+      one: '$field خلال $days يوم',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -40776,6 +40797,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get explore_handoff_insights => 'فتح في الرؤى';
 
   @override
+  String get explore_handoff_list => 'فتح في القائمة';
+
+  @override
   String get explore_hint =>
       'اسأل عن غطساتك، مثلاً سلاحف أعمق من 20 م في بونير';
 
@@ -40811,6 +40835,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get explore_recent_title => 'الأخيرة';
 
   @override
+  String explore_results_count(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نتيجة',
+      one: '$count نتيجة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get explore_results_subjectTitle => 'النتائج المطابقة';
+
+  @override
+  String explore_results_subjectTruncated(Object count) {
+    return 'يُعرض أول $count. افتح القائمة لعرضها كلها.';
+  }
+
+  @override
   String get explore_results_title => 'الغطسات المطابقة';
 
   @override
@@ -40823,13 +40866,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'يحتاج الاستكشاف إلى النموذج على الجهاز، وهو غير جاهز على هذا الجهاز.';
 
   @override
-  String get explore_subjectNotSupported => 'يمكن البحث في الغطسات فقط حاليًا.';
-
-  @override
   String get explore_title => 'استكشاف';
 
   @override
   String get explore_understood_title => 'تم فهمه';
+
+  @override
+  String get explore_unplaced_reason_aggregateWithScope =>
+      'لا يمكن دمجه مع شروط الغطسات بعد';
 
   @override
   String get explore_unplaced_reason_invalid => 'تعذّرت قراءة هذه القيمة';
@@ -45745,6 +45789,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_buddies_certifications => 'الشهادات';
 
   @override
+  String get query_buddies_diveCount => 'غطسات مشتركة';
+
+  @override
   String get query_buddies_dives => 'الغطسات';
 
   @override
@@ -45752,6 +45799,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_buddies_favorite => 'مفضّل';
+
+  @override
+  String get query_buddies_lastDived => 'آخر غطسة مشتركة';
 
   @override
   String get query_buddies_name => 'الاسم';
@@ -45775,7 +45825,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_centers_country => 'البلد';
 
   @override
+  String get query_centers_diveCount => 'عدد الغطسات';
+
+  @override
   String get query_centers_dives => 'الغطسات';
+
+  @override
+  String get query_centers_lastDived => 'آخر غطسة';
 
   @override
   String get query_centers_name => 'الاسم';
@@ -46150,13 +46206,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_equipment_brand => 'العلامة التجارية';
 
   @override
+  String get query_equipment_diveCount => 'غطسات الاستخدام';
+
+  @override
   String get query_equipment_dives => 'الغطسات';
+
+  @override
+  String get query_equipment_lastDived => 'آخر استخدام';
 
   @override
   String get query_equipment_model => 'الطراز';
 
   @override
   String get query_equipment_name => 'الاسم';
+
+  @override
+  String get query_equipment_nextServiceDue => 'موعد الصيانة التالية';
 
   @override
   String get query_equipment_serialNumber => 'الرقم التسلسلي';
@@ -46228,10 +46293,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_sites_difficulty => 'الصعوبة';
 
   @override
+  String get query_sites_diveCount => 'عدد الغطسات';
+
+  @override
   String get query_sites_dives => 'الغطسات';
 
   @override
   String get query_sites_island => 'الجزيرة';
+
+  @override
+  String get query_sites_lastDived => 'آخر غطسة';
 
   @override
   String get query_sites_maxDepth => 'أقصى عمق';
@@ -46264,10 +46335,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_species_description => 'الوصف';
 
   @override
+  String get query_species_diveCount => 'غطسات المشاهدة';
+
+  @override
   String get query_species_dives => 'الغطسات';
 
   @override
   String get query_species_expectedSites => 'متوقع في المواقع';
+
+  @override
+  String get query_species_firstSeen => 'أول مشاهدة';
+
+  @override
+  String get query_species_lastSeen => 'آخر مشاهدة';
 
   @override
   String get query_species_name => 'الاسم';
@@ -46304,6 +46384,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_tanks_volume => 'الحجم';
+
+  @override
+  String get query_trips_diveCount => 'عدد الغطسات';
 
   @override
   String get query_trips_dives => 'الغطسات';
