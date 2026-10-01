@@ -18589,6 +18589,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_import_review_noMatch => 'Nenhum mergulho correspondente';
 
   @override
+  String get media_import_review_noCaptureTime =>
+      'Nenhuma data de captura encontrada';
+
+  @override
+  String get media_import_review_noMatchFileDate =>
+      'Nenhum mergulho corresponde à data do arquivo; o arquivo não tem data de captura';
+
+  @override
   String get media_import_review_skipped => 'Não importado';
 
   @override
