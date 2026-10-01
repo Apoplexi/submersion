@@ -22,6 +22,7 @@ import 'package:submersion/features/trips/presentation/widgets/dense_trip_list_t
 import 'package:submersion/features/trips/presentation/widgets/trip_list_content.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
+import 'package:submersion/shared/widgets/feature_accent.dart';
 
 import '../../../../helpers/bulk_delete_contract.dart';
 import '../../../../helpers/selection_contract.dart';
@@ -152,6 +153,8 @@ Future<List<Override>> _buildPhoneOverrides({
   ListViewMode viewMode = ListViewMode.detailed,
   String? highlightedTripId,
   List<Diver>? divers,
+  List<TripWithStats>? allTrips,
+  TripFilterState? filter,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -161,7 +164,7 @@ Future<List<Override>> _buildPhoneOverrides({
     settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
     currentDiverIdProvider.overrideWith((ref) => MockCurrentDiverIdNotifier()),
     tripListNotifierProvider.overrideWith(
-      (ref) => _MockTripListNotifier(trips),
+      (ref) => _MockTripListNotifier(allTrips ?? trips),
     ),
     tripListViewModeProvider.overrideWith((ref) => viewMode),
     tripTableConfigProvider.overrideWith(
@@ -170,10 +173,64 @@ Future<List<Override>> _buildPhoneOverrides({
     sortedFilteredTripsProvider.overrideWith((ref) => AsyncValue.data(trips)),
     highlightedTripIdProvider.overrideWith((ref) => highlightedTripId),
     if (divers != null) allDiversProvider.overrideWith((ref) async => divers),
+    if (filter != null) tripFilterProvider.overrideWith((ref) => filter),
   ];
 }
 
 void main() {
+  // The title's subtitle counts the list (#2669), in both the phone app bar
+  // and the desktop pane header.
+  group('entry count subtitle', () {
+    testWidgets('a filter counts against every trip', (tester) async {
+      final all = [
+        _makeTrip(id: 't1', name: 'Bonaire'),
+        _makeTrip(id: 't2', name: 'Palau'),
+        _makeTrip(id: 't3', name: 'Truk'),
+      ];
+      final overrides = await _buildPhoneOverrides(
+        trips: all.take(1).toList(),
+        allTrips: all,
+        filter: const TripFilterState(equipmentId: 'reg'),
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const TripListContent(showAppBar: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 of 3 trips'), findsOneWidget);
+    });
+
+    for (final showAppBar in const [true, false]) {
+      testWidgets('${showAppBar ? 'app bar' : 'compact bar'} counts the list', (
+        tester,
+      ) async {
+        final overrides = await _buildPhoneOverrides(
+          trips: [
+            _makeTrip(id: 't1', name: 'Bonaire'),
+            _makeTrip(id: 't2', name: 'Palau'),
+          ],
+        );
+        await tester.pumpWidget(
+          testApp(
+            overrides: overrides,
+            child: TripListContent(showAppBar: showAppBar),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.descendant(
+            of: find.byType(FeatureAppBarTitle),
+            matching: find.text('2 trips'),
+          ),
+          findsOneWidget,
+        );
+      });
+    }
+  });
   group('bulk delete', () {
     late _MockTripListNotifier notifier;
 

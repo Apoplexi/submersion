@@ -39,6 +39,7 @@ import 'package:submersion/features/trips/presentation/widgets/dense_trip_list_t
 import 'package:submersion/features/trips/presentation/widgets/upcoming_trip_banner.dart';
 import 'package:submersion/shared/widgets/card_icon_label.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
+import 'package:submersion/features/trips/presentation/providers/trip_list_count_provider.dart';
 
 /// Content widget for the trip list, used in master-detail layout.
 class TripListContent extends ConsumerStatefulWidget {
@@ -241,6 +242,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                   title: FeatureAppBarTitle(
                     featureId: 'trips',
                     title: context.l10n.trips_appBar_title,
+                    subtitle: tripListCountLabel(context, ref),
                   ),
                   actions: [
                     IconButton(
@@ -561,6 +563,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
             child: FeatureAppBarTitle(
               featureId: 'trips',
               title: context.l10n.trips_appBar_title,
+              subtitle: tripListCountLabel(context, ref),
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
