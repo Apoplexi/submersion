@@ -24,6 +24,7 @@ import 'package:submersion/features/site_types/presentation/providers/site_type_
 import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/shared/widgets/feature_accent.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/selection_contract.dart';
@@ -105,6 +106,64 @@ class _MockSiteListNotifier extends StateNotifier<AsyncValue<List<DiveSite>>>
 }
 
 void main() {
+  // The title's subtitle counts the list (#2669): "2 sites" unfiltered, and
+  // against every site while a filter narrows it.
+  group('entry count subtitle', () {
+    Finder subtitle(String text) => find.descendant(
+      of: find.byType(FeatureAppBarTitle),
+      matching: find.text(text),
+    );
+
+    for (final showAppBar in const [true, false]) {
+      final bar = showAppBar ? 'app bar' : 'compact bar';
+
+      testWidgets('$bar counts the list', (tester) async {
+        final overrides = await _buildPhoneOverrides(
+          sites: [
+            _makeSite(id: 's1', name: 'Alpha Site'),
+            _makeSite(id: 's2', name: 'Bravo Site'),
+          ],
+          viewMode: ListViewMode.detailed,
+        );
+        await tester.pumpWidget(
+          testApp(
+            overrides: overrides,
+            child: SiteListContent(showAppBar: showAppBar),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(subtitle('2 sites'), findsOneWidget);
+      });
+
+      testWidgets('$bar counts a filtered list against every site', (
+        tester,
+      ) async {
+        final all = [
+          _makeSite(id: 's1', name: 'Alpha Site'),
+          _makeSite(id: 's2', name: 'Bravo Site'),
+          _makeSite(id: 's3', name: 'Charlie Site'),
+        ];
+        final overrides = await _buildPhoneOverrides(
+          sites: all.take(1).toList(),
+          viewMode: ListViewMode.detailed,
+          filter: const SiteFilterState(minRating: 3),
+        );
+        await tester.pumpWidget(
+          testApp(
+            overrides: [
+              ...overrides,
+              sitesWithCountsProvider.overrideWith((ref) async => all),
+            ],
+            child: SiteListContent(showAppBar: showAppBar),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(subtitle('1 of 3 sites'), findsOneWidget);
+      });
+    }
+  });
   late SharedPreferences prefs;
   late SiteRepository siteRepository;
 
@@ -810,6 +869,133 @@ void main() {
         visibleAfterFilter: 1,
       );
     });
+  });
+
+  group('a new filter', () {
+    for (final mode in [ListViewMode.detailed, ListViewMode.table]) {
+      testWidgets('keeps the checks that stay on screen (${mode.name})', (
+        tester,
+      ) async {
+        final all = <SiteWithDiveCount>[
+          _makeSite(id: 's1', name: 'Aaa Site'),
+          _makeSite(id: 's2', name: 'Bbb Site'),
+        ];
+
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        await tester.pumpWidget(
+          testApp(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+              currentDiverIdProvider.overrideWith(
+                (ref) => MockCurrentDiverIdNotifier(),
+              ),
+              sitesWithCountsProvider.overrideWith((ref) async => all),
+              siteListNotifierProvider.overrideWith(
+                (ref) => _MockSiteListNotifier(),
+              ),
+              siteListViewModeProvider.overrideWith((ref) => mode),
+              highlightedSiteIdProvider.overrideWith((ref) => null),
+              // A real id set takes a query's time, so the list has a
+              // loading frame.
+              queryFilteredSiteIdsProvider.overrideWith(
+                (ref, filter) => Future.delayed(
+                  const Duration(milliseconds: 50),
+                  () => const {'s1', 's2'},
+                ),
+              ),
+            ],
+            locale: const Locale('en'),
+            child: const SiteListContent(showAppBar: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('enter_selection')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+        await tester.pumpAndSettle();
+        expect(find.text('2 selected'), findsOneWidget);
+
+        // The new filter's id set loads first; the selection must survive
+        // that.
+        ProviderScope.containerOf(
+          tester.element(find.byType(SiteListContent)),
+        ).read(siteFilterProvider.notifier).state = const SiteFilterState(
+          country: 'Belize',
+        );
+        // One frame at once, as the app draws it, before the query answers.
+        await tester.pump();
+        await tester.pumpAndSettle();
+        expect(find.text('2 selected'), findsOneWidget);
+      });
+    }
+  });
+
+  group('a reload of the rows', () {
+    for (final mode in [ListViewMode.detailed, ListViewMode.table]) {
+      testWidgets('keeps the checks that stay on screen (${mode.name})', (
+        tester,
+      ) async {
+        final all = <SiteWithDiveCount>[
+          _makeSite(id: 's1', name: 'Aaa Site'),
+          _makeSite(id: 's2', name: 'Bbb Site'),
+        ];
+        // A dependency the rows watch, so bumping it reloads them.
+        final reloadTrigger = StateProvider<int>((ref) => 0);
+        // Rows that reach the list as a reload holding its previous value.
+        // Today's sorted chain drops that value (whenData), so this pins the
+        // list's contract rather than a state the real providers produce:
+        // whatever settled state arrives, the prune reads the same rows the
+        // guard checked.
+        final reloadingSites = FutureProvider<List<SiteWithDiveCount>>((
+          ref,
+        ) async {
+          ref.watch(reloadTrigger);
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          return all;
+        });
+
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        await tester.pumpWidget(
+          testApp(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+              currentDiverIdProvider.overrideWith(
+                (ref) => MockCurrentDiverIdNotifier(),
+              ),
+              sortedSitesWithCountsProvider.overrideWith(
+                (ref) => ref.watch(reloadingSites),
+              ),
+              siteListNotifierProvider.overrideWith(
+                (ref) => _MockSiteListNotifier(),
+              ),
+              siteListViewModeProvider.overrideWith((ref) => mode),
+              highlightedSiteIdProvider.overrideWith((ref) => null),
+            ],
+            locale: const Locale('en'),
+            child: const SiteListContent(showAppBar: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('enter_selection')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+        await tester.pumpAndSettle();
+        expect(find.text('2 selected'), findsOneWidget);
+
+        // A reload keeps the previous rows while the new ones load; pruning
+        // must read them, not an empty frame.
+        ProviderScope.containerOf(
+          tester.element(find.byType(SiteListContent)),
+        ).read(reloadTrigger.notifier).state++;
+        await tester.pump();
+        await tester.pumpAndSettle();
+        expect(find.text('2 selected'), findsOneWidget);
+      });
+    }
   });
 
   group('selection mode', () {

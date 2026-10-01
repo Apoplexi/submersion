@@ -330,6 +330,497 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get plannerMission_buddyPicker_empty => 'Ainda sem parceiros';
+
+  @override
+  String get plannerMission_buddyPicker_me => 'Eu';
+
+  @override
+  String get plannerMission_buddyPicker_title => 'Escolher um parceiro';
+
+  @override
+  String plannerMission_chip_issues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Missão: $count problemas',
+      one: 'Missão: $count problema',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get plannerMission_current_setsToward => 'Flui para';
+
+  @override
+  String get plannerMission_current_speed => 'Velocidade da corrente';
+
+  @override
+  String get plannerMission_disableConfirm => 'Desativar';
+
+  @override
+  String get plannerMission_disableMessage =>
+      'A rota e a equipa são removidas. O perfil gerado fica como segmentos normais que pode editar.';
+
+  @override
+  String get plannerMission_disableTitle => 'Desativar a missão DPV?';
+
+  @override
+  String get plannerMission_enable => 'Planear como missão DPV';
+
+  @override
+  String get plannerMission_enableConfirm => 'Substituir';
+
+  @override
+  String get plannerMission_enableMessage =>
+      'A missão cria o perfil a partir da rota e da equipa, por isso os segmentos deste plano são substituídos. Se desativar a missão mais tarde, fica o perfil da missão, não estes segmentos.';
+
+  @override
+  String get plannerMission_enableTitle =>
+      'Substituir os segmentos por uma missão DPV?';
+
+  @override
+  String get plannerMission_environment_openWater => 'Águas abertas';
+
+  @override
+  String get plannerMission_environment_overhead => 'Teto';
+
+  @override
+  String get plannerMission_factor_battery => 'reserva de bateria';
+
+  @override
+  String get plannerMission_factor_blockedByCurrent =>
+      'uma corrente que bloqueia a saída';
+
+  @override
+  String get plannerMission_factor_exposure => 'exposição ao oxigénio';
+
+  @override
+  String get plannerMission_factor_noFeasibleTow => 'nenhum reboque viável';
+
+  @override
+  String get plannerMission_factor_ownGas => 'gás próprio';
+
+  @override
+  String get plannerMission_factor_scenarioFailed =>
+      'um cenário de avaria que não foi possível calcular';
+
+  @override
+  String get plannerMission_factor_surfaceSwimLimit =>
+      'o limite de natação à superfície';
+
+  @override
+  String get plannerMission_factor_teamGas => 'o gás de um colega de equipa';
+
+  @override
+  String get plannerMission_issue_batteryReserveInvalid =>
+      'A reserva de bateria deve estar entre 0 e 100%';
+
+  @override
+  String get plannerMission_issue_emptyRoute => 'Adicione pelo menos um troço';
+
+  @override
+  String get plannerMission_issue_emptyTeam =>
+      'Adicione pelo menos um mergulhador';
+
+  @override
+  String plannerMission_issue_legDepthInvalid(String leg) {
+    return '$leg tem uma profundidade inválida';
+  }
+
+  @override
+  String plannerMission_issue_legTooShort(String leg) {
+    return '$leg é demasiado curto para percorrer';
+  }
+
+  @override
+  String plannerMission_issue_memberSacUnset(String name) {
+    return '$name precisa de um RMV';
+  }
+
+  @override
+  String plannerMission_issue_memberSwimSpeedUnset(String name) {
+    return '$name precisa de uma velocidade de nado';
+  }
+
+  @override
+  String get plannerMission_issue_openWaterInputInvalid =>
+      'Uma saída pela margem, o limite de nado à superfície ou a velocidade a caminhar é negativo';
+
+  @override
+  String get plannerMission_issue_planHasNoTank =>
+      'Adicione uma garrafa de gás principal ao plano';
+
+  @override
+  String get plannerMission_issue_planNotDiveable =>
+      'A rota planeada ultrapassa um limite crítico';
+
+  @override
+  String get plannerMission_issue_scenarioFailed =>
+      'Não foi possível calcular um cenário de avaria';
+
+  @override
+  String plannerMission_issue_scooterUnspecified(String name) {
+    return 'A scooter de $name precisa de velocidade e autonomia';
+  }
+
+  @override
+  String plannerMission_issue_speedBelowHeadwayFloor(String name) {
+    return 'A velocidade de nado, de scooter ou de reboque de $name é demasiado baixa para avançar';
+  }
+
+  @override
+  String get plannerMission_issue_tankBudgetUnknown =>
+      'Cada garrafa precisa de um volume e de uma pressão de enchimento';
+
+  @override
+  String get plannerMission_issue_unsupportedMode =>
+      'As missões DPV só planeiam mergulhos em circuito aberto';
+
+  @override
+  String plannerMission_issue_untraversableLeg(String leg) {
+    return 'A corrente bloqueia $leg';
+  }
+
+  @override
+  String get plannerMission_leg_depth => 'Profundidade';
+
+  @override
+  String get plannerMission_leg_distance => 'Distância';
+
+  @override
+  String get plannerMission_leg_heading => 'Rumo';
+
+  @override
+  String get plannerMission_leg_label => 'Nome do ponto';
+
+  @override
+  String get plannerMission_leg_shoreExit => 'Saída pela margem a partir daqui';
+
+  @override
+  String get plannerMission_leg_shoreSwim => 'Nado à superfície até à margem';
+
+  @override
+  String get plannerMission_leg_shoreWalk => 'Caminhar até à entrada';
+
+  @override
+  String get plannerMission_leg_useMissionCurrent =>
+      'Usar a corrente da missão';
+
+  @override
+  String get plannerMission_member_chooseScooter => 'Escolher do equipamento';
+
+  @override
+  String get plannerMission_member_manualScooter => 'Introduzir manualmente';
+
+  @override
+  String get plannerMission_member_name => 'Nome';
+
+  @override
+  String get plannerMission_member_pickBuddy => 'Escolher um parceiro';
+
+  @override
+  String get plannerMission_member_sac => 'Bottom RMV';
+
+  @override
+  String get plannerMission_member_scooter => 'Scooter';
+
+  @override
+  String get plannerMission_member_swimSpeed => 'Velocidade de nado';
+
+  @override
+  String plannerMission_profile_none(String reason) {
+    return 'Ainda sem perfil: $reason';
+  }
+
+  @override
+  String plannerMission_profile_segment(String depth, String minutes) {
+    return '$depth, $minutes min';
+  }
+
+  @override
+  String get plannerMission_profile_title => 'Perfil gerado';
+
+  @override
+  String plannerMission_results_abandonment(String waypoint) {
+    return 'Último ponto de onde todos podem sair: $waypoint';
+  }
+
+  @override
+  String get plannerMission_results_abandonmentUnknown =>
+      'Não foi possível determinar de que pontos é possível sair';
+
+  @override
+  String plannerMission_results_assumptions(String reserve) {
+    return 'Reserva de bateria de $reserve% da autonomia. O mergulhador cuja scooter avaria respira o seu próprio RMV aumentado pelo fator de stress do plano até à primeira paragem.';
+  }
+
+  @override
+  String plannerMission_results_battery(
+    String minutes,
+    String percent,
+    String reserve,
+  ) {
+    return 'Bateria $percent% da autonomia ($minutes′), reserva $reserve%';
+  }
+
+  @override
+  String plannerMission_results_bindsAt(String factor, String waypoint) {
+    return 'Limite em $waypoint: $factor';
+  }
+
+  @override
+  String get plannerMission_results_blocked =>
+      'A missão ainda não pode ser calculada:';
+
+  @override
+  String get plannerMission_results_cannotGetOut => 'não consegue sair';
+
+  @override
+  String get plannerMission_results_computing =>
+      'A calcular os cenários de avaria';
+
+  @override
+  String get plannerMission_results_failed =>
+      'Não foi possível calcular a missão';
+
+  @override
+  String plannerMission_results_home(String distance) {
+    return '$distance em linha reta até à entrada';
+  }
+
+  @override
+  String plannerMission_results_legLine(
+    String backMinutes,
+    String backSpeed,
+    String outMinutes,
+    String outSpeed,
+  ) {
+    return 'ida $outSpeed $outMinutes′, volta $backSpeed $backMinutes′';
+  }
+
+  @override
+  String plannerMission_results_legRow(String leg, String line) {
+    return '$leg: $line';
+  }
+
+  @override
+  String get plannerMission_results_legs => 'Troços';
+
+  @override
+  String plannerMission_results_limitedBy(
+    String factor,
+    String name,
+    String scooter,
+    String waypoint,
+  ) {
+    return 'Limitado pela $scooter de $name em $waypoint: $factor';
+  }
+
+  @override
+  String plannerMission_results_limitedByDiver(
+    String factor,
+    String name,
+    String waypoint,
+  ) {
+    return 'Limitado por $name em $waypoint: $factor';
+  }
+
+  @override
+  String get plannerMission_results_listSeparator => ', ';
+
+  @override
+  String plannerMission_results_memberLine(String name, String status) {
+    return '$name: $status';
+  }
+
+  @override
+  String plannerMission_results_memberLineExits(
+    String exits,
+    String name,
+    String status,
+  ) {
+    return '$name: $status ($exits)';
+  }
+
+  @override
+  String get plannerMission_results_noAbandonment =>
+      'Nenhum ponto permite sair com qualquer avaria';
+
+  @override
+  String get plannerMission_results_noBuddy => 'sem parceiro';
+
+  @override
+  String get plannerMission_results_noLimit => 'Sem limite nesta rota';
+
+  @override
+  String get plannerMission_results_notComputed => 'não foi possível calcular';
+
+  @override
+  String plannerMission_results_safeSurface(String minutes) {
+    return 'Superfície segura em $minutes′';
+  }
+
+  @override
+  String get plannerMission_results_safeSurfaceUnknown =>
+      'Superfície segura: não foi possível calcular';
+
+  @override
+  String get plannerMission_results_setsCruise =>
+      'Define a velocidade de cruzeiro da equipa';
+
+  @override
+  String plannerMission_results_surface(String minutes) {
+    return 'superfície $minutes′';
+  }
+
+  @override
+  String plannerMission_results_surfaceViaShore(String minutes) {
+    return 'superfície pela margem $minutes′';
+  }
+
+  @override
+  String get plannerMission_results_survives => 'sai';
+
+  @override
+  String plannerMission_results_swim(String minutes) {
+    return 'a nadar $minutes′';
+  }
+
+  @override
+  String get plannerMission_results_title => 'Missão';
+
+  @override
+  String plannerMission_results_tow(String minutes, String name) {
+    return 'rebocado por $name $minutes′';
+  }
+
+  @override
+  String plannerMission_results_turnPressure(String pressure) {
+    return 'Inverter a $pressure';
+  }
+
+  @override
+  String get plannerMission_results_unconstrained =>
+      'De cada ponto é possível sair com a avaria de qualquer scooter';
+
+  @override
+  String plannerMission_results_waypointLine(String distance, String minutes) {
+    return '$distance, chegada $minutes′';
+  }
+
+  @override
+  String get plannerMission_results_waypoints => 'Pontos';
+
+  @override
+  String get plannerMission_route_addLeg => 'Adicionar troço';
+
+  @override
+  String get plannerMission_route_deleteLeg => 'Eliminar troço';
+
+  @override
+  String get plannerMission_route_editLeg => 'Editar troço';
+
+  @override
+  String plannerMission_route_legSummary(
+    String depth,
+    String distance,
+    String heading,
+  ) {
+    return '$distance a $depth, rumo $heading';
+  }
+
+  @override
+  String plannerMission_route_ownCurrent(String direction, String speed) {
+    return 'Corrente $speed para $direction';
+  }
+
+  @override
+  String plannerMission_route_shoreExit(String swim, String walk) {
+    return 'Saída pela margem: nadar $swim, caminhar $walk';
+  }
+
+  @override
+  String get plannerMission_route_title => 'Rota';
+
+  @override
+  String plannerMission_route_unnamedLeg(int number) {
+    return 'Troço $number';
+  }
+
+  @override
+  String get plannerMission_scooter_burnTime => 'Autonomia';
+
+  @override
+  String get plannerMission_scooter_name => 'Nome da scooter';
+
+  @override
+  String get plannerMission_scooter_speed => 'Velocidade nominal';
+
+  @override
+  String get plannerMission_scooter_towBurnFactor =>
+      'Fator de consumo em reboque';
+
+  @override
+  String get plannerMission_scooter_towSpeedFactor =>
+      'Fator de velocidade de reboque';
+
+  @override
+  String get plannerMission_settings_batteryReserve => 'Reserva de bateria';
+
+  @override
+  String get plannerMission_settings_defaultCurrent => 'Corrente predefinida';
+
+  @override
+  String get plannerMission_settings_environment => 'Ambiente';
+
+  @override
+  String get plannerMission_settings_surfaceSwimLimit =>
+      'Nado à superfície mais longo';
+
+  @override
+  String get plannerMission_settings_walkSpeed => 'Velocidade a caminhar';
+
+  @override
+  String get plannerMission_team_addDiver => 'Adicionar mergulhador';
+
+  @override
+  String plannerMission_team_capacity(String wh) {
+    return 'Bateria de $wh Wh';
+  }
+
+  @override
+  String plannerMission_team_defaultName(int number) {
+    return 'Mergulhador $number';
+  }
+
+  @override
+  String get plannerMission_team_editDiver => 'Editar mergulhador';
+
+  @override
+  String plannerMission_team_memberSummary(String sac, String speed) {
+    return 'RMV $sac, nado $speed';
+  }
+
+  @override
+  String get plannerMission_team_noScooter => 'Nenhuma scooter definida';
+
+  @override
+  String get plannerMission_team_removeDiver => 'Remover mergulhador';
+
+  @override
+  String plannerMission_team_scooterSummary(
+    String minutes,
+    String name,
+    String speed,
+  ) {
+    return '$name: $speed, $minutes min de autonomia';
+  }
+
+  @override
+  String get plannerMission_team_title => 'Equipa DPV';
+
+  @override
   String get settings_shareAllEquipment_title =>
       'Partilhar todo o meu equipamento...';
 
@@ -655,6 +1146,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_color_slate => 'Ardósia';
 
   @override
+  String get equipment_color_black => 'Preto';
+
+  @override
+  String get equipment_color_white => 'Branco';
+
+  @override
   String get equipment_color_none => 'Nenhuma';
 
   @override
@@ -893,9 +1390,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_story_openGallery => 'Abrir fotos da viagem';
 
   @override
-  String trips_story_generateItineraryError(String error) {
-    return 'Não foi possível gerar o itinerário: $error';
-  }
+  String get trips_story_generateItineraryError =>
+      'Não foi possível gerar o itinerário. Tente novamente.';
 
   @override
   String get trips_dayType_diveDay => 'Dia de mergulho';
@@ -2335,6 +2831,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get buddies_title => 'Companheiros';
 
   @override
+  String buddies_list_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count companheiros',
+      one: '$count companheiro',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String buddies_list_countFiltered(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total companheiros',
+      one: '$total companheiro',
+    );
+    return '$shown de $_temp0';
+  }
+
+  @override
   String get buddies_title_add => 'Adicionar Companheiro';
 
   @override
@@ -2475,6 +2993,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get certifications_appBar_title => 'Certificações';
+
+  @override
+  String certifications_list_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count certificações',
+      one: '$count certificação',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String certifications_list_countFiltered(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total certificações',
+      one: '$total certificação',
+    );
+    return '$shown de $_temp0';
+  }
 
   @override
   String get certifications_detail_action_delete => 'Excluir';
@@ -4162,6 +4702,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get courses_title => 'Cursos de Treinamento';
 
   @override
+  String courses_list_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cursos',
+      one: '$count curso',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String courses_list_countFiltered(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total cursos',
+      one: '$total curso',
+    );
+    return '$shown de $_temp0';
+  }
+
+  @override
   String get courses_title_edit => 'Editar Curso';
 
   @override
@@ -5286,6 +5848,33 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveCenters_section_gpsCoordinates => 'Coordenadas GPS';
 
   @override
+  String get diveCenters_section_fillHours => 'Horário de enchimento';
+
+  @override
+  String get diveCenters_fillHours_caption =>
+      'Quando a estação enche cilindros. A previsão de enchimento da viagem usa a hora de fecho.';
+
+  @override
+  String get diveCenters_fillHours_opens => 'Abre';
+
+  @override
+  String get diveCenters_fillHours_closes => 'Fecha';
+
+  @override
+  String get diveCenters_fillHours_notSet => 'Não definido';
+
+  @override
+  String get diveCenters_fillHours_clear => 'Limpar horário de enchimento';
+
+  @override
+  String get diveCenters_fillHours_errorBoth =>
+      'Defina as duas horas, ou nenhuma.';
+
+  @override
+  String get diveCenters_fillHours_errorOrder =>
+      'A hora de fecho tem de ser depois da de abertura.';
+
+  @override
   String get diveCenters_section_notes => 'Notas';
 
   @override
@@ -5344,6 +5933,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveCenters_title => 'Centros de Mergulho';
+
+  @override
+  String diveCenters_list_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count centros de mergulho',
+      one: '$count centro de mergulho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveCenters_list_countFiltered(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total centros de mergulho',
+      one: '$total centro de mergulho',
+    );
+    return '$shown de $_temp0';
+  }
 
   @override
   String get diveCenters_title_add => 'Adicionar Centro de Mergulho';
@@ -5858,6 +6469,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String diveLog_deco_totalDecoTime(Object time) {
     return 'Total: $time';
   }
+
+  @override
+  String get diveLog_deco_withheld_ccr =>
+      'Este mergulho com rebreather não tem setpoint nem ppO2 do circuito registados, por isso a carga tecidual, o NDL e a descompressão não podem ser calculados. Adicione o setpoint ao editar o mergulho para os calcular.';
+
+  @override
+  String get diveLog_deco_withheld_scr =>
+      'Este mergulho com rebreather semifechado não tem ppO2 do circuito medida, por isso a carga tecidual, o NDL e a descompressão não podem ser calculados.';
 
   @override
   String get diveLog_delete_cancel => 'Cancelar';
@@ -7385,6 +8004,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_listPage_compactTitle => 'Mergulhos';
+
+  @override
+  String diveLog_listPage_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos',
+      one: '$count mergulho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_listPage_countFiltered(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total mergulhos',
+      one: '$total mergulho',
+    );
+    return '$shown de $_temp0';
+  }
 
   @override
   String diveLog_listPage_errorLoading(Object error) {
@@ -9034,6 +9675,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_tank_regulatorNone => 'Nenhum';
 
   @override
+  String get diveLog_tank_tripCylinderLabel => 'Cilindro da viagem';
+
+  @override
+  String get diveLog_tank_tripCylinderNone => 'Nenhum';
+
+  @override
+  String get diveLog_tank_tripCylinderMissing => 'Já não está nesta viagem';
+
+  @override
+  String get diveLog_tank_tripCylinderSuggested =>
+      'Sugerido entre os cilindros cheios da viagem';
+
+  @override
   String get diveLog_tissue_title => 'Carga Tissular';
 
   @override
@@ -10519,6 +11173,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_list_appBar_title => 'Pontos de Mergulho';
+
+  @override
+  String diveSites_list_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pontos',
+      one: '$count ponto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_list_countFiltered(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total pontos',
+      one: '$total ponto',
+    );
+    return '$shown de $_temp0';
+  }
 
   @override
   String get diveSites_list_bulkDelete_cancel => 'Cancelar';
@@ -12625,6 +13301,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_appBar_title => 'Equipamento';
 
   @override
+  String equipment_list_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count itens',
+      one: '$count item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_list_countFiltered(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total itens',
+      one: '$total item',
+    );
+    return '$shown de $_temp0';
+  }
+
+  @override
   String get equipment_bulkTags_action => 'Editar etiquetas';
 
   @override
@@ -12732,6 +13430,39 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get passport_fill_fromTag => 'Da etiqueta';
+
+  @override
+  String get passport_fill_analyseBeforeDiving =>
+      'Meça o gás com um analisador antes de mergulhar';
+
+  @override
+  String get passport_fill_writeToTagTitle => 'Carga registrada';
+
+  @override
+  String get passport_fill_writeToTagBody =>
+      'Gravá-la na etiqueta do cilindro?';
+
+  @override
+  String get passport_fill_writeToTag => 'Gravar na etiqueta';
+
+  @override
+  String get passport_fill_notNow => 'Agora não';
+
+  @override
+  String get passport_foreign_lastFill => 'Último enchimento na etiqueta';
+
+  @override
+  String passport_foreign_fillSummary(String fill, String date) {
+    return '$fill · $date';
+  }
+
+  @override
+  String passport_fill_addedFromTag(String fill) {
+    return 'Enchimento da etiqueta adicionado: $fill';
+  }
+
+  @override
   String passport_fill_analyzer(String analyzer) {
     return 'Analisado com $analyzer';
   }
@@ -12745,9 +13476,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String passport_fill_temperature(String temperature) {
     return 'Temperatura do gás $temperature';
   }
-
-  @override
-  String get passport_fill_unsigned => 'Sem assinatura';
 
   @override
   String get passport_history_title => 'Histórico de cargas';
@@ -12966,6 +13694,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get passport_nfc_fieldO2Clean => 'Limpo para O2';
 
   @override
+  String get passport_nfc_fieldFillAnalyzer => 'Analisador do enchimento';
+
+  @override
+  String get passport_nfc_fieldFilledBy => 'Enchido por';
+
+  @override
+  String get passport_nfc_fieldFillTemperature => 'Temperatura do enchimento';
+
+  @override
+  String get passport_nfc_fieldFill => 'Enchimento mais recente';
+
+  @override
+  String get passport_nfc_fillIncluded =>
+      'O enchimento mais recente também está na etiqueta';
+
+  @override
   String passport_foreign_serial(String serial) {
     return 'Nº de série $serial';
   }
@@ -12993,6 +13737,38 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get passport_logFill_analyzer => 'Analisador';
+
+  @override
+  String get passport_logFill_analysedHint => 'Insira os valores analisados';
+
+  @override
+  String get passport_trip_title => 'Viagens';
+
+  @override
+  String get passport_trip_none => 'Sem viagem atribuída';
+
+  @override
+  String passport_trip_packedFor(String trip) {
+    return 'Preparado para $trip';
+  }
+
+  @override
+  String passport_trip_more(int count) {
+    return '+$count';
+  }
+
+  @override
+  String get passport_trip_assign => 'Preparar para uma viagem';
+
+  @override
+  String get passport_trip_unassign => 'Remover desta viagem';
+
+  @override
+  String get passport_trip_onBoard => 'No quadro de cilindros da viagem';
+
+  @override
+  String get passport_trip_failed =>
+      'Não foi possível alterar a viagem. Tente novamente.';
 
   @override
   String get passport_logFill_notes => 'Notas';
@@ -13840,6 +14616,52 @@ class AppLocalizationsPt extends AppLocalizations {
       'Este mergulho já corresponde à configuração';
 
   @override
+  String cylinderConfigs_applyUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count atualizadas',
+      one: '$count atualizada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_overwriteTitle =>
+      'Substituir os dados das garrafas?';
+
+  @override
+  String cylinderConfigs_overwriteBody(String name) {
+    return 'Aplicar $name altera garrafas que já estão neste mergulho:';
+  }
+
+  @override
+  String cylinderConfigs_overwriteTank(int number, String role) {
+    return 'Cilindro $number · $role';
+  }
+
+  @override
+  String cylinderConfigs_overwriteChange(String field, String from, String to) {
+    return '$field: $from → $to';
+  }
+
+  @override
+  String get cylinderConfigs_overwriteKeepsGas =>
+      'As misturas de gás e as pressões iniciais do mergulho são mantidas.';
+
+  @override
+  String get cylinderConfigs_overwriteConfirm => 'Substituir';
+
+  @override
+  String get cylinderConfigs_fieldVolume => 'Volume';
+
+  @override
+  String get cylinderConfigs_fieldWorkingPressure => 'Pressão de trabalho';
+
+  @override
+  String get cylinderConfigs_fieldMaterial => 'Material';
+
+  @override
   String get cylinderConfigs_sectionTitle => 'Configurações';
 
   @override
@@ -14545,6 +15367,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_list_filterAll => 'Todos os Equipamentos';
+
+  @override
+  String get equipment_list_filterCurrent => 'Equipamentos Atuais';
 
   @override
   String get equipment_list_filterServiceDue => 'Manutenção Pendente';
@@ -15796,6 +16621,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_procedure => 'Procedimento de enchimento';
+
+  @override
+  String get gasCalculators_blender_logFill => 'Registrar esta carga';
+
+  @override
+  String get gasCalculators_blender_chooseCylinder => 'Escolher cilindro';
+
+  @override
+  String get gasCalculators_blender_scanTag => 'Ler etiqueta';
+
+  @override
+  String get gasCalculators_blender_notYourCylinder =>
+      'Esse cilindro não está no seu equipamento';
+
+  @override
+  String get gasCalculators_blender_cylinderFailed =>
+      'Não foi possível abrir esse cilindro. Tente novamente.';
+
+  @override
+  String gasCalculators_blender_filledFrom(String name, String mix) {
+    return '$name: $mix';
+  }
 
   @override
   String get gasCalculators_blender_amounts => 'Gás a adicionar';
@@ -17810,6 +18657,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_import_review_noMatch => 'Nenhum mergulho correspondente';
+
+  @override
+  String get media_import_review_noCaptureTime =>
+      'Nenhuma data de captura encontrada';
+
+  @override
+  String get media_import_review_noMatchFileDate =>
+      'Nenhum mergulho corresponde à data do arquivo; o arquivo não tem data de captura';
 
   @override
   String get media_import_review_skipped => 'Não importado';
@@ -21010,7 +21865,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get weightPresets_page_empty =>
-      'Guarde um lastro no editor de mergulho e ele aparecerá aqui para reutilizar.';
+      'Guarde um lastro no editor de mergulho ou toque em + para criar um aqui.';
 
   @override
   String get weightPresets_action_rename => 'Renomear';
@@ -21372,7 +22227,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_section_data_title => 'Dados';
 
   @override
-  String get settings_section_decompression_subtitle => 'Fatores de gradiente';
+  String get settings_section_decompression_subtitle =>
+      'GF, fontes de dados e narcose';
 
   @override
   String get settings_section_decompression_title => 'Descompressão';
@@ -24369,6 +25225,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Exportar inventário de equipamentos e informações de manutenção';
 
   @override
+  String get transfer_csvExport_descriptionFills =>
+      'Cada enchimento registado num passaporte de garrafa, com análise, pressão e estação';
+
+  @override
   String get transfer_csvExport_descriptionObservations =>
       'Cada verificação OK e cada problema reportado, com mergulho, etiquetas e nota';
 
@@ -24389,6 +25249,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'CSV de Equipamentos';
 
   @override
+  String get transfer_csvExport_optionFillsTitle =>
+      'CSV de enchimentos de garrafa';
+
+  @override
   String get transfer_csvExport_optionObservationsTitle =>
       'CSV de verificações de equipamento';
 
@@ -24405,6 +25269,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'Equipamentos';
+
+  @override
+  String get transfer_csvExport_typeFills => 'Enchimentos de garrafa';
 
   @override
   String get transfer_csvExport_typeObservations =>
@@ -24435,7 +25302,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_export_aboutContent =>
-      'Exporte seus dados de mergulho em vários formatos. PDF cria um logbook imprimível. UDDF é um formato universal compatível com a maioria dos softwares de registro de mergulho. Arquivos CSV podem ser abertos em aplicativos de planilha.';
+      'Exporte seus dados de mergulho em vários formatos. PDF cria um logbook imprimível. UDDF é um formato universal compatível com a maioria dos softwares de registro de mergulho. Arquivos CSV e Excel podem ser abertos em aplicativos de planilha. Você também pode fazer backup de todo o seu banco de dados em Configurações > Backup e restauração.';
 
   @override
   String get transfer_export_backupLink => 'Ir para Backup e restauração';
@@ -24537,7 +25404,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_import_fileImportSemanticLabel =>
-      'Importar dados com detecção automática';
+      'Importar dados de mergulho de um arquivo';
 
   @override
   String get transfer_import_fileImportSubtitle =>
@@ -24665,6 +25532,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_appBar_title => 'Viagens';
 
   @override
+  String trips_list_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count viagens',
+      one: '$count viagem',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_list_countFiltered(int shown, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total viagens',
+      one: '$total viagem',
+    );
+    return '$shown de $_temp0';
+  }
+
+  @override
   String get trips_appBar_tripPhotos => 'Fotos da Viagem';
 
   @override
@@ -24696,6 +25585,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get trips_detail_dives_errorLoading =>
       'Não foi possível carregar os mergulhos';
+
+  @override
+  String get trips_detail_error_loading =>
+      'Não foi possível carregar a viagem.';
 
   @override
   String get trips_detail_dives_unknownSite => 'Ponto Desconhecido';
@@ -24748,14 +25641,12 @@ class AppLocalizationsPt extends AppLocalizations {
       'Adicione mergulhos primeiro para vincular fotos';
 
   @override
-  String trips_detail_scan_errorLinking(Object error) {
-    return 'Erro ao vincular fotos: $error';
-  }
+  String get trips_detail_scan_errorLinking =>
+      'Não foi possível vincular as fotos. Tente novamente.';
 
   @override
-  String trips_detail_scan_errorScanning(Object error) {
-    return 'Erro ao escanear: $error';
-  }
+  String get trips_detail_scan_errorScanning =>
+      'Não foi possível procurar fotos. Tente novamente.';
 
   @override
   String trips_detail_scan_linkedPhotos(Object count) {
@@ -24829,9 +25720,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_diveScan_deselectAll => 'Desmarcar tudo';
 
   @override
-  String trips_diveScan_error(String error) {
-    return 'Erro ao procurar mergulhos: $error';
-  }
+  String get trips_diveScan_error =>
+      'Não foi possível procurar mergulhos. Tente novamente.';
 
   @override
   String get trips_diveScan_findButton => 'Encontrar mergulhos correspondentes';
@@ -24965,14 +25855,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_edit_snackBar_added => 'Viagem adicionada com sucesso';
 
   @override
-  String trips_edit_snackBar_errorLoading(Object error) {
-    return 'Erro ao carregar viagem: $error';
-  }
+  String get trips_edit_snackBar_errorLoading =>
+      'Não foi possível carregar a viagem. Tente novamente.';
 
   @override
-  String trips_edit_snackBar_errorSaving(Object error) {
-    return 'Erro ao salvar viagem: $error';
-  }
+  String get trips_edit_snackBar_errorSaving =>
+      'Não foi possível salvar a viagem. Tente novamente.';
 
   @override
   String get trips_edit_snackBar_updated => 'Viagem atualizada com sucesso';
@@ -25016,19 +25904,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_gallery_empty_title => 'Nenhuma foto nesta viagem';
 
   @override
-  String trips_gallery_errorLinking(Object error) {
-    return 'Erro ao vincular fotos: $error';
-  }
+  String get trips_gallery_errorLinking =>
+      'Não foi possível vincular as fotos. Tente novamente.';
 
   @override
-  String trips_gallery_errorScanning(Object error) {
-    return 'Erro ao escanear: $error';
-  }
+  String get trips_gallery_errorScanning =>
+      'Não foi possível procurar fotos. Tente novamente.';
 
   @override
-  String trips_gallery_error_loading(Object error) {
-    return 'Erro ao carregar fotos: $error';
-  }
+  String get trips_gallery_error_loading =>
+      'Não foi possível carregar as fotos.';
 
   @override
   String trips_gallery_linkedPhotos(Object count) {
@@ -25078,9 +25963,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_list_empty_title => 'Nenhuma viagem adicionada ainda';
 
   @override
-  String trips_list_error_loading(Object error) {
-    return 'Erro ao carregar viagens: $error';
-  }
+  String get trips_list_error_loading =>
+      'Não foi possível carregar as suas viagens.';
 
   @override
   String get trips_list_fab_addTrip => 'Adicionar Viagem';
@@ -25152,9 +26036,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_picker_empty_title => 'Nenhuma viagem ainda';
 
   @override
-  String trips_picker_error(Object error) {
-    return 'Erro ao carregar viagens: $error';
-  }
+  String get trips_picker_error => 'Não foi possível carregar as suas viagens.';
 
   @override
   String get trips_picker_hint => 'Toque para selecionar uma viagem';
@@ -25187,6 +26069,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String trips_search_noResults(Object query) {
     return 'Nenhuma viagem encontrada para \"$query\"';
   }
+
+  @override
+  String get trips_search_error => 'Não foi possível buscar as suas viagens.';
 
   @override
   String get trips_search_tooltip_back => 'Voltar';
@@ -25282,6 +26167,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get trips_edit_sectionTitle_planning => 'Planeamento';
+
+  @override
+  String get trips_edit_label_diversSharing =>
+      'Mergulhadores que partilham cilindros';
+
+  @override
+  String get trips_edit_hint_diversSharing =>
+      'Incluindo você. Em branco significa 1.';
+
+  @override
+  String get trips_edit_label_divesPerDay => 'Mergulhos por dia';
+
+  @override
+  String get trips_edit_hint_divesPerDay =>
+      'Para a previsão de enchimento. Em branco significa estimativa.';
 
   @override
   String get trips_edit_label_expectedDives => 'Mergulhos previstos';
@@ -25389,6 +26289,153 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get trips_gear_title => 'Equipamento';
+
+  @override
+  String get trips_gear_none => 'Nenhum equipamento preparado ainda';
+
+  @override
+  String get trips_gear_add => 'Adicionar equipamento';
+
+  @override
+  String get trips_gear_remove => 'Remover';
+
+  @override
+  String get trips_gear_failed =>
+      'Não foi possível alterar o equipamento. Tente novamente.';
+
+  @override
+  String trips_cylinders_forecast_todayShort(int needed, int full) {
+    return 'Hoje são precisos $needed, tem $full cheios.';
+  }
+
+  @override
+  String trips_cylinders_forecast_tomorrowShort(int needed, int full) {
+    return 'Amanhã são precisos $needed, terá $full cheios.';
+  }
+
+  @override
+  String trips_cylinders_forecast_fillBefore(String time) {
+    return 'Encha antes das $time.';
+  }
+
+  @override
+  String get trips_cylinders_forecast_enough =>
+      'Cilindros cheios suficientes até amanhã.';
+
+  @override
+  String get trips_cylinders_forecast_daysTitle => 'Mergulhos planeados';
+
+  @override
+  String trips_cylinders_forecast_plannedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos',
+      one: '$count mergulho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_forecast_dayTitle(String date) {
+    return 'Mergulhos planeados, $date';
+  }
+
+  @override
+  String get trips_cylinders_forecast_useEstimate => 'Usar a estimativa';
+
+  @override
+  String get trips_cylinders_forecast_fewer => 'Menos mergulhos';
+
+  @override
+  String get trips_cylinders_forecast_more => 'Mais mergulhos';
+
+  @override
+  String get trips_cylinders_forecast_saveError =>
+      'Não foi possível guardar o plano. Tente novamente.';
+
+  @override
+  String get trips_cylinders_forecast_dayPlanned => 'Planeado por si';
+
+  @override
+  String get trips_cylinders_segment_record => 'Consumo';
+
+  @override
+  String get trips_cylinders_recordEmpty =>
+      'Ainda não há mergulhos com estes cilindros.';
+
+  @override
+  String trips_cylinders_record_fillsLogged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count enchimentos registados',
+      one: '$count enchimento registado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_record_leftOut(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos não contados',
+      one: '$count mergulho não contado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_record_packageFills(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count enchimentos em pacote',
+      one: '$count enchimento em pacote',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_cylinders_record_unlinked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cilindros de mergulho não ligados',
+      one: '$count cilindro de mergulho não ligado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_cylinders_record_unlinkedTitle =>
+      'Não ligados a um cilindro';
+
+  @override
+  String trips_cylinders_record_tank(int number) {
+    return 'Cilindro $number';
+  }
+
+  @override
+  String trips_cylinders_record_filled(String pressure) {
+    return 'Enchido a $pressure';
+  }
+
+  @override
+  String trips_cylinders_record_analyzed(String mix) {
+    return 'Analisado $mix';
+  }
+
+  @override
+  String get trips_cylinders_record_exported => 'Consumo de gás exportado';
+
+  @override
+  String get trips_cylinders_record_exportFailed =>
+      'Não foi possível exportar o consumo de gás. Tente novamente.';
+
+  @override
   String get trips_cylinders_title => 'Cilindros';
 
   @override
@@ -25440,6 +26487,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get trips_cylinders_action_adjust => 'Ajustar';
+
+  @override
+  String get trips_cylinders_action_logDive => 'Registar mergulho';
 
   @override
   String trips_cylinders_bottle(String label) {
@@ -25754,6 +26804,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get trips_itinerary_noDives => 'No dives';
+
+  @override
+  String get trips_itinerary_error_loading =>
+      'Não foi possível carregar o itinerário.';
+
+  @override
+  String get trips_itinerary_daySaveError =>
+      'Não foi possível guardar o dia. Tente novamente.';
 
   @override
   String get trips_vesselType_catamaran => 'Catamaran';
@@ -27817,6 +28875,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveImport_uddf_media => 'Fotos';
 
   @override
+  String get diveImport_uddf_fills => 'Enchimentos';
+
+  @override
   String get diveImport_uddf_title => 'Importar de UDDF';
 
   @override
@@ -28988,6 +30049,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dropTarget_error_readFailed => 'Não foi possível ler o arquivo';
 
   @override
+  String get dropTarget_error_mediaNeedsDestination =>
+      'Para vincular fotos e vídeos, solte-os em Mídia, em um mergulho ou em um ponto de mergulho';
+
+  @override
+  String dropTarget_error_someUnreadable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Não foi possível ler $count arquivos, que foram ignorados',
+      one: 'Não foi possível ler $count arquivo, que foi ignorado',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get enum_cloudCover_clear => 'Limpo';
 
   @override
@@ -29577,6 +30653,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_shareAll_noneToShare => 'Nada para partilhar.';
 
   @override
+  String get settings_hiddenItems_empty => 'Nada está oculto neste perfil.';
+
+  @override
+  String get settings_hiddenItems_sites => 'Locais';
+
+  @override
+  String get settings_hiddenItems_title => 'Ocultos neste perfil';
+
+  @override
+  String get settings_hiddenItems_trips => 'Viagens';
+
+  @override
+  String get settings_hiddenItems_unhide => 'Mostrar';
+
+  @override
   String get settings_sharedData_sectionTitle => 'Dados partilhados';
 
   @override
@@ -29609,6 +30700,185 @@ class AppLocalizationsPt extends AppLocalizations {
   String trips_deleteShared_body(String name) {
     return '«$name» está partilhada com outros perfis de mergulho. Eliminá-la aqui remove-a para todos.';
   }
+
+  @override
+  String sharedItems_bulkDeleteCount_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count locais serão eliminados.',
+      one: '$count local será eliminado.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkDeleteCount_trips(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count viagens serão eliminadas.',
+      one: '$count viagem será eliminada.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkHiddenSnackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count itens removidos do teu perfil',
+      one: '$count item removido do teu perfil',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkHideCount_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count locais partilhados serão removidos apenas do teu perfil.',
+      one: '$count local partilhado será removido apenas do teu perfil.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkHideCount_trips(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count viagens partilhadas serão removidas apenas do teu perfil.',
+      one: '$count viagem partilhada será removida apenas do teu perfil.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkRemoveTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remover $count itens do teu perfil?',
+      one: 'Remover $count item do teu perfil?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkSharedWarning_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count deles estão partilhados com outros perfis e serão eliminados para todos.',
+      one:
+          '$count deles está partilhado com outros perfis e será eliminado para todos.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkSharedWarning_trips(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count delas estão partilhadas com outros perfis e serão eliminadas para todos.',
+      one:
+          '$count delas está partilhada com outros perfis e será eliminada para todos.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedItems_hiddenHere => 'Oculto no teu perfil';
+
+  @override
+  String get sharedItems_mergeTooManyShared =>
+      'Só um dos locais selecionados pode pertencer a outro perfil. Desmarca os outros para os juntar.';
+
+  @override
+  String get sharedItems_notOwner_site =>
+      'Só o proprietário pode eliminar este local';
+
+  @override
+  String get sharedItems_notOwner_trip =>
+      'Só o proprietário pode eliminar esta viagem';
+
+  @override
+  String sharedItems_otherProfilesDives_site(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos noutros perfis perderão este local.',
+      one: '$count mergulho noutro perfil perderá este local.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_otherProfilesDives_trip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos noutros perfis perderão esta viagem.',
+      one: '$count mergulho noutro perfil perderá esta viagem.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedItems_ownerUnknown => 'outro perfil de mergulho';
+
+  @override
+  String get sharedItems_removeAction => 'Remover do meu perfil';
+
+  @override
+  String sharedItems_removeBody(String owner) {
+    return 'Mantém-se no registo de $owner e em todos os outros perfis. Só fica oculto aqui.';
+  }
+
+  @override
+  String sharedItems_removeOwnDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dos teus mergulhos mantêm-se ligados.',
+      one: '$count dos teus mergulhos mantém-se ligado.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedItems_removeRestoreHint =>
+      'Podes recuperá-lo em Configurações > Dados partilhados.';
+
+  @override
+  String sharedItems_removeTitle(String name) {
+    return 'Remover «$name» do teu perfil?';
+  }
+
+  @override
+  String get sharedItems_removedSnackbar => 'Removido do teu perfil';
+
+  @override
+  String sharedItems_shareOwnerOnly(String owner) {
+    return 'Só $owner pode alterar a partilha';
+  }
+
+  @override
+  String sharedItems_sharedBy(String owner) {
+    return 'Partilhado por $owner';
+  }
+
+  @override
+  String get sharedItems_undo => 'Desfazer';
+
+  @override
+  String get sharedItems_unhideAction => 'Mostrar no meu perfil';
 
   @override
   String get sites_deleteShared_title => 'Eliminar local partilhado?';
@@ -31491,6 +32761,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Este ponto registra uma altitude, mas o mergulho não tem nenhuma, então a análise de descompressão assumiu o nível do mar. Defina a altitude do mergulho para corrigir.';
 
   @override
+  String get diveLog_detail_sacSegmentsNoPressure =>
+      'Só foram registradas as pressões inicial e final do cilindro, por isso o consumo de gás não pode ser dividido em segmentos. Para isso são necessárias leituras de pressão durante o mergulho, por exemplo de um transmissor. A média do mergulho inteiro aparece em Cilindros.';
+
+  @override
+  String get diveLog_detail_sacSegmentsNoPressure_subtitle =>
+      'Nenhuma pressão do cilindro registrada durante o mergulho';
+
+  @override
   String diveLog_detail_sacVolumeHint(String unit) {
     return 'Adicione o volume do cilindro para mostrar o RMV em $unit';
   }
@@ -32818,6 +34096,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataQuality_empty_title => 'Tudo em ordem';
 
   @override
+  String get dataQuality_empty_chipFiltered =>
+      'Sem constatações nesta categoria';
+
+  @override
+  String get dataQuality_empty_showAll => 'Mostrar todas as constatações';
+
+  @override
   String get dataQuality_empty_subtitle =>
       'Sem constatações de qualidade dos dados. Analise a sua biblioteca para verificar problemas nos mergulhos importados.';
 
@@ -33585,6 +34870,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String common_selection_countSelected(Object count) {
     return '$count selecionados';
+  }
+
+  @override
+  String common_listCount_shownOfTotal(int shown, int total) {
+    return '$shown de $total';
   }
 
   @override
@@ -40288,6 +41578,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get explore_chip_deco => 'Mergulho com descompressão';
 
   @override
+  String explore_chip_fieldPeriod(String field, String period) {
+    return '$field: $period';
+  }
+
+  @override
   String get explore_chip_noDeco => 'Sem descompressão';
 
   @override
@@ -40331,6 +41626,22 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String explore_chip_timeBefore(Object end) {
     return 'Antes de $end';
+  }
+
+  @override
+  String explore_chip_viaDives(String label) {
+    return 'Mergulhos: $label';
+  }
+
+  @override
+  String explore_chip_withinDays(int days, String field) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$field em $days dias',
+      one: '$field em $days dia',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -40438,6 +41749,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get explore_handoff_insights => 'Abrir em Análises';
 
   @override
+  String get explore_handoff_list => 'Abrir na lista';
+
+  @override
   String get explore_hint =>
       'Pergunte sobre os seus mergulhos, por exemplo tartarugas abaixo de 20 m em Bonaire';
 
@@ -40473,6 +41787,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get explore_recent_title => 'Recentes';
 
   @override
+  String explore_results_count(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count resultados',
+      one: '$count resultado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get explore_results_subjectTitle => 'Correspondências';
+
+  @override
+  String explore_results_subjectTruncated(Object count) {
+    return 'A mostrar os primeiros $count. Abra a lista para ver todos.';
+  }
+
+  @override
   String get explore_results_title => 'Mergulhos correspondentes';
 
   @override
@@ -40485,14 +41818,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Explorar precisa do modelo no dispositivo, que não está pronto neste dispositivo.';
 
   @override
-  String get explore_subjectNotSupported =>
-      'Por agora só é possível pesquisar mergulhos.';
-
-  @override
   String get explore_title => 'Explorar';
 
   @override
   String get explore_understood_title => 'Compreendido';
+
+  @override
+  String get explore_unplaced_reason_aggregateWithScope =>
+      'Ainda não é possível combinar com condições sobre os mergulhos';
 
   @override
   String get explore_unplaced_reason_invalid =>
@@ -42689,6 +44022,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'A exportar verificações de equipamento para CSV...';
 
   @override
+  String get settings_export_progress_fillsCsv =>
+      'A exportar enchimentos de garrafa para CSV...';
+
+  @override
   String get settings_export_progress_pdf =>
       'Gerando diário de mergulho em PDF...';
 
@@ -42762,6 +44099,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'A preparar CSV de verificações de equipamento...';
 
   @override
+  String get settings_export_progress_preparingFillsCsv =>
+      'A preparar CSV de enchimentos de garrafa...';
+
+  @override
   String get settings_export_progress_preparingUddf =>
       'Preparando arquivo UDDF...';
 
@@ -42781,6 +44122,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_export_empty_observations =>
       'Sem verificações de equipamento para exportar';
+
+  @override
+  String get settings_export_empty_fills =>
+      'Sem enchimentos de garrafa para exportar';
 
   @override
   String get settings_export_empty_data => 'Nenhum dado para exportar';
@@ -42808,6 +44153,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_export_success_observations =>
       'Verificações de equipamento exportadas';
+
+  @override
+  String get settings_export_success_fills =>
+      'Enchimentos de garrafa exportados';
 
   @override
   String get settings_export_success_pdf =>
@@ -42868,6 +44217,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'CSV de verificações de equipamento guardado';
 
   @override
+  String get settings_export_saved_fillsCsv =>
+      'CSV de enchimentos de garrafa guardado';
+
+  @override
   String get settings_export_saved_uddf => 'Arquivo UDDF salvo com sucesso';
 
   @override
@@ -42893,6 +44246,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_export_saveObservationsCsvDialogTitle =>
       'Salvar CSV de verificações de equipamento';
+
+  @override
+  String get settings_export_saveFillsCsvDialogTitle =>
+      'Guardar CSV de enchimentos de garrafa';
 
   @override
   String backup_operation_created(String size) {
@@ -44371,7 +45728,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String transmitters_apply_content(int tanks, int dives) {
-    return '$tanks cilindros em $dives mergulhos carregam este transmissor. Campos vazios de tamanho, material, nome e equipamento serão preenchidos, e uma função ainda definida como Gás de fundo será substituída.';
+    return '$tanks cilindros em $dives mergulhos carregam este transmissor. Campos vazios de tamanho, material, nome e equipamento serão preenchidos, e uma função ainda definida como Gás de fundo ou lida do nome do transmissor será substituída.';
   }
 
   @override
@@ -44477,6 +45834,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_tank_reassignSeries => 'Reatribuir série de pressão';
 
   @override
+  String diveLog_tank_roleFromTransmitterName(String role) {
+    return '$role, lido do nome do transmissor';
+  }
+
+  @override
   String get diveLog_reassignSheet_title => 'Séries de pressão';
 
   @override
@@ -44513,6 +45875,14 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get universalImport_summary_noticeAssignTransmitters =>
       'Atribuir transmissores';
+
+  @override
+  String get universalImport_summary_noticeTransmitterNameRolesTitle =>
+      'Funções dos cilindros lidas dos nomes dos transmissores';
+
+  @override
+  String get universalImport_summary_noticeTransmitterNameRolesBody =>
+      'O computador de mergulho obteve algumas funções de oxigênio e diluente dos nomes dados aos transmissores: um nome que começa com O é lido como oxigênio, e um que começa com D como diluente. Atribua os transmissores para confirmar ou corrigir essas funções.';
 
   @override
   String get universalImport_summary_noticeDiveNumberConflictTitle =>
@@ -45022,6 +46392,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_review_leaveUnlinked => 'Deixar sem vínculo';
 
   @override
+  String get navTrack_review_noOverlapHint =>
+      'Nenhum mergulho coincide com o horário desta gravação. Mergulhos mais próximos por hora de início:';
+
+  @override
+  String navTrack_review_offsetBefore(String offset) {
+    return '$offset antes da gravação';
+  }
+
+  @override
+  String navTrack_review_offsetAfter(String offset) {
+    return '$offset depois da gravação';
+  }
+
+  @override
+  String navTrack_review_offsetDays(int days, int hours) {
+    return '${days}d ${hours}h';
+  }
+
+  @override
+  String get navTrack_review_chooseAnotherDive => 'Escolher outro mergulho...';
+
+  @override
   String navTrack_list_importFailed(String error) {
     return 'Falha ao importar: $error';
   }
@@ -45358,6 +46750,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_buddies_certifications => 'Certificações';
 
   @override
+  String get query_buddies_diveCount => 'Mergulhos juntos';
+
+  @override
   String get query_buddies_dives => 'Mergulhos';
 
   @override
@@ -45365,6 +46760,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get query_buddies_favorite => 'Favorito';
+
+  @override
+  String get query_buddies_lastDived => 'Último mergulho juntos';
 
   @override
   String get query_buddies_name => 'Nome';
@@ -45388,7 +46786,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_centers_country => 'País';
 
   @override
+  String get query_centers_diveCount => 'Número de mergulhos';
+
+  @override
   String get query_centers_dives => 'Mergulhos';
+
+  @override
+  String get query_centers_lastDived => 'Último mergulho';
 
   @override
   String get query_centers_name => 'Nome';
@@ -45592,6 +46996,45 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_dives_rating => 'Avaliação';
 
   @override
+  String get query_dives_findings => 'Constatações de segurança';
+
+  @override
+  String get query_dives_sac => 'SAC';
+
+  @override
+  String get query_dives_sacTrend => 'Tendência do SAC';
+
+  @override
+  String get query_dives_sacTrend_rising => 'Em alta';
+
+  @override
+  String get query_dives_sacTrend_steady => 'Estável';
+
+  @override
+  String get query_dives_sacTrend_falling => 'Em queda';
+
+  @override
+  String get query_dives_sacChange => 'Variação do SAC';
+
+  @override
+  String get query_dives_finalStop => 'Última parada';
+
+  @override
+  String get query_dives_finalStop_stable => 'Estável';
+
+  @override
+  String get query_dives_finalStop_unstable => 'Instável';
+
+  @override
+  String get query_dives_finalStop_noStop => 'Sem parada';
+
+  @override
+  String get query_dives_finalStopExcursion => 'Desvio na última parada';
+
+  @override
+  String get query_dives_finalStopDuration => 'Duração da última parada';
+
+  @override
   String get query_dives_runtime => 'Duração total';
 
   @override
@@ -45670,6 +47113,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_entity_equipmentAttributes => 'Atributos do equipamento';
 
   @override
+  String get query_entity_findings => 'Constatações de segurança';
+
+  @override
+  String get query_findings_rule => 'Regra';
+
+  @override
   String get query_entity_media => 'Mídia';
 
   @override
@@ -45718,13 +47167,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_equipment_brand => 'Marca';
 
   @override
+  String get query_equipment_diveCount => 'Mergulhos em uso';
+
+  @override
   String get query_equipment_dives => 'Mergulhos';
+
+  @override
+  String get query_equipment_lastDived => 'Último uso';
 
   @override
   String get query_equipment_model => 'Modelo';
 
   @override
   String get query_equipment_name => 'Nome';
+
+  @override
+  String get query_equipment_nextServiceDue => 'Próxima manutenção';
 
   @override
   String get query_equipment_serialNumber => 'Número de série';
@@ -45796,10 +47254,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_sites_difficulty => 'Dificuldade';
 
   @override
+  String get query_sites_diveCount => 'Número de mergulhos';
+
+  @override
   String get query_sites_dives => 'Mergulhos';
 
   @override
   String get query_sites_island => 'Ilha';
+
+  @override
+  String get query_sites_lastDived => 'Último mergulho';
 
   @override
   String get query_sites_maxDepth => 'Profundidade máxima';
@@ -45832,10 +47296,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get query_species_description => 'Descrição';
 
   @override
+  String get query_species_diveCount => 'Mergulhos com avistamento';
+
+  @override
   String get query_species_dives => 'Mergulhos';
 
   @override
   String get query_species_expectedSites => 'Esperada em locais';
+
+  @override
+  String get query_species_firstSeen => 'Visto pela primeira vez';
+
+  @override
+  String get query_species_lastSeen => 'Visto pela última vez';
 
   @override
   String get query_species_name => 'Nome';
@@ -45872,6 +47345,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get query_tanks_volume => 'Volume';
+
+  @override
+  String get query_trips_diveCount => 'Número de mergulhos';
 
   @override
   String get query_trips_dives => 'Mergulhos';

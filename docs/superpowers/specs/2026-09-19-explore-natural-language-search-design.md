@@ -442,3 +442,79 @@ subjects are a single count-per-entity bar chart.
   prompt-only JSON and relies on Dart validation, and the plan says so.
 - A GitHub issue for the program must exist before the first PR; each phase
   PR references it with `Refs` and the last one closes it.
+
+## Deviations recorded during implementation (phase 2, 2026-09-28)
+
+Phase 2 was rebuilt on main after the entity query language (#2365) made
+every dive surface compile one query tree. The profile-derived predicates
+became fields on the dive query registry, so the typed syntax, the rule
+builder, the dive list and Explore all get them.
+
+- One table, `dive_derived_metrics` (schema v247), device-local with no hlc.
+  No `dive_sac_buckets`: a registry field's SQL cannot take a diver-chosen
+  N, so "SAC before versus after N minutes" became `sacTrend` (rising,
+  steady, falling; slope band 0.02 bar/min per minute) and `sacChange`
+  (percent, first half of the dive against the second). Explore leaves the
+  "after N minutes" words unplaced.
+- `sac` is searchable in the diver's pressure unit through a new
+  pressure-rate dimension (`barmin`, `psimin`). It uses the formula the
+  Insights SAC chart plots, not the engine's bucketed mean, so a search and
+  the chart agree.
+- `finalStop` is an enum (stable, unstable over 1.0 m from the median,
+  noStop), with `finalStopExcursion` (a depth) and `finalStopDuration`
+  (minutes) beside it. Null when the profile could not be judged.
+- Safety findings are the relation `findings` over `dive_safety_findings`,
+  live findings only (not dismissed, current review engine).
+- The engine computes SAC itself from the decoded samples and the richest
+  pressure series per tank, as the phase 2 branch did: the isolate has no
+  hydrated `Dive`. The final stop is judged on the tail after the last
+  sample deeper than 7.0 m, ignoring samples shallower than 2.0 m (the
+  ascent's end and the surface): the longest run within 1.5 m of the tail's
+  mean depth, lasting at least 60 s, with transit samples at either end
+  trimmed. Its excursion is the 90th percentile distance from its mean, so
+  one sample passing through is not an unsteady stop. SAC buckets are 300 s;
+  a bucket where pressure does not fall is skipped.
+- Explore stays on `DiveFilterState` and lowers the new clauses into its
+  query tree; query schema version 2. Replacing `ExploreDiveField` with the
+  registry remains query-language PR 5.
+
+## Deviations recorded during implementation (phase 3, 2026-09-30)
+
+Plan: `docs/superpowers/plans/2026-09-30-explore-phase3-subjects.md`. The
+phase 3 table above predates the entity query language (#2365), which by then
+gave every subject a registry, a query-driven list and one name index.
+
+- The subjects lower onto the shared query registries, not onto per-subject
+  filter states. The site, equipment and trip filter states already hold a
+  query, and the buddy and dive center filter states the table named were
+  never needed: those lists already narrow by a query.
+- Aggregates are registry fields: `diveCount` and `lastDived` on sites,
+  equipment, buddies and centers, `diveCount` on trips, `diveCount`,
+  `firstSeen` and `lastSeen` on species, and `nextServiceDue` on equipment.
+  They count only dives inside the stats scope, across every diver, as the
+  site list's own count does, and the typed query language gains them too.
+- A mention of another kind, a dive field or a period under a non-dive
+  subject lowers through the subject's counted dives ("sites where I saw
+  turtles"). Under trips a period is the trip's own dates.
+- Results are ordered by the active diver's dives in that scope, then by
+  name, and the one chart is that count per row. "Who have I dived with most"
+  is answered by that order, not by a sort in the schema.
+- A count or a first or last date together with a dive part ("more than 10
+  times this year", "last dived before 2022 in Bonaire") is unplaced with the
+  reason `aggregateWithScope`: an aggregate over a scoped relation is outside
+  the query language, and the registry fields are over all of a row's dives.
+- A mention of the subject's own kind matches rows by their stored name; no
+  registry entity has an id field.
+- `dueWithinDays` is `serviceDueWithin`, a date bound the compiler computes
+  from today against `equipment_service_status.due_date`. `lastUsedBefore`
+  and `lastUsedAfter` are `lastDived` with a time phrase. `favoritesOnly` is
+  the buddy's `favorite`. `minDiveCount` is `diveCount`. `firstSeenAfter` and
+  `lastSeenBefore` are `firstSeen` and `lastSeen` with a time phrase. Trip
+  `startAfter`/`endBefore` are the period, and centers' country and city a
+  place mention. `roleId`, `minSightings` and trip `location` are not built.
+- Species counts are global (the species table has no diver column), so in a
+  library with several divers they count every diver's sightings.
+- The trip list gained a visible query filter (chips, a filter button, the
+  no-match state), so a handoff to it shows what Explore understood.
+- The query schema went to version 3; versions 1 and 2 still parse. The
+  prompt measured 6,114 characters.

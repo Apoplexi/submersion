@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:drift/drift.dart' show Value, Variable;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/core/database/database.dart'
     show AppDatabase, DivesCompanion, DiveTanksCompanion;
@@ -14,13 +16,19 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/features/trips/data/repositories/trip_cylinder_repository.dart';
+import 'package:submersion/features/trips/data/repositories/itinerary_day_repository.dart';
 import 'package:submersion/features/trips/data/repositories/trip_repository.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/trips/domain/entities/trip_cylinder.dart';
 import 'package:submersion/features/trips/domain/entities/trip_cylinder_event.dart';
 import 'package:submersion/features/trips/domain/entities/trip_cylinder_state.dart';
+import 'package:submersion/features/trips/domain/entities/trip_gas_record.dart';
+import 'package:submersion/features/trips/domain/services/fill_forecast.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_cylinder_board_page.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_cylinder_providers.dart';
+import 'package:submersion/features/trips/presentation/providers/trip_gas_record_providers.dart';
+import 'package:submersion/features/trips/presentation/providers/liveaboard_providers.dart';
+import 'package:submersion/features/trips/presentation/providers/trip_fill_forecast_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/arb/app_localizations_en.dart';
 
@@ -84,6 +92,9 @@ void main() {
     TripCylinderRepository? repository,
     Future<List<TripCylinderState>>? states,
     bool settle = true,
+    FillForecast? forecast,
+    ItineraryDayRepository? itinerary,
+    TripGasRecord? record,
   }) async {
     tester.view.physicalSize = const Size(900, 1800);
     tester.view.devicePixelRatio = 1.0;
@@ -99,6 +110,13 @@ void main() {
               TankPresetEntity.fromBuiltIn(TankPresets.byName('al80')!),
             ]),
           ),
+          tripFillForecastProvider(
+            tripId,
+          ).overrideWith((ref) async => forecast),
+          if (record != null)
+            tripGasRecordProvider(tripId).overrideWith((ref) async => record),
+          if (itinerary != null)
+            itineraryDayRepositoryProvider.overrideWithValue(itinerary),
           if (repository != null)
             tripCylinderRepositoryProvider.overrideWithValue(repository),
           if (states != null)
@@ -117,6 +135,40 @@ void main() {
     } else {
       await tester.pump();
     }
+  }
+
+  Future<void> pumpBoardWithRouter(
+    WidgetTester tester,
+    GoRouter router, {
+    FillForecast? forecast,
+  }) async {
+    tester.view.physicalSize = const Size(900, 1800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+          allDiveCentersProvider.overrideWith((ref) async => const []),
+          activeEquipmentProvider.overrideWith((ref) async => const []),
+          tankPresetsProvider.overrideWith(
+            (ref) => Future.value([
+              TankPresetEntity.fromBuiltIn(TankPresets.byName('al80')!),
+            ]),
+          ),
+          tripFillForecastProvider(
+            tripId,
+          ).overrideWith((ref) async => forecast),
+        ],
+        child: MaterialApp.router(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
   }
 
   testWidgets('an empty board offers to add cylinders', (tester) async {
@@ -357,10 +409,248 @@ void main() {
     expect(find.text('Truck 1'), findsOneWidget);
   });
 
+  testWidgets('Log dive opens a new dive on that slot', (tester) async {
+    final a = await slot('Truck 1', 0);
+    String? pushed;
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => TripCylinderBoardPage(tripId: tripId),
+        ),
+        GoRoute(
+          path: '/dives/new',
+          builder: (_, state) {
+            pushed = state.uri.toString();
+            return const Scaffold(body: Text('NEW DIVE'));
+          },
+        ),
+      ],
+    );
+    await pumpBoardWithRouter(tester, router);
+    addTearDown(router.dispose);
+
+    await tester.tap(find.byKey(Key('slot-menu-${a.id}')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Log dive'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('NEW DIVE'), findsOneWidget);
+    final uri = Uri.parse(pushed!);
+    expect(uri.queryParameters['tripId'], tripId);
+    expect(uri.queryParameters['tripCylinderId'], a.id);
+  });
+
   test('reorderedIds moves one id and keeps the rest in order', () {
     expect(reorderedIds(['a', 'b', 'c'], 2, 0), ['c', 'a', 'b']);
     expect(reorderedIds(['a', 'b', 'c'], 0, 2), ['b', 'c', 'a']);
     expect(reorderedIds(['a', 'b', 'c'], 1, 1), ['a', 'b', 'c']);
+  });
+  testWidgets('the board shows the forecast as a banner', (tester) async {
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await pumpBoard(
+      tester,
+      forecast: const FillForecast(
+        fullCount: 1,
+        partialCount: 0,
+        todayDemand: 0,
+        tomorrowDemand: 4,
+        tomorrowSupply: 1,
+        todayShortfall: 0,
+        tomorrowShortfall: 3,
+        deadlineMinutes: null,
+        remainingDemand: 8,
+        days: [],
+      ),
+    );
+    expect(find.byKey(const Key('fill-forecast-banner')), findsOneWidget);
+    expect(find.text("Tomorrow needs 4, you'll have 1 full."), findsOneWidget);
+  });
+  FillForecast forecastWithDays(List<FillForecastDay> days) => FillForecast(
+    fullCount: 4,
+    partialCount: 0,
+    todayDemand: 2,
+    tomorrowDemand: 2,
+    tomorrowSupply: 2,
+    todayShortfall: 0,
+    tomorrowShortfall: 0,
+    deadlineMinutes: null,
+    remainingDemand: 6,
+    days: days,
+  );
+
+  testWidgets('the strip lists the remaining days with their plans', (
+    tester,
+  ) async {
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await pumpBoard(
+      tester,
+      forecast: forecastWithDays([
+        FillForecastDay(date: DateTime(2026, 3, 13), plannedDives: 2),
+        FillForecastDay(
+          date: DateTime(2026, 3, 14),
+          plannedDives: 1,
+          isOverride: true,
+        ),
+      ]),
+    );
+    expect(find.text('Planned dives'), findsOneWidget);
+    expect(find.textContaining('2 dives'), findsOneWidget);
+    expect(find.textContaining('1 dive'), findsOneWidget);
+  });
+
+  testWidgets('saving a day writes its plan to the itinerary', (tester) async {
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await pumpBoard(
+      tester,
+      forecast: forecastWithDays([
+        FillForecastDay(date: DateTime(2026, 3, 10), plannedDives: 2),
+      ]),
+    );
+    await tester.tap(find.byKey(const Key('forecast-day-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('plan-more')));
+    await tester.pump();
+    expect(find.text('3'), findsOneWidget);
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final days = await ItineraryDayRepository().getByTripId(tripId);
+    expect(days, hasLength(1));
+    expect(days.single.date, DateTime(2026, 3, 10));
+    expect(days.single.dayNumber, 3);
+    expect(days.single.dayType, DayType.diveDay);
+    expect(days.single.plannedDives, 3);
+  });
+
+  testWidgets('using the estimate clears a planned day', (tester) async {
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await ItineraryDayRepository().setPlannedDives(
+      tripId: tripId,
+      date: DateTime(2026, 3, 10),
+      plannedDives: 4,
+    );
+    await pumpBoard(
+      tester,
+      forecast: forecastWithDays([
+        FillForecastDay(
+          date: DateTime(2026, 3, 10),
+          plannedDives: 4,
+          isOverride: true,
+        ),
+      ]),
+    );
+    await tester.tap(find.byKey(const Key('forecast-day-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('plan-use-estimate')));
+    await tester.pumpAndSettle();
+
+    final day = (await ItineraryDayRepository().getByTripId(tripId)).single;
+    expect(day.plannedDives, isNull);
+  });
+
+  testWidgets('cancel writes nothing', (tester) async {
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await pumpBoard(
+      tester,
+      forecast: forecastWithDays([
+        FillForecastDay(date: DateTime(2026, 3, 10), plannedDives: 2),
+      ]),
+    );
+    await tester.tap(find.byKey(const Key('forecast-day-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('plan-more')));
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(await ItineraryDayRepository().getByTripId(tripId), isEmpty);
+  });
+
+  testWidgets('a day the diver planned says so to a screen reader', (
+    tester,
+  ) async {
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await pumpBoard(
+      tester,
+      forecast: forecastWithDays([
+        FillForecastDay(
+          date: DateTime(2026, 3, 10),
+          plannedDives: 3,
+          isOverride: true,
+        ),
+      ]),
+    );
+    final icon = tester.widget<Icon>(find.byIcon(Icons.edit_calendar));
+    expect(icon.semanticLabel, 'Planned by you');
+  });
+
+  testWidgets('a failed plan save says so and frees the strip', (tester) async {
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await pumpBoard(
+      tester,
+      itinerary: _FailingItineraryRepository(),
+      forecast: forecastWithDays([
+        FillForecastDay(date: DateTime(2026, 3, 10), plannedDives: 2),
+      ]),
+    );
+    await tester.tap(find.byKey(const Key('forecast-day-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.text("Couldn't save the plan. Try again."), findsOneWidget);
+    expect(find.textContaining('disk full'), findsNothing);
+    final chip = tester.widget<ActionChip>(
+      find.byKey(const Key('forecast-day-0')),
+    );
+    expect(chip.onPressed, isNotNull);
+  });
+
+  testWidgets('the plan count reads as dives to a screen reader', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await pumpBoard(
+      tester,
+      forecast: forecastWithDays([
+        FillForecastDay(date: DateTime(2026, 3, 10), plannedDives: 2),
+      ]),
+    );
+    await tester.tap(find.byKey(const Key('forecast-day-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('plan-more')));
+    await tester.pump();
+    expect(
+      tester.getSemantics(find.byKey(const Key('plan-count'))).label,
+      '3 dives',
+    );
+    handle.dispose();
+  });
+  testWidgets('the board has a Record segment', (tester) async {
+    final a = await slot('Truck 1', 0);
+    await fill(a.id);
+    await pumpBoard(
+      tester,
+      record: const TripGasRecord(
+        rows: [],
+        slots: [],
+        fillsLogged: 1,
+        costs: [],
+        packageFills: 0,
+        unlinked: [],
+        multipleDivers: false,
+      ),
+    );
+    await tester.tap(find.text('Record'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('record-empty')), findsOneWidget);
   });
 }
 
@@ -384,4 +674,14 @@ class _CountFailingRepository extends TripCylinderRepository {
   @override
   Future<int> countLinkedDives(String cylinderId) async =>
       throw StateError('count failed');
+}
+
+/// Cannot write a day's plan.
+class _FailingItineraryRepository extends ItineraryDayRepository {
+  @override
+  Future<void> setPlannedDives({
+    required String tripId,
+    required DateTime date,
+    required int? plannedDives,
+  }) async => throw StateError('disk full');
 }

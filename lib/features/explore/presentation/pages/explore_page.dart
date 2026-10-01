@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/explore/domain/nl_engine.dart';
 import 'package:submersion/features/explore/presentation/providers/explore_gate_providers.dart';
+import 'package:submersion/features/explore/presentation/providers/explore_name_index_provider.dart';
 import 'package:submersion/features/explore/presentation/providers/explore_providers.dart';
 import 'package:submersion/features/explore/presentation/widgets/explore_charts.dart';
 import 'package:submersion/features/explore/presentation/widgets/explore_chip_rows.dart';
+import 'package:submersion/features/explore/presentation/widgets/explore_handoff_bar.dart';
 import 'package:submersion/features/explore/presentation/widgets/explore_results_list.dart';
-import 'package:submersion/features/insights/presentation/providers/insights_filter_provider.dart';
+import 'package:submersion/features/explore/presentation/widgets/explore_subject_results_list.dart';
+import 'package:submersion/features/explore/domain/query_model.dart';
+import 'package:submersion/features/explore/presentation/providers/explore_subject_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -52,6 +54,9 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     final availability = ref.watch(exploreAvailabilityProvider).value;
     final count = ref.watch(exploreCountProvider);
     final compiled = state.compiled;
+    // Listened while the page is up, so a dive write refreshes the legacy
+    // buddy names now rather than on the next read; the notifier only reads.
+    ref.listen(exploreNameIndexProvider, (_, _) {});
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.explore_title)),
@@ -126,49 +131,33 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                   ExploreAttentionRow(compiled: compiled),
                   const SizedBox(height: 12),
                   Text(
-                    l10n.explore_count(count.value ?? 0),
+                    compiled.subject == ParsedSubject.dives
+                        ? l10n.explore_count(count.value ?? 0)
+                        : l10n.explore_results_count(
+                            ref
+                                    .watch(exploreSubjectRowsProvider)
+                                    .value
+                                    ?.length ??
+                                0,
+                          ),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   ExploreCharts(requests: compiled.charts),
-                  const ExploreResultsList(),
+                  if (compiled.subject == ParsedSubject.dives)
+                    const ExploreResultsList()
+                  else
+                    ExploreSubjectResultsList(subject: compiled.subject),
                 ],
               ],
             ),
           ),
-          if (compiled != null && compiled.filter.hasActiveFilters)
+          // Nothing placed is nothing to hand off, and no strip for it.
+          if (compiled != null && compiled.query != null)
             SafeArea(
               top: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // The live filter, not compiled.filter: they agree
-                          // today, and reading the published one keeps the
-                          // handoff correct if anything else ever writes it.
-                          ref.read(diveFilterProvider.notifier).state = ref
-                              .read(exploreFilterProvider);
-                          // go, not push: the handoff moves to a shell tab.
-                          context.go('/dives');
-                        },
-                        child: Text(l10n.explore_handoff_diveList),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () {
-                          ref.read(insightsFilterProvider.notifier).state = ref
-                              .read(exploreFilterProvider);
-                          context.go('/insights');
-                        },
-                        child: Text(l10n.explore_handoff_insights),
-                      ),
-                    ),
-                  ],
-                ),
+                child: ExploreHandoffBar(subject: compiled.subject),
               ),
             ),
         ],

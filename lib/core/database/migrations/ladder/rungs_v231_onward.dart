@@ -96,13 +96,62 @@ extension RungsFromV231 on AppDatabase {
       await _assertCertificationsBuddyIndex();
     }
     if (from < 245) await reportProgress();
-    // v246: metadata-only profile revision history over existing series
-    // rows (#1197). One history row per series id, no sample/blob
-    // duplication. Re-asserted in beforeOpen.
-    if (from < 246) {
+    // v247: the Explore derived metrics (issue #2195). Table-only rung, no
+    // backfill: the startup sweep fills it. Re-asserted in beforeOpen.
+    if (from < 247) {
+      await _assertDerivedMetricsTable();
+    }
+    if (from < 247) await reportProgress();
+    // v248: gear packed for a trip (issue #2338). Table-only rung, no
+    // backfill; re-asserted in beforeOpen.
+    if (from < 248) {
+      await _assertTripEquipmentSchema();
+    }
+    if (from < 248) await reportProgress();
+    // v249: the trip fill forecast's inputs (issue #2325, PR 4). Columns
+    // only, no backfill; re-asserted in beforeOpen. 248 is #2585.
+    if (from < 249) {
+      await _assertTripFillForecastColumns();
+    }
+    if (from < 249) await reportProgress();
+    // v250: a profile's hidden shared trips and sites (issue #2594).
+    // Table-only rung, no backfill; re-asserted in beforeOpen.
+    if (from < 250) {
+      await _assertTripHidesSchema();
+      await _assertSiteHidesSchema();
+    }
+    if (from < 250) await reportProgress();
+    // v251: dive_tanks.source_id (issue #2716), backfilled where the
+    // source is unambiguous. 250 is profile hides (#2594).
+    if (from < 251) {
+      await _assertDiveTankSourceIdColumn();
+      await _backfillDiveTankSourceIds();
+    }
+    if (from < 251) await reportProgress();
+    // v252: nav_tracks.diver_id, the route's owner (issue #2691 follow-up),
+    // backfilled from each linked route's dive. The column is re-asserted in
+    // beforeOpen; the backfill stays in the rung. 251 is
+    // dive_tanks.source_id (#2716).
+    if (from < 252) {
+      await _assertNavTrackDiverIdColumn();
+      await _backfillNavTrackDiverIds();
+    }
+    if (from < 252) await reportProgress();
+    // v254: dive_tanks.role_source, where a cylinder's role came from
+    // (issue #2595). Column only, no backfill: a stored role's origin is
+    // unknown, and a re-parse fills it. Re-asserted in beforeOpen. 253 is
+    // held by an open branch.
+    if (from < 254) {
+      await _assertTankRoleSourceColumn();
+    }
+    if (from < 254) await reportProgress();
+    // v255: metadata-only profile revision history over existing
+    // dive_profile_series rows (#1197). One history row per series id,
+    // no sample/blob duplication. Re-asserted in beforeOpen.
+    if (from < 255) {
       await _assertProfileSeriesHistorySchema();
       await _backfillProfileSeriesHistoryRows();
     }
-    if (from < 246) await reportProgress();
+    if (from < 255) await reportProgress();
   }
 }

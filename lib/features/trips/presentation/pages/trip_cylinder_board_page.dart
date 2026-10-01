@@ -2,15 +2,21 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
 import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/trips/domain/entities/trip_cylinder_state.dart';
 import 'package:submersion/features/trips/presentation/helpers/trip_cylinder_display.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_cylinder_providers.dart';
+import 'package:submersion/features/trips/presentation/providers/trip_fill_forecast_providers.dart';
 import 'package:submersion/features/trips/presentation/widgets/cylinders/add_trip_cylinders_sheet.dart';
 import 'package:submersion/features/trips/presentation/widgets/cylinders/trip_cylinder_fill_sheet.dart';
 import 'package:submersion/features/trips/presentation/widgets/cylinders/trip_cylinder_ledger_view.dart';
+import 'package:submersion/features/trips/presentation/widgets/cylinders/trip_cylinder_record_view.dart';
 import 'package:submersion/features/trips/presentation/widgets/cylinders/trip_cylinder_slot_card.dart';
+import 'package:submersion/features/trips/presentation/widgets/cylinders/trip_fill_forecast_banner.dart';
+import 'package:submersion/features/trips/presentation/widgets/cylinders/trip_fill_forecast_strip.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// [ids] with the one at [oldIndex] moved to [newIndex], the index
@@ -26,6 +32,8 @@ List<String> reorderedIds(List<String> ids, int oldIndex, int newIndex) {
 /// The trip's cylinder board: every slot with its state (reorderable) or
 /// the ledger of every fill and adjustment, with actions to add slots and
 /// to fill several at once.
+enum _BoardView { board, ledger, record }
+
 class TripCylinderBoardPage extends ConsumerStatefulWidget {
   final String tripId;
 
@@ -37,7 +45,7 @@ class TripCylinderBoardPage extends ConsumerStatefulWidget {
 }
 
 class _TripCylinderBoardPageState extends ConsumerState<TripCylinderBoardPage> {
-  bool _showLedger = false;
+  _BoardView _view = _BoardView.board;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +56,8 @@ class _TripCylinderBoardPageState extends ConsumerState<TripCylinderBoardPage> {
     final centers =
         ref.watch(allDiveCentersProvider).value ?? const <DiveCenter>[];
     final centerNames = {for (final c in centers) c.id: c.name};
+    final units = UnitFormatter(ref.watch(settingsProvider));
+    final forecast = ref.watch(tripFillForecastProvider(tripId)).value;
 
     final Widget body;
     if (!statesAsync.hasValue && statesAsync.isLoading) {
@@ -76,35 +86,56 @@ class _TripCylinderBoardPageState extends ConsumerState<TripCylinderBoardPage> {
     } else {
       body = Column(
         children: [
+          if (forecast != null) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: TripFillForecastBanner(forecast: forecast, units: units),
+            ),
+            if (forecast.days.isNotEmpty)
+              TripFillForecastStrip(
+                tripId: tripId,
+                days: forecast.days,
+                units: units,
+              ),
+          ],
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: SegmentedButton<bool>(
+            child: SegmentedButton<_BoardView>(
               key: const Key('board-segment'),
               segments: [
                 ButtonSegment(
-                  value: false,
+                  value: _BoardView.board,
                   label: Text(l10n.trips_cylinders_segment_board),
                 ),
                 ButtonSegment(
-                  value: true,
+                  value: _BoardView.ledger,
                   label: Text(l10n.trips_cylinders_segment_ledger),
                 ),
+                ButtonSegment(
+                  value: _BoardView.record,
+                  label: Text(l10n.trips_cylinders_segment_record),
+                ),
               ],
-              selected: {_showLedger},
-              onSelectionChanged: (s) => setState(() => _showLedger = s.first),
+              selected: {_view},
+              onSelectionChanged: (s) => setState(() => _view = s.first),
             ),
           ),
           Expanded(
-            child: _showLedger
-                ? TripCylinderLedgerView(
-                    tripId: tripId,
-                    states: states,
-                    centerNames: centerNames,
-                  )
-                : TripCylinderBoardList(
-                    states: states,
-                    centerNames: centerNames,
-                  ),
+            child: switch (_view) {
+              _BoardView.board => TripCylinderBoardList(
+                states: states,
+                centerNames: centerNames,
+              ),
+              _BoardView.ledger => TripCylinderLedgerView(
+                tripId: tripId,
+                states: states,
+                centerNames: centerNames,
+              ),
+              _BoardView.record => TripCylinderRecordView(
+                tripId: tripId,
+                centerNames: centerNames,
+              ),
+            },
           ),
         ],
       );

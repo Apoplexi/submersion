@@ -802,6 +802,16 @@ class PaginatedDiveListNotifier
 
   Future<void> loadFirstPage() => _enqueuePaging(_loadFirstPage);
 
+  /// Whether the loaded rows came from a filtered query. An add or an edit
+  /// can then move a dive into or out of the filter, which only the query can
+  /// tell, so those reload the loaded pages rather than patch them (#2669).
+  bool get _loadedUnderFilter =>
+      state.valueOrNull?.unfilteredTotalCount != null;
+
+  /// An optimistic change to [PaginatedDiveListState.unfilteredTotalCount],
+  /// which stays null for rows loaded with no filter active.
+  static int? _shifted(int? count, int by) => count == null ? null : count + by;
+
   /// A filter naming gear.serviceDue reads the service cache: each load waits
   /// for it to mirror the engine, so no page shows an empty cache or the
   /// previous diver's verdicts (#2365).
@@ -833,9 +843,14 @@ class PaginatedDiveListNotifier
           disabledSafetyRules: _ref.read(safetyReviewDisabledRulesProvider),
         ),
         _repository.getDiveCount(diverId: _currentDiverId, filter: filter),
+        if (filter.hasActiveFilters)
+          _repository.getDiveCount(diverId: _currentDiverId),
       ]);
       final dives = results[0] as List<DiveSummary>;
       final totalCount = results[1] as int;
+      final unfilteredTotalCount = filter.hasActiveFilters
+          ? results[2] as int
+          : null;
       _currentOffset = dives.length;
 
       if (!mounted) return;
@@ -845,6 +860,7 @@ class PaginatedDiveListNotifier
           hasMore: dives.length >= _pageSize,
           nextCursor: _isDateSort ? _cursorFromLastDive(dives) : null,
           totalCount: totalCount,
+          unfilteredTotalCount: unfilteredTotalCount,
         ),
       );
       // Pre-load downsampled profiles for mini charts (fire and forget)
@@ -1003,9 +1019,14 @@ class PaginatedDiveListNotifier
           disabledSafetyRules: _ref.read(safetyReviewDisabledRulesProvider),
         ),
         _repository.getDiveCount(diverId: _currentDiverId, filter: filter),
+        if (filter.hasActiveFilters)
+          _repository.getDiveCount(diverId: _currentDiverId),
       ]);
       final fetched = results[0] as List<DiveSummary>;
       final totalCount = results[1] as int;
+      final unfilteredTotalCount = filter.hasActiveFilters
+          ? results[2] as int
+          : null;
       final hasMore = fetched.length > limit;
       final dives = hasMore ? fetched.sublist(0, limit) : fetched;
       _currentOffset = dives.length;
@@ -1030,6 +1051,7 @@ class PaginatedDiveListNotifier
           hasMore: hasMore,
           nextCursor: _isDateSort ? _cursorFromLastDive(dives) : null,
           totalCount: totalCount,
+          unfilteredTotalCount: unfilteredTotalCount,
           isLoadingMore: flags?.isLoadingMore ?? false,
           loadMoreFailed: flags?.loadMoreFailed ?? false,
         ),
@@ -1110,9 +1132,14 @@ class PaginatedDiveListNotifier
     // of the diver this call started for: after a switch the loaded rows are
     // another diver's (or the same diver's, reloaded, after a switch back), so
     // reload rather than prepend a dive that does not belong or is already in.
+    //
+    // Under a filter the new dive may not match it, so the rows and both
+    // counts come from the query instead, without a spinner (#2669).
     final current = state.valueOrNull;
     if (_diverSwitches != diverSwitches) {
       await loadFirstPage();
+    } else if (_loadedUnderFilter) {
+      await _silentReloadLoadedPages();
     } else if (current != null) {
       final summary = DiveSummary.fromDive(newDive);
       state = AsyncValue.data(
@@ -1135,9 +1162,12 @@ class PaginatedDiveListNotifier
     final oldDive = await _repository.getDiveById(dive.id);
     await _repository.updateDive(dive);
 
-    // Optimistic: replace the item in the list by ID
+    // Optimistic: replace the item in the list by ID, unless a filter decides
+    // whether the edited dive still belongs in it.
     final current = state.valueOrNull;
-    if (current != null) {
+    if (_loadedUnderFilter) {
+      await _silentReloadLoadedPages();
+    } else if (current != null) {
       final summary = DiveSummary.fromDive(dive);
       final updated = current.dives.map((d) {
         return d.id == dive.id ? summary : d;
@@ -1165,6 +1195,7 @@ class PaginatedDiveListNotifier
         current.copyWith(
           dives: current.dives.where((d) => d.id != id).toList(),
           totalCount: current.totalCount - 1,
+          unfilteredTotalCount: _shifted(current.unfilteredTotalCount, -1),
         ),
       );
     } else {
@@ -1189,6 +1220,10 @@ class PaginatedDiveListNotifier
         current.copyWith(
           dives: current.dives.where((d) => !idSet.contains(d.id)).toList(),
           totalCount: current.totalCount - ids.length,
+          unfilteredTotalCount: _shifted(
+            current.unfilteredTotalCount,
+            -ids.length,
+          ),
         ),
       );
     } else {
@@ -1229,6 +1264,7 @@ class PaginatedDiveListNotifier
     }
 
     await _repository.toggleFavorite(diveId);
+    if (_loadedUnderFilter) await _silentReloadLoadedPages();
     _ref.invalidate(diveProvider(diveId));
     _invalidateOldProvider();
   }
@@ -1244,6 +1280,7 @@ class PaginatedDiveListNotifier
     }
 
     await _repository.setFavorite(diveId, isFavorite);
+    if (_loadedUnderFilter) await _silentReloadLoadedPages();
     _ref.invalidate(diveProvider(diveId));
     _invalidateOldProvider();
   }

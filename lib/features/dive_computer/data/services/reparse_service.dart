@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:uuid/uuid.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/profile/tank_pressure_glitches.dart';
@@ -12,6 +13,8 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_source_links.dart';
+import 'package:submersion/features/dive_log/data/services/derived_metrics_scheduler.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart'
     as codec;
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart'
@@ -129,7 +132,12 @@ class ReparseService {
         // ----------------------------------------------------------------
         // 3. Update Dives row (allowlisted columns only)
         // ----------------------------------------------------------------
-        await _updateDiveRow(diveId: diveId, parsed: parsed, now: now);
+        await _updateDiveRow(
+          diveId: diveId,
+          parsed: parsed,
+          now: now,
+          vendor: descriptorVendor,
+        );
       }
 
       final sourceRows = await (db.select(
@@ -200,6 +208,7 @@ class ReparseService {
           ? resolveParsedTanks(
               parsed,
               trimAtSurfacing: trimTankPressureAtSurfacing,
+              vendor: descriptorVendor,
             )
           : const <DownloadedTank>[];
       final rewritesTanks = resolvedTanks.isNotEmpty;
@@ -241,6 +250,14 @@ class ReparseService {
           diveId: diveId,
           computerId: computerId,
           resolvedTanks: resolvedTanks,
+        );
+        // A tank this parse gained is new, with no source yet (v251, issue
+        // #2716); a single-source dive's one source is it.
+        await attributeTankSources(
+          db,
+          _sync,
+          diveId,
+          now: now.millisecondsSinceEpoch,
         );
         await _replaceTankPressureProfiles(
           diveId: diveId,
@@ -507,6 +524,7 @@ class ReparseService {
     // The re-parse rewrote the profile strands; the sensor summary is
     // derived from them (condition phase 2).
     if (sources.isNotEmpty) scheduleSensorSummaryRefresh([diveId]);
+    if (sources.isNotEmpty) scheduleDerivedMetricsRefresh([diveId]);
     return (errors: errors, profilesPreserved: profilesPreserved);
   }
 
@@ -545,6 +563,10 @@ class ReparseService {
       db.diveDataSources,
     )..where((t) => t.id.equals(sourceRowId))).write(
       DiveDataSourcesCompanion(
+        // The row's own clock, so this write is newer than any peer's copy
+        // on its own; the stage() after the rewrite marks it for publishing
+        // (#2644).
+        hlc: Value(await _sync.issueRowClock()),
         maxDepth: Value(parsed.maxDepthMeters),
         avgDepth: Value(
           parsed.avgDepthMeters != 0.0 ? parsed.avgDepthMeters : null,
@@ -597,6 +619,7 @@ class ReparseService {
     required String diveId,
     required pigeon.ParsedDive parsed,
     required DateTime now,
+    required String? vendor,
   }) async {
     final diveDateTimeMs = _parsedEntryTime(parsed).millisecondsSinceEpoch;
     final exitTimeMs = diveDateTimeMs + (parsed.durationSeconds * 1000);
@@ -611,7 +634,11 @@ class ReparseService {
     // a diluent stamped by hand or by another source when this parse found
     // none, the same convention as waterTemp/GPS above.
     final diluent = resolveDiluentGas(
-      resolveParsedTanks(parsed, trimAtSurfacing: trimTankPressureAtSurfacing),
+      resolveParsedTanks(
+        parsed,
+        trimAtSurfacing: trimTankPressureAtSurfacing,
+        vendor: vendor,
+      ),
     );
 
     await (db.update(db.dives)..where((t) => t.id.equals(diveId))).write(
@@ -839,6 +866,14 @@ class ReparseService {
       return null;
     }
 
+    // The parse before the registry: whether a role came from the
+    // transmitter's name is a fact about the computer's data, which a
+    // registry match then overrides (issue #2595).
+    final nameDerivedRoles = {
+      for (final t in resolvedTanks)
+        if (t.roleSource != null) t.index: t.role ?? TankRole.backGas.name,
+    };
+
     final newTankOrders = <int>{};
     for (final tank in parsedTanks) {
       newTankOrders.add(tank.index);
@@ -846,6 +881,18 @@ class ReparseService {
       if (existing != null) {
         matchedIds.add(existing.id);
         tankIdsByIndex[tank.index] = existing.id;
+        final parsedRole = tank.role ?? TankRole.backGas.name;
+        // The role is the diver's once they set it, so a re-parse leaves it
+        // alone, unless it is still the computer's guess from the
+        // transmitter's name (issue #2595): then this parse, with the
+        // registry applied, decides it. A row from before v254 whose role is
+        // the one this parse read off the name is that same guess, whether
+        // or not the transmitter has been registered since.
+        final roleIsComputers =
+            TankRoleSource.fromName(existing.roleSource) ==
+                TankRoleSource.transmitterName ||
+            (existing.roleSource == null &&
+                existing.tankRole == nameDerivedRoles[tank.index]);
         // Update existing tank: overwrite computer fields, preserve user fields
         await (db.update(
           db.diveTanks,
@@ -872,14 +919,23 @@ class ReparseService {
             // before the serial was stored gains it (and a parse that stops
             // reporting one clears the stale value).
             transmitterSerial: Value(tank.transmitterSerial),
+            // A fresh clock, so a peer's newer copy cannot take the cleared
+            // serial back, nor this write's values (#2644).
+            hlc: Value(await _sync.issueRowClock()),
             // A legacy row gains its explicit source index here; a row that
             // already has one keeps it.
             sourceTankIndex: existing.sourceTankIndex == null
                 ? Value(tank.index)
                 : const Value.absent(),
-            // tankName, presetName, equipmentId, tankRole, tankMaterial
-            // are user-authored -- NOT touched, so the registry is not
-            // applied to an existing row either.
+            tankRole: roleIsComputers
+                ? Value(parsedRole)
+                : const Value.absent(),
+            roleSource: roleIsComputers
+                ? Value(tank.roleSource)
+                : const Value.absent(),
+            // tankName, presetName, equipmentId, tankMaterial and a role
+            // the diver set are user-authored -- NOT touched, so the rest
+            // of the registry is not applied to an existing row either.
           ),
         );
       } else {
@@ -905,6 +961,7 @@ class ReparseService {
                 hePercent: Value(tank.hePercent),
                 tankOrder: Value(tank.index),
                 tankRole: Value(tank.role ?? 'backGas'),
+                roleSource: Value(tank.roleSource),
                 transmitterSerial: Value(tank.transmitterSerial),
                 sourceTankIndex: Value(tank.index),
               ),
@@ -1005,6 +1062,7 @@ class ReparseService {
               ? Value(endpoints.start)
               : const Value.absent(),
           endPressure: needEnd ? Value(endpoints.end) : const Value.absent(),
+          hlc: Value(await _sync.issueRowClock()),
         ),
       );
     }

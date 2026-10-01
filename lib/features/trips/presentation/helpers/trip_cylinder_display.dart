@@ -5,6 +5,8 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/trips/domain/entities/trip_cylinder_event.dart';
 import 'package:submersion/features/trips/domain/entities/trip_cylinder_state.dart';
+import 'package:submersion/features/trips/domain/services/fill_forecast.dart';
+import 'package:submersion/features/trips/domain/services/trip_cylinder_labels.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -91,4 +93,63 @@ String? tripCylinderLastItemText(
     case TripCylinderEventKind.adjustment:
       return l10n.trips_cylinders_last_adjustment(when);
   }
+}
+
+/// A linked dive tank's slot in words: "Truck 2 · Bottle 14". The bottle is
+/// left out when unknown or when it is the slot's own label (an owned
+/// cylinder keeps its identifier as both).
+String tripCylinderTankLine(
+  AppLocalizations l10n,
+  TripCylinderTankLabel label,
+) {
+  final bottle = label.bottle;
+  return bottle == null || bottle == label.label
+      ? label.label
+      : '${label.label} · ${l10n.trips_cylinders_bottle(bottle)}';
+}
+
+/// A slot as the tank editor's picker lists it: label, status, mix,
+/// pressure, then the bottle in it. The status leads because a narrow
+/// picker ellipsizes the end, and the status is what the diver chooses by.
+String tripCylinderPickerLabel(
+  AppLocalizations l10n,
+  UnitFormatter units,
+  TripCylinderState state,
+) {
+  final bottle = state.bottleLabel;
+  return [
+    state.cylinder.label,
+    tripCylinderStatusLabel(l10n, state.status),
+    state.mix == null ? '--' : tripCylinderMixLabel(l10n, state.mix!),
+    state.pressure == null ? '--' : units.formatPressure(state.pressure),
+    if (bottle != state.cylinder.label) l10n.trips_cylinders_bottle(bottle),
+  ].join(' · ');
+}
+
+/// The forecast in words (decided 2026-09-29): today's shortfall, then
+/// tomorrow's, the first of them ending with the fill deadline; or, with no
+/// shortfall, that the full cylinders last through tomorrow.
+({List<String> lines, bool short}) tripFillForecastLines(
+  AppLocalizations l10n,
+  UnitFormatter units,
+  FillForecast f,
+) {
+  final lines = [
+    if (f.caution)
+      l10n.trips_cylinders_forecast_todayShort(f.todayDemand, f.fullCount),
+    if (f.fillRunNeeded)
+      l10n.trips_cylinders_forecast_tomorrowShort(
+        f.tomorrowDemand,
+        f.tomorrowSupply,
+      ),
+  ];
+  if (lines.isEmpty) {
+    return (lines: [l10n.trips_cylinders_forecast_enough], short: false);
+  }
+  final deadline = f.deadlineMinutes;
+  if (deadline == null) return (lines: lines, short: true);
+  final fill = l10n.trips_cylinders_forecast_fillBefore(
+    units.formatMinutesOfDay(deadline),
+  );
+  return (lines: ['${lines.first} $fill', ...lines.skip(1)], short: true);
 }

@@ -3,6 +3,7 @@ import 'package:submersion/core/query/domain/query_subject.dart';
 import 'package:submersion/core/query/registry/query_entity.dart';
 import 'package:submersion/core/query/registry/query_field.dart';
 import 'package:submersion/core/query/registry/query_relation.dart';
+import 'package:submersion/features/dive_log/query/dive_aggregate_fields.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
 /// Every field and relation a site query can name (#2365). The site list's
@@ -60,13 +61,13 @@ final siteQueryEntity = QueryEntity(
   ],
   fields: [
     _text('name', 'name'),
-    // Trimmed: the location chips offer the trimmed spelling, and a stored
-    // value with stray whitespace must still match it (and one that is only
-    // whitespace is empty).
+    // Trimmed: the location chips and Explore's place names offer the
+    // trimmed spelling, and a stored value with stray whitespace must still
+    // match it (and one that is only whitespace is empty).
     _text('country', 'country', trimmed: 'TRIM({r}.country, $_dartWhitespace)'),
     _text('region', 'region', trimmed: 'TRIM({r}.region, $_dartWhitespace)'),
-    _text('city', 'city'),
-    _text('island', 'island'),
+    _text('city', 'city', trimmed: 'TRIM({r}.city, $_dartWhitespace)'),
+    _text('island', 'island', trimmed: 'TRIM({r}.island, $_dartWhitespace)'),
     _text('notes', 'notes'),
     const QueryField(
       key: 'rating',
@@ -105,6 +106,8 @@ final siteQueryEntity = QueryEntity(
       emptySql: '({r}.latitude IS NULL OR {r}.longitude IS NULL)',
       labelKey: 'query_sites_coordinates',
     ),
+    diveCountField('sites', 'ad.site_id = {r}.id'),
+    diveDateField('sites', 'lastDived', 'ad.site_id = {r}.id'),
   ],
   relations: [
     const QueryRelation(

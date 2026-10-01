@@ -1,16 +1,18 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/query/domain/query_node.dart';
+import 'package:submersion/core/query/units/unit_prefs.dart';
+import 'package:submersion/features/explore/presentation/providers/explore_name_index_provider.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
-import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/explore/domain/chart_selection.dart';
-import 'package:submersion/features/explore/domain/name_index.dart';
-import 'package:submersion/features/explore/domain/query_compiler.dart';
+import 'package:submersion/core/query/names/name_index.dart';
+import 'package:submersion/features/explore/domain/explore_compiler.dart';
 import 'package:submersion/features/explore/domain/query_model.dart';
 import 'package:submersion/features/explore/presentation/providers/explore_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -68,7 +70,7 @@ void main() {
       overrides: [
         ...overrides,
         localeProvider.overrideWithValue('en'),
-        nameIndexProvider.overrideWith((ref) async => NameIndex.empty),
+        exploreNameIndexProvider.overrideWith((ref) async => NameIndex.empty),
       ].cast(),
     );
     addTearDown(c.dispose);
@@ -86,12 +88,51 @@ void main() {
     await insertDive('deep', depth: 30);
     await insertDive('shallow', depth: 5);
     final c = await container();
-    c.read(exploreFilterProvider.notifier).state = const DiveFilterState(
-      minDepth: 20,
+    c.read(exploreQueryNodeProvider.notifier).state = ConditionNode(
+      FieldPath(['depth']),
+      QueryOp.gte,
+      const NumberValue(20, null),
     );
     final results = await c.read(exploreResultsProvider.future);
     expect(results.map((s) => s.id), ['deep']);
     expect(await c.read(exploreCountProvider.future), 1);
+  });
+
+  test('the SAC chart plots each matched dive SAC', () async {
+    // 200 to 140 bar over 50 min at 15 m average: 0.48 bar/min.
+    await db
+        .into(db.dives)
+        .insert(
+          DivesCompanion(
+            id: const Value('sac'),
+            diveDateTime: Value(now),
+            createdAt: Value(now),
+            updatedAt: Value(now),
+            maxDepth: const Value(25),
+            runtime: const Value(3000),
+            avgDepth: const Value(15),
+          ),
+        );
+    await db
+        .into(db.diveTanks)
+        .insert(
+          DiveTanksCompanion.insert(
+            id: 't1',
+            diveId: 'sac',
+            startPressure: const Value(200),
+            endPressure: const Value(140),
+          ),
+        );
+    final c = await container();
+    c.read(exploreQueryNodeProvider.notifier).state = ConditionNode(
+      FieldPath(['depth']),
+      QueryOp.gte,
+      const NumberValue(20, null),
+    );
+    final data = await c.read(
+      exploreChartDataProvider(const ChartRequest(ChartKind.sacTrend)).future,
+    );
+    expect(data.points.single.value, closeTo(0.48, 0.001));
   });
 
   test('every chart kind runs its query under the filter', () async {
@@ -101,8 +142,10 @@ void main() {
     await insertDive('b', depth: 25, siteId: 's2');
     await insertDive('shallow', depth: 4, siteId: 's1');
     final c = await container();
-    c.read(exploreFilterProvider.notifier).state = const DiveFilterState(
-      minDepth: 20,
+    c.read(exploreQueryNodeProvider.notifier).state = ConditionNode(
+      FieldPath(['depth']),
+      QueryOp.gte,
+      const NumberValue(20, null),
     );
 
     for (final kind in [
@@ -133,8 +176,10 @@ void main() {
   test('every entity-count kind resolves to a ranking query', () async {
     await insertDive('a', depth: 30);
     final c = await container();
-    c.read(exploreFilterProvider.notifier).state = const DiveFilterState(
-      minDepth: 20,
+    c.read(exploreQueryNodeProvider.notifier).state = ConditionNode(
+      FieldPath(['depth']),
+      QueryOp.gte,
+      const NumberValue(20, null),
     );
     for (final kind in [
       MentionKind.species,
@@ -213,7 +258,7 @@ void main() {
               ),
             );
       }
-      final compiled = QueryCompiler.compile(
+      final compiled = ExploreCompiler.compile(
         ParsedQuery.fromJson({
           'schemaVersion': kQuerySchemaVersion,
           'subject': 'dives',
@@ -228,11 +273,13 @@ void main() {
             },
           ],
         }),
-        CompilerContext(
-          units: (
+        ExploreCompilerContext(
+          units: const UnitPrefs(
             depth: DepthUnit.meters,
             temperature: TemperatureUnit.celsius,
             pressure: PressureUnit.bar,
+            weight: WeightUnit.kilograms,
+            volume: VolumeUnit.liters,
           ),
           names: NameIndex.empty,
           now: DateTime(2026, 9, 28),
@@ -240,7 +287,7 @@ void main() {
       );
       expect(compiled.unplaced, isEmpty);
       final c = await container();
-      c.read(exploreFilterProvider.notifier).state = compiled.filter;
+      c.read(exploreQueryNodeProvider.notifier).state = compiled.query;
       final results = await c.read(exploreResultsProvider.future);
       expect(results.map((s) => s.id), ['match']);
     },
@@ -264,7 +311,7 @@ void main() {
             ),
           );
     }
-    final compiled = QueryCompiler.compile(
+    final compiled = ExploreCompiler.compile(
       ParsedQuery.fromJson({
         'schemaVersion': kQuerySchemaVersion,
         'subject': 'dives',
@@ -277,18 +324,20 @@ void main() {
           },
         ],
       }),
-      CompilerContext(
-        units: (
+      ExploreCompilerContext(
+        units: const UnitPrefs(
           depth: DepthUnit.meters,
           temperature: TemperatureUnit.celsius,
           pressure: PressureUnit.bar,
+          weight: WeightUnit.kilograms,
+          volume: VolumeUnit.liters,
         ),
         names: NameIndex.empty,
         now: DateTime(2026, 9, 28),
       ),
     );
     final c = await container();
-    c.read(exploreFilterProvider.notifier).state = compiled.filter;
+    c.read(exploreQueryNodeProvider.notifier).state = compiled.query;
     final results = await c.read(exploreResultsProvider.future);
     expect(results.map((s) => s.id).toSet(), {'light', 'blank'});
   });
@@ -298,7 +347,7 @@ void main() {
     await c.read(recentQueryRecorderProvider)(
       'turtles in bonaire',
       'en',
-      const ParsedQuery(subject: QuerySubject.dives),
+      const ParsedQuery(subject: ParsedSubject.dives),
     );
     final recent = await c.read(recentQueriesProvider.future);
     expect(recent.map((r) => r.sentence), ['turtles in bonaire']);
@@ -311,7 +360,7 @@ void main() {
         .record(
           'tortues',
           'fr',
-          const ParsedQuery(subject: QuerySubject.dives),
+          const ParsedQuery(subject: ParsedSubject.dives),
           diverId: '',
         );
     expect(await c.read(recentQueriesProvider.future), isEmpty);
@@ -332,13 +381,13 @@ void main() {
         .record(
           'wrecks with Bob',
           'en',
-          const ParsedQuery(subject: QuerySubject.dives),
+          const ParsedQuery(subject: ParsedSubject.dives),
           diverId: 'bob',
         );
     await c.read(recentQueryRecorderProvider)(
       'turtles with Ana',
       'en',
-      const ParsedQuery(subject: QuerySubject.dives),
+      const ParsedQuery(subject: ParsedSubject.dives),
     );
     final recent = await c.read(recentQueriesProvider.future);
     expect(recent.map((r) => r.sentence), ['turtles with Ana']);

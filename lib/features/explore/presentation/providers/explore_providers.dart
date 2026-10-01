@@ -1,82 +1,53 @@
 import 'dart:convert';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/query/domain/query_node.dart';
 import 'package:submersion/core/services/logger_service.dart';
-import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
-import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
-import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_log/query/dive_filter_query.dart';
-import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
-import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
-import 'package:submersion/features/explore/data/explore_repository.dart';
-import 'package:submersion/features/explore/data/name_index_builder.dart';
 import 'package:submersion/features/explore/data/recent_query_repository.dart';
 import 'package:submersion/features/explore/domain/chart_selection.dart';
-import 'package:submersion/features/explore/domain/compiled_query.dart';
-import 'package:submersion/features/explore/domain/name_index.dart';
+import 'package:submersion/features/explore/domain/explore_compilation.dart';
+import 'package:submersion/core/query/names/name_index.dart';
 import 'package:submersion/features/explore/domain/nl_engine.dart';
-import 'package:submersion/features/explore/domain/query_compiler.dart';
+import 'package:submersion/features/explore/domain/entity_resolver.dart';
+import 'package:submersion/features/explore/domain/explore_compiler.dart';
 import 'package:submersion/features/explore/domain/query_model.dart';
-import 'package:submersion/features/explore/domain/unit_grounding.dart';
 import 'package:submersion/features/explore/presentation/providers/explore_gate_providers.dart';
-import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
+import 'package:submersion/features/explore/presentation/providers/explore_name_index_provider.dart';
+import 'package:submersion/features/explore/presentation/providers/explore_repository_provider.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/insights/domain/trend_aggregation.dart';
 import 'package:submersion/features/insights/presentation/providers/insights_providers.dart';
-import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
-import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
-import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/query/presentation/providers/query_unit_prefs_provider.dart';
 
-/// Explore's own filter scope, so editing chips never rescopes the dive list
-/// or Statistics until the diver asks for a handoff.
-final exploreFilterProvider = StateProvider<DiveFilterState>(
-  (ref) => const DiveFilterState(),
+/// Explore's own scope, so editing chips never rescopes the dive list or
+/// Statistics until the diver asks for a handoff (#2365 PR 5).
+final exploreQueryNodeProvider = StateProvider<QueryNode?>((ref) => null);
+
+/// What the published sentence asks for; dives until a sentence says
+/// otherwise (phase 3).
+final exploreSubjectProvider = StateProvider<ParsedSubject>(
+  (ref) => ParsedSubject.dives,
 );
 
-final unitPrefsProvider = Provider<UnitPrefs>((ref) {
-  final s = ref.watch(settingsProvider);
-  return (
-    depth: s.depthUnit,
-    temperature: s.temperatureUnit,
-    pressure: s.pressureUnit,
-  );
-});
+/// For a non-dive subject, the dive-level part of the published sentence,
+/// which its ranking counts.
+final exploreDiveScopeProvider = StateProvider<QueryNode?>((ref) => null);
 
-final exploreRepositoryProvider = Provider<ExploreRepository>(
-  (ref) => ExploreRepository(),
+/// The scope as the dive repositories take it: the query alone, and only
+/// while the subject is dives; another subject's query roots elsewhere.
+final exploreFilterProvider = Provider<DiveFilterState>(
+  (ref) => DiveFilterState(
+    query: ref.watch(exploreSubjectProvider) == ParsedSubject.dives
+        ? ref.watch(exploreQueryNodeProvider)
+        : null,
+  ),
 );
-
-/// Labels for the resolver, rebuilt when any source table changes.
-final nameIndexProvider = FutureProvider<NameIndex>((ref) async {
-  final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
-  final builder = NameIndexBuilder(
-    sites: ref.watch(siteRepositoryProvider),
-    species: ref.watch(speciesRepositoryProvider),
-    equipment: ref.watch(equipmentRepositoryProvider),
-    buddies: ref.watch(buddyRepositoryProvider),
-    dives: ref.watch(diveRepositoryProvider),
-    tags: ref.watch(tagRepositoryProvider),
-    centers: ref.watch(diveCenterRepositoryProvider),
-    trips: ref.watch(tripRepositoryProvider),
-    computers: ref.watch(diveComputerRepositoryProvider),
-  );
-  ref.invalidateSelfWhen(builder.sites.watchSitesChanges());
-  ref.invalidateSelfWhen(builder.species.watchSpeciesChanges());
-  ref.invalidateSelfWhen(builder.equipment.watchEquipmentChanges());
-  ref.invalidateSelfWhen(builder.buddies.watchBuddiesChanges());
-  ref.invalidateSelfWhen(builder.dives.watchDivesChanges());
-  ref.invalidateSelfWhen(builder.tags.watchTagsChanges());
-  ref.invalidateSelfWhen(builder.centers.watchDiveCentersChanges());
-  ref.invalidateSelfWhen(builder.trips.watchTripsChanges());
-  ref.invalidateSelfWhen(builder.computers.watchComputersChanges());
-  final locale = ref.watch(localeProvider);
-  return builder.build(diverId: diverId, l10n: l10nForLocaleTag(locale));
-});
 
 final recentQueryRepositoryProvider = Provider<RecentQueryRepository>(
   (ref) => RecentQueryRepository(),
@@ -109,7 +80,7 @@ final recentQueriesProvider = FutureProvider<List<RecentQuery>>((ref) async {
 class ExploreState {
   final String sentence;
   final ParsedQuery? parsed;
-  final CompiledQuery? compiled;
+  final ExploreCompilation? compiled;
   final bool running;
   final NlError? error;
 
@@ -124,7 +95,7 @@ class ExploreState {
   ExploreState copyWith({
     String? sentence,
     ParsedQuery? parsed,
-    CompiledQuery? compiled,
+    ExploreCompilation? compiled,
     bool? running,
     NlError? error,
     bool clearError = false,
@@ -197,7 +168,9 @@ class ExploreQueryNotifier extends StateNotifier<ExploreState> {
       clearError: true,
       clearResults: true,
     );
-    _ref.read(exploreFilterProvider.notifier).state = const DiveFilterState();
+    _ref.read(exploreQueryNodeProvider.notifier).state = null;
+    _ref.read(exploreSubjectProvider.notifier).state = ParsedSubject.dives;
+    _ref.read(exploreDiveScopeProvider.notifier).state = null;
     return request;
   }
 
@@ -243,7 +216,7 @@ class ExploreQueryNotifier extends StateNotifier<ExploreState> {
     if (parsed == null || mentionIndex >= parsed.mentions.length) return;
     final mentions = [...parsed.mentions];
     mentions[mentionIndex] = QueryMention(
-      kind: entry.kind,
+      kind: mentionKindOf(entry.target),
       text: entry.label,
       identity: entry.identity,
     );
@@ -262,33 +235,39 @@ class ExploreQueryNotifier extends StateNotifier<ExploreState> {
     // Also retires any request still in flight.
     _request++;
     state = const ExploreState();
-    _ref.read(exploreFilterProvider.notifier).state = const DiveFilterState();
+    _ref.read(exploreQueryNodeProvider.notifier).state = null;
+    _ref.read(exploreSubjectProvider.notifier).state = ParsedSubject.dives;
+    _ref.read(exploreDiveScopeProvider.notifier).state = null;
   }
 
   /// False when a newer request superseded [request] while the name index
   /// loaded, in which case nothing is published.
   Future<bool> _compileAndPublish(ParsedQuery parsed, int request) async {
-    final names = await _ref.read(nameIndexProvider.future);
+    final names = await _ref.read(exploreNameIndexProvider.future);
     if (request != _request) return false;
     _publish(parsed, names);
     return true;
   }
 
   void _compileSync(ParsedQuery parsed) {
-    final names = _ref.read(nameIndexProvider).value ?? NameIndex.empty;
+    final names = _ref.read(exploreNameIndexProvider).value ?? NameIndex.empty;
     _publish(parsed, names);
   }
 
   void _publish(ParsedQuery parsed, NameIndex names) {
-    final compiled = QueryCompiler.compile(
+    final compiled = ExploreCompiler.compile(
       parsed,
-      CompilerContext(
-        units: _ref.read(unitPrefsProvider),
+      ExploreCompilerContext(
+        units: _ref.read(queryUnitPrefsProvider),
         names: names,
         now: DateTime.now(),
       ),
     );
-    _ref.read(exploreFilterProvider.notifier).state = compiled.filter;
+    // Subject and scope first, so no listener sees a new query under the
+    // old subject.
+    _ref.read(exploreSubjectProvider.notifier).state = compiled.subject;
+    _ref.read(exploreDiveScopeProvider.notifier).state = compiled.diveScope;
+    _ref.read(exploreQueryNodeProvider.notifier).state = compiled.query;
     state = state.copyWith(
       parsed: parsed,
       compiled: compiled,
@@ -396,6 +375,16 @@ final exploreChartDataProvider =
                 filter: filter,
               ),
             );
+          case ChartKind.sacTrend:
+            return ExploreChartData(
+              points: await stats.getSacPressurePerDive(
+                diverId: diverId,
+                filter: filter,
+              ),
+            );
+          // Drawn from the ranked rows (explore_charts.dart), never here.
+          case ChartKind.subjectCounts:
+            return const ExploreChartData();
           case ChartKind.entityCounts:
             final rows = switch (request.entityKind) {
               MentionKind.species => (await stats.getMostCommonSightings(

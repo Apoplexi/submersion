@@ -22,7 +22,7 @@ void main() {
     LocalCacheDatabaseService.instance.resetForTesting();
   });
 
-  const parsed = ParsedQuery(subject: QuerySubject.dives);
+  const parsed = ParsedQuery(subject: ParsedSubject.dives);
 
   test('records and lists newest first', () async {
     await repo.record('a', 'en', parsed, diverId: 'ana');
@@ -30,7 +30,7 @@ void main() {
     await repo.record('b', 'en', parsed, diverId: 'ana');
     final list = await repo.list(diverId: 'ana', locale: 'en');
     expect(list.map((r) => r.sentence), ['b', 'a']);
-    expect(list.first.parsed.subject, QuerySubject.dives);
+    expect(list.first.parsed.subject, ParsedSubject.dives);
   });
 
   test(
@@ -133,4 +133,13 @@ void main() {
       expect(await scoped.list(diverId: 'bob', locale: 'en'), hasLength(1));
     });
   }
+
+  test('a sentence saved before schema v2 is kept', () async {
+    await repo.record('turtles', 'en', parsed, diverId: 'ana');
+    await db.customStatement('UPDATE recent_queries SET schema_version = 1');
+    expect(
+      (await repo.list(diverId: 'ana', locale: 'en')).map((r) => r.sentence),
+      ['turtles'],
+    );
+  });
 }

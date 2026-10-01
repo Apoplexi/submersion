@@ -7,9 +7,15 @@ library;
 
 import 'dart:convert';
 
-const int kQuerySchemaVersion = 1;
+const int kQuerySchemaVersion = 3;
 
-enum QuerySubject { dives, equipment, sites, buddies, species, trips, centers }
+/// The oldest schema version a stored or model-written parse may carry.
+/// Versions 2 and 3 only added fields and units (3: each subject's own
+/// fields, phase 3), so every older payload is a valid current one and a
+/// diver's recent sentences survive the bumps.
+const int kMinReadableQuerySchemaVersion = 1;
+
+enum ParsedSubject { dives, equipment, sites, buddies, species, trips, centers }
 
 enum ClauseOp {
   lt('lt'),
@@ -34,7 +40,9 @@ enum ClauseUnit {
   psi('psi'),
   min('min'),
   lMin('l_min'),
-  cuftMin('cuft_min');
+  cuftMin('cuft_min'),
+  barMin('bar_min'),
+  psiMin('psi_min');
 
   final String jsonName;
   const ClauseUnit(this.jsonName);
@@ -113,7 +121,7 @@ class QueryTime {
 
 class ParsedQuery {
   final int schemaVersion;
-  final QuerySubject subject;
+  final ParsedSubject subject;
   final List<QueryClause> clauses;
   final List<QueryMention> mentions;
   final QueryTime? time;
@@ -141,13 +149,15 @@ class ParsedQuery {
 
   factory ParsedQuery.fromJson(Map<String, Object?> json) {
     final version = json['schemaVersion'];
-    if (version != kQuerySchemaVersion) {
+    if (version is! int ||
+        version < kMinReadableQuerySchemaVersion ||
+        version > kQuerySchemaVersion) {
       throw QuerySchemaException(
         'schemaVersion $version, expected $kQuerySchemaVersion',
       );
     }
     final subject = _enumByName(
-      QuerySubject.values,
+      ParsedSubject.values,
       json['subject'],
       'subject',
     );

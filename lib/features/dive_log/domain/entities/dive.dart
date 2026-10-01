@@ -1096,6 +1096,13 @@ class DiveTank extends Equatable {
   final double? endPressure; // bar
   final GasMix gasMix;
   final TankRole role; // back gas, stage, deco, bailout, etc.
+
+  /// Where [role] came from when no person chose it (issue #2595): a role
+  /// the computer read off the transmitter's name is unconfirmed, and the
+  /// transmitter registry may replace it. Null once the diver or the
+  /// registry set the role. Downloads, re-parses and the registry write it;
+  /// [DiveRepository.updateDive] clears it when the role changes.
+  final TankRoleSource? roleSource;
   final TankMaterial? material; // aluminum, steel, carbon fiber
   final int order; // for multi-tank ordering
   final String? presetName; // name of preset used (e.g., 'al80', 'hp100')
@@ -1113,6 +1120,13 @@ class DiveTank extends Equatable {
   /// the same dive whose tanks carry the same serial were read from the same
   /// transmitter, whatever gas mix each computer had programmed.
   final String? transmitterSerial;
+
+  /// The data source this tank row came from (v251, issue #2716), so two
+  /// consolidated sources that name no computer keep their copies of one
+  /// cylinder apart. Null means the dive's primary source. Read-only
+  /// projection, like [computerId]: the import, download and source-moving
+  /// paths write it, and edit flows never do.
+  final String? sourceId;
 
   /// Parsed tank index this row's computer-owned data comes from (v200). Null
   /// on rows from before v200 means "same as order"; -1 (kNoSourceTankIndex
@@ -1161,11 +1175,13 @@ class DiveTank extends Equatable {
     this.endPressure,
     this.gasMix = const GasMix(),
     this.role = TankRole.backGas,
+    this.roleSource,
     this.material,
     this.order = 0,
     this.presetName,
     this.computerId,
     this.transmitterSerial,
+    this.sourceId,
     this.sourceTankIndex,
     this.regulatorEquipmentId,
     this.tripCylinderId,
@@ -1191,6 +1207,8 @@ class DiveTank extends Equatable {
     double? endPressure,
     GasMix? gasMix,
     TankRole? role,
+    TankRoleSource? roleSource,
+    bool clearRoleSource = false,
     TankMaterial? material,
     int? order,
     String? presetName,
@@ -1198,11 +1216,13 @@ class DiveTank extends Equatable {
     String? computerId,
     String? transmitterSerial,
     bool clearTransmitterSerial = false,
+    String? sourceId,
     int? sourceTankIndex,
     bool clearSourceTankIndex = false,
     String? regulatorEquipmentId,
     String? equipmentId,
     bool clearRegulatorEquipmentId = false,
+    bool clearMaterial = false,
     String? tripCylinderId,
     bool clearTripCylinderId = false,
     double? decoSwitchDepth,
@@ -1218,13 +1238,15 @@ class DiveTank extends Equatable {
       endPressure: endPressure ?? this.endPressure,
       gasMix: gasMix ?? this.gasMix,
       role: role ?? this.role,
-      material: material ?? this.material,
+      roleSource: clearRoleSource ? null : (roleSource ?? this.roleSource),
+      material: clearMaterial ? null : (material ?? this.material),
       order: order ?? this.order,
       presetName: clearPresetName ? null : (presetName ?? this.presetName),
       computerId: computerId ?? this.computerId,
       transmitterSerial: clearTransmitterSerial
           ? null
           : (transmitterSerial ?? this.transmitterSerial),
+      sourceId: sourceId ?? this.sourceId,
       sourceTankIndex: clearSourceTankIndex
           ? null
           : (sourceTankIndex ?? this.sourceTankIndex),
@@ -1252,11 +1274,13 @@ class DiveTank extends Equatable {
     endPressure,
     gasMix,
     role,
+    roleSource,
     material,
     order,
     presetName,
     computerId,
     transmitterSerial,
+    sourceId,
     sourceTankIndex,
     regulatorEquipmentId,
     equipmentId,
