@@ -344,14 +344,7 @@
   "trips_story_checklistProgress": "{done} מתוך {total} הושלמו",
   "trips_story_generateItinerary": "צור מסלול",
   "trips_story_openGallery": "פתיחת תמונות הטיול",
-  "trips_story_generateItineraryError": "לא ניתן ליצור מסלול: {error}",
-  "@trips_story_generateItineraryError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "trips_story_generateItineraryError": "לא ניתן ליצור מסלול. נסו שוב.",
   "trips_dayType_diveDay": "יום צלילה",
   "trips_dayType_seaDay": "יום ים",
   "trips_dayType_portDay": "יום נמל",
@@ -7248,6 +7241,7 @@
   "trips_detail_dialog_deleteTitle": "למחוק טיול?",
   "trips_detail_dives_empty": "אין עדיין צלילות בטיול זה",
   "trips_detail_dives_errorLoading": "לא ניתן לטעון צלילות",
+  "trips_detail_error_loading": "לא ניתן לטעון את הטיול.",
   "trips_detail_dives_unknownSite": "אתר לא ידוע",
   "trips_detail_dives_viewAll": "הצג הכל ({count})",
   "trips_detail_durationDays": "{days} ימים",
@@ -7268,8 +7262,8 @@
   "trips_detail_label_vesselType": "Type",
   "trips_detail_scan_accessDenied": "הגישה לספריית התמונות נדחתה",
   "trips_detail_scan_addDivesFirst": "הוסף צלילות תחילה כדי לקשר תמונות",
-  "trips_detail_scan_errorLinking": "שגיאה בקישור תמונות: {error}",
-  "trips_detail_scan_errorScanning": "שגיאה בסריקה: {error}",
+  "trips_detail_scan_errorLinking": "לא ניתן לקשר את התמונות. נסו שוב.",
+  "trips_detail_scan_errorScanning": "לא ניתן לסרוק תמונות. נסו שוב.",
   "trips_detail_scan_linkedPhotos": "קושרו {count} תמונות",
   "trips_detail_scan_linkingPhotos": "מקשר תמונות...",
   "trips_detail_sectionTitle_dailyBreakdown": "Daily Breakdown",
@@ -7486,14 +7480,7 @@
   "trips_cylinders_forecast_useEstimate": "להשתמש בהערכה",
   "trips_cylinders_forecast_fewer": "פחות צלילות",
   "trips_cylinders_forecast_more": "יותר צלילות",
-  "trips_cylinders_forecast_saveError": "לא ניתן לשמור את התוכנית: {error}",
-  "@trips_cylinders_forecast_saveError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "trips_cylinders_forecast_saveError": "לא ניתן לשמור את התוכנית. נסו שוב.",
   "trips_cylinders_forecast_dayPlanned": "תוכנן על ידך",
   "trips_cylinders_segment_record": "רישום",
   "trips_cylinders_recordEmpty": "עדיין אין צלילות מהמכלים האלה.",
@@ -7555,6 +7542,7 @@
     }
   },
   "trips_cylinders_record_exported": "רישום הגז יוצא",
+  "trips_cylinders_record_exportFailed": "לא ניתן לייצא את רישום הגז. נסו שוב.",
   "trips_cylinders_title": "מכלים",
   "trips_cylinders_summary": "מלאים {full} · חלקיים {partial} · ריקים {empty}",
   "@trips_cylinders_summary": {
@@ -7755,8 +7743,8 @@
   "trips_edit_sectionTitle_vessel": "Vessel Details",
   "trips_edit_semanticLabel_save": "שמור טיול",
   "trips_edit_snackBar_added": "הטיול נוסף בהצלחה",
-  "trips_edit_snackBar_errorLoading": "שגיאה בטעינת הטיול: {error}",
-  "trips_edit_snackBar_errorSaving": "שגיאה בשמירת הטיול: {error}",
+  "trips_edit_snackBar_errorLoading": "לא ניתן לטעון את הטיול. נסו שוב.",
+  "trips_edit_snackBar_errorSaving": "לא ניתן לשמור את הטיול. נסו שוב.",
   "trips_edit_snackBar_updated": "הטיול עודכן בהצלחה",
   "trips_edit_validation_nameRequired": "נא להזין שם טיול",
   "trips_edit_validation_vesselRequired": "Vessel name is required for liveaboard trips",
@@ -7767,9 +7755,9 @@
   "trips_gallery_diveSection_title": "צלילה #{number} - {site}",
   "trips_gallery_empty_subtitle": "הקש על סמל המצלמה כדי לסרוק את הגלריה שלך",
   "trips_gallery_empty_title": "אין תמונות בטיול זה",
-  "trips_gallery_errorLinking": "שגיאה בקישור תמונות: {error}",
-  "trips_gallery_errorScanning": "שגיאה בסריקה: {error}",
-  "trips_gallery_error_loading": "שגיאה בטעינת תמונות: {error}",
+  "trips_gallery_errorLinking": "לא ניתן לקשר את התמונות. נסו שוב.",
+  "trips_gallery_errorScanning": "לא ניתן לסרוק תמונות. נסו שוב.",
+  "trips_gallery_error_loading": "לא ניתן לטעון את התמונות.",
   "trips_gallery_linkedPhotos": "קושרו {count} תמונות",
   "trips_gallery_linkingPhotos": "מקשר תמונות...",
   "trips_gallery_tooltip_scan": "סרוק גלריית מכשיר",
@@ -7779,6 +7767,8 @@
   "trips_itinerary_diveCount": "{count, plural, =1{1 dive} other{{count} dives}}",
   "trips_itinerary_editDay": "Edit Day",
   "trips_itinerary_noDives": "No dives",
+  "trips_itinerary_error_loading": "לא ניתן לטעון את המסלול.",
+  "trips_itinerary_daySaveError": "לא ניתן לשמור את היום. נסו שוב.",
   "trips_itinerary_notes_label": "Notes",
   "trips_itinerary_portName_label": "Port / Anchorage",
   "trips_list_button_retry": "נסה שוב",
@@ -7788,7 +7778,7 @@
   "trips_list_empty_filtered_title": "אין טיולים התואמים למסננים שלך",
   "trips_list_empty_subtitle": "צור טיולים כדי לקבץ את הצלילות שלך לפי יעד",
   "trips_list_empty_title": "עדיין לא נוספו טיולים",
-  "trips_list_error_loading": "שגיאה בטעינת טיולים: {error}",
+  "trips_list_error_loading": "לא ניתן לטעון את הטיולים.",
   "trips_list_fab_addTrip": "הוסף טיול",
   "trips_list_filters_clearAll": "נקה הכל",
   "trips_list_inProgress": "בעיצומו",
@@ -7810,7 +7800,7 @@
   "trips_picker_clearTooltip": "נקה בחירה",
   "trips_picker_empty_createButton": "צור טיול",
   "trips_picker_empty_title": "עדיין אין טיולים",
-  "trips_picker_error": "שגיאה בטעינת טיולים: {error}",
+  "trips_picker_error": "לא ניתן לטעון את הטיולים.",
   "trips_picker_hint": "הקש כדי לבחור טיול",
   "trips_picker_newTrip": "טיול חדש",
   "trips_picker_noSelection": "לא נבחר טיול",
@@ -7820,6 +7810,7 @@
   "trips_search_empty_hint": "חיפוש לפי שם, מיקום או אתר נופש",
   "trips_search_fieldLabel": "חיפוש טיולים...",
   "trips_search_noResults": "לא נמצאו טיולים עבור \"{query}\"",
+  "trips_search_error": "לא ניתן לחפש בטיולים.",
   "trips_search_tooltip_back": "חזרה",
   "trips_search_tooltip_clear": "נקה חיפוש",
   "trips_summary_header_subtitle": "בחר טיול מהרשימה כדי לצפות בפרטים",
@@ -8114,14 +8105,7 @@
     }
   },
   "trips_diveScan_deselectAll": "בטל בחירת הכל",
-  "trips_diveScan_error": "שגיאה בחיפוש צלילות: {error}",
-  "@trips_diveScan_error": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "trips_diveScan_error": "לא ניתן לחפש צלילות. נסו שוב.",
   "trips_diveScan_findButton": "מצא צלילות תואמות",
   "trips_diveScan_groupOtherTrips": "בטיולים אחרים ({count})",
   "@trips_diveScan_groupOtherTrips": {

@@ -1382,9 +1382,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_story_openGallery => 'Reisfoto\'s openen';
 
   @override
-  String trips_story_generateItineraryError(String error) {
-    return 'Kan reisschema niet genereren: $error';
-  }
+  String get trips_story_generateItineraryError =>
+      'Kan het reisschema niet genereren. Probeer het opnieuw.';
 
   @override
   String get trips_dayType_diveDay => 'Duikdag';
@@ -25312,6 +25311,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_detail_dives_errorLoading => 'Kan duiken niet laden';
 
   @override
+  String get trips_detail_error_loading => 'Kan de reis niet laden.';
+
+  @override
   String get trips_detail_dives_unknownSite => 'Onbekende duikstek';
 
   @override
@@ -25363,14 +25365,12 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voeg eerst duiken toe om foto\'s te koppelen';
 
   @override
-  String trips_detail_scan_errorLinking(Object error) {
-    return 'Fout bij koppelen van foto\'s: $error';
-  }
+  String get trips_detail_scan_errorLinking =>
+      'Kan de foto\'s niet koppelen. Probeer het opnieuw.';
 
   @override
-  String trips_detail_scan_errorScanning(Object error) {
-    return 'Fout bij scannen: $error';
-  }
+  String get trips_detail_scan_errorScanning =>
+      'Kan niet naar foto\'s zoeken. Probeer het opnieuw.';
 
   @override
   String trips_detail_scan_linkedPhotos(Object count) {
@@ -25444,9 +25444,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_diveScan_deselectAll => 'Alles deselecteren';
 
   @override
-  String trips_diveScan_error(String error) {
-    return 'Fout bij het zoeken naar duiken: $error';
-  }
+  String get trips_diveScan_error =>
+      'Kan niet naar duiken zoeken. Probeer het opnieuw.';
 
   @override
   String get trips_diveScan_findButton => 'Zoek overeenkomende duiken';
@@ -25579,14 +25578,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_edit_snackBar_added => 'Reis succesvol toegevoegd';
 
   @override
-  String trips_edit_snackBar_errorLoading(Object error) {
-    return 'Fout bij laden van reis: $error';
-  }
+  String get trips_edit_snackBar_errorLoading =>
+      'Kan de reis niet laden. Probeer het opnieuw.';
 
   @override
-  String trips_edit_snackBar_errorSaving(Object error) {
-    return 'Fout bij opslaan van reis: $error';
-  }
+  String get trips_edit_snackBar_errorSaving =>
+      'Kan de reis niet opslaan. Probeer het opnieuw.';
 
   @override
   String get trips_edit_snackBar_updated => 'Reis succesvol bijgewerkt';
@@ -25629,19 +25626,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_gallery_empty_title => 'Geen foto\'s in deze reis';
 
   @override
-  String trips_gallery_errorLinking(Object error) {
-    return 'Fout bij koppelen van foto\'s: $error';
-  }
+  String get trips_gallery_errorLinking =>
+      'Kan de foto\'s niet koppelen. Probeer het opnieuw.';
 
   @override
-  String trips_gallery_errorScanning(Object error) {
-    return 'Fout bij scannen: $error';
-  }
+  String get trips_gallery_errorScanning =>
+      'Kan niet naar foto\'s zoeken. Probeer het opnieuw.';
 
   @override
-  String trips_gallery_error_loading(Object error) {
-    return 'Fout bij laden van foto\'s: $error';
-  }
+  String get trips_gallery_error_loading => 'Kan de foto\'s niet laden.';
 
   @override
   String trips_gallery_linkedPhotos(Object count) {
@@ -25691,9 +25684,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_list_empty_title => 'Nog geen reizen toegevoegd';
 
   @override
-  String trips_list_error_loading(Object error) {
-    return 'Fout bij laden van reizen: $error';
-  }
+  String get trips_list_error_loading => 'Kan je reizen niet laden.';
 
   @override
   String get trips_list_fab_addTrip => 'Reis toevoegen';
@@ -25765,9 +25756,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_picker_empty_title => 'Nog geen reizen';
 
   @override
-  String trips_picker_error(Object error) {
-    return 'Fout bij laden van reizen: $error';
-  }
+  String get trips_picker_error => 'Kan je reizen niet laden.';
 
   @override
   String get trips_picker_hint => 'Tik om een reis te selecteren';
@@ -25799,6 +25788,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String trips_search_noResults(Object query) {
     return 'Geen reizen gevonden voor \"$query\"';
   }
+
+  @override
+  String get trips_search_error => 'Kan je reizen niet doorzoeken.';
 
   @override
   String get trips_search_tooltip_back => 'Terug';
@@ -26078,9 +26070,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_cylinders_forecast_more => 'Meer duiken';
 
   @override
-  String trips_cylinders_forecast_saveError(String error) {
-    return 'Plan kon niet worden opgeslagen: $error';
-  }
+  String get trips_cylinders_forecast_saveError =>
+      'Kan het plan niet opslaan. Probeer het opnieuw.';
 
   @override
   String get trips_cylinders_forecast_dayPlanned => 'Door jou gepland';
@@ -26156,6 +26147,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get trips_cylinders_record_exported => 'Gasverbruik geëxporteerd';
+
+  @override
+  String get trips_cylinders_record_exportFailed =>
+      'Kan het gasverbruik niet exporteren. Probeer het opnieuw.';
 
   @override
   String get trips_cylinders_title => 'Flessen';
@@ -26524,6 +26519,13 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get trips_itinerary_noDives => 'No dives';
+
+  @override
+  String get trips_itinerary_error_loading => 'Kan het reisschema niet laden.';
+
+  @override
+  String get trips_itinerary_daySaveError =>
+      'Kan de dag niet opslaan. Probeer het opnieuw.';
 
   @override
   String get trips_vesselType_catamaran => 'Catamaran';

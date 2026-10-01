@@ -1394,9 +1394,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trips_story_openGallery => 'Ouvrir les photos du voyage';
 
   @override
-  String trips_story_generateItineraryError(String error) {
-    return 'Impossible de générer l\'itinéraire : $error';
-  }
+  String get trips_story_generateItineraryError =>
+      'Impossible de générer l\'itinéraire. Réessayez.';
 
   @override
   String get trips_dayType_diveDay => 'Jour de plongée';
@@ -25597,6 +25596,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de charger les plongées';
 
   @override
+  String get trips_detail_error_loading => 'Impossible de charger le voyage.';
+
+  @override
   String get trips_detail_dives_unknownSite => 'Site inconnu';
 
   @override
@@ -25648,14 +25650,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ajoutez d\'abord des plongées pour associer des photos';
 
   @override
-  String trips_detail_scan_errorLinking(Object error) {
-    return 'Erreur lors de l\'association des photos : $error';
-  }
+  String get trips_detail_scan_errorLinking =>
+      'Impossible d\'associer les photos. Réessayez.';
 
   @override
-  String trips_detail_scan_errorScanning(Object error) {
-    return 'Erreur lors du scan : $error';
-  }
+  String get trips_detail_scan_errorScanning =>
+      'Impossible de rechercher les photos. Réessayez.';
 
   @override
   String trips_detail_scan_linkedPhotos(Object count) {
@@ -25729,9 +25729,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trips_diveScan_deselectAll => 'Tout désélectionner';
 
   @override
-  String trips_diveScan_error(String error) {
-    return 'Erreur lors de la recherche de plongées : $error';
-  }
+  String get trips_diveScan_error =>
+      'Impossible de rechercher les plongées. Réessayez.';
 
   @override
   String get trips_diveScan_findButton =>
@@ -25866,14 +25865,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trips_edit_snackBar_added => 'Voyage ajouté avec succès';
 
   @override
-  String trips_edit_snackBar_errorLoading(Object error) {
-    return 'Erreur lors du chargement du voyage : $error';
-  }
+  String get trips_edit_snackBar_errorLoading =>
+      'Impossible de charger le voyage. Réessayez.';
 
   @override
-  String trips_edit_snackBar_errorSaving(Object error) {
-    return 'Erreur lors de l\'enregistrement du voyage : $error';
-  }
+  String get trips_edit_snackBar_errorSaving =>
+      'Impossible d\'enregistrer le voyage. Réessayez.';
 
   @override
   String get trips_edit_snackBar_updated => 'Voyage mis à jour avec succès';
@@ -25916,19 +25913,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trips_gallery_empty_title => 'Aucune photo dans ce voyage';
 
   @override
-  String trips_gallery_errorLinking(Object error) {
-    return 'Erreur lors de l\'association des photos : $error';
-  }
+  String get trips_gallery_errorLinking =>
+      'Impossible d\'associer les photos. Réessayez.';
 
   @override
-  String trips_gallery_errorScanning(Object error) {
-    return 'Erreur lors du scan : $error';
-  }
+  String get trips_gallery_errorScanning =>
+      'Impossible de rechercher les photos. Réessayez.';
 
   @override
-  String trips_gallery_error_loading(Object error) {
-    return 'Erreur lors du chargement des photos : $error';
-  }
+  String get trips_gallery_error_loading => 'Impossible de charger les photos.';
 
   @override
   String trips_gallery_linkedPhotos(Object count) {
@@ -25978,9 +25971,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trips_list_empty_title => 'Aucun voyage ajouté';
 
   @override
-  String trips_list_error_loading(Object error) {
-    return 'Erreur lors du chargement des voyages : $error';
-  }
+  String get trips_list_error_loading => 'Impossible de charger vos voyages.';
 
   @override
   String get trips_list_fab_addTrip => 'Ajouter un voyage';
@@ -26054,9 +26045,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trips_picker_empty_title => 'Aucun voyage';
 
   @override
-  String trips_picker_error(Object error) {
-    return 'Erreur lors du chargement des voyages : $error';
-  }
+  String get trips_picker_error => 'Impossible de charger vos voyages.';
 
   @override
   String get trips_picker_hint => 'Appuie pour sélectionner un voyage';
@@ -26088,6 +26077,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String trips_search_noResults(Object query) {
     return 'Aucun voyage trouvé pour \"$query\"';
   }
+
+  @override
+  String get trips_search_error => 'Impossible de rechercher dans vos voyages.';
 
   @override
   String get trips_search_tooltip_back => 'Retour';
@@ -26366,9 +26358,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trips_cylinders_forecast_more => 'Plus de plongées';
 
   @override
-  String trips_cylinders_forecast_saveError(String error) {
-    return 'Impossible d\'enregistrer le plan : $error';
-  }
+  String get trips_cylinders_forecast_saveError =>
+      'Impossible d\'enregistrer le plan. Réessayez.';
 
   @override
   String get trips_cylinders_forecast_dayPlanned => 'Planifié par vous';
@@ -26444,6 +26435,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trips_cylinders_record_exported => 'Relevé de gaz exporté';
+
+  @override
+  String get trips_cylinders_record_exportFailed =>
+      'Impossible d\'exporter le relevé de gaz. Réessayez.';
 
   @override
   String get trips_cylinders_title => 'Blocs';
@@ -26813,6 +26808,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trips_itinerary_noDives => 'No dives';
+
+  @override
+  String get trips_itinerary_error_loading =>
+      'Impossible de charger l\'itinéraire.';
+
+  @override
+  String get trips_itinerary_daySaveError =>
+      'Impossible d\'enregistrer la journée. Réessayez.';
 
   @override
   String get trips_vesselType_catamaran => 'Catamaran';

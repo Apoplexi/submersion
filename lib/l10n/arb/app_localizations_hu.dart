@@ -1390,9 +1390,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_story_openGallery => 'Utazási fotók megnyitása';
 
   @override
-  String trips_story_generateItineraryError(String error) {
-    return 'Nem sikerült létrehozni az útitervet: $error';
-  }
+  String get trips_story_generateItineraryError =>
+      'Nem sikerült létrehozni az útitervet. Próbáld újra.';
 
   @override
   String get trips_dayType_diveDay => 'Merülőnap';
@@ -25427,6 +25426,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerült a merülések betöltése';
 
   @override
+  String get trips_detail_error_loading => 'Nem sikerült betölteni az utat.';
+
+  @override
   String get trips_detail_dives_unknownSite => 'Ismeretlen merülőhely';
 
   @override
@@ -25476,14 +25478,12 @@ class AppLocalizationsHu extends AppLocalizations {
       'Előbb adjon hozzá merüléseket a fotók csatolásához';
 
   @override
-  String trips_detail_scan_errorLinking(Object error) {
-    return 'Hiba a fotók csatolásakor: $error';
-  }
+  String get trips_detail_scan_errorLinking =>
+      'Nem sikerült csatolni a fotókat. Próbáld újra.';
 
   @override
-  String trips_detail_scan_errorScanning(Object error) {
-    return 'Hiba a keresés során: $error';
-  }
+  String get trips_detail_scan_errorScanning =>
+      'Nem sikerült fotókat keresni. Próbáld újra.';
 
   @override
   String trips_detail_scan_linkedPhotos(Object count) {
@@ -25557,9 +25557,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_diveScan_deselectAll => 'Összes kiválasztás törlése';
 
   @override
-  String trips_diveScan_error(String error) {
-    return 'Hiba a merülések keresésekor: $error';
-  }
+  String get trips_diveScan_error =>
+      'Nem sikerült merüléseket keresni. Próbáld újra.';
 
   @override
   String get trips_diveScan_findButton => 'Egyező merülések keresése';
@@ -25692,14 +25691,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_edit_snackBar_added => 'Út sikeresen hozzáadva';
 
   @override
-  String trips_edit_snackBar_errorLoading(Object error) {
-    return 'Hiba az út betöltésekor: $error';
-  }
+  String get trips_edit_snackBar_errorLoading =>
+      'Nem sikerült betölteni az utat. Próbáld újra.';
 
   @override
-  String trips_edit_snackBar_errorSaving(Object error) {
-    return 'Hiba az út mentésekor: $error';
-  }
+  String get trips_edit_snackBar_errorSaving =>
+      'Nem sikerült menteni az utat. Próbáld újra.';
 
   @override
   String get trips_edit_snackBar_updated => 'Út sikeresen frissítve';
@@ -25743,19 +25740,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_gallery_empty_title => 'Nincsenek fotók ezen az úton';
 
   @override
-  String trips_gallery_errorLinking(Object error) {
-    return 'Hiba a fotók csatolásakor: $error';
-  }
+  String get trips_gallery_errorLinking =>
+      'Nem sikerült csatolni a fotókat. Próbáld újra.';
 
   @override
-  String trips_gallery_errorScanning(Object error) {
-    return 'Hiba a keresés során: $error';
-  }
+  String get trips_gallery_errorScanning =>
+      'Nem sikerült fotókat keresni. Próbáld újra.';
 
   @override
-  String trips_gallery_error_loading(Object error) {
-    return 'Hiba a fotók betöltésekor: $error';
-  }
+  String get trips_gallery_error_loading => 'Nem sikerült betölteni a fotókat.';
 
   @override
   String trips_gallery_linkedPhotos(Object count) {
@@ -25805,9 +25798,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_list_empty_title => 'Még nincsenek utak hozzáadva';
 
   @override
-  String trips_list_error_loading(Object error) {
-    return 'Hiba az utak betöltésekor: $error';
-  }
+  String get trips_list_error_loading => 'Nem sikerült betölteni az utaidat.';
 
   @override
   String get trips_list_fab_addTrip => 'Út hozzáadása';
@@ -25879,9 +25870,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_picker_empty_title => 'Még nincsenek utak';
 
   @override
-  String trips_picker_error(Object error) {
-    return 'Hiba az utak betöltésekor: $error';
-  }
+  String get trips_picker_error => 'Nem sikerült betölteni az utaidat.';
 
   @override
   String get trips_picker_hint => 'Koppintson egy út kiválasztásához';
@@ -25914,6 +25903,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String trips_search_noResults(Object query) {
     return 'Nem található út a következőre: \"$query\"';
   }
+
+  @override
+  String get trips_search_error => 'Nem sikerült keresni az utaid között.';
 
   @override
   String get trips_search_tooltip_back => 'Vissza';
@@ -26191,9 +26183,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_cylinders_forecast_more => 'Több merülés';
 
   @override
-  String trips_cylinders_forecast_saveError(String error) {
-    return 'A terv mentése nem sikerült: $error';
-  }
+  String get trips_cylinders_forecast_saveError =>
+      'Nem sikerült menteni a tervet. Próbáld újra.';
 
   @override
   String get trips_cylinders_forecast_dayPlanned => 'Általad tervezve';
@@ -26269,6 +26260,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get trips_cylinders_record_exported => 'Gázkimutatás exportálva';
+
+  @override
+  String get trips_cylinders_record_exportFailed =>
+      'Nem sikerült exportálni a gázkimutatást. Próbáld újra.';
 
   @override
   String get trips_cylinders_title => 'Palackok';
@@ -26639,6 +26634,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get trips_itinerary_noDives => 'No dives';
+
+  @override
+  String get trips_itinerary_error_loading =>
+      'Nem sikerült betölteni az útitervet.';
+
+  @override
+  String get trips_itinerary_daySaveError =>
+      'Nem sikerült menteni a napot. Próbáld újra.';
 
   @override
   String get trips_vesselType_catamaran => 'Catamaran';
