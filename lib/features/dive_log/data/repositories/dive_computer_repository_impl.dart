@@ -29,6 +29,7 @@ import 'package:submersion/features/dive_log/data/repositories/series_id_chunks.
 import 'package:submersion/features/dive_log/data/repositories/tank_computer_links.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_source_links.dart';
+import 'package:submersion/features/dive_log/domain/entities/computer_tissue_snapshot.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart'
@@ -1375,6 +1376,9 @@ class DiveComputerRepository {
     // same way every other field in that branch is left untouched.
     double? diluentO2,
     double? diluentHe,
+    // Tissue state the computer reported for the dive as a whole; stored
+    // verbatim. Null on an update leaves any stored snapshot in place.
+    ComputerTissueSnapshot? computerTissue,
     List<EventData>? events,
     List<GasSwitchData>? gasSwitches,
     int? diveNumber,
@@ -1512,6 +1516,7 @@ class DiveComputerRepository {
                 gradientFactorHigh: Value(gfHigh),
                 decoAlgorithm: Value(decoAlgorithm),
                 decoConservatism: Value(decoConservatism),
+                computerTissueJson: Value(computerTissue?.encode()),
                 diveMode: Value(diveMode.code),
                 // Only set when the caller resolved a Diluent cylinder,
                 // never a fabricated default -- an OC dive or a CCR dive
@@ -2019,6 +2024,9 @@ class DiveComputerRepository {
             gradientFactorHigh: Value(gfHigh),
             decoAlgorithm: Value(decoAlgorithm),
             decoConservatism: Value(decoConservatism),
+            computerTissueJson: computerTissue == null
+                ? const Value.absent()
+                : Value(computerTissue.encode()),
           ),
         );
         await _syncRepository.markRecordPending(
@@ -2466,6 +2474,8 @@ class DiveComputerRepository {
         o2SensorMv4: p.o2SensorMv4,
         o2SensorMv5: p.o2SensorMv5,
         o2SensorMv6: p.o2SensorMv6,
+        gf99: p.gf99,
+        n2Load: p.n2Load,
       );
 
   /// Calculate bottom time (seconds) from profile points.
@@ -2668,6 +2678,13 @@ class ProfilePointData {
   final int? o2SensorMv5;
   final int? o2SensorMv6;
 
+  /// Computer-reported GF99, whole percent. libdivecomputer never reports
+  /// it; file importers may.
+  final int? gf99;
+
+  /// Computer-reported aggregate N2 tissue loading, whole percent.
+  final int? n2Load;
+
   const ProfilePointData({
     required this.timestamp,
     required this.depth,
@@ -2700,6 +2717,8 @@ class ProfilePointData {
     this.o2SensorMv4,
     this.o2SensorMv5,
     this.o2SensorMv6,
+    this.gf99,
+    this.n2Load,
   });
 }
 
