@@ -190,8 +190,9 @@ class _TripGearAlertsPanelState extends ConsumerState<TripGearAlertsPanel> {
     );
   }
 
-  /// The scrubber margin on each rebreather on the trip. A comfortable margin
-  /// is information, not a warning; one under 20 percent is an alert.
+  /// The scrubber margin on each rebreather on the trip with an enabled
+  /// repack clock. A comfortable margin is information, not a warning; one
+  /// under 20 percent is an alert.
   _Section? _scrubberSection() {
     final margins =
         ref.watch(tripScrubberMarginsProvider(widget.trip.id)).value ??
