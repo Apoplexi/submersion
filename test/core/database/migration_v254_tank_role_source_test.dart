@@ -21,16 +21,17 @@ void main() {
     },
   );
 
-  test('v254 is the current schema version and is in the ladder', () {
-    // The newest rung owns the exact assertion; relax it to
-    // greaterThanOrEqualTo when the next one lands.
-    expect(AppDatabase.currentSchemaVersion, 254);
+  test('v254 is at or below the current schema version and in the ladder', () {
+    // Relaxed once v255 (safety stop ceilings, #2550) landed on top; the
+    // newest rung owns the exact assertions.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(254));
     expect(AppDatabase.migrationVersions, contains(254));
     // 253 (safety review inputs, #2592) sits directly below, and 252
-    // (nav_tracks.diver_id, #2703) below that.
+    // (nav_tracks.diver_id, #2703) below that; 255 (#2550) sits above.
     expect(AppDatabase.migrationVersions, containsAll([251, 252, 253]));
-    expect(AppDatabase.migrationStepCount(253), 1);
-    expect(AppDatabase.migrationStepCount(252), 2);
+    final above254 = AppDatabase.migrationStepCount(254);
+    expect(AppDatabase.migrationStepCount(253), above254 + 1);
+    expect(AppDatabase.migrationStepCount(252), above254 + 2);
     expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
   });
 
