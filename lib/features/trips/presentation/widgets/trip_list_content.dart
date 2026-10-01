@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
+import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/models/sort_state.dart';
@@ -15,6 +16,7 @@ import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
+import 'package:submersion/shared/widgets/shared_items/shared_item_dialogs.dart';
 import 'package:submersion/shared/widgets/sort_bottom_sheet.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
@@ -331,11 +333,50 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     final ids = _selectedIds.toList();
     if (ids.isEmpty) return BulkActionOutcome.cancelled;
 
+    // Another profile's shared trips are hidden, not deleted, and the
+    // owner's shared ones are named as going for everyone (issue #2594).
+    final sharing = await readSharingContext(ref);
+    if (!mounted) return BulkActionOutcome.cancelled;
+    final trips = ref.read(tripListNotifierProvider).value ?? const [];
+    final selected = [
+      for (final t in trips)
+        if (ids.contains(t.trip.id)) t.trip,
+    ];
+    final split = splitForBulkDelete(
+      selected,
+      ownerOf: (t) => t.diverId,
+      isSharedOf: (t) => t.isShared,
+      activeDiverId: sharing.activeDiverId,
+    );
+    final deleteCount = split.destroy.length;
+    final hideCount = split.hide.length;
+    if (deleteCount + hideCount == 0) return BulkActionOutcome.cancelled;
+    final sharedDeleteCount = sharing.diverCount >= 2
+        ? split.destroy.where((t) => t.isShared).length
+        : 0;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(ctx.l10n.common_bulkDelete_title(ids.length)),
-        content: Text(ctx.l10n.common_bulkDelete_body),
+        title: Text(
+          // Counts only what is deleted: the body lines name the shared
+          // trips that are only removed from this profile.
+          deleteCount > 0
+              ? ctx.l10n.common_bulkDelete_title(deleteCount)
+              : ctx.l10n.sharedItems_bulkRemoveTitle(hideCount),
+        ),
+        content: Text(
+          [
+            ...bulkDeleteLines(
+              ctx.l10n,
+              SharedItemKind.trip,
+              deleteCount: deleteCount,
+              hideCount: hideCount,
+              sharedDeleteCount: sharedDeleteCount,
+            ),
+            if (deleteCount > 0) ctx.l10n.common_bulkDelete_body,
+          ].join('\n\n'),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -343,10 +384,16 @@ class _TripListContentState extends ConsumerState<TripListContent> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(ctx).colorScheme.error,
+            style: deleteCount > 0
+                ? FilledButton.styleFrom(
+                    backgroundColor: Theme.of(ctx).colorScheme.error,
+                  )
+                : null,
+            child: Text(
+              deleteCount > 0
+                  ? ctx.l10n.common_action_delete
+                  : ctx.l10n.common_action_remove,
             ),
-            child: Text(ctx.l10n.common_action_delete),
           ),
         ],
       ),
@@ -354,19 +401,27 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     if (confirmed != true || !mounted) return BulkActionOutcome.cancelled;
 
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final notifier = ref.read(tripListNotifierProvider.notifier);
     _selection.exit();
 
-    for (final id in ids) {
-      await notifier.deleteTrip(id);
+    var deleted = 0;
+    for (final trip in split.destroy) {
+      if (await notifier.deleteTrip(trip.id)) deleted++;
     }
+    final hidden = split.hide.isEmpty
+        ? 0
+        : await notifier.hideTrips([for (final t in split.hide) t.id]);
 
     if (!mounted) return BulkActionOutcome.completed;
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
-      ),
-    );
+    final summary = [
+      if (deleted > 0) l10n.common_bulkDelete_snackbar(deleted),
+      if (hidden > 0) l10n.sharedItems_bulkHiddenSnackbar(hidden),
+    ];
+    // Nothing done (every action refused): no empty snackbar.
+    if (summary.isNotEmpty) {
+      messenger.showSnackBar(SnackBar(content: Text(summary.join(' · '))));
+    }
     return BulkActionOutcome.completed;
   }
 

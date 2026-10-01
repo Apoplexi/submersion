@@ -51,8 +51,23 @@ class _MockTripListNotifier
   /// Ids bulk delete actually asked to remove.
   final deleted = <String>[];
 
+  /// What the repository answers: false refuses every delete and hide.
+  bool allowed = true;
+
   @override
-  Future<void> deleteTrip(String id) async => deleted.add(id);
+  Future<bool> deleteTrip(String id) async {
+    deleted.add(id);
+    return allowed;
+  }
+
+  /// Ids bulk delete hid instead (issue #2594), in one batch.
+  final hidden = <String>[];
+
+  @override
+  Future<int> hideTrips(List<String> ids) async {
+    hidden.addAll(ids);
+    return allowed ? ids.length : 0;
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
@@ -80,11 +95,13 @@ TripWithStats _makeTrip({
   int diveCount = 0,
   double? maxDepth,
   bool isShared = false,
+  String? diverId,
 }) {
   return TripWithStats(
     trip: Trip(
       id: id,
       name: name,
+      diverId: diverId,
       startDate: startDate ?? DateTime(2024, 6, 1),
       endDate: endDate ?? DateTime(2024, 6, 7),
       location: location,
@@ -218,6 +235,127 @@ void main() {
       );
 
       expect(notifier.deleted, isEmpty);
+    });
+  });
+
+  group('bulk delete of shared trips (issue #2594)', () {
+    late _MockTripListNotifier notifier;
+
+    Future<void> openDelete(
+      WidgetTester tester,
+      List<TripWithStats> trips,
+    ) async {
+      notifier = _MockTripListNotifier(trips);
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            currentDiverIdProvider.overrideWith(
+              (ref) => MockCurrentDiverIdNotifier(),
+            ),
+            validatedCurrentDiverIdProvider.overrideWith((_) async => 'd2'),
+            allDiversProvider.overrideWith(
+              (_) async => [_makeDiver('d1'), _makeDiver('d2')],
+            ),
+            tripListNotifierProvider.overrideWith((ref) => notifier),
+            tripListViewModeProvider.overrideWith(
+              (ref) => ListViewMode.detailed,
+            ),
+            tripTableConfigProvider.overrideWith(
+              (ref) => _TestTripTableConfigNotifier(_testConfig),
+            ),
+            sortedFilteredTripsProvider.overrideWith(
+              (ref) => AsyncValue.data(trips),
+            ),
+            highlightedTripIdProvider.overrideWith((ref) => null),
+          ],
+          child: const TripListContent(showAppBar: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('selection_delete')));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('deletes the profile\'s own and hides another\'s shared', (
+      tester,
+    ) async {
+      await openDelete(tester, [
+        _makeTrip(id: 'mine', name: 'Aaa Trip', diverId: 'd2', isShared: true),
+        _makeTrip(
+          id: 'theirs',
+          name: 'Bbb Trip',
+          diverId: 'd1',
+          isShared: true,
+        ),
+      ]);
+      // The title counts only what is deleted; the hidden one is only
+      // removed from this profile (issue #2594 review).
+      expect(find.text('Delete 1 item?'), findsOneWidget);
+      expect(find.textContaining('1 trip will be deleted.'), findsOneWidget);
+      expect(
+        find.textContaining(
+          '1 of them is shared with other profiles and will be deleted for '
+          'everyone.',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining(
+          '1 shared trip will be removed from your profile only.',
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Delete').hitTestable().last);
+      await tester.pumpAndSettle();
+      expect(notifier.deleted, ['mine']);
+      expect(notifier.hidden, ['theirs']);
+    });
+
+    testWidgets('a bulk action the repository refuses shows no snackbar', (
+      tester,
+    ) async {
+      await openDelete(tester, [
+        _makeTrip(
+          id: 'theirs',
+          name: 'Bbb Trip',
+          diverId: 'd1',
+          isShared: true,
+        ),
+      ]);
+      notifier.allowed = false;
+      await tester.tap(find.text('Remove').hitTestable().last);
+      await tester.pumpAndSettle();
+      expect(notifier.hidden, ['theirs']);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+
+    testWidgets('only another profile\'s shared trips: a remove, no delete', (
+      tester,
+    ) async {
+      await openDelete(tester, [
+        _makeTrip(
+          id: 'theirs',
+          name: 'Bbb Trip',
+          diverId: 'd1',
+          isShared: true,
+        ),
+      ]);
+      expect(find.text('Remove 1 item from your profile?'), findsOneWidget);
+      await tester.tap(find.text('Remove').hitTestable().last);
+      await tester.pumpAndSettle();
+      expect(notifier.deleted, isEmpty);
+      expect(notifier.hidden, ['theirs']);
     });
   });
 
