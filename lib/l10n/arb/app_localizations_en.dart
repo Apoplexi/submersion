@@ -15063,6 +15063,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type, $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20949,6 +20954,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_data_header_backupSync => 'Backup & Sync';
+
+  @override
+  String get settings_data_header_import => 'Import';
 
   @override
   String get settings_data_header_storage => 'Storage';

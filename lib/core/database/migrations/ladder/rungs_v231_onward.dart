@@ -161,13 +161,19 @@ extension RungsFromV231 on AppDatabase {
       await _scrubSafetyStopCeilings();
     }
     if (from < 255) await reportProgress();
-    // v256: metadata-only profile revision history over existing
+    // v256: dives.computer_tissue_json (issue #1977). Column-only rung, no
+    // backfill: null reads as "the computer reported no tissue state".
+    if (from < 256) {
+      await _assertComputerTissueColumn();
+    }
+    if (from < 256) await reportProgress();
+    // v257: metadata-only profile revision history over existing
     // dive_profile_series rows (#1197). One history row per series id,
     // no sample/blob duplication. Re-asserted in beforeOpen.
-    if (from < 256) {
+    if (from < 257) {
       await _assertProfileSeriesHistorySchema();
       await _backfillProfileSeriesHistoryRows();
     }
-    if (from < 256) await reportProgress();
+    if (from < 257) await reportProgress();
   }
 }

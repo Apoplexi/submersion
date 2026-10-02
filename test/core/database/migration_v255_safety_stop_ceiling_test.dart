@@ -116,24 +116,20 @@ void main() {
   List<ProfileSample> decoded(Map<String, Object?> row) =>
       codec.decode(row['samples']! as Uint8List);
 
-  test(
-    'v255 is at or below the current schema version and is in the ladder',
-    () {
-      // The newest rung owns the exact assertion; relax it to
-      // greaterThanOrEqualTo when the next one lands.
-      expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(255));
-      expect(AppDatabase.migrationVersions, contains(255));
-      // 254 (dive_tanks.role_source, #2595) sits directly below this rung,
-      // and 253 (safety review inputs, #2592) below that. 256 is the profile
-      // history rung on top.
-      expect(AppDatabase.migrationVersions, containsAll([253, 254]));
-      final above254 = AppDatabase.migrationStepCount(254);
-      expect(above254, 2);
-      expect(AppDatabase.migrationStepCount(253), above254 + 1);
-      expect(AppDatabase.migrationStepCount(252), above254 + 2);
-      expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
-    },
-  );
+  test('v255 is at or below the current schema version and in the ladder', () {
+    // Relaxed once v256 (computer tissue, #1977) and v257 (profile revision
+    // history, #1197) landed on top; the newest rung owns the exact
+    // assertion.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(255));
+    expect(AppDatabase.migrationVersions, contains(255));
+    // 254 (dive_tanks.role_source, #2595) sits directly below this rung,
+    // and 253 (safety review inputs, #2592) below that.
+    expect(AppDatabase.migrationVersions, containsAll([253, 254]));
+    final above255 = AppDatabase.migrationStepCount(255);
+    expect(AppDatabase.migrationStepCount(254), above255 + 1);
+    expect(AppDatabase.migrationStepCount(252), above255 + 3);
+    expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
+  });
 
   test('a database at v252 loses its safety stop ceilings and keeps every '
       'other ceiling', () async {

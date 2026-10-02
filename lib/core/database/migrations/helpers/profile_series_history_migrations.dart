@@ -3,7 +3,7 @@ part of '../app_database_migrations.dart';
 /// Profile revision history over `dive_profile_series` (#1197).
 extension ProfileSeriesHistoryMigrations on AppDatabase {
   /// Idempotent creation of profile revision metadata over
-  /// `dive_profile_series` (v246).
+  /// `dive_profile_series` (v257).
   ///
   /// History is pointer-only: samples stay in `dive_profile_series` and this
   /// table stores parent/branch links plus a content hash for de-dup checks.

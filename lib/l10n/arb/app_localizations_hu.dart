@@ -15242,6 +15242,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String equipment_figure_itemLabelUnnumbered(String type, String name) {
+    return '$type, $name';
+  }
+
+  @override
   String equipment_figure_summary(String name, int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -21217,6 +21222,9 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_data_header_backupSync =>
       'Biztonsági mentés és szinkronizálás';
+
+  @override
+  String get settings_data_header_import => 'Importálás';
 
   @override
   String get settings_data_header_storage => 'Tárolás';
