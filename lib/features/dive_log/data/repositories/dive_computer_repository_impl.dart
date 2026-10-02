@@ -1769,6 +1769,9 @@ class DiveComputerRepository {
           computerId: computerId,
           sourceId: ownerSourceId,
           isPrimary: isPrimary,
+          // A download is a computer import whether or not the dive already
+          // had a series, matching how the v257 backfill classifies it.
+          revisionKind: 'computer_import',
           samples: [for (final point in points) _sampleFromPointData(point)],
         );
       }

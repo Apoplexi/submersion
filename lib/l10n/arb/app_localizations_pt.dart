@@ -6762,6 +6762,68 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_detail_section_diveProfile => 'Perfil do Mergulho';
 
   @override
+  String get diveLog_detail_profileRevision_kind_edit => 'Edição';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_create => 'Criado';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_computerImport =>
+      'Importação de computador de mergulho';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_legacy => 'Legado';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_profileEditor =>
+      'Editor de perfil';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_dataQualityRepair =>
+      'Reparo de qualidade de dados';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_smoothAll =>
+      'Suavizar todo o perfil';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_smoothSelection =>
+      'Suavizar seleção';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_removeAllOutliers =>
+      'Remover todos os outliers';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_removeSelectedOutliers =>
+      'Remover outliers selecionados';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_shiftDepth =>
+      'Deslocar profundidade';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_shiftTime =>
+      'Deslocar tempo';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_deleteSegment =>
+      'Excluir segmento';
+
+  @override
+  String
+  get diveLog_detail_profileRevision_editType_deleteSegmentInterpolated =>
+      'Excluir segmento (interpolado)';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_generateFromWaypoints =>
+      'Gerar a partir de waypoints';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_trimEndZeros =>
+      'Aparar zeros finais';
+
+  @override
   String get diveLog_detail_section_equipment => 'Equipamentos';
 
   @override
@@ -43919,6 +43981,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_profileEditor_mode_trim => 'Cortar';
+
+  @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'Alternar revisão ativa. Esta mudança entra em vigor imediatamente e todas as futuras edições serão baseadas nesta revisão.';
+
+  @override
+  String get diveLog_profileEditor_revisionSwitchFailed =>
+      'Não foi possível alternar a revisão do perfil.';
 
   @override
   String diveLog_sources_sectionTitle(int count) {

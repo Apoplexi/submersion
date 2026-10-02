@@ -6614,6 +6614,66 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_section_diveProfile => 'פרופיל צלילה';
 
   @override
+  String get diveLog_detail_profileRevision_kind_edit => 'עריכה';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_create => 'נוצר';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_computerImport =>
+      'ייבוא ממחשב צלילה';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_legacy => 'מורשת';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_profileEditor =>
+      'עורך פרופיל';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_dataQualityRepair =>
+      'תיקון איכות נתונים';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_smoothAll =>
+      'החלקת כל הפרופיל';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_smoothSelection =>
+      'החלקת הבחירה';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_removeAllOutliers =>
+      'הסרת כל החריגים';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_removeSelectedOutliers =>
+      'הסרת חריגים נבחרים';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_shiftDepth => 'הזזת עומק';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_shiftTime => 'הזזת זמן';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_deleteSegment =>
+      'מחיקת מקטע';
+
+  @override
+  String
+  get diveLog_detail_profileRevision_editType_deleteSegmentInterpolated =>
+      'מחיקת מקטע (אינטרפולציה)';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_generateFromWaypoints =>
+      'יצירה מנקודות דרך';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_trimEndZeros =>
+      'קיצוץ אפסים בסוף';
+
+  @override
   String get diveLog_detail_section_equipment => 'ציוד';
 
   @override
@@ -43050,6 +43110,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_profileEditor_mode_trim => 'חיתוך';
+
+  @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'החלף גרסה פעילה. שינוי זה יוצא לפועל מיד וכל העריכות הבאות יהיו מבוססות על גרסה זו.';
+
+  @override
+  String get diveLog_profileEditor_revisionSwitchFailed =>
+      'לא ניתן להחליף את גרסת הפרופיל.';
 
   @override
   String diveLog_sources_sectionTitle(int count) {

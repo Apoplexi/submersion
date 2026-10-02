@@ -6446,6 +6446,61 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_diveProfile => '潜水轮廓';
 
   @override
+  String get diveLog_detail_profileRevision_kind_edit => '编辑';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_create => '创建';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_computerImport => '电脑导入';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_legacy => '旧版';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_profileEditor => '轮廓编辑器';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_dataQualityRepair =>
+      '数据质量修复';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_smoothAll => '平滑整个轮廓';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_smoothSelection =>
+      '平滑所选区域';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_removeAllOutliers =>
+      '移除所有异常值';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_removeSelectedOutliers =>
+      '移除所选异常值';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_shiftDepth => '调整深度';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_shiftTime => '调整时间';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_deleteSegment => '删除区段';
+
+  @override
+  String
+  get diveLog_detail_profileRevision_editType_deleteSegmentInterpolated =>
+      '删除区段（插值）';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_generateFromWaypoints =>
+      '根据路径点生成';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_trimEndZeros => '裁剪末尾零值';
+
+  @override
   String get diveLog_detail_section_equipment => '装备';
 
   @override
@@ -41399,6 +41454,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_profileEditor_mode_trim => '修剪';
+
+  @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      '切换活跃版本。此更改立即生效，所有未来编辑都将基于此版本。';
+
+  @override
+  String get diveLog_profileEditor_revisionSwitchFailed => '无法切换剖面版本。';
 
   @override
   String diveLog_sources_sectionTitle(int count) {

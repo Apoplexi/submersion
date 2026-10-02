@@ -6717,6 +6717,68 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_detail_section_diveProfile => 'Duikprofiel';
 
   @override
+  String get diveLog_detail_profileRevision_kind_edit => 'Bewerking';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_create => 'Aangemaakt';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_computerImport =>
+      'Computerimport';
+
+  @override
+  String get diveLog_detail_profileRevision_kind_legacy => 'Bestaand';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_profileEditor =>
+      'Profieleditor';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_dataQualityRepair =>
+      'Reparatie gegevenskwaliteit';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_smoothAll =>
+      'Heel profiel gladmaken';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_smoothSelection =>
+      'Selectie gladmaken';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_removeAllOutliers =>
+      'Alle uitschieters verwijderen';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_removeSelectedOutliers =>
+      'Geselecteerde uitschieters verwijderen';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_shiftDepth =>
+      'Diepte verschuiven';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_shiftTime =>
+      'Tijd verschuiven';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_deleteSegment =>
+      'Segment verwijderen';
+
+  @override
+  String
+  get diveLog_detail_profileRevision_editType_deleteSegmentInterpolated =>
+      'Segment verwijderen (geïnterpoleerd)';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_generateFromWaypoints =>
+      'Genereren uit waypoints';
+
+  @override
+  String get diveLog_detail_profileRevision_editType_trimEndZeros =>
+      'Eindnullen trimmen';
+
+  @override
   String get diveLog_detail_section_equipment => 'Uitrusting';
 
   @override
@@ -43621,6 +43683,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_profileEditor_mode_trim => 'Bijsnijden';
+
+  @override
+  String get diveLog_profileEditor_revisionSelectorTooltip =>
+      'Wissel naar actieve revisie. Deze wijziging treedt onmiddellijk in werking en alle toekomstige bewerkingen zijn gebaseerd op deze revisie.';
+
+  @override
+  String get diveLog_profileEditor_revisionSwitchFailed =>
+      'Kan niet wisselen van profielrevisie.';
 
   @override
   String diveLog_sources_sectionTitle(int count) {
