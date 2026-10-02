@@ -43074,6 +43074,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'החלף גרסה פעילה. שינוי זה יוצא לפועל מיד וכל העריכות הבאות יהיו מבוססות על גרסה זו.';
 
   @override
+  String get diveLog_profileEditor_revisionSwitchFailed =>
+      'לא ניתן להחליף את גרסת הפרופיל.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

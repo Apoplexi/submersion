@@ -803,6 +803,43 @@ void main() {
       },
     );
 
+    test('a second computer attached to an existing dive is also marked '
+        'computer_import', () async {
+      final computerId = await insertComputer();
+      final entryTime = DateTime(2026, 5, 10, 8, 30);
+      const points = [
+        ProfilePointData(timestamp: 0, depth: 0.0),
+        ProfilePointData(timestamp: 60, depth: 12.0),
+      ];
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: points,
+        durationSeconds: 30 * 60,
+        maxDepth: 12.0,
+        forceNew: true,
+      );
+      final otherComputerId = await insertComputer(
+        id: 'computer-2',
+        name: 'Other Computer',
+      );
+      final matchedId = await repository.importProfile(
+        computerId: otherComputerId,
+        profileStartTime: entryTime,
+        points: points,
+        durationSeconds: 30 * 60,
+        maxDepth: 12.0,
+      );
+
+      expect(matchedId, diveId);
+      final revisions = await profileSeries.getRevisionsForDive(diveId);
+      expect(revisions, hasLength(2));
+      expect(
+        revisions.map((r) => r.revisionKind),
+        everyElement('computer_import'),
+      );
+    });
+
     test(
       'forceNew=true skips dive matching and always creates new dive',
       () async {

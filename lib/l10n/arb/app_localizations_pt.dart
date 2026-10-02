@@ -43945,6 +43945,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Alternar revisão ativa. Esta mudança entra em vigor imediatamente e todas as futuras edições serão baseadas nesta revisão.';
 
   @override
+  String get diveLog_profileEditor_revisionSwitchFailed =>
+      'Não foi possível alternar a revisão do perfil.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -172,13 +172,17 @@ class ProfileSeriesRepository {
     int? now,
   }) async {
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
-    final target =
-        await (_db.select(_db.diveProfileSeries)
-              ..where((t) => t.id.equals(seriesId) & t.diveId.equals(diveId)))
-            .getSingleOrNull();
-    if (target == null) return;
-
+    var changed = false;
     await _db.transaction(() async {
+      // Read inside the transaction so a concurrent delete or sync cannot
+      // leave the dive with no primary series.
+      final target =
+          await (_db.select(_db.diveProfileSeries)
+                ..where((t) => t.id.equals(seriesId) & t.diveId.equals(diveId)))
+              .getSingleOrNull();
+      if (target == null) return;
+      changed = true;
+
       final activeRows =
           await (_db.select(_db.diveProfileSeries)..where(
                 (t) => t.diveId.equals(diveId) & t.isPrimary.equals(true),
@@ -215,7 +219,7 @@ class ProfileSeriesRepository {
         await _markPending(seriesId, nowMs);
       }
     });
-    SyncEventBus.notifyLocalChange();
+    if (changed) SyncEventBus.notifyLocalChange();
   }
 
   /// Timestamp order, ties in input order. Every writer hands over whatever

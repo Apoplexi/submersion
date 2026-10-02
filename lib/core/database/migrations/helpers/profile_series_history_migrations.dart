@@ -43,6 +43,9 @@ extension ProfileSeriesHistoryMigrations on AppDatabase {
   /// Backfill history rows for existing series using the safest classifier
   /// the current schema supports.
   ///
+  /// Runs on every open, so only series that still lack a history row are
+  /// classified: the per-row source lookup is skipped for the rest.
+  ///
   /// Minimal old-schema fixtures do not all carry `source_id`,
   /// `dive_data_sources`, or `source_format`, so the classifier degrades in
   /// layers rather than assuming the richest shape is always present.
@@ -119,6 +122,9 @@ extension ProfileSeriesHistoryMigrations on AppDatabase {
         $revisionKindCase,
         s.created_at
       FROM dive_profile_series s
+      WHERE NOT EXISTS (
+        SELECT 1 FROM dive_profile_series_history h WHERE h.series_id = s.id
+      )
     ''');
   }
 }

@@ -43588,6 +43588,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تبديل المراجعة النشطة. هذا التغيير يسري مفعوله فوراً وسيتم أساس جميع التعديلات المستقبلية على هذه المراجعة.';
 
   @override
+  String get diveLog_profileEditor_revisionSwitchFailed =>
+      'تعذر تبديل مراجعة الملف الشخصي.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

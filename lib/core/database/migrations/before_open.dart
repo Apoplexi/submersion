@@ -7,10 +7,6 @@ part of 'app_database_migrations.dart';
 /// asserted again here.
 extension BeforeOpenBackstops on AppDatabase {
   Future<void> _beforeOpen(OpeningDetails details) async {
-    // v255 backstop: a safety stop is no decompression ceiling. Safe to
-    // re-run: it rewrites only the series that still carry one.
-    await _scrubSafetyStopCeilings();
-
     // v257 backstop: metadata-only profile revision history over existing
     // dive_profile_series rows. Safe to re-run: INSERT OR IGNORE keeps
     // existing revisions untouched and only fills missing pointer rows.

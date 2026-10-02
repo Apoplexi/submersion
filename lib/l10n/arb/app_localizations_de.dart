@@ -43849,6 +43849,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktive Revision wechseln. Diese Änderung wird sofort wirksam und alle zukünftigen Bearbeitungen basieren auf dieser Revision.';
 
   @override
+  String get diveLog_profileEditor_revisionSwitchFailed =>
+      'Profilrevision konnte nicht gewechselt werden.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

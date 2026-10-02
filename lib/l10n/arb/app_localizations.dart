@@ -69975,6 +69975,12 @@ abstract class AppLocalizations {
   /// **'Switch active revision. This takes effect immediately and all future edits will be based on this revision.'**
   String get diveLog_profileEditor_revisionSelectorTooltip;
 
+  /// No description provided for @diveLog_profileEditor_revisionSwitchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not switch profile revision.'**
+  String get diveLog_profileEditor_revisionSwitchFailed;
+
   /// Header of the dive-detail section listing where a dive's data came from (dive computers, imported files, manual entry).
   ///
   /// In en, this message translates to:

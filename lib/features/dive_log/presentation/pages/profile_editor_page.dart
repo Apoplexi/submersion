@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -31,14 +32,20 @@ class ProfileEditorPage extends ConsumerStatefulWidget {
 class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
   late StateNotifierProvider<ProfileEditorNotifier, ProfileEditorState>
   _editorProvider;
-  int? _lastProfileHash;
+  List<DiveProfilePoint>? _lastProfile;
 
   void _initializeProvider(List<DiveProfilePoint> profile) {
-    // Only reinitialize if profile actually changed (based on hash)
-    final profileHash = profile.hashCode;
-    if (_lastProfileHash == profileHash) return;
+    final previous = _lastProfile;
+    if (previous != null) {
+      // diveProvider re-emits a fresh list on every dive-detail table tick
+      // (a sync, a tank edit), so compare contents rather than identity.
+      if (listEquals(previous, profile)) return;
+      // Never throw away unsaved edits for a profile that changed underneath
+      // the editor; the revision selector is disabled while edits are pending.
+      if (ref.read(_editorProvider).hasChanges) return;
+    }
 
-    _lastProfileHash = profileHash;
+    _lastProfile = profile;
 
     _editorProvider =
         StateNotifierProvider.autoDispose<
@@ -189,6 +196,7 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
                   context,
                   ref,
                   widget.diveId,
+                  enabled: !state.hasChanges,
                 ),
               ),
             ],
@@ -247,11 +255,14 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
     );
   }
 
+  /// Switching revisions reloads the editor, so [enabled] is false while
+  /// the session has unsaved edits that the switch would discard.
   Widget _buildProfileRevisionControl(
     BuildContext context,
     WidgetRef ref,
-    String diveId,
-  ) {
+    String diveId, {
+    required bool enabled,
+  }) {
     final historyAsync = ref.watch(profileSeriesHistoryProvider(diveId));
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
@@ -282,6 +293,7 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
 
         return PopupMenuButton<String>(
           tooltip: context.l10n.diveLog_profileEditor_revisionSelectorTooltip,
+          enabled: enabled,
           onSelected: (seriesId) async {
             if (seriesId == active.seriesId) return;
             try {
@@ -295,8 +307,10 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
             } catch (_) {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Could not switch profile revision.'),
+                SnackBar(
+                  content: Text(
+                    context.l10n.diveLog_profileEditor_revisionSwitchFailed,
+                  ),
                 ),
               );
             }

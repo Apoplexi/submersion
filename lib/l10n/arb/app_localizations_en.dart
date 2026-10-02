@@ -43303,6 +43303,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Switch active revision. This takes effect immediately and all future edits will be based on this revision.';
 
   @override
+  String get diveLog_profileEditor_revisionSwitchFailed =>
+      'Could not switch profile revision.';
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

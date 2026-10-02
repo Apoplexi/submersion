@@ -173,14 +173,14 @@ void main() {
     expect(corrupt['has_positive_ceiling'], 1);
   });
 
-  test('a database already at v256 is not rewritten again', () async {
+  test('a database already at v255 is not rewritten again', () async {
     final db = AppDatabase(strandedAt(AppDatabase.currentSchemaVersion));
     addTearDown(db.close);
     final after = await rows(db);
     expect(
       after['s-safety-only']!['samples'],
-      bytesOf([ndl, safety.withoutSafetyStopCeiling()]),
+      bytesOf(seeded['s-safety-only']!),
     );
-    expect(after['s-safety-only']!['has_positive_ceiling'], 0);
+    expect(after['s-safety-only']!['has_positive_ceiling'], 1);
   });
 }

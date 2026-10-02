@@ -1667,7 +1667,6 @@ class DiveComputerRepository {
       if (!hadSeries) {
         isPrimary = true;
       }
-      final revisionKind = hadSeries ? 'create' : 'computer_import';
 
       // A profile attached to an existing dive used to leave no
       // dive_data_sources row, so its fingerprint was invisible to the
@@ -1760,7 +1759,9 @@ class DiveComputerRepository {
           computerId: computerId,
           sourceId: ownerSourceId,
           isPrimary: isPrimary,
-          revisionKind: revisionKind,
+          // A download is a computer import whether or not the dive already
+          // had a series, matching how the v257 backfill classifies it.
+          revisionKind: 'computer_import',
           samples: [for (final point in points) _sampleFromPointData(point)],
         );
       }
