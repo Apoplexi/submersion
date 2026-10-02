@@ -46597,6 +46597,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrack_section_menuMakePrimary => 'Marcar como principal';
 
   @override
+  String get navTrack_editRow_none => 'Ninguna';
+
+  @override
+  String get navTrack_editRow_loadFailed => 'No se pudieron cargar las rutas';
+
+  @override
+  String navTrack_editRow_more(int count, String name) {
+    return '$name +$count';
+  }
+
+  @override
+  String get navTrack_editSheet_removeTooltip => 'Quitar ruta';
+
+  @override
+  String navTrack_editRow_saveFailed(String error) {
+    return 'No se pudieron actualizar las rutas submarinas de esta inmersión: $error';
+  }
+
+  @override
   String get navTrack_importError_unsupportedFormat =>
       'Este archivo no es un registro de navegación Seacraft ENC.';
 
@@ -46622,9 +46641,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveDetailSection_navTrack_description =>
       'Ruta submarina medida desde una consola de navegación';
-
-  @override
-  String get dashboard_quickActions_navRoutes => 'Rutas submarinas';
 
   @override
   String navTrack_list_durationHours(int hours, int minutes) {
@@ -47678,6 +47694,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'Renombrar, reordenar y eliminar consultas guardadas';
+
+  @override
+  String get settings_manage_navRoutes_subtitle =>
+      'Importar, alinear y vincular rutas grabadas';
 
   @override
   String get query_error_unterminatedQuote => 'comillas sin cerrar';

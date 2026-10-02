@@ -46668,6 +46668,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navTrack_section_menuMakePrimary => 'Définir comme principal';
 
   @override
+  String get navTrack_editRow_none => 'Aucun';
+
+  @override
+  String get navTrack_editRow_loadFailed => 'Impossible de charger les trajets';
+
+  @override
+  String navTrack_editRow_more(int count, String name) {
+    return '$name +$count';
+  }
+
+  @override
+  String get navTrack_editSheet_removeTooltip => 'Retirer le trajet';
+
+  @override
+  String navTrack_editRow_saveFailed(String error) {
+    return 'Impossible de mettre à jour les trajets sous-marins de cette plongée : $error';
+  }
+
+  @override
   String get navTrack_importError_unsupportedFormat =>
       'Ce fichier n\'est pas un journal de navigation Seacraft ENC.';
 
@@ -46693,9 +46712,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveDetailSection_navTrack_description =>
       'Trajet sous-marin mesuré depuis une console de navigation';
-
-  @override
-  String get dashboard_quickActions_navRoutes => 'Trajets sous-marins';
 
   @override
   String navTrack_list_durationHours(int hours, int minutes) {
@@ -47751,6 +47767,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'Renommer, réorganiser et supprimer les requêtes enregistrées';
+
+  @override
+  String get settings_manage_navRoutes_subtitle =>
+      'Importer, aligner et lier les trajets enregistrés';
 
   @override
   String get query_error_unterminatedQuote => 'guillemet non fermé';

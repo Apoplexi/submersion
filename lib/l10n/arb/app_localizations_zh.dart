@@ -43860,6 +43860,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navTrack_section_menuMakePrimary => '设为主要';
 
   @override
+  String get navTrack_editRow_none => '无';
+
+  @override
+  String get navTrack_editRow_loadFailed => '无法加载路线';
+
+  @override
+  String navTrack_editRow_more(int count, String name) {
+    return '$name +$count';
+  }
+
+  @override
+  String get navTrack_editSheet_removeTooltip => '移除路线';
+
+  @override
+  String navTrack_editRow_saveFailed(String error) {
+    return '无法更新此潜水的水下路线：$error';
+  }
+
+  @override
   String get navTrack_importError_unsupportedFormat =>
       '此文件不是 Seacraft ENC 导航日志。';
 
@@ -43880,9 +43899,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveDetailSection_navTrack_description => '通过导航控制台测量的水下路线';
-
-  @override
-  String get dashboard_quickActions_navRoutes => '水下路线';
 
   @override
   String navTrack_list_durationHours(int hours, int minutes) {
@@ -44928,6 +44944,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_manage_savedQueries_subtitle => '重命名、重新排序和删除已保存的查询';
+
+  @override
+  String get settings_manage_navRoutes_subtitle => '导入、对齐并关联已记录的路线';
 
   @override
   String get query_error_unterminatedQuote => '引号未闭合';

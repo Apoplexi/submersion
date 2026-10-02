@@ -45628,6 +45628,25 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navTrack_section_menuMakePrimary => 'הגדרה כראשי';
 
   @override
+  String get navTrack_editRow_none => 'אין';
+
+  @override
+  String get navTrack_editRow_loadFailed => 'לא ניתן לטעון את המסלולים';
+
+  @override
+  String navTrack_editRow_more(int count, String name) {
+    return '$name +$count';
+  }
+
+  @override
+  String get navTrack_editSheet_removeTooltip => 'הסרת מסלול';
+
+  @override
+  String navTrack_editRow_saveFailed(String error) {
+    return 'לא ניתן לעדכן את המסלולים התת-ימיים של צלילה זו: $error';
+  }
+
+  @override
   String get navTrack_importError_unsupportedFormat =>
       'קובץ זה אינו יומן ניווט Seacraft ENC.';
 
@@ -45653,9 +45672,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get diveDetailSection_navTrack_description =>
       'מסלול תת-ימי שנמדד ממסוף ניווט';
-
-  @override
-  String get dashboard_quickActions_navRoutes => 'מסלולים תת-ימיים';
 
   @override
   String navTrack_list_durationHours(int hours, int minutes) {
@@ -46707,6 +46723,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'שינוי שם, סידור מחדש ומחיקה של שאילתות שמורות';
+
+  @override
+  String get settings_manage_navRoutes_subtitle =>
+      'ייבוא, יישור וקישור של מסלולים מוקלטים';
 
   @override
   String get query_error_unterminatedQuote => 'מירכאה לא סגורה';

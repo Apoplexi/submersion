@@ -46185,6 +46185,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navTrack_section_menuMakePrimary => 'تعيين كأساسي';
 
   @override
+  String get navTrack_editRow_none => 'لا يوجد';
+
+  @override
+  String get navTrack_editRow_loadFailed => 'تعذر تحميل المسارات';
+
+  @override
+  String navTrack_editRow_more(int count, String name) {
+    return '$name +$count';
+  }
+
+  @override
+  String get navTrack_editSheet_removeTooltip => 'إزالة المسار';
+
+  @override
+  String navTrack_editRow_saveFailed(String error) {
+    return 'تعذر تحديث مسارات هذه الغوصة تحت الماء: $error';
+  }
+
+  @override
   String get navTrack_importError_unsupportedFormat =>
       'هذا الملف ليس سجل ملاحة Seacraft ENC.';
 
@@ -46210,9 +46229,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get diveDetailSection_navTrack_description =>
       'مسار تحت الماء تم قياسه من وحدة تحكم ملاحية';
-
-  @override
-  String get dashboard_quickActions_navRoutes => 'المسارات تحت الماء';
 
   @override
   String navTrack_list_durationHours(int hours, int minutes) {
@@ -47265,6 +47281,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'إعادة تسمية الاستعلامات المحفوظة وإعادة ترتيبها وحذفها';
+
+  @override
+  String get settings_manage_navRoutes_subtitle =>
+      'استيراد المسارات المسجلة ومحاذاتها وربطها';
 
   @override
   String get query_error_unterminatedQuote => 'علامة اقتباس غير مغلقة';

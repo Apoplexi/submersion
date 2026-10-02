@@ -13823,6 +13823,11 @@
   "navTrack_section_menuOpen": "فتح المسار",
   "navTrack_section_menuOpen3d": "فتح المشهد ثلاثي الأبعاد",
   "navTrack_section_menuMakePrimary": "تعيين كأساسي",
+  "navTrack_editRow_none": "لا يوجد",
+  "navTrack_editRow_loadFailed": "تعذر تحميل المسارات",
+  "navTrack_editRow_more": "{name} +{count}",
+  "navTrack_editSheet_removeTooltip": "إزالة المسار",
+  "navTrack_editRow_saveFailed": "تعذر تحديث مسارات هذه الغوصة تحت الماء: {error}",
   "navTrack_importError_unsupportedFormat": "هذا الملف ليس سجل ملاحة Seacraft ENC.",
   "navTrack_importError_unreadable": "تعذرت قراءة هذا الملف كسجل ملاحة Seacraft ENC.",
   "navTrack_importError_tooShort": "يحتوي هذا التسجيل على عدد قليل جدًا من العينات ليكون مسارًا قابلاً للاستخدام.",
@@ -13830,7 +13835,6 @@
   "navTrack_importError_tooLarge": "يحتوي هذا التسجيل على عينات أكثر مما يمكن لمسار تخزينه.",
   "diveDetailSection_navTrack_name": "مسار تحت الماء",
   "diveDetailSection_navTrack_description": "مسار تحت الماء تم قياسه من وحدة تحكم ملاحية",
-  "dashboard_quickActions_navRoutes": "المسارات تحت الماء",
   "navTrack_list_durationHours": "{hours}h {minutes}min",
   "navTrack_list_durationMinutes": "{minutes}min"
 ,
@@ -14252,6 +14256,7 @@
   "savedQueries_snackbar_deleted": "تم حذف \"{name}\"",
   "settings_manage_savedQueries": "الاستعلامات المحفوظة",
   "settings_manage_savedQueries_subtitle": "إعادة تسمية الاستعلامات المحفوظة وإعادة ترتيبها وحذفها",
+  "settings_manage_navRoutes_subtitle": "استيراد المسارات المسجلة ومحاذاتها وربطها",
   "query_editor_needsText": "أدخل كلمة واحدة على الأقل",
   "query_saveNeedsDiver": "أنشئ ملف غواص لحفظ الاستعلامات"
 }

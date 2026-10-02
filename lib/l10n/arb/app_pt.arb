@@ -13823,6 +13823,11 @@
   "navTrack_section_menuOpen": "Abrir rota",
   "navTrack_section_menuOpen3d": "Abrir paisagem 3D",
   "navTrack_section_menuMakePrimary": "Definir como principal",
+  "navTrack_editRow_none": "Nenhuma",
+  "navTrack_editRow_loadFailed": "Não foi possível carregar as rotas",
+  "navTrack_editRow_more": "{name} +{count}",
+  "navTrack_editSheet_removeTooltip": "Remover rota",
+  "navTrack_editRow_saveFailed": "Não foi possível atualizar as rotas subaquáticas deste mergulho: {error}",
   "navTrack_importError_unsupportedFormat": "Este arquivo não é um registro de navegação Seacraft ENC.",
   "navTrack_importError_unreadable": "Não foi possível ler este arquivo como um registro de navegação Seacraft ENC.",
   "navTrack_importError_tooShort": "Esta gravação tem amostras insuficientes para ser uma rota utilizável.",
@@ -13830,7 +13835,6 @@
   "navTrack_importError_tooLarge": "Esta gravação tem mais amostras do que uma rota pode armazenar.",
   "diveDetailSection_navTrack_name": "Rota subaquática",
   "diveDetailSection_navTrack_description": "Rota subaquática medida a partir de um console de navegação",
-  "dashboard_quickActions_navRoutes": "Rotas subaquáticas",
   "navTrack_list_durationHours": "{hours}h {minutes}min",
   "navTrack_list_durationMinutes": "{minutes}min"
 ,
@@ -14252,6 +14256,7 @@
   "savedQueries_snackbar_deleted": "Consulta \"{name}\" excluída",
   "settings_manage_savedQueries": "Consultas salvas",
   "settings_manage_savedQueries_subtitle": "Renomear, reordenar e excluir consultas salvas",
+  "settings_manage_navRoutes_subtitle": "Importar, alinhar e associar rotas gravadas",
   "query_editor_needsText": "Digite pelo menos uma palavra",
   "query_saveNeedsDiver": "Crie um perfil de mergulhador para salvar consultas"
 }
