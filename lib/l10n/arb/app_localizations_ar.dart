@@ -20895,6 +20895,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_data_header_backupSync => 'النسخ الاحتياطي والمزامنة';
 
   @override
+  String get settings_data_header_import => 'الاستيراد';
+
+  @override
   String get settings_data_header_storage => 'التخزين';
 
   @override

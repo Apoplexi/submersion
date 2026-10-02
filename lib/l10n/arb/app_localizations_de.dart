@@ -21195,6 +21195,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_data_header_backupSync => 'Sicherung & Synchronisierung';
 
   @override
+  String get settings_data_header_import => 'Import';
+
+  @override
   String get settings_data_header_storage => 'Speicher';
 
   @override

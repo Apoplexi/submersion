@@ -21073,6 +21073,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_data_header_backupSync => 'Back-up & synchronisatie';
 
   @override
+  String get settings_data_header_import => 'Importeren';
+
+  @override
   String get settings_data_header_storage => 'Opslag';
 
   @override

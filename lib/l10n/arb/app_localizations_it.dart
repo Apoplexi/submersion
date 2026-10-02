@@ -21224,6 +21224,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_data_header_backupSync => 'Backup e sincronizzazione';
 
   @override
+  String get settings_data_header_import => 'Importazione';
+
+  @override
   String get settings_data_header_storage => 'Archiviazione';
 
   @override

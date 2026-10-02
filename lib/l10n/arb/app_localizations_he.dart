@@ -20730,6 +20730,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_data_header_backupSync => 'גיבוי וסנכרון';
 
   @override
+  String get settings_data_header_import => 'ייבוא';
+
+  @override
   String get settings_data_header_storage => 'אחסון';
 
   @override
