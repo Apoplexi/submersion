@@ -162,7 +162,15 @@ class ProfileSeriesRepository {
     ];
   }
 
-  /// Makes one existing series the active primary series of [diveId].
+  /// Makes one existing series, with its segment siblings, the active
+  /// primary profile of [diveId].
+  ///
+  /// A live profile can span several series: one recording split over
+  /// disjoint time ranges (a merged split dive) is promoted as a set by
+  /// [promoteWinnerOwnedBy]. An edit replaces that whole set but its history
+  /// row names a single parent, so activating the parent also brings back
+  /// every series from the same recording (same source and computer) that
+  /// overlaps neither the target nor another sibling already chosen.
   ///
   /// No profile blob is copied: this only flips `is_primary` flags and stamps
   /// changed rows pending for sync.
@@ -183,14 +191,33 @@ class ProfileSeriesRepository {
       if (target == null) return;
       changed = true;
 
-      final activeRows =
-          await (_db.select(_db.diveProfileSeries)..where(
-                (t) => t.diveId.equals(diveId) & t.isPrimary.equals(true),
-              ))
+      final rows =
+          await (_db.select(_db.diveProfileSeries)
+                ..where((t) => t.diveId.equals(diveId))
+                ..orderBy([(t) => OrderingTerm.asc(t.startTimestamp)]))
               .get();
+      final live = <DiveProfileSeriesRow>[target];
+      for (final row in rows) {
+        if (row.id == target.id ||
+            row.sourceId != target.sourceId ||
+            row.computerId != target.computerId) {
+          continue;
+        }
+        final overlaps = live.any(
+          (chosen) =>
+              row.startTimestamp <= chosen.endTimestamp &&
+              chosen.startTimestamp <= row.endTimestamp,
+        );
+        if (!overlaps) live.add(row);
+      }
+      final liveIds = {for (final row in live) row.id};
       final toDemote = [
-        for (final r in activeRows)
-          if (r.id != seriesId) r.id,
+        for (final r in rows)
+          if (r.isPrimary && !liveIds.contains(r.id)) r.id,
+      ];
+      final toPromote = [
+        for (final r in live)
+          if (!r.isPrimary) r.id,
       ];
 
       if (toDemote.isNotEmpty) {
@@ -207,20 +234,33 @@ class ProfileSeriesRepository {
         }
       }
 
-      if (!target.isPrimary) {
+      if (toPromote.isNotEmpty) {
         await (_db.update(
           _db.diveProfileSeries,
-        )..where((t) => t.id.equals(seriesId))).write(
+        )..where((t) => t.id.isIn(toPromote))).write(
           DiveProfileSeriesCompanion(
             isPrimary: const Value(true),
             updatedAt: Value(nowMs),
           ),
         );
-        await _markPending(seriesId, nowMs);
+        for (final id in toPromote) {
+          await _markPending(id, nowMs);
+        }
       }
     });
     if (changed) SyncEventBus.notifyLocalChange();
   }
+
+  /// Deletes [seriesId] when it is a demoted manual edit (no computer), the
+  /// state a profile undo leaves the edit it reverted. A computer series or
+  /// a series that is live again is never touched. One tombstone; the
+  /// history row goes with it by cascade.
+  Future<List<String>> deleteUndoneEdit(String seriesId) => _delete(
+    (t) =>
+        t.id.equals(seriesId) &
+        t.computerId.isNull() &
+        t.isPrimary.equals(false),
+  );
 
   /// Timestamp order, ties in input order. Every writer hands over whatever
   /// order it has; the codec and every reader assume ascending timestamps.

@@ -387,39 +387,158 @@ void main() {
     },
   );
 
+  test('restoreOriginalProfile with parent history activates the parent and '
+      'deletes the undone edit', () async {
+    await computer('comp-1');
+    await dives.createDive(dive('dive-1', const []));
+    await source('src-1', 'dive-1', 'comp-1', primary: true);
+
+    final original = await series.insertSeries(
+      diveId: 'dive-1',
+      computerId: 'comp-1',
+      sourceId: 'src-1',
+      isPrimary: true,
+      samples: const [ProfileSample(timestamp: 0, depth: 4.0)],
+      now: 1000,
+    );
+
+    await dives.saveEditedProfile('dive-1', const [
+      domain.DiveProfilePoint(timestamp: 0, depth: 9.0),
+    ]);
+
+    final afterEdit = await series.getSeriesForDive('dive-1');
+    final edited = afterEdit.singleWhere((s) => s.isPrimary).id;
+
+    await dives.restoreOriginalProfile('dive-1');
+
+    final rows = await series.getSeriesForDive('dive-1');
+    expect(rows.map((s) => s.id), [original]);
+    expect(rows.single.isPrimary, isTrue);
+    expect((await dives.getDiveProfile('dive-1')).map((p) => p.depth), [4.0]);
+
+    final tombstones = await db.select(db.deletionLog).get();
+    expect(tombstones.map((t) => t.recordId), [edited]);
+    final history = await dives.getProfileHistory('dive-1');
+    expect(history.map((r) => r.seriesId), [original]);
+  });
+
+  test('an undone edit stays undone across a primary-source swap', () async {
+    await computer('comp-1');
+    await computer('comp-2');
+    await dives.createDive(dive('dive-1', const []));
+    await source('src-1', 'dive-1', 'comp-1', primary: true);
+    await source('src-2', 'dive-1', 'comp-2');
+    final a = await series.insertSeries(
+      diveId: 'dive-1',
+      computerId: 'comp-1',
+      sourceId: 'src-1',
+      samples: const [ProfileSample(timestamp: 0, depth: 4.0)],
+      now: 1000,
+    );
+    await series.insertSeries(
+      diveId: 'dive-1',
+      computerId: 'comp-2',
+      sourceId: 'src-2',
+      isPrimary: false,
+      samples: const [ProfileSample(timestamp: 0, depth: 5.0)],
+      now: 1000,
+    );
+
+    await dives.saveEditedProfile('dive-1', const [
+      domain.DiveProfilePoint(timestamp: 0, depth: 9.0),
+    ]);
+    await dives.restoreOriginalProfile('dive-1');
+    await dives.setPrimaryDataSource(
+      diveId: 'dive-1',
+      computerReadingId: 'src-2',
+    );
+    await dives.setPrimaryDataSource(
+      diveId: 'dive-1',
+      computerReadingId: 'src-1',
+    );
+
+    final live = (await series.getSeriesForDive(
+      'dive-1',
+    )).where((s) => s.isPrimary).map((s) => s.id);
+    expect(live, [a]);
+    expect((await dives.getDiveProfile('dive-1')).map((p) => p.depth), [4.0]);
+  });
+
+  test('restoring the parent of an edit brings back every disjoint segment of '
+      'its recording', () async {
+    await computer('comp-1');
+    await dives.createDive(dive('dive-1', const []));
+    await source('src-1', 'dive-1', 'comp-1', primary: true);
+    // One computer's dive merged from two downloads: two primary series
+    // over disjoint time ranges.
+    final first = await series.insertSeries(
+      diveId: 'dive-1',
+      computerId: 'comp-1',
+      sourceId: 'src-1',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 0.0),
+        ProfileSample(timestamp: 60, depth: 10.0),
+      ],
+      now: 1000,
+    );
+    final second = await series.insertSeries(
+      diveId: 'dive-1',
+      computerId: 'comp-1',
+      sourceId: 'src-1',
+      samples: const [
+        ProfileSample(timestamp: 600, depth: 12.0),
+        ProfileSample(timestamp: 660, depth: 0.0),
+      ],
+      now: 1000,
+    );
+
+    await dives.saveEditedProfile('dive-1', const [
+      domain.DiveProfilePoint(timestamp: 0, depth: 0.0),
+      domain.DiveProfilePoint(timestamp: 660, depth: 0.0),
+    ]);
+    await dives.restoreOriginalProfile('dive-1');
+
+    final live = (await series.getSeriesForDive(
+      'dive-1',
+    )).where((s) => s.isPrimary).map((s) => s.id).toSet();
+    expect(live, {first, second});
+    expect((await dives.getDiveProfile('dive-1')).map((p) => p.timestamp), [
+      0,
+      60,
+      600,
+      660,
+    ]);
+  });
+
   test(
-    'restoreOriginalProfile with parent history activates parent without deleting edit',
+    'switching revisions refreshes the dive depth stats from the live samples',
     () async {
       await computer('comp-1');
       await dives.createDive(dive('dive-1', const []));
       await source('src-1', 'dive-1', 'comp-1', primary: true);
-
       final original = await series.insertSeries(
         diveId: 'dive-1',
         computerId: 'comp-1',
         sourceId: 'src-1',
-        isPrimary: true,
-        samples: const [ProfileSample(timestamp: 0, depth: 4.0)],
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 0.0),
+          ProfileSample(timestamp: 60, depth: 40.0),
+        ],
         now: 1000,
       );
 
       await dives.saveEditedProfile('dive-1', const [
-        domain.DiveProfilePoint(timestamp: 0, depth: 9.0),
+        domain.DiveProfilePoint(timestamp: 0, depth: 0.0),
+        domain.DiveProfilePoint(timestamp: 60, depth: 30.0),
       ]);
+      Future<double?> maxDepth() async => (await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals('dive-1'))).getSingle()).maxDepth;
+      expect(await maxDepth(), 30.0);
 
-      final afterEdit = await series.getSeriesForDive('dive-1');
-      final edited = afterEdit.singleWhere((s) => s.isPrimary).id;
+      await dives.setActiveProfileSeries('dive-1', original);
 
-      await dives.restoreOriginalProfile('dive-1');
-
-      final rows = await series.getSeriesForDive('dive-1');
-      expect(rows.map((s) => s.id).toSet(), {original, edited});
-      expect(rows.firstWhere((s) => s.id == original).isPrimary, isTrue);
-      expect(rows.firstWhere((s) => s.id == edited).isPrimary, isFalse);
-      expect((await dives.getDiveProfile('dive-1')).map((p) => p.depth), [4.0]);
-
-      final tombstones = await db.select(db.deletionLog).get();
-      expect(tombstones.map((t) => t.recordId), isNot(contains(edited)));
+      expect(await maxDepth(), 40.0);
     },
   );
 

@@ -1313,9 +1313,14 @@ class DiveRepository {
   /// Activates the previous profile state.
   ///
   /// When history has a parent for the active profile, that parent is
-  /// activated directly (no blob copy). If the active profile has no parent,
-  /// the legacy ownership-based fallback deletes the edited primary row and
-  /// picks the original source rows.
+  /// activated directly (no blob copy) and the undone edit is deleted. If the
+  /// active profile has no parent, the legacy ownership-based fallback
+  /// deletes the edited primary row and picks the original source rows.
+  ///
+  /// The undone edit must not survive as a demoted series: it still has no
+  /// computer and is owned by the primary source, so
+  /// [ProfileSeriesRepository.promoteWinnerOwnedBy] would rank it first and
+  /// a later primary-source swap would bring the undone edit back.
   Future<void> restoreOriginalProfile(String diveId) async {
     try {
       _log.info('Restoring original profile for dive: $diveId');
@@ -1335,6 +1340,7 @@ class DiveRepository {
             seriesId: parentSeriesId,
             now: now,
           );
+          await _profileSeries.deleteUndoneEdit(activeSeriesId!);
           return;
         }
 
@@ -1381,7 +1387,7 @@ class DiveRepository {
         }
       });
 
-      SyncEventBus.notifyLocalChange();
+      await _refreshDiveAfterProfileSwitch(diveId, now: now);
       _log.info('Restored original profile for dive: $diveId');
     } catch (e, stackTrace) {
       _log.error(
@@ -1400,10 +1406,50 @@ class DiveRepository {
 
   /// Makes [seriesId] the active profile for [diveId] without copying blobs.
   Future<void> setActiveProfileSeries(String diveId, String seriesId) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
     await _profileSeries.activateSeriesForDive(
       diveId: diveId,
       seriesId: seriesId,
+      now: now,
     );
+    await _refreshDiveAfterProfileSwitch(diveId, now: now);
+  }
+
+  /// Brings the dive in line with a profile that a restore or a revision
+  /// switch just made live, as [saveEditedProfileWithKind] does for an edit:
+  /// depth stats from the live samples, the safety review dropped so it
+  /// recomputes, and the dive stamped for sync.
+  Future<void> _refreshDiveAfterProfileSwitch(
+    String diveId, {
+    required int now,
+  }) async {
+    final points = await getDiveProfile(diveId);
+    if (points.isNotEmpty) {
+      var maxDepth = 0.0;
+      var depthSum = 0.0;
+      for (final point in points) {
+        if (point.depth > maxDepth) maxDepth = point.depth;
+        depthSum += point.depth;
+      }
+      await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+        DivesCompanion(
+          maxDepth: Value(maxDepth),
+          avgDepth: Value(depthSum / points.length),
+          updatedAt: Value(now),
+        ),
+      );
+    }
+    await SafetyFindingsRepository.clearReviewForDive(
+      _db,
+      _syncRepository,
+      diveId,
+    );
+    await _syncRepository.markRecordPending(
+      entityType: 'dives',
+      recordId: diveId,
+      localUpdatedAt: now,
+    );
+    SyncEventBus.notifyLocalChange();
   }
 
   /// Load downsampled profile points for multiple dives in a single query.
