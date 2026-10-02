@@ -19213,6 +19213,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'Le diluant dépasse sa MOD Dil à $depth (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'Le plan de décompression CCR n\'emporte aucun gaz de bailout';
 

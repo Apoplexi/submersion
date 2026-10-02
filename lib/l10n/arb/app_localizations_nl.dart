@@ -19018,6 +19018,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'Diluent overschrijdt de Dil-MOD op $depth (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'CCR-decompressieplan heeft geen bailoutgas aan boord';
 

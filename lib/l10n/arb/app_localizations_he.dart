@@ -18719,6 +18719,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
+    return 'המדלל חורג מ-MOD מדלל ב-$depth (ppO₂ $value bar)';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'תוכנית דקומפרסיה CCR ללא גז חילוץ (bailout)';
 
