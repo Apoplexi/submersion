@@ -2169,11 +2169,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    context.l10n.diveLog_detail_section_diveProfile,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+                Text(
+                  context.l10n.diveLog_detail_section_diveProfile,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Row(
                   children: [
