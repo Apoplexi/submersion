@@ -8990,31 +8990,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String diveLog_listPage_searchLimitNotice(int limit) {
-    return 'Die ersten $limit Treffer werden angezeigt. Verfeinern Sie die Suche, um die Ergebnisse einzugrenzen.';
-  }
-
-  @override
-  String diveLog_listPage_searchNoResults(Object query) {
-    return 'Keine Tauchgänge gefunden für \"$query\"';
-  }
-
-  @override
-  String get diveLog_listPage_searchSuggestion =>
-      'Nach Tauchplatz, Tauchpartner oder Notizen suchen';
-
-  @override
-  String get diveLog_listPage_tooltip_back => 'Zurück';
-
-  @override
   String get diveLog_listPage_tooltip_backToDiveList =>
       'Zurück zur Tauchgangliste';
 
   @override
   String get diveLog_listPage_tooltip_clearSearch => 'Suche löschen';
-
-  @override
-  String get diveLog_listPage_tooltip_filterDives => 'Tauchgänge filtern';
 
   @override
   String get diveLog_listPage_tooltip_listView => 'Listenansicht';
@@ -9024,6 +9004,33 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_listPage_tooltip_searchDives => 'Tauchgänge suchen';
+
+  @override
+  String get diveLog_search_fieldHint => 'Suche, z. B. depth > 30m';
+
+  @override
+  String get diveLog_search_refineTooltip => 'Verfeinern';
+
+  @override
+  String get diveLog_search_closeTooltip => 'Suche schließen';
+
+  @override
+  String get diveLog_search_scopeWithin => 'Innerhalb der Filter';
+
+  @override
+  String get diveLog_search_scopeAll => 'Alle Tauchgänge';
+
+  @override
+  String get diveLog_search_jumpTitle => 'Zum Tauchgang springen';
+
+  @override
+  String get diveLog_search_openInsights => 'In Einblicken öffnen';
+
+  @override
+  String get diveLog_search_cleared => 'Suche zurückgesetzt';
+
+  @override
+  String get diveLog_search_undo => 'Rückgängig';
 
   @override
   String get diveLog_listPage_tooltip_sort => 'Sortieren';

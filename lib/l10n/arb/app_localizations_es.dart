@@ -8988,31 +8988,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String diveLog_listPage_searchLimitNotice(int limit) {
-    return 'Mostrando las primeras $limit coincidencias. Refina la búsqueda para acotar los resultados.';
-  }
-
-  @override
-  String diveLog_listPage_searchNoResults(Object query) {
-    return 'No se encontraron inmersiones para \"$query\"';
-  }
-
-  @override
-  String get diveLog_listPage_searchSuggestion =>
-      'Buscar por punto, compañero o notas';
-
-  @override
-  String get diveLog_listPage_tooltip_back => 'Atrás';
-
-  @override
   String get diveLog_listPage_tooltip_backToDiveList =>
       'Volver a la lista de inmersiones';
 
   @override
   String get diveLog_listPage_tooltip_clearSearch => 'Borrar búsqueda';
-
-  @override
-  String get diveLog_listPage_tooltip_filterDives => 'Filtrar inmersiones';
 
   @override
   String get diveLog_listPage_tooltip_listView => 'Vista de lista';
@@ -9022,6 +9002,33 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveLog_listPage_tooltip_searchDives => 'Buscar inmersiones';
+
+  @override
+  String get diveLog_search_fieldHint => 'Busca, p. ej. depth > 30m';
+
+  @override
+  String get diveLog_search_refineTooltip => 'Refinar';
+
+  @override
+  String get diveLog_search_closeTooltip => 'Cerrar búsqueda';
+
+  @override
+  String get diveLog_search_scopeWithin => 'Dentro de los filtros';
+
+  @override
+  String get diveLog_search_scopeAll => 'Todas las inmersiones';
+
+  @override
+  String get diveLog_search_jumpTitle => 'Ir a la inmersión';
+
+  @override
+  String get diveLog_search_openInsights => 'Abrir en Análisis';
+
+  @override
+  String get diveLog_search_cleared => 'Búsqueda borrada';
+
+  @override
+  String get diveLog_search_undo => 'Deshacer';
 
   @override
   String get diveLog_listPage_tooltip_sort => 'Ordenar';

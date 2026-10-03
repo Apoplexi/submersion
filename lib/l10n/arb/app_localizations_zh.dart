@@ -8550,29 +8550,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String diveLog_listPage_searchLimitNotice(int limit) {
-    return '仅显示前 $limit 条匹配结果。请细化搜索以缩小范围。';
-  }
-
-  @override
-  String diveLog_listPage_searchNoResults(Object query) {
-    return '未找到与「$query」匹配的潜水';
-  }
-
-  @override
-  String get diveLog_listPage_searchSuggestion => '按潜水点、潜伴或备注搜索';
-
-  @override
-  String get diveLog_listPage_tooltip_back => '返回';
-
-  @override
   String get diveLog_listPage_tooltip_backToDiveList => '返回潜水列表';
 
   @override
   String get diveLog_listPage_tooltip_clearSearch => '清除搜索';
-
-  @override
-  String get diveLog_listPage_tooltip_filterDives => '筛选潜水';
 
   @override
   String get diveLog_listPage_tooltip_listView => '列表视图';
@@ -8582,6 +8563,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_listPage_tooltip_searchDives => '搜索潜水';
+
+  @override
+  String get diveLog_search_fieldHint => '搜索，或试试 depth > 30m';
+
+  @override
+  String get diveLog_search_refineTooltip => '细化';
+
+  @override
+  String get diveLog_search_closeTooltip => '关闭搜索';
+
+  @override
+  String get diveLog_search_scopeWithin => '在筛选范围内';
+
+  @override
+  String get diveLog_search_scopeAll => '全部潜水';
+
+  @override
+  String get diveLog_search_jumpTitle => '跳转到潜水';
+
+  @override
+  String get diveLog_search_openInsights => '在洞察中打开';
+
+  @override
+  String get diveLog_search_cleared => '已清除搜索';
+
+  @override
+  String get diveLog_search_undo => '撤消';
 
   @override
   String get diveLog_listPage_tooltip_sort => '排序';

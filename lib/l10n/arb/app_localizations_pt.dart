@@ -8989,31 +8989,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String diveLog_listPage_searchLimitNotice(int limit) {
-    return 'Mostrando as primeiras $limit correspondências. Refine a busca para restringir os resultados.';
-  }
-
-  @override
-  String diveLog_listPage_searchNoResults(Object query) {
-    return 'Nenhum mergulho encontrado para \"$query\"';
-  }
-
-  @override
-  String get diveLog_listPage_searchSuggestion =>
-      'Buscar por ponto, dupla ou anotações';
-
-  @override
-  String get diveLog_listPage_tooltip_back => 'Voltar';
-
-  @override
   String get diveLog_listPage_tooltip_backToDiveList =>
       'Voltar para a lista de mergulhos';
 
   @override
   String get diveLog_listPage_tooltip_clearSearch => 'Limpar busca';
-
-  @override
-  String get diveLog_listPage_tooltip_filterDives => 'Filtrar mergulhos';
 
   @override
   String get diveLog_listPage_tooltip_listView => 'Visualização em Lista';
@@ -9023,6 +9003,33 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_listPage_tooltip_searchDives => 'Buscar mergulhos';
+
+  @override
+  String get diveLog_search_fieldHint => 'Pesquise, ex. depth > 30m';
+
+  @override
+  String get diveLog_search_refineTooltip => 'Refinar';
+
+  @override
+  String get diveLog_search_closeTooltip => 'Fechar busca';
+
+  @override
+  String get diveLog_search_scopeWithin => 'Dentro dos filtros';
+
+  @override
+  String get diveLog_search_scopeAll => 'Todos os mergulhos';
+
+  @override
+  String get diveLog_search_jumpTitle => 'Ir para o mergulho';
+
+  @override
+  String get diveLog_search_openInsights => 'Abrir em Análises';
+
+  @override
+  String get diveLog_search_cleared => 'Busca limpa';
+
+  @override
+  String get diveLog_search_undo => 'Desfazer';
 
   @override
   String get diveLog_listPage_tooltip_sort => 'Ordenar';

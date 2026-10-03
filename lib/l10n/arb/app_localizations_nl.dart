@@ -8926,30 +8926,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String diveLog_listPage_searchLimitNotice(int limit) {
-    return 'De eerste $limit resultaten worden getoond. Verfijn je zoekopdracht om de resultaten te beperken.';
-  }
-
-  @override
-  String diveLog_listPage_searchNoResults(Object query) {
-    return 'Geen duiken gevonden voor \"$query\"';
-  }
-
-  @override
-  String get diveLog_listPage_searchSuggestion =>
-      'Zoek op stek, buddy of notities';
-
-  @override
-  String get diveLog_listPage_tooltip_back => 'Terug';
-
-  @override
   String get diveLog_listPage_tooltip_backToDiveList => 'Terug naar duiklijst';
 
   @override
   String get diveLog_listPage_tooltip_clearSearch => 'Zoekopdracht wissen';
-
-  @override
-  String get diveLog_listPage_tooltip_filterDives => 'Duiken filteren';
 
   @override
   String get diveLog_listPage_tooltip_listView => 'Lijstweergave';
@@ -8959,6 +8939,33 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_listPage_tooltip_searchDives => 'Duiken zoeken';
+
+  @override
+  String get diveLog_search_fieldHint => 'Zoek, bv. depth > 30m';
+
+  @override
+  String get diveLog_search_refineTooltip => 'Verfijnen';
+
+  @override
+  String get diveLog_search_closeTooltip => 'Zoeken sluiten';
+
+  @override
+  String get diveLog_search_scopeWithin => 'Binnen filters';
+
+  @override
+  String get diveLog_search_scopeAll => 'Alle duiken';
+
+  @override
+  String get diveLog_search_jumpTitle => 'Naar duik springen';
+
+  @override
+  String get diveLog_search_openInsights => 'Openen in Inzichten';
+
+  @override
+  String get diveLog_search_cleared => 'Zoekopdracht gewist';
+
+  @override
+  String get diveLog_search_undo => 'Ongedaan maken';
 
   @override
   String get diveLog_listPage_tooltip_sort => 'Sorteren';

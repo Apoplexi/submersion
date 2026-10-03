@@ -5016,16 +5016,20 @@
   "diveLog_listPage_tripGroupExpand": "Show dives on {tripName}",
   "diveLog_listPage_tripGroupCollapse": "Hide dives on {tripName}",
   "diveLog_listPage_tripGroupOpenTrip": "Open trip {tripName}",
-  "diveLog_listPage_searchLimitNotice": "Showing the first {limit} matches. Refine your search to narrow results.",
-  "diveLog_listPage_searchNoResults": "No dives found for \"{query}\"",
-  "diveLog_listPage_searchSuggestion": "Search by site, buddy, or notes",
-  "diveLog_listPage_tooltip_back": "Back",
   "diveLog_listPage_tooltip_backToDiveList": "Back to dive list",
   "diveLog_listPage_tooltip_clearSearch": "Clear search",
-  "diveLog_listPage_tooltip_filterDives": "Filter dives",
   "diveLog_listPage_tooltip_listView": "List View",
   "diveLog_listPage_tooltip_mapView": "Map View",
   "diveLog_listPage_tooltip_searchDives": "Search dives",
+  "diveLog_search_fieldHint": "Search, or try depth > 30m",
+  "diveLog_search_refineTooltip": "Refine",
+  "diveLog_search_closeTooltip": "Close search",
+  "diveLog_search_scopeWithin": "Within filters",
+  "diveLog_search_scopeAll": "All dives",
+  "diveLog_search_jumpTitle": "Jump to dive",
+  "diveLog_search_openInsights": "Open in Insights",
+  "diveLog_search_cleared": "Search cleared",
+  "diveLog_search_undo": "Undo",
   "diveLog_listPage_tooltip_sort": "Sort",
   "diveLog_listPage_unknownSite": "Unknown Site",
   "diveLog_map_emptySubtitle": "Log dives with location data to see your activity on the map",
@@ -5768,20 +5772,6 @@
     "placeholders": {
       "tripName": {
         "type": "String"
-      }
-    }
-  },
-  "@diveLog_listPage_searchLimitNotice": {
-    "placeholders": {
-      "limit": {
-        "type": "int"
-      }
-    }
-  },
-  "@diveLog_listPage_searchNoResults": {
-    "placeholders": {
-      "query": {
-        "type": "Object"
       }
     }
   },

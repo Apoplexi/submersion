@@ -8815,31 +8815,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String diveLog_listPage_searchLimitNotice(int limit) {
-    return 'عرض أول $limit نتيجة مطابقة. حسّن البحث لتضييق النتائج.';
-  }
-
-  @override
-  String diveLog_listPage_searchNoResults(Object query) {
-    return 'لم يتم العثور على غوصات لـ \"$query\"';
-  }
-
-  @override
-  String get diveLog_listPage_searchSuggestion =>
-      'البحث حسب الموقع أو زميل الغوص أو الملاحظات';
-
-  @override
-  String get diveLog_listPage_tooltip_back => 'رجوع';
-
-  @override
   String get diveLog_listPage_tooltip_backToDiveList =>
       'العودة إلى قائمة الغوصات';
 
   @override
   String get diveLog_listPage_tooltip_clearSearch => 'مسح البحث';
-
-  @override
-  String get diveLog_listPage_tooltip_filterDives => 'تصفية الغوصات';
 
   @override
   String get diveLog_listPage_tooltip_listView => 'عرض القائمة';
@@ -8849,6 +8829,33 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_listPage_tooltip_searchDives => 'البحث في الغوصات';
+
+  @override
+  String get diveLog_search_fieldHint => 'ابحث، أو جرّب depth > 30m';
+
+  @override
+  String get diveLog_search_refineTooltip => 'تحسين البحث';
+
+  @override
+  String get diveLog_search_closeTooltip => 'إغلاق البحث';
+
+  @override
+  String get diveLog_search_scopeWithin => 'ضمن عوامل التصفية';
+
+  @override
+  String get diveLog_search_scopeAll => 'كل الغوصات';
+
+  @override
+  String get diveLog_search_jumpTitle => 'الانتقال إلى غوصة';
+
+  @override
+  String get diveLog_search_openInsights => 'فتح في الرؤى';
+
+  @override
+  String get diveLog_search_cleared => 'تم مسح البحث';
+
+  @override
+  String get diveLog_search_undo => 'تراجع';
 
   @override
   String get diveLog_listPage_tooltip_sort => 'ترتيب';
