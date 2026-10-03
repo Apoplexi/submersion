@@ -7748,16 +7748,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_allTypes => 'Összes típus';
 
   @override
-  String get diveLog_filter_apply => 'Szűrők alkalmazása';
-
-  @override
   String get diveLog_filter_buddyHint => 'Keresés búvártárs neve alapján';
 
   @override
   String get diveLog_filter_buddyName => 'Búvártárs neve';
-
-  @override
-  String get diveLog_filter_clearAll => 'Összes törlése';
 
   @override
   String get diveLog_filter_clearDates => 'Dátumok törlése';
@@ -7843,13 +7837,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_sectionBuddy => 'Búvártárs';
 
   @override
-  String get diveLog_filter_sectionDateRange => 'Dátumtartomány';
-
-  @override
   String get diveLog_filter_sectionDepthRange => 'Mélység tartomány (méter)';
-
-  @override
-  String get diveLog_filter_sectionDiveSite => 'Merülőhely';
 
   @override
   String get diveLog_filter_sectionDiveType => 'Merülés típusa';
@@ -7879,15 +7867,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_filter_startDate => 'Kezdés dátuma';
-
-  @override
-  String get diveLog_filter_title => 'Merülések szűrése';
-
-  @override
-  String get diveLog_filter_resizeGrip => 'Szűrőpanel átméretezése';
-
-  @override
-  String get diveLog_filter_tooltip_close => 'Szűrő bezárása';
 
   @override
   String get diveLog_fullscreenProfile_close => 'Teljes képernyő bezárása';
@@ -8105,9 +8084,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_listPage_fab_logDive => 'Merülés rögzítése';
-
-  @override
-  String get diveLog_listPage_menuAdvancedSearch => 'Speciális keresés';
 
   @override
   String get diveLog_listPage_menuDiveNumbering => 'Merülés számozás';
@@ -8992,6 +8968,46 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_listPage_tooltip_searchDives => 'Merülések keresése';
 
   @override
+  String get diveLog_refine_title => 'Szűkítés';
+
+  @override
+  String get diveLog_refine_groupRules => 'Szabályok';
+
+  @override
+  String get diveLog_refine_groupPeople => 'Személyek és élővilág';
+
+  @override
+  String get diveLog_refine_groupCustomFields => 'Egyéni mezők';
+
+  @override
+  String get diveLog_refine_summaryAny => 'Bármely';
+
+  @override
+  String diveLog_refine_summaryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count beállítva',
+      one: '$count beállítva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_refine_showDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés megjelenítése',
+      one: '$count merülés megjelenítése',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_refine_showDivesNoCount => 'Merülések megjelenítése';
+
+  @override
   String get diveLog_search_fieldHint => 'Keresés, pl. depth > 30m';
 
   @override
@@ -9358,13 +9374,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_search_allTrips => 'Összes utazás';
 
   @override
-  String get diveLog_search_appBar => 'Részletes keresés';
-
-  @override
   String get diveLog_search_cancel => 'Mégse';
-
-  @override
-  String get diveLog_search_clearAll => 'Összes törlése';
 
   @override
   String get diveLog_search_customFieldKey => 'Custom Field Key';
@@ -9373,15 +9383,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_search_customFieldValue => 'Value contains...';
 
   @override
-  String get diveLog_search_end => 'Vége';
-
-  @override
   String get diveLog_search_errorLoadingCenters =>
       'Hiba a merülőközpontok betöltésekor';
-
-  @override
-  String get diveLog_search_errorLoadingDiveTypes =>
-      'Hiba a merülés típusok betöltésekor';
 
   @override
   String get diveLog_search_errorLoadingEquipment =>
@@ -9410,19 +9413,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_search_label_diveSite => 'Merülőhely';
 
   @override
-  String get diveLog_search_label_diveType => 'Merülés típus';
-
-  @override
-  String get diveLog_search_label_durationRange => 'Időtartam tartomány (min)';
-
-  @override
   String get diveLog_search_label_equipment => 'Felszerelés';
 
   @override
   String get diveLog_search_label_trip => 'Utazás';
-
-  @override
-  String get diveLog_search_search => 'Keresés';
 
   @override
   String get diveLog_search_section_conditions => 'Körülmények';
@@ -9438,12 +9432,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_search_section_organization => 'Szervezet';
-
-  @override
-  String get diveLog_search_section_social => 'Közösségi';
-
-  @override
-  String get diveLog_search_start => 'Kezdés';
 
   @override
   String diveLog_selection_countSelected(Object count) {
@@ -47549,12 +47537,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get query_editor_valueFalse => 'Nem';
-
-  @override
-  String get diveLog_filter_queryRow => 'Lekérdezés';
-
-  @override
-  String get diveLog_search_section_query => 'Lekérdezés';
 
   @override
   String get query_saveDialog_title => 'Lekérdezés mentése';

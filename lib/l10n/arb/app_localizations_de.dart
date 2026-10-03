@@ -7763,16 +7763,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filter_allTypes => 'Alle Typen';
 
   @override
-  String get diveLog_filter_apply => 'Filter anwenden';
-
-  @override
   String get diveLog_filter_buddyHint => 'Nach Tauchpartnername suchen';
 
   @override
   String get diveLog_filter_buddyName => 'Tauchpartnername';
-
-  @override
-  String get diveLog_filter_clearAll => 'Alle zurücksetzen';
 
   @override
   String get diveLog_filter_clearDates => 'Daten zurücksetzen';
@@ -7858,13 +7852,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filter_sectionBuddy => 'Tauchpartner';
 
   @override
-  String get diveLog_filter_sectionDateRange => 'Datumsbereich';
-
-  @override
   String get diveLog_filter_sectionDepthRange => 'Tiefenbereich (Meter)';
-
-  @override
-  String get diveLog_filter_sectionDiveSite => 'Tauchplatz';
 
   @override
   String get diveLog_filter_sectionDiveType => 'Tauchgangart';
@@ -7893,15 +7881,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_filter_startDate => 'Startdatum';
-
-  @override
-  String get diveLog_filter_title => 'Tauchgänge filtern';
-
-  @override
-  String get diveLog_filter_resizeGrip => 'Filterbereich skalieren';
-
-  @override
-  String get diveLog_filter_tooltip_close => 'Filter schließen';
 
   @override
   String get diveLog_fullscreenProfile_close => 'Vollbild schließen';
@@ -8118,9 +8097,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_listPage_fab_logDive => 'Tauchgang erfassen';
-
-  @override
-  String get diveLog_listPage_menuAdvancedSearch => 'Erweiterte Suche';
 
   @override
   String get diveLog_listPage_menuDiveNumbering => 'Tauchgangnummerierung';
@@ -9011,6 +8987,46 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_listPage_tooltip_searchDives => 'Tauchgänge suchen';
 
   @override
+  String get diveLog_refine_title => 'Verfeinern';
+
+  @override
+  String get diveLog_refine_groupRules => 'Regeln';
+
+  @override
+  String get diveLog_refine_groupPeople => 'Personen & Lebewesen';
+
+  @override
+  String get diveLog_refine_groupCustomFields => 'Benutzerdefinierte Felder';
+
+  @override
+  String get diveLog_refine_summaryAny => 'Alle';
+
+  @override
+  String diveLog_refine_summaryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gesetzt',
+      one: '$count gesetzt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_refine_showDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge anzeigen',
+      one: '$count Tauchgang anzeigen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_refine_showDivesNoCount => 'Tauchgänge anzeigen';
+
+  @override
   String get diveLog_search_fieldHint => 'Suche, z. B. depth > 30m';
 
   @override
@@ -9376,13 +9392,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_search_allTrips => 'Alle Reisen';
 
   @override
-  String get diveLog_search_appBar => 'Erweiterte Suche';
-
-  @override
   String get diveLog_search_cancel => 'Abbrechen';
-
-  @override
-  String get diveLog_search_clearAll => 'Alles löschen';
 
   @override
   String get diveLog_search_customFieldKey => 'Custom Field Key';
@@ -9391,15 +9401,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_search_customFieldValue => 'Value contains...';
 
   @override
-  String get diveLog_search_end => 'Ende';
-
-  @override
   String get diveLog_search_errorLoadingCenters =>
       'Fehler beim Laden der Tauchbasen';
-
-  @override
-  String get diveLog_search_errorLoadingDiveTypes =>
-      'Fehler beim Laden der Tauchgangstypen';
 
   @override
   String get diveLog_search_errorLoadingEquipment =>
@@ -9427,19 +9430,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_search_label_diveSite => 'Tauchplatz';
 
   @override
-  String get diveLog_search_label_diveType => 'Tauchgangart';
-
-  @override
-  String get diveLog_search_label_durationRange => 'Dauerbereich (min)';
-
-  @override
   String get diveLog_search_label_equipment => 'Ausrüstung';
 
   @override
   String get diveLog_search_label_trip => 'Reise';
-
-  @override
-  String get diveLog_search_search => 'Suchen';
 
   @override
   String get diveLog_search_section_conditions => 'Bedingungen';
@@ -9455,12 +9449,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_search_section_organization => 'Organisation';
-
-  @override
-  String get diveLog_search_section_social => 'Soziales';
-
-  @override
-  String get diveLog_search_start => 'Start';
 
   @override
   String diveLog_selection_countSelected(Object count) {
@@ -47660,12 +47648,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get query_editor_valueFalse => 'Nein';
-
-  @override
-  String get diveLog_filter_queryRow => 'Abfrage';
-
-  @override
-  String get diveLog_search_section_query => 'Abfrage';
 
   @override
   String get query_saveDialog_title => 'Abfrage speichern';

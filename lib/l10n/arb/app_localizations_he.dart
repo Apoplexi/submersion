@@ -7582,16 +7582,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filter_allTypes => 'כל הסוגים';
 
   @override
-  String get diveLog_filter_apply => 'החלת מסננים';
-
-  @override
   String get diveLog_filter_buddyHint => 'חיפוש לפי שם שותף';
 
   @override
   String get diveLog_filter_buddyName => 'שם שותף';
-
-  @override
-  String get diveLog_filter_clearAll => 'ניקוי הכל';
 
   @override
   String get diveLog_filter_clearDates => 'ניקוי תאריכים';
@@ -7672,13 +7666,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filter_sectionBuddy => 'שותף';
 
   @override
-  String get diveLog_filter_sectionDateRange => 'טווח תאריכים';
-
-  @override
   String get diveLog_filter_sectionDepthRange => 'טווח עומק (מטרים)';
-
-  @override
-  String get diveLog_filter_sectionDiveSite => 'אתר צלילה';
 
   @override
   String get diveLog_filter_sectionDiveType => 'סוג צלילה';
@@ -7706,15 +7694,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_filter_startDate => 'תאריך התחלה';
-
-  @override
-  String get diveLog_filter_title => 'סינון צלילות';
-
-  @override
-  String get diveLog_filter_resizeGrip => 'שינוי גודל חלונית הסינון';
-
-  @override
-  String get diveLog_filter_tooltip_close => 'סגירת מסנן';
 
   @override
   String get diveLog_fullscreenProfile_close => 'סגירת מסך מלא';
@@ -7929,9 +7908,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_listPage_fab_logDive => 'רישום צלילה';
-
-  @override
-  String get diveLog_listPage_menuAdvancedSearch => 'חיפוש מתקדם';
 
   @override
   String get diveLog_listPage_menuDiveNumbering => 'מספור צלילות';
@@ -8797,6 +8773,46 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_listPage_tooltip_searchDives => 'חיפוש צלילות';
 
   @override
+  String get diveLog_refine_title => 'צמצום';
+
+  @override
+  String get diveLog_refine_groupRules => 'כללים';
+
+  @override
+  String get diveLog_refine_groupPeople => 'אנשים וחיים ימיים';
+
+  @override
+  String get diveLog_refine_groupCustomFields => 'שדות מותאמים';
+
+  @override
+  String get diveLog_refine_summaryAny => 'הכול';
+
+  @override
+  String diveLog_refine_summaryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מסננים',
+      one: 'מסנן אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_refine_showDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הצגת $count צלילות',
+      one: 'הצגת צלילה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_refine_showDivesNoCount => 'הצגת צלילות';
+
+  @override
   String get diveLog_search_fieldHint => 'חיפוש, או נסו depth > 30m';
 
   @override
@@ -9155,13 +9171,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_search_allTrips => 'כל הטיולים';
 
   @override
-  String get diveLog_search_appBar => 'חיפוש מתקדם';
-
-  @override
   String get diveLog_search_cancel => 'ביטול';
-
-  @override
-  String get diveLog_search_clearAll => 'נקה הכל';
 
   @override
   String get diveLog_search_customFieldKey => 'Custom Field Key';
@@ -9170,13 +9180,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_search_customFieldValue => 'Value contains...';
 
   @override
-  String get diveLog_search_end => 'סיום';
-
-  @override
   String get diveLog_search_errorLoadingCenters => 'שגיאה בטעינת מרכזי צלילה';
-
-  @override
-  String get diveLog_search_errorLoadingDiveTypes => 'שגיאה בטעינת סוגי צלילה';
 
   @override
   String get diveLog_search_errorLoadingEquipment => 'שגיאה בטעינת הציוד';
@@ -9203,19 +9207,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_search_label_diveSite => 'אתר צלילה';
 
   @override
-  String get diveLog_search_label_diveType => 'סוג צלילה';
-
-  @override
-  String get diveLog_search_label_durationRange => 'טווח משך (min)';
-
-  @override
   String get diveLog_search_label_equipment => 'ציוד';
 
   @override
   String get diveLog_search_label_trip => 'טיול';
-
-  @override
-  String get diveLog_search_search => 'חיפוש';
 
   @override
   String get diveLog_search_section_conditions => 'תנאים';
@@ -9231,12 +9226,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_search_section_organization => 'ארגון';
-
-  @override
-  String get diveLog_search_section_social => 'חברתי';
-
-  @override
-  String get diveLog_search_start => 'התחלה';
 
   @override
   String diveLog_selection_countSelected(Object count) {
@@ -46802,12 +46791,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get query_editor_valueFalse => 'לא';
-
-  @override
-  String get diveLog_filter_queryRow => 'שאילתה';
-
-  @override
-  String get diveLog_search_section_query => 'שאילתה';
 
   @override
   String get query_saveDialog_title => 'שמירת שאילתה';
