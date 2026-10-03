@@ -6903,6 +6903,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get diveLog_edit_equipmentCaption =>
+      'المعدات التي استخدمتها، لعدد غطساتها وسجل صيانتها. الأسطوانة المدرجة هنا لا تضيف بيانات غاز؛ أضفها أيضًا ضمن الأسطوانات.';
+
+  @override
   String get diveLog_edit_equipmentHint =>
       'انقر \"استخدام طقم\" أو \"إضافة\" لاختيار المعدات';
 
@@ -7322,6 +7326,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_edit_tankCard_volume => 'الحجم';
+
+  @override
+  String get diveLog_edit_tanksCaption =>
+      'ما تنفست منه. تأتي رسوم الغاز البيانية واستهلاك الغاز والإحصاءات من هذه الأسطوانات.';
 
   @override
   String get diveLog_edit_tooltip_calculateFromProfile => 'حساب من ملف الغوصة';
@@ -9521,6 +9529,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_tank_tooltip_remove => 'إزالة الأسطوانة';
+
+  @override
+  String get diveLog_tank_fromOwnCylinder => 'التعبئة من أسطواناتي';
+
+  @override
+  String get diveLog_tank_ownCylinderFailed =>
+      'تعذّر نسخ بيانات تلك الأسطوانة. حاول مرة أخرى.';
+
+  @override
+  String get diveLog_tank_ownCylinderHint =>
+      'ينسخ حجم الأسطوانة المختارة وآخر تعبئة لها ويضيفها إلى معدات هذه الغطسة.';
+
+  @override
+  String get diveLog_tank_ownCylinderTitle => 'أسطواناتي';
 
   @override
   String get diveLog_tank_regulatorLabel => 'منظم التنفس';
