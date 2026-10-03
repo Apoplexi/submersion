@@ -271,6 +271,7 @@ class ReparseService {
         );
         await _insertGasSwitches(
           diveId: diveId,
+          computerId: computerId,
           parsed: parsed,
           tankIdsByIndex: tankIdsByIndex,
           now: now,
@@ -810,6 +811,7 @@ class ReparseService {
   /// the shared resolver) to the freshly carried-over tank id.
   Future<void> _insertGasSwitches({
     required String diveId,
+    required String? computerId,
     required pigeon.ParsedDive parsed,
     required Map<int, String> tankIdsByIndex,
     required DateTime now,
@@ -831,6 +833,7 @@ class ReparseService {
             timestamp: Value(sw.timeSeconds),
             tankId: Value(tankId),
             depth: Value(sw.depth),
+            computerId: Value(computerId),
             createdAt: Value(nowMs),
           ),
         );
