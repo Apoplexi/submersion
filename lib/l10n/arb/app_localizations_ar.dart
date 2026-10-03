@@ -25545,8 +25545,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_edit_dialog_keepEditing => 'متابعة التعديل';
 
   @override
-  String trips_edit_durationDays(Object days) {
-    return '$days أيام';
+  String trips_edit_durationDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days أيام',
+      two: 'يومان',
+      one: 'يوم واحد',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -25881,6 +25888,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get trips_type_dayTrip => 'رحلة يومية';
+
+  @override
+  String get trips_type_description_dayTrip =>
+      'يوم واحد فقط، مثل غطسة محلية واحدة';
+
+  @override
+  String get trips_type_description_liveaboard =>
+      'الإقامة على متن قارب غوص، مع تفاصيل القارب ومسار الرحلة';
+
+  @override
+  String get trips_type_description_resort => 'إقامة في منتجع غوص';
+
+  @override
+  String get trips_type_description_shore =>
+      'غطسات من الشاطئ على مدى يوم أو أكثر';
 
   @override
   String get trips_edit_label_tripType => 'Trip Type';
