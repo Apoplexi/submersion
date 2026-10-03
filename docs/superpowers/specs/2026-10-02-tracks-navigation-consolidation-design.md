@@ -333,8 +333,9 @@ Snackbar, with the GPS log's own strings ("Match dives to GPS logs"):
 - the sweep failed: the generic "try again" message (failure logged)
 
 Underwater tracks waiting for that choice are counted by
-`navTrackPendingChoiceCountProvider` and shown as a "N routes need your
-choice" hint under the summary strip.
+`navTrackPendingChoiceCountProvider` and shown as a "N underwater tracks
+need your choice" hint under the summary strip (PR 1 shipped it as "N routes
+need your choice"; PR 2 rewords it).
 
 The list also takes #2819's first-load states: a spinner while the first
 load runs and a "try again" message if it fails, both only before any data
@@ -346,7 +347,21 @@ both kinds the dive list's card design together.
 
 ## Vocabulary (PR 2)
 
-User-facing "route" becomes "underwater track" in every locale:
+User-facing "route" becomes "track": the full "underwater track" wherever a
+string can be seen outside an underwater-only screen, plain "track" inside
+one. Every key whose value changes is renamed, and the old key is deleted
+from all 11 locales. Out of scope: the dive planner's route, a trip's voyage
+route, the emergency card and the startup recovery text, which use "route" in
+another sense.
+
+Each locale uses one word for a track, the same word its Tracks destination
+uses, for GPS and underwater tracks alike. Hungarian says "nyomvonal" (the
+nav label reads "Nyomvonalak"), chosen on 2026-10-03 over the "útvonal" the
+PR 2 plan's table lists; "útvonal" stays where it means a route or a path.
+Arabic and Hebrew use one word for route and track, so only their key names
+change. `test/l10n/underwater_track_vocabulary_test.dart` enforces the rule.
+
+The strings it covers, in every locale:
 
 - dive detail section heading and actions (`NavTrackSection`)
 - detail, alignment and 3D page titles and dialogs

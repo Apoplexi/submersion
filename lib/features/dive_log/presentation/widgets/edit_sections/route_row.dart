@@ -4,7 +4,7 @@ import 'package:submersion/features/nav_track/domain/dive_route_link_draft.dart'
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/form_row.dart';
 
-/// The Dive Edit page's "Underwater Route" row, under Site (spec
+/// The Dive Edit page's "Underwater Track" row, under Site (spec
 /// 2026-10-02-underwater-route-entry-points-design.md, section 1). Shows
 /// the routes the dive will have once saved; tapping opens the route sheet.
 ///
@@ -38,10 +38,10 @@ class RouteRow extends StatelessWidget {
     };
     return FormRow.picker(
       key: const ValueKey('dive-edit-route-row'),
-      label: l10n.navTrack_section_title,
+      label: l10n.navTrack_section_trackTitle,
       value: value,
       placeholder: loadFailed && draft == null
-          ? l10n.navTrack_editRow_loadFailed
+          ? l10n.navTrack_editRow_tracksLoadFailed
           : l10n.navTrack_editRow_none,
       onTap: () {
         if (draft != null) onTap();

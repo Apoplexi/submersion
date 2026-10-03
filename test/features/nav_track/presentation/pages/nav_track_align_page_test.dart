@@ -974,7 +974,7 @@ void main() {
     await _pump(tester, route: degraded);
 
     expect(tester.takeException(), isNull);
-    expect(find.text('Could not load this route.'), findsOneWidget);
+    expect(find.text('Could not load this track.'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('nav-track-align-trust-slider')),
       findsNothing,
@@ -1062,6 +1062,42 @@ void main() {
 
       expect(after.latitude, closeTo(before.latitude, 1e-9));
       expect(after.longitude, closeTo(before.longitude, 1e-9));
+    });
+  });
+
+  group('when the track cannot be shown', () {
+    Future<void> pumpAlign(
+      WidgetTester tester,
+      Future<NavTrack?> Function() load,
+    ) async {
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            navTrackByIdProvider('r1').overrideWith((ref) => load()),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: NavTrackAlignPage(routeId: 'r1'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a failed load says the track could not be loaded', (
+      tester,
+    ) async {
+      await pumpAlign(tester, () async => throw StateError('database locked'));
+      expect(find.text('Could not load this track.'), findsOneWidget);
+    });
+
+    testWidgets('a missing track says the track was not found', (tester) async {
+      await pumpAlign(tester, () async => null);
+      expect(find.text('Track not found.'), findsOneWidget);
     });
   });
 }

@@ -25645,7 +25645,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get universalImport_summary_importAsRoute => 'Importar como ruta';
+  String get universalImport_summary_importAsUnderwaterTrack =>
+      'Importar como track submarino';
 
   @override
   String get universalImport_summary_fileNeedsIndividualImport =>
@@ -27058,7 +27059,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get gpsTrack_importError_tooLarge =>
-      'Ese archivo tiene demasiadas posiciones para guardarlo como un solo recorrido. Divídelo en recorridos más cortos e impórtalos por separado.';
+      'Ese archivo tiene demasiadas posiciones para guardarlo como un solo track. Divídelo en tracks más cortos e impórtalos por separado.';
 
   @override
   String get gpsTrack_export_saved => 'Track guardado';
@@ -27086,7 +27087,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String gpsTrack_map_truncated(int count) {
-    return 'Se muestran las $count rutas más recientes. Ajusta el filtro de fechas para ver las demás.';
+    return 'Se muestran los $count tracks más recientes. Ajusta el filtro de fechas para ver los demás.';
   }
 
   @override
@@ -29169,7 +29170,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => 'Paredes verticales';
 
   @override
-  String get dive3d_seascape_showRoute => 'Mostrar ruta';
+  String get dive3d_seascape_showUnderwaterTrack => 'Mostrar track submarino';
 
   @override
   String get dive3d_overlay_water => 'Superficie del agua';
@@ -29439,11 +29440,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ruta estimada (navegación a estima)';
 
   @override
-  String get dive3d_spatial_recordedPath => 'Ruta grabada';
+  String get dive3d_spatial_recordedTrack => 'Track grabado';
 
   @override
-  String dive3d_spatial_recordedPathWithSource(String source) {
-    return 'Ruta grabada ($source)';
+  String dive3d_spatial_recordedTrackWithSource(String source) {
+    return 'Track grabado ($source)';
   }
 
   @override
@@ -43771,10 +43772,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cómo se agrupa y ordena el equipo en una inmersión';
 
   @override
-  String get navTrack_common_loadError => 'No se pudo cargar esta ruta.';
+  String get navTrack_common_trackLoadError => 'No se pudo cargar este track.';
 
   @override
-  String get navTrack_common_notFound => 'Ruta no encontrada.';
+  String get navTrack_common_trackNotFound => 'Track no encontrado.';
 
   @override
   String get navTrack_common_cancel => 'Cancelar';
@@ -43876,16 +43877,16 @@ class AppLocalizationsEs extends AppLocalizations {
       ' (batimetría de baja resolución: solo se comprobaron conflictos en tierra)';
 
   @override
-  String get navTrack_detail_renameTitle => 'Cambiar nombre de la ruta';
+  String get navTrack_detail_renameTrackTitle => 'Cambiar nombre del track';
 
   @override
-  String get navTrack_detail_deleteTitle => '¿Eliminar ruta?';
+  String get navTrack_detail_deleteTrackTitle => '¿Eliminar track?';
 
   @override
   String get navTrack_detail_deleteMessage => 'Esto no se puede deshacer.';
 
   @override
-  String get navTrack_detail_defaultTitle => 'Ruta';
+  String get navTrack_detail_defaultTrackTitle => 'Track submarino';
 
   @override
   String get navTrack_detail_menuRename => 'Cambiar nombre';
@@ -43966,7 +43967,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrack_detail_chooseSite => 'Elegir punto de buceo';
 
   @override
-  String get navTrack_review_title => 'Importar ruta submarina';
+  String get navTrack_review_importTrackTitle => 'Importar track submarino';
 
   @override
   String navTrack_review_segmentSummaryNoFix(int underwater) {
@@ -43983,8 +43984,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String navTrack_review_saveError(String error) {
-    return 'No se pudo guardar esta ruta: $error';
+  String navTrack_review_trackSaveError(String error) {
+    return 'No se pudo guardar este track: $error';
   }
 
   @override
@@ -44003,8 +44004,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se registró movimiento: la distancia y la velocidad se mantienen en cero durante todo el archivo.';
 
   @override
-  String get navTrack_review_warningDuplicate =>
-      'Esto parece una ruta ya importada del mismo archivo.';
+  String get navTrack_review_trackDuplicateWarning =>
+      'Esto parece un track ya importado del mismo archivo.';
 
   @override
   String get navTrack_review_replaceLabel => 'Reemplazar';
@@ -44078,56 +44079,57 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get navTrack_review_saveConfirmation => 'Ruta guardada.';
+  String get navTrack_review_trackSavedConfirmation =>
+      'Track submarino guardado.';
 
   @override
-  String navTrack_list_pendingChoice(num count) {
+  String navTrack_list_pendingTrackChoice(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count rutas esperan tu elección',
-      one: '$count ruta espera tu elección',
+      other: '$count tracks submarinos esperan tu elección',
+      one: '$count track submarino espera tu elección',
     );
     return '$_temp0';
   }
 
   @override
-  String get navTrack_seascape_title => 'Paisaje submarino de la ruta';
+  String get navTrack_seascape_trackTitle => 'Paisaje submarino del track';
 
   @override
-  String get navTrack_seascape_noScene =>
-      'Esta ruta no tiene un paisaje submarino disponible.';
+  String get navTrack_seascape_trackNoScene =>
+      'Este track no tiene un paisaje submarino disponible.';
 
   @override
   String get navTrack_handoff_recognized =>
       'Registro de navegación Seacraft ENC reconocido';
 
   @override
-  String get navTrack_handoff_description =>
-      'Esto es una ruta submarina, no un registro de inmersión. Tiene su propio lugar en Submersion, separado de tu importación de inmersiones.';
+  String get navTrack_handoff_trackDescription =>
+      'Esto es un track submarino, no un registro de inmersión. Tiene su propio lugar en Submersion, separado de tu importación de inmersiones.';
 
   @override
-  String get navTrack_handoff_reviewButton => 'Revisar ruta';
+  String get navTrack_handoff_reviewTrackButton => 'Revisar track submarino';
 
   @override
-  String get navTrack_section_title => 'Ruta submarina';
+  String get navTrack_section_trackTitle => 'Track submarino';
 
   @override
-  String navTrack_section_routeCount(num count) {
+  String navTrack_section_trackCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count rutas',
-      one: '$count ruta',
+      other: '$count tracks',
+      one: '$count track',
     );
     return '$_temp0';
   }
 
   @override
-  String get navTrack_section_noRouteLinked => 'Ninguna ruta vinculada';
+  String get navTrack_section_noTrackLinked => 'Ningún track vinculado';
 
   @override
-  String get navTrack_section_linkButton => 'Vincular ruta';
+  String get navTrack_section_linkTrackButton => 'Vincular track';
 
   @override
   String get navTrack_section_importButton => 'Importar archivo';
@@ -44136,7 +44138,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrack_section_primaryTag => 'principal';
 
   @override
-  String get navTrack_section_menuOpen => 'Abrir ruta';
+  String get navTrack_section_menuOpenTrack => 'Abrir track';
 
   @override
   String get navTrack_section_menuOpen3d => 'Abrir paisaje 3D';
@@ -44148,7 +44150,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrack_editRow_none => 'Ninguna';
 
   @override
-  String get navTrack_editRow_loadFailed => 'No se pudieron cargar las rutas';
+  String get navTrack_editRow_tracksLoadFailed =>
+      'No se pudieron cargar los tracks submarinos';
 
   @override
   String navTrack_editRow_more(int count, String name) {
@@ -44156,11 +44159,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get navTrack_editSheet_removeTooltip => 'Quitar ruta';
+  String get navTrack_editSheet_removeTrackTooltip => 'Quitar track';
 
   @override
-  String navTrack_editRow_saveFailed(String error) {
-    return 'No se pudieron actualizar las rutas submarinas de esta inmersión: $error';
+  String navTrack_editRow_tracksSaveFailed(String error) {
+    return 'No se pudieron actualizar los tracks submarinos de esta inmersión: $error';
   }
 
   @override
@@ -44172,23 +44175,23 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo leer este archivo como un registro de navegación Seacraft ENC.';
 
   @override
-  String get navTrack_importError_tooShort =>
-      'Esta grabación tiene muy pocas muestras para ser una ruta utilizable.';
+  String get navTrack_importError_trackTooShort =>
+      'Esta grabación tiene muy pocas muestras para ser un track submarino utilizable.';
 
   @override
   String get navTrack_importError_badData =>
       'Este archivo tiene datos que Submersion no pudo interpretar.';
 
   @override
-  String get navTrack_importError_tooLarge =>
-      'Esta grabación tiene más muestras de las que una ruta puede almacenar.';
+  String get navTrack_importError_trackTooLarge =>
+      'Esta grabación tiene más muestras de las que un track submarino puede almacenar.';
 
   @override
-  String get diveDetailSection_navTrack_name => 'Ruta submarina';
+  String get diveDetailSection_navTrack_trackName => 'Track submarino';
 
   @override
-  String get diveDetailSection_navTrack_description =>
-      'Ruta submarina medida desde una consola de navegación';
+  String get diveDetailSection_navTrack_trackDescription =>
+      'Track submarino medido desde una consola de navegación';
 
   @override
   String navTrack_list_durationHours(int hours, int minutes) {

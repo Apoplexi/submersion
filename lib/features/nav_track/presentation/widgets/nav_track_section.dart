@@ -13,7 +13,7 @@ import 'package:submersion/features/nav_track/presentation/widgets/nav_track_sha
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// The dive detail "Underwater Route" section (spec
+/// The dive detail "Underwater Track" section (spec
 /// 2026-09-10-underwater-nav-track-design.md, "Dive detail section"): the
 /// routes linked to this dive. The detail page only shows it when at least
 /// one route is linked; linking and importing happen on the Dive Edit page
@@ -31,9 +31,9 @@ class NavTrackSection extends ConsumerWidget {
     final l10n = context.l10n;
 
     return CollapsibleCardSection(
-      title: l10n.navTrack_section_title,
+      title: l10n.navTrack_section_trackTitle,
       icon: Icons.route,
-      collapsedSubtitle: l10n.navTrack_section_routeCount(routes.length),
+      collapsedSubtitle: l10n.navTrack_section_trackCount(routes.length),
       isExpanded: isExpanded,
       onToggle: (expanded) =>
           ref.read(navTrackSectionExpandedProvider.notifier).state = expanded,
@@ -104,7 +104,7 @@ class _RouteRow extends ConsumerWidget {
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 'open',
-              child: Text(l10n.navTrack_section_menuOpen),
+              child: Text(l10n.navTrack_section_menuOpenTrack),
             ),
             PopupMenuItem(
               value: '3d',

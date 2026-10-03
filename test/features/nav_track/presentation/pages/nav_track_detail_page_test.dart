@@ -594,7 +594,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Could not load this route.'), findsOneWidget);
+    expect(find.text('Could not load this track.'), findsOneWidget);
   });
 
   testWidgets('shows "Route not found" when the route no longer exists', (
@@ -616,7 +616,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Route not found.'), findsOneWidget);
+    expect(find.text('Track not found.'), findsOneWidget);
   });
 
   testWidgets('shows the "set start point" placeholder when unanchored', (
@@ -753,7 +753,7 @@ void main() {
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Delete route?'), findsOneWidget);
+      expect(find.text('Delete track?'), findsOneWidget);
       // Two "Delete" texts now exist: the dialog title's button and the
       // menu item underneath; tap the dialog's action explicitly.
       await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
@@ -901,4 +901,29 @@ void main() {
       );
     });
   });
+
+  testWidgets(
+    'a track with no name or source file is titled Underwater track',
+    (tester) async {
+      await _pump(
+        tester,
+        route: NavTrack(
+          id: 'r1',
+          source: NavTrackSource.seacraftEnc,
+          startTime: 1755856800000,
+          endTime: 1755860400000,
+          pointCount: 0,
+          createdAt: DateTime(2026, 8, 22),
+          updatedAt: DateTime(2026, 8, 22),
+        ),
+      );
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.text('Underwater track'),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 }
