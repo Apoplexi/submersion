@@ -444,10 +444,10 @@ void main() {
           location: GeoPoint(47.5, 8.6),
         );
         final router = GoRouter(
-          initialLocation: '/nav-routes/${route.id}',
+          initialLocation: '/tracks/underwater/${route.id}',
           routes: [
             GoRoute(
-              path: '/nav-routes/:id',
+              path: '/tracks/underwater/:id',
               builder: (context, state) =>
                   NavTrackDetailPage(trackId: state.pathParameters['id']!),
             ),
@@ -497,10 +497,10 @@ void main() {
         );
         Object? seededLocation;
         final router = GoRouter(
-          initialLocation: '/nav-routes/${route.id}',
+          initialLocation: '/tracks/underwater/${route.id}',
           routes: [
             GoRoute(
-              path: '/nav-routes/:id',
+              path: '/tracks/underwater/:id',
               builder: (context, state) =>
                   NavTrackDetailPage(trackId: state.pathParameters['id']!),
             ),
@@ -718,13 +718,13 @@ void main() {
             path: '/',
             builder: (context, state) => Scaffold(
               body: TextButton(
-                onPressed: () => context.push('/nav-routes/${route.id}'),
+                onPressed: () => context.push('/tracks/underwater/${route.id}'),
                 child: const Text('open'),
               ),
             ),
           ),
           GoRoute(
-            path: '/nav-routes/:id',
+            path: '/tracks/underwater/:id',
             builder: (context, state) =>
                 NavTrackDetailPage(trackId: state.pathParameters['id']!),
           ),
@@ -769,20 +769,20 @@ void main() {
       final overrides = await getBaseOverrides();
       final route = _route();
       final router = GoRouter(
-        initialLocation: '/nav-routes/${route.id}',
+        initialLocation: '/tracks/underwater/${route.id}',
         routes: [
           GoRoute(
-            path: '/nav-routes/:id',
+            path: '/tracks/underwater/:id',
             builder: (context, state) =>
                 NavTrackDetailPage(trackId: state.pathParameters['id']!),
           ),
           GoRoute(
-            path: '/nav-routes/:id/align',
+            path: '/tracks/underwater/:id/align',
             builder: (context, state) =>
                 const Scaffold(body: Text('ALIGN_PAGE')),
           ),
           GoRoute(
-            path: '/nav-routes/:id/3d',
+            path: '/tracks/underwater/:id/3d',
             builder: (context, state) =>
                 const Scaffold(body: Text('SEASCAPE_PAGE')),
           ),
@@ -812,15 +812,15 @@ void main() {
       final overrides = await getBaseOverrides();
       final route = _route();
       final router = GoRouter(
-        initialLocation: '/nav-routes/${route.id}',
+        initialLocation: '/tracks/underwater/${route.id}',
         routes: [
           GoRoute(
-            path: '/nav-routes/:id',
+            path: '/tracks/underwater/:id',
             builder: (context, state) =>
                 NavTrackDetailPage(trackId: state.pathParameters['id']!),
           ),
           GoRoute(
-            path: '/nav-routes/:id/3d',
+            path: '/tracks/underwater/:id/3d',
             builder: (context, state) =>
                 const Scaffold(body: Text('SEASCAPE_PAGE')),
           ),

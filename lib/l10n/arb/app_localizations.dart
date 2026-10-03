@@ -27661,12 +27661,6 @@ abstract class AppLocalizations {
   /// **'Equipment'**
   String get nav_equipment;
 
-  /// No description provided for @nav_gpsLog.
-  ///
-  /// In en, this message translates to:
-  /// **'GPS Log'**
-  String get nav_gpsLog;
-
   /// Media console sidebar/tab label for the library view
   ///
   /// In en, this message translates to:
@@ -28362,6 +28356,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expand menu'**
   String get nav_tooltip_expandMenu;
+
+  /// No description provided for @nav_tracks.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks'**
+  String get nav_tracks;
+
+  /// No description provided for @nav_tracksSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS and underwater tracks'**
+  String get nav_tracksSubtitle;
 
   /// Navigation label for data transfer section
   ///
@@ -37049,6 +37055,60 @@ abstract class AppLocalizations {
   /// **'Tides'**
   String get tides_title;
 
+  /// No description provided for @tracks_badge_underwater.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwater'**
+  String get tracks_badge_underwater;
+
+  /// No description provided for @tracks_empty_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a GPS track on your phone during a dive day, or import GPX, KML, CSV or FIT files and Seacraft ENC navigation logs. GPS tracks are matched to your dives automatically; you choose the dive for each underwater track.'**
+  String get tracks_empty_body;
+
+  /// No description provided for @tracks_empty_clearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get tracks_empty_clearFilters;
+
+  /// No description provided for @tracks_empty_filtered.
+  ///
+  /// In en, this message translates to:
+  /// **'No tracks match these filters'**
+  String get tracks_empty_filtered;
+
+  /// No description provided for @tracks_empty_title.
+  ///
+  /// In en, this message translates to:
+  /// **'No tracks yet'**
+  String get tracks_empty_title;
+
+  /// No description provided for @tracks_kind_all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get tracks_kind_all;
+
+  /// No description provided for @tracks_kind_gps.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS'**
+  String get tracks_kind_gps;
+
+  /// No description provided for @tracks_kind_underwater.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwater'**
+  String get tracks_kind_underwater;
+
+  /// No description provided for @tracks_map_noMappable.
+  ///
+  /// In en, this message translates to:
+  /// **'None of these tracks has a position on the map yet.'**
+  String get tracks_map_noMappable;
+
   /// No description provided for @transfer_appBar_title.
   ///
   /// In en, this message translates to:
@@ -42080,12 +42140,6 @@ abstract class AppLocalizations {
   /// **'Waiting for GPS fix'**
   String get gpsLogger_noFixYet;
 
-  /// No description provided for @gpsLogger_noTracks.
-  ///
-  /// In en, this message translates to:
-  /// **'No GPS tracks recorded yet'**
-  String get gpsLogger_noTracks;
-
   /// No description provided for @gpsLogger_permissionDenied.
   ///
   /// In en, this message translates to:
@@ -42151,12 +42205,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Trimmed, {duration}'**
   String gpsLogger_trackSubtitleTrimmed(String duration);
-
-  /// No description provided for @gpsLogger_tracksHeader.
-  ///
-  /// In en, this message translates to:
-  /// **'Recorded tracks'**
-  String get gpsLogger_tracksHeader;
 
   /// No description provided for @gpsTrack_action_trim.
   ///
@@ -43088,18 +43136,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tank Presets'**
   String get tankPresets_title;
-
-  /// No description provided for @tools_gpsLogger_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Record your position during a dive day and match imported dives to GPS locations automatically.'**
-  String get tools_gpsLogger_description;
-
-  /// No description provided for @tools_gpsLogger_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Record a surface track'**
-  String get tools_gpsLogger_subtitle;
 
   /// No description provided for @tools_gpsLogger_title.
   ///
@@ -68902,6 +68938,12 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get navTrack_common_delete;
 
+  /// No description provided for @navTrack_common_unlinked.
+  ///
+  /// In en, this message translates to:
+  /// **'unlinked'**
+  String get navTrack_common_unlinked;
+
   /// No description provided for @navTrack_common_unlink.
   ///
   /// In en, this message translates to:
@@ -69357,53 +69399,11 @@ abstract class AppLocalizations {
   /// **'Import failed: {error}'**
   String navTrack_list_importFailed(String error);
 
-  /// No description provided for @navTrack_list_matchError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not check for route matches.'**
-  String get navTrack_list_matchError;
-
-  /// No description provided for @navTrack_list_matchSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Checked for routes needing your choice.'**
-  String get navTrack_list_matchSuccess;
-
   /// No description provided for @navTrack_list_deleteMessage.
   ///
   /// In en, this message translates to:
   /// **'Delete \"{name}\"?'**
   String navTrack_list_deleteMessage(String name);
-
-  /// No description provided for @navTrack_list_importTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Import route file'**
-  String get navTrack_list_importTooltip;
-
-  /// No description provided for @navTrack_list_matchTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Check now'**
-  String get navTrack_list_matchTooltip;
-
-  /// No description provided for @navTrack_list_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Underwater Routes'**
-  String get navTrack_list_title;
-
-  /// No description provided for @navTrack_list_noMapRoutes.
-  ///
-  /// In en, this message translates to:
-  /// **'No routes are placed on the map yet.'**
-  String get navTrack_list_noMapRoutes;
-
-  /// No description provided for @navTrack_list_empty.
-  ///
-  /// In en, this message translates to:
-  /// **'No underwater routes yet.'**
-  String get navTrack_list_empty;
 
   /// No description provided for @navTrack_review_saveConfirmation.
   ///
@@ -69416,12 +69416,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{{count} route needs your choice} other{{count} routes need your choice}}'**
   String navTrack_list_pendingChoice(num count);
-
-  /// No description provided for @navTrack_list_loadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load routes: {error}'**
-  String navTrack_list_loadError(String error);
 
   /// No description provided for @navTrack_seascape_title.
   ///
@@ -71534,12 +71528,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rename, reorder and delete saved queries'**
   String get settings_manage_savedQueries_subtitle;
-
-  /// No description provided for @settings_manage_navRoutes_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Import, align and link recorded routes'**
-  String get settings_manage_navRoutes_subtitle;
 
   /// Query error message.
   ///

@@ -16980,9 +16980,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nav_equipment => 'المعدات';
 
   @override
-  String get nav_gpsLog => 'سجل GPS';
-
-  @override
   String get media_console_library => 'المكتبة';
 
   @override
@@ -17386,6 +17383,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get nav_tooltip_expandMenu => 'توسيع القائمة';
+
+  @override
+  String get nav_tracks => 'المسارات';
+
+  @override
+  String get nav_tracksSubtitle => 'مسارات GPS والمسارات تحت الماء';
 
   @override
   String get nav_transfer => 'نقل البيانات';
@@ -23073,6 +23076,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tides_title => 'المد والجزر';
 
   @override
+  String get tracks_badge_underwater => 'تحت الماء';
+
+  @override
+  String get tracks_empty_body =>
+      'سجّل مسار GPS على هاتفك خلال يوم الغطس، أو استورد ملفات GPX أو KML أو CSV أو FIT وسجلات الملاحة من Seacraft ENC. تتم مطابقة مسارات GPS مع غطساتك تلقائيًا، وتختار أنت الغطسة لكل مسار تحت الماء.';
+
+  @override
+  String get tracks_empty_clearFilters => 'مسح عوامل التصفية';
+
+  @override
+  String get tracks_empty_filtered => 'لا توجد مسارات تطابق عوامل التصفية هذه';
+
+  @override
+  String get tracks_empty_title => 'لا توجد مسارات بعد';
+
+  @override
+  String get tracks_kind_all => 'الكل';
+
+  @override
+  String get tracks_kind_gps => 'GPS';
+
+  @override
+  String get tracks_kind_underwater => 'تحت الماء';
+
+  @override
+  String get tracks_map_noMappable =>
+      'لا يملك أي من هذه المسارات موقعًا على الخريطة بعد.';
+
+  @override
   String get transfer_appBar_title => 'النقل';
 
   @override
@@ -26333,9 +26365,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsLogger_noFixYet => 'في انتظار إشارة GPS';
 
   @override
-  String get gpsLogger_noTracks => 'لا توجد مسارات GPS مسجّلة بعد';
-
-  @override
   String get gpsLogger_permissionDenied =>
       'يلزم إذن الموقع لتسجيل مسار GPS. فعّله من إعدادات النظام.';
 
@@ -26400,9 +26429,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String gpsLogger_trackSubtitleTrimmed(String duration) {
     return 'مقتطع، $duration';
   }
-
-  @override
-  String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override
   String get gpsTrack_action_trim => 'اقتصاص...';
@@ -26962,13 +26988,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tankPresets_title => 'إعدادات الأسطوانات';
-
-  @override
-  String get tools_gpsLogger_description =>
-      'سجّل موقعك خلال يوم الغطس وتتم مطابقة الغطسات المستوردة مع مواقع GPS تلقائيًا.';
-
-  @override
-  String get tools_gpsLogger_subtitle => 'تسجيل مسار السطح';
 
   @override
   String get tools_gpsLogger_title => 'مسجّل GPS';
@@ -43153,6 +43172,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navTrack_common_delete => 'حذف';
 
   @override
+  String get navTrack_common_unlinked => 'غير مرتبط';
+
+  @override
   String get navTrack_common_unlink => 'إلغاء الربط';
 
   @override
@@ -43437,32 +43459,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError => 'تعذر التحقق من مطابقات المسارات.';
-
-  @override
-  String get navTrack_list_matchSuccess =>
-      'تم التحقق من المسارات التي تنتظر اختيارك.';
-
-  @override
   String navTrack_list_deleteMessage(String name) {
     return 'حذف \"$name\"؟';
   }
-
-  @override
-  String get navTrack_list_importTooltip => 'استيراد ملف مسار';
-
-  @override
-  String get navTrack_list_matchTooltip => 'تحقق الآن';
-
-  @override
-  String get navTrack_list_title => 'المسارات تحت الماء';
-
-  @override
-  String get navTrack_list_noMapRoutes =>
-      'لا توجد مسارات موضوعة على الخريطة بعد.';
-
-  @override
-  String get navTrack_list_empty => 'لا توجد مسارات تحت الماء بعد.';
 
   @override
   String get navTrack_review_saveConfirmation => 'تم حفظ المسار.';
@@ -43478,11 +43477,6 @@ class AppLocalizationsAr extends AppLocalizations {
       one: 'مسار واحد ينتظر اختيارك',
     );
     return '$_temp0';
-  }
-
-  @override
-  String navTrack_list_loadError(String error) {
-    return 'تعذر تحميل المسارات: $error';
   }
 
   @override
@@ -44628,10 +44622,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'إعادة تسمية الاستعلامات المحفوظة وإعادة ترتيبها وحذفها';
-
-  @override
-  String get settings_manage_navRoutes_subtitle =>
-      'استيراد المسارات المسجلة ومحاذاتها وربطها';
 
   @override
   String get query_error_unterminatedQuote => 'علامة اقتباس غير مغلقة';

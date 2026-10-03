@@ -3,6 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_page.dart';
+import 'package:submersion/features/nav_track/presentation/pages/nav_track_align_page.dart';
+import 'package:submersion/features/nav_track/presentation/pages/nav_track_detail_page.dart';
+import 'package:submersion/features/nav_track/presentation/pages/nav_track_seascape_page.dart';
+import 'package:submersion/features/tracks/domain/track_kind.dart';
+import 'package:submersion/features/tracks/presentation/pages/tracks_map_page.dart';
+import 'package:submersion/features/tracks/presentation/pages/tracks_page.dart';
+import 'package:submersion/core/router/track_locations.dart';
 import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/router/app_router.dart';
 import 'package:submersion/features/connections/presentation/connections_links.dart';
@@ -32,6 +40,22 @@ GoRoute? _findRouteByName(List<RouteBase> routes, String name) {
     }
     if (route is ShellRoute) {
       final found = _findRouteByName(route.routes, name);
+      if (found != null) return found;
+    }
+  }
+  return null;
+}
+
+/// Finds a [GoRoute] by its own path segment in a route tree recursively.
+GoRoute? _findRouteByPath(List<RouteBase> routes, String path) {
+  for (final route in routes) {
+    if (route is GoRoute) {
+      if (route.path == path) return route;
+      final found = _findRouteByPath(route.routes, path);
+      if (found != null) return found;
+    }
+    if (route is ShellRoute) {
+      final found = _findRouteByPath(route.routes, path);
       if (found != null) return found;
     }
   }
@@ -120,11 +144,200 @@ void main() {
     container.dispose();
   });
 
-  group('gps-log relocation', () {
-    test('gpsLog route is registered at top level', () {
-      final route = _findRouteByName(router.configuration.routes, 'gpsLog');
-      expect(route, isNotNull);
-      expect(route!.path, '/gps-log');
+  group('tracks area', () {
+    test('every tracks page is a top-level sibling of /tracks', () {
+      // go_router builds one page per matched segment and /tracks has its
+      // own pageBuilder, so a nested detail would stack the landing page
+      // under it: two Back presses from a dive's track link.
+      final routes = router.configuration.routes;
+      final tracks = _findRouteByName(routes, 'tracks');
+      expect(tracks?.path, kTracksLocation);
+      expect(tracks!.routes, isEmpty);
+      for (final (name, path) in const [
+        ('tracksMap', '/tracks/map'),
+        ('gpsTrackDetail', '/tracks/gps/:id'),
+        ('underwaterTrackDetail', '/tracks/underwater/:id'),
+        ('underwaterTrackAlign', '/tracks/underwater/:id/align'),
+        ('underwaterTrackSeascape', '/tracks/underwater/:id/3d'),
+      ]) {
+        expect(_findRouteByName(routes, name)?.path, path, reason: name);
+      }
+    });
+
+    test('the location helpers match the route table', () {
+      final config = router.configuration;
+      for (final (location, fullPath) in [
+        (kTracksMapLocation, '/tracks/map'),
+        (gpsTrackLocation('abc'), '/tracks/gps/:id'),
+        (underwaterTrackLocation('abc'), '/tracks/underwater/:id'),
+        (underwaterTrackAlignLocation('abc'), '/tracks/underwater/:id/align'),
+        (underwaterTrackSeascapeLocation('abc'), '/tracks/underwater/:id/3d'),
+      ]) {
+        expect(
+          config.findMatch(Uri.parse(location)).fullPath,
+          fullPath,
+          reason: location,
+        );
+      }
+    });
+
+    test('static paths are declared before parameterised siblings', () {
+      // ':id' matches any single segment, so a static sibling declared after
+      // it would never match.
+      final paths = _orderedRoutePaths(router.configuration.routes);
+      expect(
+        paths.indexOf('/tracks/map'),
+        lessThan(paths.indexOf('/tracks/gps/:id')),
+      );
+      expect(paths.indexOf('/gps-log/map'), isNot(-1));
+      expect(
+        paths.indexOf('/gps-log/map'),
+        lessThan(paths.indexOf('/gps-log/:id')),
+      );
+    });
+
+    testWidgets('each tracks route builds its page with the path id', (
+      tester,
+    ) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      GoRouterState stateFor(
+        String fullPath,
+        String location, [
+        Map<String, String> params = const {},
+      ]) => GoRouterState(
+        router.configuration,
+        uri: Uri.parse(location),
+        matchedLocation: Uri.parse(location).path,
+        fullPath: fullPath,
+        pathParameters: params,
+        pageKey: ValueKey(location),
+      );
+      final routes = router.configuration.routes;
+      Widget build(String name, GoRouterState state) =>
+          _findRouteByName(routes, name)!.builder!(capturedContext, state);
+
+      final landing = _findRouteByName(routes, 'tracks')!.pageBuilder!(
+        capturedContext,
+        stateFor('/tracks', '/tracks?kind=underwater'),
+      );
+      expect(landing, isA<NoTransitionPage<void>>());
+      final tracksPage =
+          (landing as NoTransitionPage<void>).child as TracksPage;
+      expect(tracksPage.initialKind, TrackKindFilter.underwater);
+
+      expect(
+        build('tracksMap', stateFor('/tracks/map', '/tracks/map')),
+        isA<TracksMapPage>(),
+      );
+      final gps =
+          build(
+                'gpsTrackDetail',
+                stateFor('/tracks/gps/:id', '/tracks/gps/g1', {'id': 'g1'}),
+              )
+              as GpsTrackDetailPage;
+      expect(gps.trackId, 'g1');
+      final detail =
+          build(
+                'underwaterTrackDetail',
+                stateFor('/tracks/underwater/:id', '/tracks/underwater/u1', {
+                  'id': 'u1',
+                }),
+              )
+              as NavTrackDetailPage;
+      expect(detail.trackId, 'u1');
+      final align =
+          build(
+                'underwaterTrackAlign',
+                stateFor(
+                  '/tracks/underwater/:id/align',
+                  '/tracks/underwater/u1/align',
+                  {'id': 'u1'},
+                ),
+              )
+              as NavTrackAlignPage;
+      expect(align.routeId, 'u1');
+      final seascape =
+          build(
+                'underwaterTrackSeascape',
+                stateFor(
+                  '/tracks/underwater/:id/3d',
+                  '/tracks/underwater/u1/3d',
+                  {'id': 'u1'},
+                ),
+              )
+              as NavTrackSeascapePage;
+      expect(seascape.trackId, 'u1');
+    });
+
+    testWidgets('old GPS log and underwater route locations redirect into '
+        '/tracks', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      Future<String?> redirect(
+        String path,
+        String location, [
+        Map<String, String> params = const {},
+      ]) async {
+        final route = _findRouteByPath(router.configuration.routes, path);
+        expect(route?.redirect, isNotNull, reason: path);
+        return route!.redirect!(
+          capturedContext,
+          GoRouterState(
+            router.configuration,
+            uri: Uri.parse(location),
+            matchedLocation: location,
+            fullPath: path,
+            pathParameters: params,
+            pageKey: ValueKey(location),
+          ),
+        );
+      }
+
+      expect(await redirect('/gps-log', '/gps-log'), '/tracks');
+      expect(await redirect('/gps-log/map', '/gps-log/map'), '/tracks/map');
+      expect(
+        await redirect('/gps-log/:id', '/gps-log/abc', {'id': 'abc'}),
+        '/tracks/gps/abc',
+      );
+      expect(
+        await redirect('/nav-routes', '/nav-routes'),
+        '/tracks?kind=underwater',
+      );
+      expect(
+        await redirect('/nav-routes/:id', '/nav-routes/r1', {'id': 'r1'}),
+        '/tracks/underwater/r1',
+      );
+      expect(
+        await redirect('/nav-routes/:id/align', '/nav-routes/r1/align', {
+          'id': 'r1',
+        }),
+        '/tracks/underwater/r1/align',
+      );
+      expect(
+        await redirect('/nav-routes/:id/3d', '/nav-routes/r1/3d', {'id': 'r1'}),
+        '/tracks/underwater/r1/3d',
+      );
+      expect(await redirect('gps-logger', '/planning/gps-logger'), '/tracks');
     });
 
     test('old planning gps-logger path is a redirect', () {
@@ -147,46 +360,6 @@ void main() {
       expect(route, isNotNull);
       expect(route!.redirect, isNotNull);
       expect(route.builder, isNull);
-    });
-
-    test('gpsTrackDetail is a SIBLING of gps-log, not a child', () {
-      // go_router builds one page per matched segment and /gps-log has its
-      // own pageBuilder, so nesting stacked a GpsLoggerPage underneath the
-      // detail page - two Back presses to leave, the first landing on a
-      // logger page the diver never opened.
-      final gpsLog = _findRouteByName(router.configuration.routes, 'gpsLog');
-      expect(
-        gpsLog!.routes.whereType<GoRoute>().map((r) => r.name),
-        isNot(contains('gpsTrackDetail')),
-      );
-
-      final detail = _findRouteByName(
-        router.configuration.routes,
-        'gpsTrackDetail',
-      );
-      expect(detail!.path, '/gps-log/:id');
-    });
-
-    test('gpsTrackMap is a sibling too', () {
-      final gpsLog = _findRouteByName(router.configuration.routes, 'gpsLog');
-      expect(
-        gpsLog!.routes.whereType<GoRoute>().map((r) => r.name),
-        isNot(contains('gpsTrackMap')),
-      );
-      final map = _findRouteByName(router.configuration.routes, 'gpsTrackMap');
-      expect(map!.path, '/gps-log/map');
-    });
-
-    test('the static gps-log route is declared before the :id route', () {
-      // ':id' matches any single segment, so a static sibling declared after
-      // it would never match.
-      // _collectRoutePaths returns a Set, which cannot express order.
-      final paths = _orderedRoutePaths(router.configuration.routes);
-      final mapIndex = paths.indexOf('/gps-log/map');
-      final idIndex = paths.indexOf('/gps-log/:id');
-      expect(mapIndex, isNot(-1));
-      expect(idIndex, isNot(-1));
-      expect(mapIndex, lessThan(idIndex));
     });
   });
 

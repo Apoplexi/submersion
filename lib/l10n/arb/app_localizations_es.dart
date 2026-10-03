@@ -17244,9 +17244,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get nav_equipment => 'Equipo';
 
   @override
-  String get nav_gpsLog => 'Registro GPS';
-
-  @override
   String get media_console_library => 'Biblioteca';
 
   @override
@@ -17651,6 +17648,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get nav_tooltip_expandMenu => 'Expandir menú';
+
+  @override
+  String get nav_tracks => 'Tracks';
+
+  @override
+  String get nav_tracksSubtitle => 'Tracks GPS y submarinos';
 
   @override
   String get nav_transfer => 'Transferencia';
@@ -23376,6 +23379,35 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tides_title => 'Mareas';
 
   @override
+  String get tracks_badge_underwater => 'Submarino';
+
+  @override
+  String get tracks_empty_body =>
+      'Graba un track GPS con tu teléfono durante un día de buceo o importa archivos GPX, KML, CSV o FIT y registros de navegación de Seacraft ENC. Los tracks GPS se asocian automáticamente a tus inmersiones; para cada track submarino eliges la inmersión.';
+
+  @override
+  String get tracks_empty_clearFilters => 'Borrar filtros';
+
+  @override
+  String get tracks_empty_filtered => 'Ningún track coincide con estos filtros';
+
+  @override
+  String get tracks_empty_title => 'Aún no hay tracks';
+
+  @override
+  String get tracks_kind_all => 'Todos';
+
+  @override
+  String get tracks_kind_gps => 'GPS';
+
+  @override
+  String get tracks_kind_underwater => 'Submarinos';
+
+  @override
+  String get tracks_map_noMappable =>
+      'Ninguno de estos tracks tiene todavía una posición en el mapa.';
+
+  @override
   String get transfer_appBar_title => 'Transferir';
 
   @override
@@ -26680,9 +26712,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gpsLogger_noFixYet => 'Esperando señal GPS';
 
   @override
-  String get gpsLogger_noTracks => 'Aún no hay tracks GPS grabados';
-
-  @override
   String get gpsLogger_permissionDenied =>
       'Se necesita permiso de ubicación para grabar un track GPS. Actívalo en los ajustes del sistema.';
 
@@ -26742,9 +26771,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String gpsLogger_trackSubtitleTrimmed(String duration) {
     return 'Recortada, $duration';
   }
-
-  @override
-  String get gpsLogger_tracksHeader => 'Tracks grabados';
 
   @override
   String get gpsTrack_action_trim => 'Recortar...';
@@ -27310,13 +27336,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tankPresets_title => 'Presets de tanque';
-
-  @override
-  String get tools_gpsLogger_description =>
-      'Graba tu posición durante un día de buceo y empareja automáticamente las inmersiones importadas con ubicaciones GPS.';
-
-  @override
-  String get tools_gpsLogger_subtitle => 'Graba un track de superficie';
 
   @override
   String get tools_gpsLogger_title => 'Registrador GPS';
@@ -43528,6 +43547,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrack_common_delete => 'Eliminar';
 
   @override
+  String get navTrack_common_unlinked => 'sin vincular';
+
+  @override
   String get navTrack_common_unlink => 'Desvincular';
 
   @override
@@ -43812,33 +43834,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError =>
-      'No se pudo comprobar el emparejamiento de rutas.';
-
-  @override
-  String get navTrack_list_matchSuccess =>
-      'Se comprobaron las rutas que esperan tu elección.';
-
-  @override
   String navTrack_list_deleteMessage(String name) {
     return '¿Eliminar «$name»?';
   }
-
-  @override
-  String get navTrack_list_importTooltip => 'Importar archivo de ruta';
-
-  @override
-  String get navTrack_list_matchTooltip => 'Comprobar ahora';
-
-  @override
-  String get navTrack_list_title => 'Rutas submarinas';
-
-  @override
-  String get navTrack_list_noMapRoutes =>
-      'Aún no hay rutas colocadas en el mapa.';
-
-  @override
-  String get navTrack_list_empty => 'Aún no hay rutas submarinas.';
 
   @override
   String get navTrack_review_saveConfirmation => 'Ruta guardada.';
@@ -43852,11 +43850,6 @@ class AppLocalizationsEs extends AppLocalizations {
       one: '$count ruta espera tu elección',
     );
     return '$_temp0';
-  }
-
-  @override
-  String navTrack_list_loadError(String error) {
-    return 'No se pudieron cargar las rutas: $error';
   }
 
   @override
@@ -45001,10 +44994,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'Renombrar, reordenar y eliminar consultas guardadas';
-
-  @override
-  String get settings_manage_navRoutes_subtitle =>
-      'Importar, alinear y vincular rutas grabadas';
 
   @override
   String get query_error_unterminatedQuote => 'comillas sin cerrar';

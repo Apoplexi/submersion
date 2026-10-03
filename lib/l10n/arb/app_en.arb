@@ -10319,7 +10319,6 @@
   "nav_diveCenters": "Dive Centers",
   "nav_dives": "Dives",
   "nav_equipment": "Equipment",
-  "nav_gpsLog": "GPS Log",
   "media_console_library": "Library",
   "@media_console_library": {
     "description": "Media console sidebar/tab label for the library view"
@@ -10846,6 +10845,8 @@
   "nav_tooltip_closeMenu": "Close menu",
   "nav_tooltip_collapseMenu": "Collapse menu",
   "nav_tooltip_expandMenu": "Expand menu",
+  "nav_tracks": "Tracks",
+  "nav_tracksSubtitle": "GPS and underwater tracks",
   "nav_transfer": "Transfer",
   "nav_trips": "Trips",
   "@nav_buddies": {
@@ -14374,6 +14375,15 @@
     }
   },
   "tides_title": "Tides",
+  "tracks_badge_underwater": "Underwater",
+  "tracks_empty_body": "Record a GPS track on your phone during a dive day, or import GPX, KML, CSV or FIT files and Seacraft ENC navigation logs. GPS tracks are matched to your dives automatically; you choose the dive for each underwater track.",
+  "tracks_empty_clearFilters": "Clear filters",
+  "tracks_empty_filtered": "No tracks match these filters",
+  "tracks_empty_title": "No tracks yet",
+  "tracks_kind_all": "All",
+  "tracks_kind_gps": "GPS",
+  "tracks_kind_underwater": "Underwater",
+  "tracks_map_noMappable": "None of these tracks has a position on the map yet.",
   "transfer_appBar_title": "Transfer",
   "transfer_computers_appleWatchHeader": "Apple Watch",
   "transfer_computers_appleWatchSubtitle": "Import dives via Apple HealthKit",
@@ -16933,7 +16943,6 @@
   },
   "gpsLogger_matchResultNone": "No dives matched a recorded track",
   "gpsLogger_noFixYet": "Waiting for GPS fix",
-  "gpsLogger_noTracks": "No GPS tracks recorded yet",
   "gpsLogger_permissionDenied": "Location permission is required to record a GPS track. Enable it in system settings.",
   "gpsLogger_recordingStatus": "Recording - {count, plural, one{{count} point} other{{count} points}}",
   "@gpsLogger_recordingStatus": {
@@ -16977,7 +16986,6 @@
       }
     }
   },
-  "gpsLogger_tracksHeader": "Recorded tracks",
   "gpsTrack_action_trim": "Trim...",
   "gpsTrack_action_split": "Split...",
   "gpsTrack_action_resetTrim": "Reset trim",
@@ -17401,8 +17409,6 @@
   "tankPresets_setAsDefault": "Set as default",
   "tankPresets_showInPickers": "Show in tank pickers",
   "tankPresets_title": "Tank Presets",
-  "tools_gpsLogger_description": "Record your position during a dive day and match imported dives to GPS locations automatically.",
-  "tools_gpsLogger_subtitle": "Record a surface track",
   "tools_gpsLogger_title": "GPS Logger",
   "tools_weight_bodyWeightOptional": "Body Weight (optional)",
   "tools_weight_disclaimer": "This is an estimate only. Always perform a buoyancy check at the start of your dive and adjust as needed. Factors like BCD, personal buoyancy, and breathing patterns will affect your actual weight requirements.",
@@ -26502,6 +26508,7 @@
   "navTrack_common_cancel": "Cancel",
   "navTrack_common_save": "Save",
   "navTrack_common_delete": "Delete",
+  "navTrack_common_unlinked": "unlinked",
   "navTrack_common_unlink": "Unlink",
   "navTrack_common_open3dTooltip": "Open 3D",
   "navTrack_common_diveNumber": "Dive #{number}",
@@ -26756,8 +26763,6 @@
       }
     }
   },
-  "navTrack_list_matchError": "Could not check for route matches.",
-  "navTrack_list_matchSuccess": "Checked for routes needing your choice.",
   "navTrack_list_deleteMessage": "Delete \"{name}\"?",
   "@navTrack_list_deleteMessage": {
     "placeholders": {
@@ -26766,25 +26771,12 @@
       }
     }
   },
-  "navTrack_list_importTooltip": "Import route file",
-  "navTrack_list_matchTooltip": "Check now",
-  "navTrack_list_title": "Underwater Routes",
-  "navTrack_list_noMapRoutes": "No routes are placed on the map yet.",
-  "navTrack_list_empty": "No underwater routes yet.",
   "navTrack_review_saveConfirmation": "Route saved.",
   "navTrack_list_pendingChoice": "{count, plural, one{{count} route needs your choice} other{{count} routes need your choice}}",
   "@navTrack_list_pendingChoice": {
     "placeholders": {
       "count": {
         "type": "num"
-      }
-    }
-  },
-  "navTrack_list_loadError": "Could not load routes: {error}",
-  "@navTrack_list_loadError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
       }
     }
   },
@@ -27498,7 +27490,6 @@
   "@settings_manage_savedQueries": {"description": "Settings > Manage entry"},
   "settings_manage_savedQueries_subtitle": "Rename, reorder and delete saved queries",
   "@settings_manage_savedQueries_subtitle": {"description": "Settings > Manage entry subtitle"},
-  "settings_manage_navRoutes_subtitle": "Import, align and link recorded routes",
   "query_error_unterminatedQuote": "unterminated quote",
   "@query_error_unterminatedQuote": {"description": "Query error message."},
   "query_error_unexpectedCharacter": "unexpected character \"{text}\"",

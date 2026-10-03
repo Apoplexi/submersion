@@ -17252,9 +17252,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get nav_equipment => 'Equipamentos';
 
   @override
-  String get nav_gpsLog => 'Registro GPS';
-
-  @override
   String get media_console_library => 'Biblioteca';
 
   @override
@@ -17660,6 +17657,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get nav_tooltip_expandMenu => 'Expandir menu';
+
+  @override
+  String get nav_tracks => 'Trilhas';
+
+  @override
+  String get nav_tracksSubtitle => 'Trilhas GPS e subaquáticas';
 
   @override
   String get nav_transfer => 'Transferir';
@@ -23368,6 +23371,36 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tides_title => 'Marés';
 
   @override
+  String get tracks_badge_underwater => 'Subaquática';
+
+  @override
+  String get tracks_empty_body =>
+      'Grave uma trilha GPS com seu celular durante um dia de mergulho ou importe arquivos GPX, KML, CSV ou FIT e registros de navegação Seacraft ENC. As trilhas GPS são associadas automaticamente aos seus mergulhos; você escolhe o mergulho de cada trilha subaquática.';
+
+  @override
+  String get tracks_empty_clearFilters => 'Limpar filtros';
+
+  @override
+  String get tracks_empty_filtered =>
+      'Nenhuma trilha corresponde a estes filtros';
+
+  @override
+  String get tracks_empty_title => 'Ainda não há trilhas';
+
+  @override
+  String get tracks_kind_all => 'Todas';
+
+  @override
+  String get tracks_kind_gps => 'GPS';
+
+  @override
+  String get tracks_kind_underwater => 'Subaquáticas';
+
+  @override
+  String get tracks_map_noMappable =>
+      'Nenhuma destas trilhas tem ainda uma posição no mapa.';
+
+  @override
   String get transfer_appBar_title => 'Transferência';
 
   @override
@@ -26667,9 +26700,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsLogger_noFixYet => 'Aguardando sinal de GPS';
 
   @override
-  String get gpsLogger_noTracks => 'Nenhuma trilha GPS gravada ainda';
-
-  @override
   String get gpsLogger_permissionDenied =>
       'A permissão de localização é necessária para gravar uma trilha GPS. Ative-a nas configurações do sistema.';
 
@@ -26729,9 +26759,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String gpsLogger_trackSubtitleTrimmed(String duration) {
     return 'Recortada, $duration';
   }
-
-  @override
-  String get gpsLogger_tracksHeader => 'Trilhas gravadas';
 
   @override
   String get gpsTrack_action_trim => 'Recortar...';
@@ -27296,13 +27323,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tankPresets_title => 'Presets de Cilindro';
-
-  @override
-  String get tools_gpsLogger_description =>
-      'Grave sua posição durante um dia de mergulho e associe automaticamente os mergulhos importados a localizações GPS.';
-
-  @override
-  String get tools_gpsLogger_subtitle => 'Grave uma trilha de superfície';
 
   @override
   String get tools_gpsLogger_title => 'Registrador GPS';
@@ -43507,6 +43527,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_common_delete => 'Excluir';
 
   @override
+  String get navTrack_common_unlinked => 'sem vínculo';
+
+  @override
   String get navTrack_common_unlink => 'Desvincular';
 
   @override
@@ -43792,33 +43815,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError =>
-      'Não foi possível verificar as associações de rotas.';
-
-  @override
-  String get navTrack_list_matchSuccess =>
-      'Verificadas as rotas que aguardam sua escolha.';
-
-  @override
   String navTrack_list_deleteMessage(String name) {
     return 'Excluir \"$name\"?';
   }
-
-  @override
-  String get navTrack_list_importTooltip => 'Importar arquivo de rota';
-
-  @override
-  String get navTrack_list_matchTooltip => 'Verificar agora';
-
-  @override
-  String get navTrack_list_title => 'Rotas subaquáticas';
-
-  @override
-  String get navTrack_list_noMapRoutes =>
-      'Nenhuma rota colocada no mapa ainda.';
-
-  @override
-  String get navTrack_list_empty => 'Nenhuma rota subaquática ainda.';
 
   @override
   String get navTrack_review_saveConfirmation => 'Rota salva.';
@@ -43832,11 +43831,6 @@ class AppLocalizationsPt extends AppLocalizations {
       one: '$count rota aguarda sua escolha',
     );
     return '$_temp0';
-  }
-
-  @override
-  String navTrack_list_loadError(String error) {
-    return 'Não foi possível carregar as rotas: $error';
   }
 
   @override
@@ -44982,10 +44976,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'Renomear, reordenar e excluir consultas salvas';
-
-  @override
-  String get settings_manage_navRoutes_subtitle =>
-      'Importar, alinhar e associar rotas gravadas';
 
   @override
   String get query_error_unterminatedQuote => 'aspas não fechadas';

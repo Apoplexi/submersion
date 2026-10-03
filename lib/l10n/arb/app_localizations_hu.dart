@@ -17193,9 +17193,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get nav_equipment => 'Felszerelés';
 
   @override
-  String get nav_gpsLog => 'GPS-napló';
-
-  @override
   String get media_console_library => 'Könyvtár';
 
   @override
@@ -17599,6 +17596,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get nav_tooltip_expandMenu => 'Menü kinyitása';
+
+  @override
+  String get nav_tracks => 'Útvonalak';
+
+  @override
+  String get nav_tracksSubtitle => 'GPS- és víz alatti útvonalak';
 
   @override
   String get nav_transfer => 'Átvitel';
@@ -23286,6 +23289,36 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tides_title => 'Árapály';
 
   @override
+  String get tracks_badge_underwater => 'Víz alatti';
+
+  @override
+  String get tracks_empty_body =>
+      'Rögzíts GPS-útvonalat a telefonoddal egy merülőnapon, vagy importálj GPX, KML, CSV vagy FIT fájlokat és Seacraft ENC navigációs naplókat. A GPS-útvonalak automatikusan párosulnak a merüléseiddel; a víz alatti útvonalakhoz te választod ki a merülést.';
+
+  @override
+  String get tracks_empty_clearFilters => 'Szűrők törlése';
+
+  @override
+  String get tracks_empty_filtered =>
+      'Egy útvonal sem felel meg ezeknek a szűrőknek';
+
+  @override
+  String get tracks_empty_title => 'Még nincsenek útvonalak';
+
+  @override
+  String get tracks_kind_all => 'Mind';
+
+  @override
+  String get tracks_kind_gps => 'GPS';
+
+  @override
+  String get tracks_kind_underwater => 'Víz alatti';
+
+  @override
+  String get tracks_map_noMappable =>
+      'Ezen útvonalak egyikének sincs még helye a térképen.';
+
+  @override
   String get transfer_appBar_title => 'Átvitel';
 
   @override
@@ -26562,9 +26595,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsLogger_noFixYet => 'Várakozás GPS-jelre';
 
   @override
-  String get gpsLogger_noTracks => 'Még nincs rögzített GPS-útvonal';
-
-  @override
   String get gpsLogger_permissionDenied =>
       'GPS-útvonal rögzítéséhez helymeghatározási engedély szükséges. Engedélyezd a rendszerbeállításokban.';
 
@@ -26623,9 +26653,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String gpsLogger_trackSubtitleTrimmed(String duration) {
     return 'Levágva, $duration';
   }
-
-  @override
-  String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override
   String get gpsTrack_action_trim => 'Vágás...';
@@ -27188,13 +27215,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tankPresets_title => 'Palacksablonok';
-
-  @override
-  String get tools_gpsLogger_description =>
-      'Rögzítsd a pozíciódat a merülőnap során, és párosítsd automatikusan az importált merüléseket GPS-helyekhez.';
-
-  @override
-  String get tools_gpsLogger_subtitle => 'Felszíni útvonal rögzítése';
 
   @override
   String get tools_gpsLogger_title => 'GPS-naplózó';
@@ -43294,6 +43314,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get navTrack_common_delete => 'Törlés';
 
   @override
+  String get navTrack_common_unlinked => 'nincs társítva';
+
+  @override
   String get navTrack_common_unlink => 'Leválasztás';
 
   @override
@@ -43578,33 +43601,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError =>
-      'Nem sikerült ellenőrizni az útvonalak párosítását.';
-
-  @override
-  String get navTrack_list_matchSuccess =>
-      'A választásodra váró útvonalak ellenőrizve.';
-
-  @override
   String navTrack_list_deleteMessage(String name) {
     return '„$name” törlése?';
   }
-
-  @override
-  String get navTrack_list_importTooltip => 'Útvonalfájl importálása';
-
-  @override
-  String get navTrack_list_matchTooltip => 'Ellenőrzés most';
-
-  @override
-  String get navTrack_list_title => 'Vízalatti útvonalak';
-
-  @override
-  String get navTrack_list_noMapRoutes =>
-      'Még nincs útvonal a térképen elhelyezve.';
-
-  @override
-  String get navTrack_list_empty => 'Még nincsenek vízalatti útvonalak.';
 
   @override
   String get navTrack_review_saveConfirmation => 'Útvonal mentve.';
@@ -43618,11 +43617,6 @@ class AppLocalizationsHu extends AppLocalizations {
       one: '$count útvonal vár a választásodra',
     );
     return '$_temp0';
-  }
-
-  @override
-  String navTrack_list_loadError(String error) {
-    return 'Nem sikerült betölteni az útvonalakat: $error';
   }
 
   @override
@@ -44770,10 +44764,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'Mentett lekérdezések átnevezése, átrendezése és törlése';
-
-  @override
-  String get settings_manage_navRoutes_subtitle =>
-      'Rögzített útvonalak importálása, igazítása és összekapcsolása';
 
   @override
   String get query_error_unterminatedQuote => 'lezáratlan idézőjel';

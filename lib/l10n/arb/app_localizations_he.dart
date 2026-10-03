@@ -16849,9 +16849,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get nav_equipment => 'ציוד';
 
   @override
-  String get nav_gpsLog => 'יומן GPS';
-
-  @override
   String get media_console_library => 'ספרייה';
 
   @override
@@ -17252,6 +17249,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get nav_tooltip_expandMenu => 'הרחבת תפריט';
+
+  @override
+  String get nav_tracks => 'מסלולים';
+
+  @override
+  String get nav_tracksSubtitle => 'מסלולי GPS ומסלולים תת-ימיים';
 
   @override
   String get nav_transfer => 'העברה';
@@ -22796,6 +22799,35 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tides_title => 'גאות';
 
   @override
+  String get tracks_badge_underwater => 'תת-ימי';
+
+  @override
+  String get tracks_empty_body =>
+      'הקלט מסלול GPS בטלפון במהלך יום צלילה, או ייבא קובצי GPX, KML, CSV או FIT ויומני ניווט של Seacraft ENC. מסלולי GPS מותאמים לצלילות שלך באופן אוטומטי, ואת הצלילה של כל מסלול תת-ימי בוחרים ידנית.';
+
+  @override
+  String get tracks_empty_clearFilters => 'ניקוי מסננים';
+
+  @override
+  String get tracks_empty_filtered => 'אין מסלולים שתואמים למסננים האלה';
+
+  @override
+  String get tracks_empty_title => 'אין עדיין מסלולים';
+
+  @override
+  String get tracks_kind_all => 'הכול';
+
+  @override
+  String get tracks_kind_gps => 'GPS';
+
+  @override
+  String get tracks_kind_underwater => 'תת-ימיים';
+
+  @override
+  String get tracks_map_noMappable =>
+      'לאף אחד מהמסלולים האלה אין עדיין מיקום על המפה.';
+
+  @override
   String get transfer_appBar_title => 'העברה';
 
   @override
@@ -26017,9 +26049,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsLogger_noFixYet => 'ממתין לאות GPS';
 
   @override
-  String get gpsLogger_noTracks => 'עדיין לא הוקלטו מסלולי GPS';
-
-  @override
   String get gpsLogger_permissionDenied =>
       'נדרשת הרשאת מיקום כדי להקליט מסלול GPS. יש להפעיל אותה בהגדרות המערכת.';
 
@@ -26081,9 +26110,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String gpsLogger_trackSubtitleTrimmed(String duration) {
     return 'נחתך, $duration';
   }
-
-  @override
-  String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override
   String get gpsTrack_action_trim => 'חיתוך...';
@@ -26639,13 +26665,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tankPresets_title => 'תבניות מיכל';
-
-  @override
-  String get tools_gpsLogger_description =>
-      'הקלט את מיקומך במהלך יום צלילה והתאם אוטומטית צלילות מיובאות למיקומי GPS.';
-
-  @override
-  String get tools_gpsLogger_subtitle => 'הקלטת מסלול פני המים';
 
   @override
   String get tools_gpsLogger_title => 'מקליט GPS';
@@ -42613,6 +42632,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navTrack_common_delete => 'מחק';
 
   @override
+  String get navTrack_common_unlinked => 'לא מקושר';
+
+  @override
   String get navTrack_common_unlink => 'בטל קישור';
 
   @override
@@ -42896,30 +42918,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError => 'לא ניתן היה לבדוק התאמות של מסלולים.';
-
-  @override
-  String get navTrack_list_matchSuccess => 'נבדקו המסלולים הממתינים לבחירתך.';
-
-  @override
   String navTrack_list_deleteMessage(String name) {
     return 'למחוק את \"$name\"?';
   }
-
-  @override
-  String get navTrack_list_importTooltip => 'ייבוא קובץ מסלול';
-
-  @override
-  String get navTrack_list_matchTooltip => 'בדוק עכשיו';
-
-  @override
-  String get navTrack_list_title => 'מסלולים תת-ימיים';
-
-  @override
-  String get navTrack_list_noMapRoutes => 'עדיין לא הוצבו מסלולים על המפה.';
-
-  @override
-  String get navTrack_list_empty => 'עדיין אין מסלולים תת-ימיים.';
 
   @override
   String get navTrack_review_saveConfirmation => 'המסלול נשמר.';
@@ -42934,11 +42935,6 @@ class AppLocalizationsHe extends AppLocalizations {
       one: 'מסלול אחד ממתין לבחירתך',
     );
     return '$_temp0';
-  }
-
-  @override
-  String navTrack_list_loadError(String error) {
-    return 'לא ניתן היה לטעון את המסלולים: $error';
   }
 
   @override
@@ -44080,10 +44076,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'שינוי שם, סידור מחדש ומחיקה של שאילתות שמורות';
-
-  @override
-  String get settings_manage_navRoutes_subtitle =>
-      'ייבוא, יישור וקישור של מסלולים מוקלטים';
 
   @override
   String get query_error_unterminatedQuote => 'מירכאה לא סגורה';

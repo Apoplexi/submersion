@@ -17130,9 +17130,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get nav_equipment => 'Uitrusting';
 
   @override
-  String get nav_gpsLog => 'GPS-log';
-
-  @override
   String get media_console_library => 'Bibliotheek';
 
   @override
@@ -17535,6 +17532,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get nav_tooltip_expandMenu => 'Menu uitklappen';
+
+  @override
+  String get nav_tracks => 'Tracks';
+
+  @override
+  String get nav_tracksSubtitle => 'GPS- en onderwatertracks';
 
   @override
   String get nav_transfer => 'Overdracht';
@@ -23188,6 +23191,35 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tides_title => 'Getijden';
 
   @override
+  String get tracks_badge_underwater => 'Onderwater';
+
+  @override
+  String get tracks_empty_body =>
+      'Neem tijdens een duikdag een GPS-track op met je telefoon, of importeer GPX-, KML-, CSV- of FIT-bestanden en Seacraft ENC-navigatielogs. GPS-tracks worden automatisch aan je duiken gekoppeld; voor elke onderwatertrack kies je zelf de duik.';
+
+  @override
+  String get tracks_empty_clearFilters => 'Filters wissen';
+
+  @override
+  String get tracks_empty_filtered => 'Geen tracks voldoen aan deze filters';
+
+  @override
+  String get tracks_empty_title => 'Nog geen tracks';
+
+  @override
+  String get tracks_kind_all => 'Alle';
+
+  @override
+  String get tracks_kind_gps => 'GPS';
+
+  @override
+  String get tracks_kind_underwater => 'Onderwater';
+
+  @override
+  String get tracks_map_noMappable =>
+      'Geen van deze tracks heeft al een positie op de kaart.';
+
+  @override
   String get transfer_appBar_title => 'Overdracht';
 
   @override
@@ -26464,9 +26496,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gpsLogger_noFixYet => 'Wachten op GPS-fix';
 
   @override
-  String get gpsLogger_noTracks => 'Nog geen GPS-tracks opgenomen';
-
-  @override
   String get gpsLogger_permissionDenied =>
       'Locatietoestemming is vereist om een GPS-track op te nemen. Schakel deze in bij de systeeminstellingen.';
 
@@ -26525,9 +26554,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String gpsLogger_trackSubtitleTrimmed(String duration) {
     return 'Bijgesneden, $duration';
   }
-
-  @override
-  String get gpsLogger_tracksHeader => 'Opgenomen tracks';
 
   @override
   String get gpsTrack_action_trim => 'Bijsnijden...';
@@ -27090,13 +27116,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tankPresets_title => 'Flesinstellingen';
-
-  @override
-  String get tools_gpsLogger_description =>
-      'Registreer je positie tijdens een duikdag en koppel geïmporteerde duiken automatisch aan GPS-locaties.';
-
-  @override
-  String get tools_gpsLogger_subtitle => 'Neem een oppervlaktetrack op';
 
   @override
   String get tools_gpsLogger_title => 'GPS-logger';
@@ -43202,6 +43221,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get navTrack_common_delete => 'Verwijderen';
 
   @override
+  String get navTrack_common_unlinked => 'niet gekoppeld';
+
+  @override
   String get navTrack_common_unlink => 'Ontkoppelen';
 
   @override
@@ -43487,33 +43509,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError =>
-      'Kon routekoppelingen niet controleren.';
-
-  @override
-  String get navTrack_list_matchSuccess =>
-      'Gecontroleerd op routes die op je keuze wachten.';
-
-  @override
   String navTrack_list_deleteMessage(String name) {
     return '\"$name\" verwijderen?';
   }
-
-  @override
-  String get navTrack_list_importTooltip => 'Routebestand importeren';
-
-  @override
-  String get navTrack_list_matchTooltip => 'Nu controleren';
-
-  @override
-  String get navTrack_list_title => 'Onderwaterroutes';
-
-  @override
-  String get navTrack_list_noMapRoutes =>
-      'Nog geen routes op de kaart geplaatst.';
-
-  @override
-  String get navTrack_list_empty => 'Nog geen onderwaterroutes.';
 
   @override
   String get navTrack_review_saveConfirmation => 'Route opgeslagen.';
@@ -43527,11 +43525,6 @@ class AppLocalizationsNl extends AppLocalizations {
       one: '$count route wacht op je keuze',
     );
     return '$_temp0';
-  }
-
-  @override
-  String navTrack_list_loadError(String error) {
-    return 'Routes konden niet worden geladen: $error';
   }
 
   @override
@@ -44675,10 +44668,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_manage_savedQueries_subtitle =>
       'Opgeslagen query\'s hernoemen, herschikken en verwijderen';
-
-  @override
-  String get settings_manage_navRoutes_subtitle =>
-      'Opgenomen routes importeren, uitlijnen en koppelen';
 
   @override
   String get query_error_unterminatedQuote => 'niet-afgesloten aanhalingsteken';
