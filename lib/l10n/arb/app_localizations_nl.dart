@@ -46241,10 +46241,12 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError => 'Routes konden niet worden gekoppeld.';
+  String get navTrack_list_matchError =>
+      'Kon routekoppelingen niet controleren.';
 
   @override
-  String get navTrack_list_matchSuccess => 'Routes gekoppeld aan duiken.';
+  String get navTrack_list_matchSuccess =>
+      'Gecontroleerd op routes die op je keuze wachten.';
 
   @override
   String navTrack_list_deleteMessage(String name) {
@@ -46255,7 +46257,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get navTrack_list_importTooltip => 'Routebestand importeren';
 
   @override
-  String get navTrack_list_matchTooltip => 'Nu koppelen';
+  String get navTrack_list_matchTooltip => 'Nu controleren';
 
   @override
   String get navTrack_list_title => 'Onderwaterroutes';
@@ -46266,6 +46268,25 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get navTrack_list_empty => 'Nog geen onderwaterroutes.';
+
+  @override
+  String get navTrack_review_saveConfirmation => 'Route opgeslagen.';
+
+  @override
+  String navTrack_list_pendingChoice(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count routes wachten op je keuze',
+      one: '$count route wacht op je keuze',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String navTrack_list_loadError(String error) {
+    return 'Routes konden niet worden geladen: $error';
+  }
 
   @override
   String get navTrack_seascape_title => 'Onderwaterlandschap van de route';

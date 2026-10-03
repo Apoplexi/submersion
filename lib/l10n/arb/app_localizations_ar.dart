@@ -46163,10 +46163,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError => 'تعذرت مطابقة المسارات.';
+  String get navTrack_list_matchError => 'تعذر التحقق من مطابقات المسارات.';
 
   @override
-  String get navTrack_list_matchSuccess => 'تمت مطابقة المسارات مع الغطسات.';
+  String get navTrack_list_matchSuccess =>
+      'تم التحقق من المسارات التي تنتظر اختيارك.';
 
   @override
   String navTrack_list_deleteMessage(String name) {
@@ -46177,7 +46178,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navTrack_list_importTooltip => 'استيراد ملف مسار';
 
   @override
-  String get navTrack_list_matchTooltip => 'المطابقة الآن';
+  String get navTrack_list_matchTooltip => 'تحقق الآن';
 
   @override
   String get navTrack_list_title => 'المسارات تحت الماء';
@@ -46188,6 +46189,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get navTrack_list_empty => 'لا توجد مسارات تحت الماء بعد.';
+
+  @override
+  String get navTrack_review_saveConfirmation => 'تم حفظ المسار.';
+
+  @override
+  String navTrack_list_pendingChoice(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مسار ينتظر اختيارك',
+      few: '$count مسارات تنتظر اختيارك',
+      two: 'مساران ينتظران اختيارك',
+      one: 'مسار واحد ينتظر اختيارك',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String navTrack_list_loadError(String error) {
+    return 'تعذر تحميل المسارات: $error';
+  }
 
   @override
   String get navTrack_seascape_title => 'المشهد البحري للمسار';

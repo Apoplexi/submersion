@@ -46649,10 +46649,12 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get navTrack_list_matchError => 'Impossible d\'associer les trajets.';
+  String get navTrack_list_matchError =>
+      'Impossible de vérifier les associations de trajets.';
 
   @override
-  String get navTrack_list_matchSuccess => 'Trajets associés aux plongées.';
+  String get navTrack_list_matchSuccess =>
+      'Vérification des trajets en attente de votre choix terminée.';
 
   @override
   String navTrack_list_deleteMessage(String name) {
@@ -46663,7 +46665,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navTrack_list_importTooltip => 'Importer un fichier de trajet';
 
   @override
-  String get navTrack_list_matchTooltip => 'Associer maintenant';
+  String get navTrack_list_matchTooltip => 'Vérifier maintenant';
 
   @override
   String get navTrack_list_title => 'Trajets sous-marins';
@@ -46674,6 +46676,25 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get navTrack_list_empty => 'Aucun trajet sous-marin pour l\'instant.';
+
+  @override
+  String get navTrack_review_saveConfirmation => 'Trajet enregistré.';
+
+  @override
+  String navTrack_list_pendingChoice(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count trajets attendent votre choix',
+      one: '$count trajet attend votre choix',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String navTrack_list_loadError(String error) {
+    return 'Impossible de charger les trajets : $error';
+  }
 
   @override
   String get navTrack_seascape_title => 'Paysage sous-marin du trajet';
