@@ -1403,11 +1403,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String trips_story_dockedDay_goToDay(int number) {
-    return 'Ugrás a(z) $number. napra';
-  }
-
-  @override
   String get trips_story_surfaceDay => 'Felszíni nap';
 
   @override
@@ -1460,6 +1455,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_dayType_disembark => 'Kiszállás';
 
   @override
+  String get trips_dayType_travel => 'Utazás';
+
+  @override
+  String get trips_dayType_rest => 'Pihenőnap';
+
+  @override
   String get trips_story_planned => 'Tervezett';
 
   @override
@@ -1494,8 +1495,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_story_rhythm_semantics => 'A nap merülési idői';
 
   @override
-  String get trips_story_map_semantics =>
-      'Úti térkép. A látható nap helyszínei kiemelve.';
+  String trips_story_dayMap_semantics(int number) {
+    return '$number. nap térképe';
+  }
+
+  @override
+  String get trips_story_dayMap_expand => 'Térkép teljes képernyőn';
+
+  @override
+  String trips_story_dayMap_divePin(int number) {
+    return '$number. merülés';
+  }
 
   @override
   String get diveLog_bulkEdit_groupRebreather => 'Merülési mód és rebreather';
@@ -13721,17 +13731,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String trips_gearAlerts_count(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count felszerelési figyelmeztetés ehhez az utazáshoz',
-      one: '$count felszerelési figyelmeztetés ehhez az utazáshoz',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String trips_serviceAlert_count(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -24466,23 +24465,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get trips_gear_title => 'Felszerelés';
-
-  @override
-  String get trips_gear_none => 'Még nincs bepakolt felszerelés';
-
-  @override
-  String get trips_gear_add => 'Felszerelés hozzáadása';
-
-  @override
   String get trips_gear_remove => 'Kivétel';
 
   @override
   String get trips_gear_failed =>
       'Nem sikerült módosítani a felszerelést. Próbáld újra.';
-
-  @override
-  String get trips_gear_useSet => 'Készlet használata';
 
   @override
   String trips_gear_packedFromSet(int count, String name) {
@@ -24495,6 +24482,41 @@ class AppLocalizationsHu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trips_gear_add_action => 'Hozzáadás';
+
+  @override
+  String get trips_gear_add_fromEquipment => 'A felszerelésemből';
+
+  @override
+  String get trips_gear_add_fromSet => 'Egy felszerelés-készlet';
+
+  @override
+  String get trips_gear_add_rental => 'Bérelt palackok';
+
+  @override
+  String get trips_gear_section_packed => 'Bepakolva';
+
+  @override
+  String get trips_gear_section_cylinders => 'Palackok';
+
+  @override
+  String get trips_gear_empty_upcoming =>
+      'Még semmi sincs bepakolva. Add hozzá a felszerelést, amit viszel, és a palackokat, amelyekből merülsz.';
+
+  @override
+  String get trips_gear_empty_past =>
+      'Ehhez az utazáshoz semmit sem pakoltak be.';
+
+  @override
+  String get trips_gear_slot_rental => 'Bérelt';
+
+  @override
+  String get trips_gear_slot_own => 'Saját felszerelés';
+
+  @override
+  String get trips_gear_openBoard => 'Áttekintés megnyitása';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {
@@ -24637,13 +24659,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String trips_cylinders_summaryUnfilled(int count) {
     return 'Még nincs töltve $count';
   }
-
-  @override
-  String get trips_cylinders_setUp => 'Palackok beállítása';
-
-  @override
-  String get trips_cylinders_setUpHint =>
-      'Kövesd az úton nálad lévő palackokat: töltések, keverékek és hogy mennyi maradt mindegyikben.';
 
   @override
   String get trips_cylinders_status_full => 'Tele';
@@ -24896,16 +24911,127 @@ class AppLocalizationsHu extends AppLocalizations {
       'Vessel name is required for liveaboard trips';
 
   @override
-  String get trips_detail_tab_overview => 'Overview';
+  String get trips_detail_tab_overview => 'Áttekintés';
 
   @override
-  String get trips_detail_tab_itinerary => 'Itinerary';
+  String get trips_detail_tab_itinerary => 'Útiterv';
 
   @override
-  String get trips_detail_tab_photos => 'Photos';
+  String get trips_detail_tab_photos => 'Fotók';
 
   @override
-  String get trips_detail_tab_dives => 'Dives';
+  String get trips_detail_tab_dives => 'Merülések';
+
+  @override
+  String get trips_detail_tab_gear => 'Felszerelés';
+
+  @override
+  String trips_overview_checklist_progress(int done, int total) {
+    return '$done/$total kész';
+  }
+
+  @override
+  String trips_overview_checklist_dueSoon(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count esedékes a héten',
+      one: '$count esedékes a héten',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_checklist_overdue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lejárt',
+      one: '$count lejárt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_packed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem bepakolva',
+      one: '$count elem bepakolva',
+      zero: 'Semmi nincs bepakolva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_cylinders(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count palack',
+      one: '$count palack',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_serviceAlerts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count szervizfigyelmeztetés',
+      one: '$count szervizfigyelmeztetés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_itinerary_days(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nap',
+      one: '$count nap',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_itinerary_divesPlanned(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tervezett merülés',
+      one: '$count tervezett merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_overview_itinerary_none => 'Még nincs megtervezve';
+
+  @override
+  String get trips_overview_plan => 'Terv';
+
+  @override
+  String trips_overview_plan_divesPerDay(int count) {
+    return '$count merülés/nap';
+  }
+
+  @override
+  String trips_overview_plan_sharing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count búvár osztozik a palackokon',
+      one: '$count búvár osztozik a palackokon',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_overview_plan_notSet => 'Nincs megadva';
 
   @override
   String get trips_detail_sectionTitle_vessel => 'Vessel';
@@ -24966,15 +25092,40 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_itinerary_notes_label => 'Notes';
 
   @override
-  String get trips_itinerary_noDives => 'No dives';
-
-  @override
   String get trips_itinerary_error_loading =>
       'Nem sikerült betölteni az útitervet.';
 
   @override
   String get trips_itinerary_daySaveError =>
       'Nem sikerült menteni a napot. Próbáld újra.';
+
+  @override
+  String get trips_itinerary_empty =>
+      'Még nincs útiterv. Készíts egyet az utazás dátumaiból.';
+
+  @override
+  String get trips_itinerary_fillMissing => 'Hiányzó napok kitöltése';
+
+  @override
+  String trips_itinerary_plannedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tervezett merülés',
+      one: '1 tervezett merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_itinerary_plannedDives_label => 'Tervezett merülések';
+
+  @override
+  String get trips_itinerary_plannedDives_invalid =>
+      'Adj meg egy egész számot, vagy hagyd üresen.';
+
+  @override
+  String get trips_itinerary_location_label => 'Helyszín';
 
   @override
   String get trips_vesselType_catamaran => 'Catamaran';

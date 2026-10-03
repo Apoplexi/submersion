@@ -335,7 +335,6 @@
   "o2Toxicity_thisDive": "Cette plongée",
   "o2Toxicity_weekly": "Hebdomadaire",
   "trips_story_dayLabel": "Jour {number}",
-  "trips_story_dockedDay_goToDay": "Aller au jour {number}",
   "trips_story_surfaceDay": "Journée en surface",
   "trips_story_today": "Aujourd'hui",
   "trips_story_dayOfTrip": "Jour {current} sur {total}",
@@ -349,6 +348,8 @@
   "trips_dayType_portDay": "Jour au port",
   "trips_dayType_embark": "Embarquement",
   "trips_dayType_disembark": "Débarquement",
+  "trips_dayType_travel": "Voyage",
+  "trips_dayType_rest": "Repos",
   "trips_story_planned": "Prévu",
   "trips_story_empty_title": "Pas encore de plongées ni d'itinéraire",
   "trips_story_empty_subtitle": "Ajoutez des plongées ou planifiez les jours pour voir le récit.",
@@ -356,7 +357,23 @@
   "trips_story_history_avgTemp": "moy. {value}",
   "trips_story_history_avgDepth": "prof. moy. {value}",
   "trips_story_rhythm_semantics": "Heures de plongée de cette journée",
-  "trips_story_map_semantics": "Carte du voyage. Les sites du jour affiché sont mis en évidence.",
+  "trips_story_dayMap_semantics": "Carte du jour {number}",
+  "@trips_story_dayMap_semantics": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_story_dayMap_expand": "Afficher la carte en plein écran",
+  "trips_story_dayMap_divePin": "Plongée {number}",
+  "@trips_story_dayMap_divePin": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_bulkEdit_groupRebreather": "Mode de plongée et recycleur",
   "diveLog_bulkEdit_fieldSetpointLow": "Consigne basse",
   "diveLog_bulkEdit_fieldSetpointHigh": "Consigne haute",
@@ -3897,7 +3914,6 @@
   "equipment_serviceKinds_everyDays": "tous les {days} jours",
   "equipment_serviceKinds_everyDives": "toutes les {dives} plongées",
   "equipment_serviceKinds_everyHours": "toutes les {hours} heures",
-  "trips_gearAlerts_count": "{count, plural, one{{count} alerte matériel pour ce voyage} other{{count} alertes matériel pour ce voyage}}",
   "trips_serviceAlert_count": "{count, plural, =1{{count} équipement nécessite un entretien avant ce voyage} other{{count} équipements nécessitent un entretien avant ce voyage}}",
   "trips_serviceAlert_dueBefore": "{kind} à échéance le {date}",
   "equipment_service_overdue": "{kind} en retard",
@@ -6551,9 +6567,96 @@
   "trips_detail_stat_speciesSeen": "Species seen",
   "trips_detail_stat_totalRuntime": "Durée totale",
   "trips_detail_stat_totalDives": "Total des plongées",
-  "trips_detail_tab_dives": "Dives",
-  "trips_detail_tab_itinerary": "Itinerary",
-  "trips_detail_tab_overview": "Overview",
+  "trips_detail_tab_dives": "Plongées",
+  "trips_detail_tab_gear": "Matériel",
+  "trips_overview_checklist_progress": "{done} sur {total} faites",
+  "@trips_overview_checklist_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_checklist_dueSoon": "{count, plural, =1{{count} à faire cette semaine} other{{count} à faire cette semaine}}",
+  "@trips_overview_checklist_dueSoon": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_checklist_overdue": "{count, plural, =1{{count} en retard} other{{count} en retard}}",
+  "@trips_overview_checklist_overdue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_gear_packed": "{count, plural, =0{Rien de prévu} =1{{count} élément prévu} other{{count} éléments prévus}}",
+  "@trips_overview_gear_packed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_gear_cylinders": "{count, plural, =1{{count} bloc} other{{count} blocs}}",
+  "@trips_overview_gear_cylinders": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_gear_serviceAlerts": "{count, plural, =1{{count} alerte d'entretien} other{{count} alertes d'entretien}}",
+  "@trips_overview_gear_serviceAlerts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_itinerary_days": "{count, plural, =1{{count} jour} other{{count} jours}}",
+  "@trips_overview_itinerary_days": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_itinerary_divesPlanned": "{count, plural, =1{{count} plongée prévue} other{{count} plongées prévues}}",
+  "@trips_overview_itinerary_divesPlanned": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_itinerary_none": "Pas encore planifié",
+  "trips_overview_plan": "Plan",
+  "trips_overview_plan_divesPerDay": "{count} plongées/jour",
+  "@trips_overview_plan_divesPerDay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_plan_sharing": "{count, plural, =1{{count} plongeur partage les blocs} other{{count} plongeurs partagent les blocs}}",
+  "@trips_overview_plan_sharing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_overview_plan_notSet": "Non défini",
+  "trips_detail_tab_itinerary": "Itinéraire",
+  "trips_detail_tab_overview": "Aperçu",
   "trips_detail_tab_photos": "Photos",
   "trips_detail_tab_checklist": "Liste de contrôle",
   "trips_detail_tooltip_edit": "Modifier le voyage",
@@ -6692,13 +6795,20 @@
       }
     }
   },
-  "trips_gear_title": "Matériel",
-  "trips_gear_none": "Aucun matériel prévu pour l'instant",
-  "trips_gear_add": "Ajouter du matériel",
   "trips_gear_remove": "Retirer",
   "trips_gear_failed": "Impossible de modifier le matériel. Réessayez.",
-  "trips_gear_useSet": "Utiliser un ensemble",
   "trips_gear_packedFromSet": "{count, plural, =0{Tout le contenu de {name} est déjà prévu} one{{count} élément de {name} ajouté} other{{count} éléments de {name} ajoutés}}",
+  "trips_gear_add_action": "Ajouter",
+  "trips_gear_add_fromEquipment": "Depuis mon matériel",
+  "trips_gear_add_fromSet": "Un ensemble de matériel",
+  "trips_gear_add_rental": "Blocs de location",
+  "trips_gear_section_packed": "Prévu",
+  "trips_gear_section_cylinders": "Blocs",
+  "trips_gear_empty_upcoming": "Rien de prévu pour l'instant. Ajoutez le matériel que vous emporterez et les blocs avec lesquels vous plongerez.",
+  "trips_gear_empty_past": "Rien n'a été prévu pour ce voyage.",
+  "trips_gear_slot_rental": "Location",
+  "trips_gear_slot_own": "Mon matériel",
+  "trips_gear_openBoard": "Ouvrir le tableau",
   "trips_cylinders_forecast_todayShort": "Aujourd'hui il en faut {needed}, vous en avez {full} pleins.",
   "@trips_cylinders_forecast_todayShort": {
     "placeholders": {
@@ -6836,8 +6946,6 @@
       }
     }
   },
-  "trips_cylinders_setUp": "Configurer les blocs",
-  "trips_cylinders_setUpHint": "Suivez les blocs que vous avez sur ce voyage : gonflages, mélanges et ce qu'il reste dans chacun.",
   "trips_cylinders_status_full": "Plein",
   "trips_cylinders_status_partial": "Entamé",
   "trips_cylinders_status_empty": "Vide",
@@ -7035,9 +7143,21 @@
   "trips_itinerary_dayType_label": "Day Type",
   "trips_itinerary_diveCount": "{count, plural, =1{{count} plongée} other{{count} plongées}}",
   "trips_itinerary_editDay": "Edit Day",
-  "trips_itinerary_noDives": "No dives",
   "trips_itinerary_error_loading": "Impossible de charger l'itinéraire.",
   "trips_itinerary_daySaveError": "Impossible d'enregistrer la journée. Réessayez.",
+  "trips_itinerary_empty": "Pas encore d'itinéraire. Générez-en un à partir des dates du voyage.",
+  "trips_itinerary_fillMissing": "Compléter les jours manquants",
+  "trips_itinerary_plannedDives": "{count, plural, =1{{count} plongée prévue} other{{count} plongées prévues}}",
+  "@trips_itinerary_plannedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_itinerary_plannedDives_label": "Plongées prévues",
+  "trips_itinerary_plannedDives_invalid": "Saisissez un nombre entier de plongées, ou laissez vide.",
+  "trips_itinerary_location_label": "Lieu",
   "trips_itinerary_notes_label": "Notes",
   "trips_itinerary_portName_label": "Port / Anchorage",
   "trips_list_button_retry": "Réessayer",

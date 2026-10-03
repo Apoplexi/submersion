@@ -1349,11 +1349,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String trips_story_dockedDay_goToDay(int number) {
-    return '跳转到第 $number 天';
-  }
-
-  @override
   String get trips_story_surfaceDay => '水面日';
 
   @override
@@ -1404,6 +1399,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_dayType_disembark => '离船';
 
   @override
+  String get trips_dayType_travel => '旅行';
+
+  @override
+  String get trips_dayType_rest => '休息';
+
+  @override
   String get trips_story_planned => '已计划';
 
   @override
@@ -1436,7 +1437,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_story_rhythm_semantics => '当天的潜水时间';
 
   @override
-  String get trips_story_map_semantics => '旅行地图。当前日期的潜点已高亮。';
+  String trips_story_dayMap_semantics(int number) {
+    return '第 $number 天地图';
+  }
+
+  @override
+  String get trips_story_dayMap_expand => '全屏查看地图';
+
+  @override
+  String trips_story_dayMap_divePin(int number) {
+    return '第 $number 次潜水';
+  }
 
   @override
   String get diveLog_bulkEdit_groupRebreather => '潜水模式与循环呼吸器';
@@ -13146,16 +13157,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String trips_gearAlerts_count(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '此行程有 $count 条装备提醒',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String trips_serviceAlert_count(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -23283,22 +23284,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get trips_gear_title => '装备';
-
-  @override
-  String get trips_gear_none => '尚未打包任何装备';
-
-  @override
-  String get trips_gear_add => '添加装备';
-
-  @override
   String get trips_gear_remove => '移除';
 
   @override
   String get trips_gear_failed => '无法更改装备，请重试。';
-
-  @override
-  String get trips_gear_useSet => '使用套装';
 
   @override
   String trips_gear_packedFromSet(int count, String name) {
@@ -23310,6 +23299,39 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trips_gear_add_action => '添加';
+
+  @override
+  String get trips_gear_add_fromEquipment => '从我的装备中选择';
+
+  @override
+  String get trips_gear_add_fromSet => '一套装备';
+
+  @override
+  String get trips_gear_add_rental => '租用气瓶';
+
+  @override
+  String get trips_gear_section_packed => '已打包';
+
+  @override
+  String get trips_gear_section_cylinders => '气瓶';
+
+  @override
+  String get trips_gear_empty_upcoming => '还没有打包任何东西。添加你要带的装备和要使用的气瓶。';
+
+  @override
+  String get trips_gear_empty_past => '这次旅行没有打包任何东西。';
+
+  @override
+  String get trips_gear_slot_rental => '租用';
+
+  @override
+  String get trips_gear_slot_own => '我的装备';
+
+  @override
+  String get trips_gear_openBoard => '打开看板';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {
@@ -23444,12 +23466,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String trips_cylinders_summaryUnfilled(int count) {
     return '尚未充气 $count';
   }
-
-  @override
-  String get trips_cylinders_setUp => '设置气瓶';
-
-  @override
-  String get trips_cylinders_setUpHint => '记录本次行程中你持有的气瓶：充气、混合气以及每瓶剩余多少。';
 
   @override
   String get trips_cylinders_status_full => '满';
@@ -23703,6 +23719,109 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_detail_tab_dives => '潜水';
 
   @override
+  String get trips_detail_tab_gear => '装备';
+
+  @override
+  String trips_overview_checklist_progress(int done, int total) {
+    return '已完成 $done/$total';
+  }
+
+  @override
+  String trips_overview_checklist_dueSoon(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '本周到期 $count 项',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_checklist_overdue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已逾期 $count 项',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_packed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已打包 $count 件',
+      zero: '尚未打包',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_cylinders(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个气瓶',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_serviceAlerts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条维护提醒',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_itinerary_days(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_itinerary_divesPlanned(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '计划 $count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_overview_itinerary_none => '尚未计划';
+
+  @override
+  String get trips_overview_plan => '计划';
+
+  @override
+  String trips_overview_plan_divesPerDay(int count) {
+    return '每天 $count 次潜水';
+  }
+
+  @override
+  String trips_overview_plan_sharing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 名潜水员共用气瓶',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_overview_plan_notSet => '未设置';
+
+  @override
   String get trips_detail_sectionTitle_vessel => '船只';
 
   @override
@@ -23761,13 +23880,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_itinerary_notes_label => '备注';
 
   @override
-  String get trips_itinerary_noDives => '无潜水';
-
-  @override
   String get trips_itinerary_error_loading => '无法加载行程。';
 
   @override
   String get trips_itinerary_daySaveError => '无法保存日程，请重试。';
+
+  @override
+  String get trips_itinerary_empty => '还没有行程。根据旅行日期生成一个。';
+
+  @override
+  String get trips_itinerary_fillMissing => '补全缺少的天数';
+
+  @override
+  String trips_itinerary_plannedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '计划 $count 次潜水',
+      one: '计划 1 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_itinerary_plannedDives_label => '计划潜水次数';
+
+  @override
+  String get trips_itinerary_plannedDives_invalid => '请输入整数的潜水次数，或留空。';
+
+  @override
+  String get trips_itinerary_location_label => '地点';
 
   @override
   String get trips_vesselType_catamaran => '双体船';

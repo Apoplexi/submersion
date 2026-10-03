@@ -1390,11 +1390,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String trips_story_dockedDay_goToDay(int number) {
-    return 'Go to day $number';
-  }
-
-  @override
   String get trips_story_surfaceDay => 'Surface day';
 
   @override
@@ -1447,6 +1442,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trips_dayType_disembark => 'Disembark';
 
   @override
+  String get trips_dayType_travel => 'Travel';
+
+  @override
+  String get trips_dayType_rest => 'Rest';
+
+  @override
   String get trips_story_planned => 'Planned';
 
   @override
@@ -1481,8 +1482,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trips_story_rhythm_semantics => 'Dive times during this day';
 
   @override
-  String get trips_story_map_semantics =>
-      'Trip map. Sites for the day in view are highlighted.';
+  String trips_story_dayMap_semantics(int number) {
+    return 'Map of day $number';
+  }
+
+  @override
+  String get trips_story_dayMap_expand => 'View fullscreen map';
+
+  @override
+  String trips_story_dayMap_divePin(int number) {
+    return 'Dive $number';
+  }
 
   @override
   String get diveLog_bulkEdit_groupRebreather => 'Dive Mode & Rebreather';
@@ -13557,17 +13567,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String trips_gearAlerts_count(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count gear alerts for this trip',
-      one: '$count gear alert for this trip',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String trips_serviceAlert_count(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -24159,22 +24158,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get trips_gear_title => 'Gear';
-
-  @override
-  String get trips_gear_none => 'No gear packed yet';
-
-  @override
-  String get trips_gear_add => 'Add gear';
-
-  @override
   String get trips_gear_remove => 'Unpack';
 
   @override
   String get trips_gear_failed => 'Could not change the gear. Try again.';
-
-  @override
-  String get trips_gear_useSet => 'Use set';
 
   @override
   String trips_gear_packedFromSet(int count, String name) {
@@ -24187,6 +24174,40 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trips_gear_add_action => 'Add';
+
+  @override
+  String get trips_gear_add_fromEquipment => 'From my equipment';
+
+  @override
+  String get trips_gear_add_fromSet => 'An equipment set';
+
+  @override
+  String get trips_gear_add_rental => 'Rental cylinders';
+
+  @override
+  String get trips_gear_section_packed => 'Packed';
+
+  @override
+  String get trips_gear_section_cylinders => 'Cylinders';
+
+  @override
+  String get trips_gear_empty_upcoming =>
+      'Nothing packed yet. Add the gear you\'ll bring and the cylinders you\'ll dive from.';
+
+  @override
+  String get trips_gear_empty_past => 'Nothing was packed for this trip.';
+
+  @override
+  String get trips_gear_slot_rental => 'Rental';
+
+  @override
+  String get trips_gear_slot_own => 'My equipment';
+
+  @override
+  String get trips_gear_openBoard => 'Open board';
 
   @override
   String trips_cylinders_forecast_todayShort(int needed, int full) {
@@ -24330,13 +24351,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String trips_cylinders_summaryUnfilled(int count) {
     return 'Not filled yet $count';
   }
-
-  @override
-  String get trips_cylinders_setUp => 'Set up cylinders';
-
-  @override
-  String get trips_cylinders_setUpHint =>
-      'Track the cylinders you hold on this trip: fills, mixes and what is left in each.';
 
   @override
   String get trips_cylinders_status_full => 'Full';
@@ -24598,6 +24612,117 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trips_detail_tab_dives => 'Dives';
 
   @override
+  String get trips_detail_tab_gear => 'Gear';
+
+  @override
+  String trips_overview_checklist_progress(int done, int total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String trips_overview_checklist_dueSoon(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count due this week',
+      one: '1 due this week',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_checklist_overdue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count overdue',
+      one: '1 overdue',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_packed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items packed',
+      one: '1 item packed',
+      zero: 'Nothing packed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_cylinders(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cylinders',
+      one: '1 cylinder',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_gear_serviceAlerts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count service alerts',
+      one: '1 service alert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_itinerary_days(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_overview_itinerary_divesPlanned(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives planned',
+      one: '1 dive planned',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_overview_itinerary_none => 'Not planned yet';
+
+  @override
+  String get trips_overview_plan => 'Plan';
+
+  @override
+  String trips_overview_plan_divesPerDay(int count) {
+    return '$count dives/day';
+  }
+
+  @override
+  String trips_overview_plan_sharing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count divers share cylinders',
+      one: '1 diver shares cylinders',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_overview_plan_notSet => 'Not set';
+
+  @override
   String get trips_detail_sectionTitle_vessel => 'Vessel';
 
   @override
@@ -24656,14 +24781,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trips_itinerary_notes_label => 'Notes';
 
   @override
-  String get trips_itinerary_noDives => 'No dives';
-
-  @override
   String get trips_itinerary_error_loading => 'Couldn\'t load the itinerary.';
 
   @override
   String get trips_itinerary_daySaveError =>
       'Couldn\'t save the day. Try again.';
+
+  @override
+  String get trips_itinerary_empty =>
+      'No itinerary yet. Generate one from the trip dates.';
+
+  @override
+  String get trips_itinerary_fillMissing => 'Fill in missing days';
+
+  @override
+  String trips_itinerary_plannedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives planned',
+      one: '1 dive planned',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_itinerary_plannedDives_label => 'Planned dives';
+
+  @override
+  String get trips_itinerary_plannedDives_invalid =>
+      'Enter a whole number of dives, or leave it blank.';
+
+  @override
+  String get trips_itinerary_location_label => 'Location';
 
   @override
   String get trips_vesselType_catamaran => 'Catamaran';
