@@ -5956,6 +5956,19 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die ausgewählten Tauchgänge gehören zu unterschiedlichen Tauchern und können nicht kombiniert werden.';
 
   @override
+  String get diveLog_combine_modeJoin => 'Zu einem Tauchgang verbinden';
+
+  @override
+  String get diveLog_combine_modeJoinShort => 'Verbinden';
+
+  @override
+  String get diveLog_combine_modeMerge =>
+      'Als weiteren Computer zusammenführen';
+
+  @override
+  String get diveLog_combine_modeMergeShort => 'Zusammenführen';
+
+  @override
   String get diveLog_combine_profilePreview => 'Kombiniertes Profil';
 
   @override
@@ -5997,6 +6010,27 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_computerSource_badge_primary => 'Primär';
 
   @override
+  String get diveLog_consolidate_alignBestFit => 'Beste Übereinstimmung';
+
+  @override
+  String get diveLog_consolidate_alignStarts => 'Anfänge ausrichten';
+
+  @override
+  String get diveLog_consolidate_alignStartsShort => 'Anfänge';
+
+  @override
+  String get diveLog_consolidate_alignmentLabel =>
+      'Aufzeichnungen ausrichten nach';
+
+  @override
+  String get diveLog_consolidate_clockNote =>
+      'Diese Aufzeichnungen überschneiden sich zeitlich nicht, daher geht die Uhr eines Computers wahrscheinlich falsch. Der Tauchgang behält die Zeit des primären Computers.';
+
+  @override
+  String get diveLog_consolidate_clockNoteShort =>
+      'Die Uhr eines Computers geht wahrscheinlich falsch.';
+
+  @override
   String get diveLog_consolidate_confirm =>
       'Als ein Tauchgang mit beiden Computern behalten';
 
@@ -6011,6 +6045,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get diveLog_consolidate_error_sameComputer =>
       'Diese Tauchgänge stammen vom selben Tauchcomputer und können auf diese Weise nicht zusammengeführt werden.';
+
+  @override
+  String get diveLog_consolidate_noProfileFallback =>
+      'Eine Aufzeichnung hat kein Tiefenprofil zum Abgleichen, daher wird ihr Anfang an dem des primären Computers ausgerichtet.';
+
+  @override
+  String get diveLog_consolidate_sameDiveHint =>
+      'Diese Profile sehen aus wie derselbe Tauchgang, aufgezeichnet von zwei Computern.';
 
   @override
   String get diveLog_consolidate_selectPrimary => 'Primärer Tauchcomputer';

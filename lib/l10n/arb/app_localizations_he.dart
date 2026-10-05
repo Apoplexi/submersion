@@ -5824,6 +5824,18 @@ class AppLocalizationsHe extends AppLocalizations {
       'הצלילות שנבחרו שייכות לצוללנים שונים ולא ניתן למזג אותן.';
 
   @override
+  String get diveLog_combine_modeJoin => 'חיבור לצלילה אחת';
+
+  @override
+  String get diveLog_combine_modeJoinShort => 'חיבור';
+
+  @override
+  String get diveLog_combine_modeMerge => 'מיזוג כמחשב נוסף';
+
+  @override
+  String get diveLog_combine_modeMergeShort => 'מיזוג';
+
+  @override
   String get diveLog_combine_profilePreview => 'פרופיל ממוזג';
 
   @override
@@ -5864,6 +5876,26 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_computerSource_badge_primary => 'ראשי';
 
   @override
+  String get diveLog_consolidate_alignBestFit => 'התאמה מיטבית';
+
+  @override
+  String get diveLog_consolidate_alignStarts => 'יישור התחלות';
+
+  @override
+  String get diveLog_consolidate_alignStartsShort => 'התחלות';
+
+  @override
+  String get diveLog_consolidate_alignmentLabel => 'יישור הרשומות לפי';
+
+  @override
+  String get diveLog_consolidate_clockNote =>
+      'הרשומות האלה לא חופפות בזמן, כך שכנראה השעון של אחד המחשבים שגוי. הצלילה שומרת על השעה של המחשב הראשי.';
+
+  @override
+  String get diveLog_consolidate_clockNoteShort =>
+      'כנראה השעון של אחד המחשבים שגוי.';
+
+  @override
   String get diveLog_consolidate_confirm => 'לשמור כצלילה אחת עם שני המחשבים';
 
   @override
@@ -5877,6 +5909,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get diveLog_consolidate_error_sameComputer =>
       'הצלילות האלה מגיעות מאותו מחשב צלילה ולא ניתן למזג אותן בדרך זו.';
+
+  @override
+  String get diveLog_consolidate_noProfileFallback =>
+      'לאחת הרשומות אין פרופיל עומק להתאמה, ולכן ההתחלה שלה מיושרת להתחלה של הראשי.';
+
+  @override
+  String get diveLog_consolidate_sameDiveHint =>
+      'הפרופילים האלה נראים כמו אותה צלילה שתועדה על ידי שני מחשבים.';
 
   @override
   String get diveLog_consolidate_selectPrimary => 'מחשב הצלילה הראשי';
