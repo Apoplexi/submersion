@@ -1393,6 +1393,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get o2Toxicity_thisDive => 'Dieser Tauchgang';
 
   @override
+  String get o2Toxicity_lastDive => 'Letzter Tauchgang';
+
+  @override
+  String o2Toxicity_lastDiveStart(String percent) {
+    return 'Vor letztem Tauchgang: $percent%';
+  }
+
+  @override
+  String o2Toxicity_lastDiveDelta(String percent) {
+    return 'Letzter Tauchgang: +$percent%';
+  }
+
+  @override
   String get o2Toxicity_weekly => 'Wöchentlich';
 
   @override
@@ -30533,6 +30546,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get safetySettings_noFlyHeader => 'Fliegen nach dem Tauchen';
 
   @override
+  String get safetySettings_cnsOtuHeader => 'Aktuelle CNS/OTU-Belastung';
+
+  @override
   String get safetySettings_noFlyPreset_standard => 'Standard (12/18/24 h)';
 
   @override
@@ -30579,6 +30595,31 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get safetyHub_noFly_clear_subtitle => 'Keine aktive Flugbeschränkung';
+
+  @override
+  String get safetyHub_cnsOtu_clear_title => 'Keine aktive Belastung';
+
+  @override
+  String get safetyHub_cnsOtu_clear_subtitle =>
+      'CNS und OTU sind seit deinem letzten Tauchgang abgeklungen';
+
+  @override
+  String safetyHub_cnsOtu_sinceLastDive(String duration) {
+    return 'Letzter Tauchgang vor $duration';
+  }
+
+  @override
+  String safetyHub_cnsOtu_elapsedDaysHours(int days, int hours) {
+    return '${days}T ${hours}h';
+  }
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_title =>
+      'Letzter Tauchgang ohne Profil';
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_body =>
+      'Ohne Tiefenprofil lassen sich CNS% und OTU dafür nicht berechnen. Die Summen unten enthalten ihn nicht.';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
@@ -31019,6 +31060,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get planning_card_noFly_subtitle =>
       'Richtwert-Countdown ab deinen letzten Tauchgängen';
+
+  @override
+  String get planning_card_cnsOtu_subtitle =>
+      'Live-Zerfall seit deinem letzten Tauchgang';
 
   @override
   String get settings_section_safety_title => 'Sicherheit';

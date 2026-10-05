@@ -1395,6 +1395,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get o2Toxicity_thisDive => 'Ez a merülés';
 
   @override
+  String get o2Toxicity_lastDive => 'Utolsó merülés';
+
+  @override
+  String o2Toxicity_lastDiveStart(String percent) {
+    return 'Utolsó merülés előtt: $percent%';
+  }
+
+  @override
+  String o2Toxicity_lastDiveDelta(String percent) {
+    return 'Utolsó merülés: +$percent%';
+  }
+
+  @override
   String get o2Toxicity_weekly => 'Heti';
 
   @override
@@ -30447,6 +30460,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get safetySettings_noFlyHeader => 'Repülés merülés után';
 
   @override
+  String get safetySettings_cnsOtuHeader => 'Jelenlegi CNS/OTU terhelés';
+
+  @override
   String get safetySettings_noFlyPreset_standard => 'Normál (12/18/24 ó)';
 
   @override
@@ -30494,6 +30510,31 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get safetyHub_noFly_clear_subtitle =>
       'Nincs aktív repülési korlátozás';
+
+  @override
+  String get safetyHub_cnsOtu_clear_title => 'Nincs aktív terhelés';
+
+  @override
+  String get safetyHub_cnsOtu_clear_subtitle =>
+      'A CNS és az OTU lecsengett az utolsó merülés óta';
+
+  @override
+  String safetyHub_cnsOtu_sinceLastDive(String duration) {
+    return 'Az utolsó merülés $duration ezelőtt ért véget';
+  }
+
+  @override
+  String safetyHub_cnsOtu_elapsedDaysHours(int days, int hours) {
+    return '${days}n $hoursó';
+  }
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_title =>
+      'Az utolsó merülésnek nincs profilja';
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_body =>
+      'Mélységprofil nélkül a CNS% és az OTU nem számítható ki. Az alábbi összesítések nem tartalmazzák.';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
@@ -30930,6 +30971,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get planning_card_noFly_subtitle =>
       'Irányadó visszaszámlálás az utolsó merüléseidtől';
+
+  @override
+  String get planning_card_cnsOtu_subtitle =>
+      'Élő csökkenés az utolsó merülés óta';
 
   @override
   String get settings_section_safety_title => 'Biztonság';

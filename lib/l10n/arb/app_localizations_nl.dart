@@ -1387,6 +1387,19 @@ class AppLocalizationsNl extends AppLocalizations {
   String get o2Toxicity_thisDive => 'Deze duik';
 
   @override
+  String get o2Toxicity_lastDive => 'Laatste duik';
+
+  @override
+  String o2Toxicity_lastDiveStart(String percent) {
+    return 'Voor de laatste duik: $percent%';
+  }
+
+  @override
+  String o2Toxicity_lastDiveDelta(String percent) {
+    return 'Laatste duik: +$percent%';
+  }
+
+  @override
   String get o2Toxicity_weekly => 'Wekelijks';
 
   @override
@@ -30368,6 +30381,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get safetySettings_noFlyHeader => 'Vliegen na het duiken';
 
   @override
+  String get safetySettings_cnsOtuHeader => 'Huidige CNS/OTU-belasting';
+
+  @override
   String get safetySettings_noFlyPreset_standard => 'Standaard (12/18/24 u)';
 
   @override
@@ -30414,6 +30430,30 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get safetyHub_noFly_clear_subtitle => 'Geen actieve vliegbeperking';
+
+  @override
+  String get safetyHub_cnsOtu_clear_title => 'Geen actieve belasting';
+
+  @override
+  String get safetyHub_cnsOtu_clear_subtitle =>
+      'CNS en OTU zijn afgenomen sinds je laatste duik';
+
+  @override
+  String safetyHub_cnsOtu_sinceLastDive(String duration) {
+    return 'Laatste duik eindigde $duration geleden';
+  }
+
+  @override
+  String safetyHub_cnsOtu_elapsedDaysHours(int days, int hours) {
+    return '${days}d ${hours}u';
+  }
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_title => 'Laatste duik zonder profiel';
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_body =>
+      'Zonder diepteprofiel kunnen CNS% en OTU ervan niet worden berekend. De totalen hieronder laten hem buiten beschouwing.';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
@@ -30850,6 +30890,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get planning_card_noFly_subtitle =>
       'Richtlijn-aftelling vanaf je laatste duiken';
+
+  @override
+  String get planning_card_cnsOtu_subtitle =>
+      'Live afname sinds je laatste duik';
 
   @override
   String get settings_section_safety_title => 'Veiligheid';

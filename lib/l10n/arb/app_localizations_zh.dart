@@ -1341,6 +1341,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get o2Toxicity_thisDive => '本次潜水';
 
   @override
+  String get o2Toxicity_lastDive => '上次潜水';
+
+  @override
+  String o2Toxicity_lastDiveStart(String percent) {
+    return '上次潜水前：$percent%';
+  }
+
+  @override
+  String o2Toxicity_lastDiveDelta(String percent) {
+    return '上次潜水：+$percent%';
+  }
+
+  @override
   String get o2Toxicity_weekly => '每周';
 
   @override
@@ -28957,6 +28970,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get safetySettings_noFlyHeader => '潜水后飞行';
 
   @override
+  String get safetySettings_cnsOtuHeader => '当前CNS/OTU负荷';
+
+  @override
   String get safetySettings_noFlyPreset_standard => '标准(12/18/24 小时)';
 
   @override
@@ -29001,6 +29017,29 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get safetyHub_noFly_clear_subtitle => '无活动的飞行限制';
+
+  @override
+  String get safetyHub_cnsOtu_clear_title => '无活跃负荷';
+
+  @override
+  String get safetyHub_cnsOtu_clear_subtitle => '自上次潜水以来CNS和OTU已消退';
+
+  @override
+  String safetyHub_cnsOtu_sinceLastDive(String duration) {
+    return '上次潜水结束于$duration前';
+  }
+
+  @override
+  String safetyHub_cnsOtu_elapsedDaysHours(int days, int hours) {
+    return '$days天$hours小时';
+  }
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_title => '上次潜水没有剖面';
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_body =>
+      '没有深度剖面，无法计算其 CNS% 和 OTU。下方合计不包含此次潜水。';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
@@ -29412,6 +29451,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get planning_card_noFly_subtitle => '基于最近潜水的指导倒计时';
+
+  @override
+  String get planning_card_cnsOtu_subtitle => '自上次潜水以来的实时衰减';
 
   @override
   String get settings_section_safety_title => '安全';

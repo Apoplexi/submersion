@@ -1427,6 +1427,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get o2Toxicity_thisDive => 'هذه الغطسة';
 
   @override
+  String get o2Toxicity_lastDive => 'الغطسة الأخيرة';
+
+  @override
+  String o2Toxicity_lastDiveStart(String percent) {
+    return 'قبل الغطسة الأخيرة: $percent%';
+  }
+
+  @override
+  String o2Toxicity_lastDiveDelta(String percent) {
+    return 'الغطسة الأخيرة: +$percent%';
+  }
+
+  @override
   String get o2Toxicity_weekly => 'أسبوعي';
 
   @override
@@ -31059,6 +31072,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetySettings_noFlyHeader => 'الطيران بعد الغوص';
 
   @override
+  String get safetySettings_cnsOtuHeader => 'الحمل الحالي لـ CNS/OTU';
+
+  @override
   String get safetySettings_noFlyPreset_standard => 'قياسي (12/18/24 س)';
 
   @override
@@ -31105,6 +31121,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get safetyHub_noFly_clear_subtitle => 'لا يوجد قيد نشط على الطيران';
+
+  @override
+  String get safetyHub_cnsOtu_clear_title => 'لا يوجد حمل نشط';
+
+  @override
+  String get safetyHub_cnsOtu_clear_subtitle =>
+      'تلاشى كل من CNS وOTU منذ غطستك الأخيرة';
+
+  @override
+  String safetyHub_cnsOtu_sinceLastDive(String duration) {
+    return 'انتهت الغطسة الأخيرة منذ $duration';
+  }
+
+  @override
+  String safetyHub_cnsOtu_elapsedDaysHours(int days, int hours) {
+    return '${days}d ${hours}h';
+  }
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_title => 'آخر غطسة بلا بيانات مخطط';
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_body =>
+      'لا يمكن حساب CNS% و OTU لها بدون بيانات العمق. المجاميع أدناه لا تشملها.';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
@@ -31540,6 +31580,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get planning_card_noFly_subtitle => 'عدّاد إرشادي منذ آخر غطساتك';
+
+  @override
+  String get planning_card_cnsOtu_subtitle => 'تناقص مباشر منذ غطستك الأخيرة';
 
   @override
   String get settings_section_safety_title => 'السلامة';

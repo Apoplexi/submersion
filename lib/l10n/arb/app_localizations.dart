@@ -2149,6 +2149,24 @@ abstract class AppLocalizations {
   /// **'This Dive'**
   String get o2Toxicity_thisDive;
 
+  /// No description provided for @o2Toxicity_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get o2Toxicity_lastDive;
+
+  /// No description provided for @o2Toxicity_lastDiveStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Before last dive: {percent}%'**
+  String o2Toxicity_lastDiveStart(String percent);
+
+  /// No description provided for @o2Toxicity_lastDiveDelta.
+  ///
+  /// In en, this message translates to:
+  /// **'Last dive: +{percent}%'**
+  String o2Toxicity_lastDiveDelta(String percent);
+
   /// No description provided for @o2Toxicity_weekly.
   ///
   /// In en, this message translates to:
@@ -48258,6 +48276,12 @@ abstract class AppLocalizations {
   /// **'Flying after diving'**
   String get safetySettings_noFlyHeader;
 
+  /// No description provided for @safetySettings_cnsOtuHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Current CNS/OTU load'**
+  String get safetySettings_cnsOtuHeader;
+
   /// No description provided for @safetySettings_noFlyPreset_standard.
   ///
   /// In en, this message translates to:
@@ -48329,6 +48353,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No active flying restriction'**
   String get safetyHub_noFly_clear_subtitle;
+
+  /// No description provided for @safetyHub_cnsOtu_clear_title.
+  ///
+  /// In en, this message translates to:
+  /// **'No active load'**
+  String get safetyHub_cnsOtu_clear_title;
+
+  /// No description provided for @safetyHub_cnsOtu_clear_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS and OTU have cleared since your last dive'**
+  String get safetyHub_cnsOtu_clear_subtitle;
+
+  /// No description provided for @safetyHub_cnsOtu_sinceLastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last dive ended {duration} ago'**
+  String safetyHub_cnsOtu_sinceLastDive(String duration);
+
+  /// No description provided for @safetyHub_cnsOtu_elapsedDaysHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d {hours}h'**
+  String safetyHub_cnsOtu_elapsedDaysHours(int days, int hours);
+
+  /// No description provided for @safetyHub_cnsOtu_noProfile_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Last dive has no profile'**
+  String get safetyHub_cnsOtu_noProfile_title;
+
+  /// No description provided for @safetyHub_cnsOtu_noProfile_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Its CNS% and OTU can\'t be calculated without depth samples. The totals below leave it out.'**
+  String get safetyHub_cnsOtu_noProfile_body;
 
   /// No description provided for @safetyHub_noFly_category_single.
   ///
@@ -49043,6 +49103,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Guideline countdown from your last dives'**
   String get planning_card_noFly_subtitle;
+
+  /// No description provided for @planning_card_cnsOtu_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live decay since your last dive'**
+  String get planning_card_cnsOtu_subtitle;
 
   /// No description provided for @settings_section_safety_title.
   ///

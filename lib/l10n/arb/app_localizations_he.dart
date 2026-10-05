@@ -1377,6 +1377,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String get o2Toxicity_thisDive => 'צלילה זו';
 
   @override
+  String get o2Toxicity_lastDive => 'צלילה אחרונה';
+
+  @override
+  String o2Toxicity_lastDiveStart(String percent) {
+    return 'לפני הצלילה האחרונה: $percent%';
+  }
+
+  @override
+  String o2Toxicity_lastDiveDelta(String percent) {
+    return 'צלילה אחרונה: +$percent%';
+  }
+
+  @override
   String get o2Toxicity_weekly => 'שבועי';
 
   @override
@@ -29861,6 +29874,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get safetySettings_noFlyHeader => 'טיסה אחרי צלילה';
 
   @override
+  String get safetySettings_cnsOtuHeader => 'עומס CNS/OTU נוכחי';
+
+  @override
   String get safetySettings_noFlyPreset_standard => 'רגיל (12/18/24 ש\')';
 
   @override
@@ -29906,6 +29922,30 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get safetyHub_noFly_clear_subtitle => 'אין הגבלת טיסה פעילה';
+
+  @override
+  String get safetyHub_cnsOtu_clear_title => 'אין עומס פעיל';
+
+  @override
+  String get safetyHub_cnsOtu_clear_subtitle =>
+      'ה-CNS וה-OTU דעכו מאז הצלילה האחרונה שלך';
+
+  @override
+  String safetyHub_cnsOtu_sinceLastDive(String duration) {
+    return 'הצלילה האחרונה הסתיימה לפני $duration';
+  }
+
+  @override
+  String safetyHub_cnsOtu_elapsedDaysHours(int days, int hours) {
+    return '${days}d ${hours}h';
+  }
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_title => 'לצלילה האחרונה אין פרופיל';
+
+  @override
+  String get safetyHub_cnsOtu_noProfile_body =>
+      'ללא פרופיל עומק לא ניתן לחשב את ה-CNS% וה-OTU שלה. הסיכומים שלהלן אינם כוללים אותה.';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
@@ -30334,6 +30374,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get planning_card_noFly_subtitle =>
       'ספירה לאחור מנחה מהצלילות האחרונות שלך';
+
+  @override
+  String get planning_card_cnsOtu_subtitle =>
+      'דעיכה בזמן אמת מאז הצלילה האחרונה שלך';
 
   @override
   String get settings_section_safety_title => 'בטיחות';
