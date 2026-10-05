@@ -11923,6 +11923,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_equipmentType_strobe => 'فلاش';
 
   @override
+  String get enum_equipmentType_lens => 'عدسة';
+
+  @override
+  String get enum_equipmentType_port => 'منفذ العدسة';
+
+  @override
+  String get enum_equipmentType_trayHandle => 'حامل / مقبض';
+
+  @override
+  String get enum_equipmentType_armClamp => 'ذراع / مشبك';
+
+  @override
+  String get enum_equipmentType_videoLight => 'مصباح فيديو';
+
+  @override
+  String get enum_equipmentType_floatArm => 'ذراع طفو / عوامة';
+
+  @override
   String get enum_equipmentType_undersuit => 'بدلة داخلية';
 
   @override
@@ -30604,6 +30622,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attrLabel_pocket_mount => 'التثبيت';
 
   @override
+  String get attrLabel_lens_type => 'نوع العدسة';
+
+  @override
+  String get attrLabel_focal_length_mm => 'البعد البؤري (مم)';
+
+  @override
+  String get attrLabel_port_type => 'نوع المنفذ';
+
+  @override
+  String get attrLabel_tray_style => 'النمط';
+
+  @override
+  String get attrLabel_arm_length_m => 'طول الذراع';
+
+  @override
+  String get attrLabel_guide_number_m => 'الرقم الدليلي';
+
+  @override
   String get attrLabel_bag_style => 'النمط';
 
   @override
@@ -30761,6 +30797,33 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get attrChoice_pocket_mount_thigh => 'الفخذ';
+
+  @override
+  String get attrChoice_lens_type_camera_lens => 'عدسة الكاميرا';
+
+  @override
+  String get attrChoice_lens_type_wet_lens => 'عدسة رطبة';
+
+  @override
+  String get attrChoice_lens_type_diopter => 'عدسة مقرّبة (ديوبتر)';
+
+  @override
+  String get attrChoice_port_type_dome => 'قبة';
+
+  @override
+  String get attrChoice_port_type_flat => 'مسطح';
+
+  @override
+  String get attrChoice_port_type_macro => 'ماكرو';
+
+  @override
+  String get attrChoice_tray_style_single_handle => 'مقبض واحد';
+
+  @override
+  String get attrChoice_tray_style_double_handle => 'مقبضان';
+
+  @override
+  String get attrChoice_tray_style_pistol_grip => 'مقبض مسدس';
 
   @override
   String get attrChoice_bag_style_duffel => 'حقيبة سفر';
