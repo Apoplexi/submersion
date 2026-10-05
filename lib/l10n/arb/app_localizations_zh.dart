@@ -6927,6 +6927,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_filter_clearWeekdays => '清除星期筛选';
 
   @override
+  String get diveLog_filter_clearSite => '清除潜水点筛选';
+
+  @override
   String get diveLog_filter_dateSeparator => '至';
 
   @override
@@ -6976,9 +6979,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_filter_searchComputersHint => '输入以搜索潜水电脑';
-
-  @override
-  String get diveLog_filter_searchSitesHint => '输入以搜索潜水点';
 
   @override
   String get diveLog_filter_searchTypesHint => '输入以搜索类型';
@@ -10204,6 +10204,31 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_list_sort_title => '排序潜水点';
+
+  @override
+  String get diveSites_group_noCountry => '无国家';
+
+  @override
+  String diveSites_group_siteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个潜水点',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_picker_nearby => '附近';
+
+  @override
+  String get diveSites_list_groupBy => '分组方式';
+
+  @override
+  String get diveSites_list_groupBy_location => '国家和地区';
+
+  @override
+  String get diveSites_list_groupBy_none => '无';
 
   @override
   String diveSites_list_tile_diveCount(int count) {

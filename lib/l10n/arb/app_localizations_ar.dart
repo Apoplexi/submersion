@@ -7383,6 +7383,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_clearWeekdays => 'مسح أيام الأسبوع';
 
   @override
+  String get diveLog_filter_clearSite => 'مسح مرشح الموقع';
+
+  @override
   String get diveLog_filter_dateSeparator => 'إلى';
 
   @override
@@ -7432,9 +7435,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_searchComputersHint => 'اكتب للبحث عن حواسيب الغوص';
-
-  @override
-  String get diveLog_filter_searchSitesHint => 'اكتب للبحث عن المواقع';
 
   @override
   String get diveLog_filter_searchTypesHint => 'اكتب للبحث عن الأنواع';
@@ -10849,6 +10849,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_list_sort_title => 'ترتيب المواقع';
+
+  @override
+  String get diveSites_group_noCountry => 'بلا دولة';
+
+  @override
+  String diveSites_group_siteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعان',
+      one: 'موقع واحد',
+      zero: 'لا مواقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_picker_nearby => 'قريب';
+
+  @override
+  String get diveSites_list_groupBy => 'التجميع حسب';
+
+  @override
+  String get diveSites_list_groupBy_location => 'الدولة والمنطقة';
+
+  @override
+  String get diveSites_list_groupBy_none => 'بلا';
 
   @override
   String diveSites_list_tile_diveCount(int count) {
