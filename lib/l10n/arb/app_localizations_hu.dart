@@ -17683,6 +17683,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_viewer_goToDive => 'Ugrás a merüléshez';
 
   @override
+  String get media_viewer_enterFullscreen => 'Teljes képernyő';
+
+  @override
+  String get media_viewer_exitFullscreen => 'Kilépés a teljes képernyőből';
+
+  @override
+  String get media_viewer_moreOptions => 'További lehetőségek';
+
+  @override
   String get nav_home => 'Főoldal';
 
   @override

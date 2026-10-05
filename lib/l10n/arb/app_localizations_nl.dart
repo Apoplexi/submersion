@@ -17619,6 +17619,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_viewer_goToDive => 'Naar duik';
 
   @override
+  String get media_viewer_enterFullscreen => 'Volledig scherm';
+
+  @override
+  String get media_viewer_exitFullscreen => 'Volledig scherm verlaten';
+
+  @override
+  String get media_viewer_moreOptions => 'Meer opties';
+
+  @override
   String get nav_home => 'Home';
 
   @override
