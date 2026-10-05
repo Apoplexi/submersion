@@ -6344,6 +6344,41 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_detail_section_customFields => 'Custom Fields';
 
   @override
+  String get diveLog_gasSwitches_title => 'Cambi gas';
+
+  @override
+  String get diveLog_gasSwitches_onTime => 'Tutti i cambi gas puntuali';
+
+  @override
+  String diveLog_gasSwitches_lateRow(
+    String actual,
+    String ideal,
+    String delay,
+  ) {
+    return 'Cambiato a $actual invece di $ideal, $delay di ritardo';
+  }
+
+  @override
+  String diveLog_gasSwitches_missedRow(String ideal) {
+    return 'Non cambiato (ideale a $ideal)';
+  }
+
+  @override
+  String diveLog_gasSwitches_extraDeco(String extra) {
+    return '+$extra di deco';
+  }
+
+  @override
+  String diveLog_gasSwitches_total(String extra) {
+    return 'Deco aggiuntiva totale: $extra';
+  }
+
+  @override
+  String diveLog_gasSwitches_lateRowTime(String delay, String actual) {
+    return 'Cambiato con $delay di ritardo a $actual';
+  }
+
+  @override
   String get diveLog_detail_section_decoStatus => 'Stato deco';
 
   @override
@@ -7424,6 +7459,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveLog_legend_label_gasDensity => 'Densità del gas';
+
+  @override
+  String get diveLog_legend_label_lateGasSwitches => 'Cambi gas tardivi';
 
   @override
   String get diveLog_legend_label_gasSwitches => 'Cambi gas';
@@ -9306,6 +9344,18 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_lateSwitch => 'Cambio tardivo';
+
+  @override
+  String get diveLog_tooltip_missedSwitch => 'Cambio mancato';
+
+  @override
+  String get diveLog_tooltip_switchDelay => 'Ritardo';
+
+  @override
+  String get diveLog_tooltip_extraDeco => 'Deco aggiuntiva';
 
   @override
   String get diveLog_tooltip_gtr => 'GTR';
@@ -18349,6 +18399,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Mostra i marcatori per i cambi gas';
 
   @override
+  String get settings_appearance_lateGasSwitches => 'Cambi gas tardivi';
+
+  @override
+  String get settings_appearance_lateGasSwitches_subtitle =>
+      'Evidenzia nel profilo i cambi gas deco tardivi e mancati';
+
+  @override
   String get settings_appearance_gasTimeline => 'Cronologia del gas';
 
   @override
@@ -18472,6 +18529,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String safetyReview_highSurfaceGf_title(String gf, String gfHigh) {
     return 'Emersione con fattore di gradiente $gf, oltre il $gfHigh configurato';
   }
+
+  @override
+  String safetyReview_lateGasSwitch_title(String extra) {
+    return 'Un cambio gas tardivo o mancato ha aggiunto $extra di deco';
+  }
+
+  @override
+  String get safetyReview_lateGasSwitch_noCost_title =>
+      'Un cambio gas è stato tardivo ma non ha aggiunto deco';
 
   @override
   String safetyReview_timeRange(String start, String end) {
@@ -18598,6 +18664,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get safetySettings_rule_sawtoothProfile => 'Profili a dente di sega';
+
+  @override
+  String get safetySettings_rule_lateGasSwitch => 'Cambio gas tardivo';
 
   @override
   String get safetySettings_rule_highSurfaceGf =>

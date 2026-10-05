@@ -10057,6 +10057,48 @@ abstract class AppLocalizations {
   /// **'Custom Fields'**
   String get diveLog_detail_section_customFields;
 
+  /// No description provided for @diveLog_gasSwitches_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas switches'**
+  String get diveLog_gasSwitches_title;
+
+  /// No description provided for @diveLog_gasSwitches_onTime.
+  ///
+  /// In en, this message translates to:
+  /// **'All gas switches on time'**
+  String get diveLog_gasSwitches_onTime;
+
+  /// No description provided for @diveLog_gasSwitches_lateRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Switched at {actual} instead of {ideal}, {delay} late'**
+  String diveLog_gasSwitches_lateRow(String actual, String ideal, String delay);
+
+  /// No description provided for @diveLog_gasSwitches_missedRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not switched (ideal at {ideal})'**
+  String diveLog_gasSwitches_missedRow(String ideal);
+
+  /// No description provided for @diveLog_gasSwitches_extraDeco.
+  ///
+  /// In en, this message translates to:
+  /// **'+{extra} deco'**
+  String diveLog_gasSwitches_extraDeco(String extra);
+
+  /// No description provided for @diveLog_gasSwitches_total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total extra deco: {extra}'**
+  String diveLog_gasSwitches_total(String extra);
+
+  /// No description provided for @diveLog_gasSwitches_lateRowTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Switched {delay} late at {actual}'**
+  String diveLog_gasSwitches_lateRowTime(String delay, String actual);
+
   /// No description provided for @diveLog_detail_section_decoStatus.
   ///
   /// In en, this message translates to:
@@ -11814,6 +11856,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gas Density'**
   String get diveLog_legend_label_gasDensity;
+
+  /// No description provided for @diveLog_legend_label_lateGasSwitches.
+  ///
+  /// In en, this message translates to:
+  /// **'Late gas switches'**
+  String get diveLog_legend_label_lateGasSwitches;
 
   /// No description provided for @diveLog_legend_label_gasSwitches.
   ///
@@ -14958,6 +15006,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TTS'**
   String get diveLog_tooltip_tts;
+
+  /// No description provided for @diveLog_tooltip_lateSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Late switch'**
+  String get diveLog_tooltip_lateSwitch;
+
+  /// No description provided for @diveLog_tooltip_missedSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed switch'**
+  String get diveLog_tooltip_missedSwitch;
+
+  /// No description provided for @diveLog_tooltip_switchDelay.
+  ///
+  /// In en, this message translates to:
+  /// **'Delay'**
+  String get diveLog_tooltip_switchDelay;
+
+  /// No description provided for @diveLog_tooltip_extraDeco.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra deco'**
+  String get diveLog_tooltip_extraDeco;
 
   /// No description provided for @diveLog_tooltip_gtr.
   ///
@@ -29479,6 +29551,18 @@ abstract class AppLocalizations {
   /// **'Show markers for gas switches'**
   String get settings_appearance_gasSwitchMarkers_subtitle;
 
+  /// No description provided for @settings_appearance_lateGasSwitches.
+  ///
+  /// In en, this message translates to:
+  /// **'Late gas switches'**
+  String get settings_appearance_lateGasSwitches;
+
+  /// No description provided for @settings_appearance_lateGasSwitches_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shade late and missed deco gas switches on the profile'**
+  String get settings_appearance_lateGasSwitches_subtitle;
+
   /// No description provided for @settings_appearance_gasTimeline.
   ///
   /// In en, this message translates to:
@@ -29671,6 +29755,18 @@ abstract class AppLocalizations {
   /// **'Surfaced at gradient factor {gf}, above the configured {gfHigh}'**
   String safetyReview_highSurfaceGf_title(String gf, String gfHigh);
 
+  /// No description provided for @safetyReview_lateGasSwitch_title.
+  ///
+  /// In en, this message translates to:
+  /// **'A late or missed gas switch added {extra} of deco'**
+  String safetyReview_lateGasSwitch_title(String extra);
+
+  /// No description provided for @safetyReview_lateGasSwitch_noCost_title.
+  ///
+  /// In en, this message translates to:
+  /// **'A gas switch was late but added no deco'**
+  String get safetyReview_lateGasSwitch_noCost_title;
+
   /// No description provided for @safetyReview_timeRange.
   ///
   /// In en, this message translates to:
@@ -29832,6 +29928,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sawtooth profiles'**
   String get safetySettings_rule_sawtoothProfile;
+
+  /// No description provided for @safetySettings_rule_lateGasSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Late gas switch'**
+  String get safetySettings_rule_lateGasSwitch;
 
   /// No description provided for @safetySettings_rule_highSurfaceGf.
   ///

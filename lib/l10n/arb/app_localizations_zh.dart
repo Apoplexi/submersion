@@ -6047,6 +6047,41 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_customFields => '自定义字段';
 
   @override
+  String get diveLog_gasSwitches_title => '换气';
+
+  @override
+  String get diveLog_gasSwitches_onTime => '所有换气均按时';
+
+  @override
+  String diveLog_gasSwitches_lateRow(
+    String actual,
+    String ideal,
+    String delay,
+  ) {
+    return '在 $actual 换气，而非 $ideal，延迟 $delay';
+  }
+
+  @override
+  String diveLog_gasSwitches_missedRow(String ideal) {
+    return '未换气（理想深度 $ideal）';
+  }
+
+  @override
+  String diveLog_gasSwitches_extraDeco(String extra) {
+    return '减压 +$extra';
+  }
+
+  @override
+  String diveLog_gasSwitches_total(String extra) {
+    return '额外减压总计：$extra';
+  }
+
+  @override
+  String diveLog_gasSwitches_lateRowTime(String delay, String actual) {
+    return '在 $actual 换气，延迟 $delay';
+  }
+
+  @override
   String get diveLog_detail_section_decoStatus => '减压状态';
 
   @override
@@ -7056,6 +7091,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_legend_label_gasDensity => '气体密度';
+
+  @override
+  String get diveLog_legend_label_lateGasSwitches => '延迟换气';
 
   @override
   String get diveLog_legend_label_gasSwitches => '气体切换';
@@ -8860,6 +8898,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_lateSwitch => '延迟换气';
+
+  @override
+  String get diveLog_tooltip_missedSwitch => '漏换气';
+
+  @override
+  String get diveLog_tooltip_switchDelay => '延迟';
+
+  @override
+  String get diveLog_tooltip_extraDeco => '额外减压';
 
   @override
   String get diveLog_tooltip_gtr => 'GTR';
@@ -17482,6 +17532,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_appearance_gasSwitchMarkers_subtitle => '显示气体切换标记';
 
   @override
+  String get settings_appearance_lateGasSwitches => '延迟换气';
+
+  @override
+  String get settings_appearance_lateGasSwitches_subtitle =>
+      '在剖面图上标出延迟和遗漏的减压换气';
+
+  @override
   String get settings_appearance_gasTimeline => '气体时间线';
 
   @override
@@ -17599,6 +17656,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String safetyReview_lateGasSwitch_title(String extra) {
+    return '一次延迟或遗漏的换气增加了 $extra 减压';
+  }
+
+  @override
+  String get safetyReview_lateGasSwitch_noCost_title => '一次换气延迟，但未增加减压';
+
+  @override
   String safetyReview_timeRange(String start, String end) {
     return '于 $start–$end';
   }
@@ -17714,6 +17779,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get safetySettings_rule_sawtoothProfile => '锯齿形剖面';
+
+  @override
+  String get safetySettings_rule_lateGasSwitch => '延迟换气';
 
   @override
   String get safetySettings_rule_highSurfaceGf => '出水时梯度因子过高';
