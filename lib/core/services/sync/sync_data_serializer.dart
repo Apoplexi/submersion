@@ -9209,7 +9209,6 @@ class SyncDataSerializer {
       'endLimit': 30.0,
       'useDiveComputerCnsData': false,
       'defaultNdlSource': 1,
-      'defaultCeilingSource': 1,
       'defaultTtsSource': 1,
       'defaultCnsSource': 1,
       // Appearance settings
