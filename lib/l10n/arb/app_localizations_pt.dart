@@ -48926,4 +48926,19 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get query_saveNeedsDiver =>
       'Crie um perfil de mergulhador para salvar consultas';
+
+  @override
+  String get builtIns_showColumnLabel => 'Mostrar';
+
+  @override
+  String get builtIns_showInPickers => 'Mostrar nos seletores';
+
+  @override
+  String preDive_start_allTemplatesHidden(String path) {
+    return 'Todas as listas de verificação estão ocultas. Mostre uma novamente em $path.';
+  }
+
+  @override
+  String get settings_conflict_field_hiddenBuiltInIds =>
+      'Entradas integradas ocultas';
 }

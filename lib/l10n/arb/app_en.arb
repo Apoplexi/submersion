@@ -29069,5 +29069,13 @@
   "query_editor_needsText": "Enter at least one word",
   "@query_editor_needsText": {"description": "Builder text row left empty: it needs at least one word"},
   "query_saveNeedsDiver": "Create a diver profile to save queries",
-  "@query_saveNeedsDiver": {"description": "Snackbar when Save is tapped with no diver profile"}
+  "@query_saveNeedsDiver": {"description": "Snackbar when Save is tapped with no diver profile"},
+  "builtIns_showColumnLabel": "Show",
+  "@builtIns_showColumnLabel": {"description": "Column header above the switches that hide built-in entries from the pickers on the Manage pages"},
+  "builtIns_showInPickers": "Show in pickers",
+  "@builtIns_showInPickers": {"description": "Tooltip on a built-in entry's show/hide switch on a Manage page"},
+  "preDive_start_allTemplatesHidden": "Every checklist is hidden. Show one again in {path}.",
+  "@preDive_start_allTemplatesHidden": {"description": "Helper under the start sheet's checklist field when the diver hid every checklist template; path is the localized Settings > Manage > Pre-Dive Checklists trail", "placeholders": {"path": {"type": "String"}}},
+  "settings_conflict_field_hiddenBuiltInIds": "Hidden built-in entries",
+  "@settings_conflict_field_hiddenBuiltInIds": {"description": "Sync conflict dialog label for the built-in dive types, roles, site types, service types and checklists a diver hid from the pickers"}
 }

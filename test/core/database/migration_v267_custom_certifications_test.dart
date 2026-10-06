@@ -73,11 +73,15 @@ void main() {
     'hlc',
   };
 
-  test('v267 is the current schema version and in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, 267);
+  test('v267 is at or below the current schema version and in the ladder', () {
+    // Relaxed once v269 (diver_settings.hidden_built_in_ids, #401) landed on
+    // top; the newest rung owns the exact assertions.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(267));
     expect(AppDatabase.migrationVersions, contains(267));
-    expect(AppDatabase.migrationVersions.last, 267);
-    expect(AppDatabase.migrationStepCount(266), 1);
+    expect(
+      AppDatabase.migrationStepCount(266),
+      AppDatabase.migrationStepCount(267) + 1,
+    );
     // Additive rung: new synced tables never raise the floor.
     expect(AppDatabase.minimumCompatibleSchemaVersion, lessThan(267));
   });

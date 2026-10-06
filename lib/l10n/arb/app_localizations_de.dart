@@ -48816,4 +48816,19 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get query_saveNeedsDiver =>
       'Legen Sie ein Taucherprofil an, um Abfragen zu speichern';
+
+  @override
+  String get builtIns_showColumnLabel => 'Anzeigen';
+
+  @override
+  String get builtIns_showInPickers => 'In der Auswahl anzeigen';
+
+  @override
+  String preDive_start_allTemplatesHidden(String path) {
+    return 'Alle Checklisten sind ausgeblendet. Unter $path wieder einblenden.';
+  }
+
+  @override
+  String get settings_conflict_field_hiddenBuiltInIds =>
+      'Ausgeblendete integrierte Einträge';
 }

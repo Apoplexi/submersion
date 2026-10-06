@@ -14584,5 +14584,9 @@
   "settings_manage_savedQueries": "الاستعلامات المحفوظة",
   "settings_manage_savedQueries_subtitle": "إعادة تسمية الاستعلامات المحفوظة وإعادة ترتيبها وحذفها",
   "query_editor_needsText": "أدخل كلمة واحدة على الأقل",
-  "query_saveNeedsDiver": "أنشئ ملف غواص لحفظ الاستعلامات"
+  "query_saveNeedsDiver": "أنشئ ملف غواص لحفظ الاستعلامات",
+  "builtIns_showColumnLabel": "إظهار",
+  "builtIns_showInPickers": "إظهار في قوائم الاختيار",
+  "preDive_start_allTemplatesHidden": "جميع قوائم التحقق مخفية. أظهر واحدة مجددًا من {path}.",
+  "settings_conflict_field_hiddenBuiltInIds": "العناصر المضمنة المخفية"
 }

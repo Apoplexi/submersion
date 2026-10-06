@@ -48157,4 +48157,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get query_saveNeedsDiver => 'Create a diver profile to save queries';
+
+  @override
+  String get builtIns_showColumnLabel => 'Show';
+
+  @override
+  String get builtIns_showInPickers => 'Show in pickers';
+
+  @override
+  String preDive_start_allTemplatesHidden(String path) {
+    return 'Every checklist is hidden. Show one again in $path.';
+  }
+
+  @override
+  String get settings_conflict_field_hiddenBuiltInIds =>
+      'Hidden built-in entries';
 }
