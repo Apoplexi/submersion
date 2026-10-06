@@ -7057,6 +7057,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_label_waterType => 'نوع المياه';
 
   @override
+  String get diveLog_edit_label_weightName => 'الاسم (اختياري)';
+
+  @override
+  String get diveLog_edit_hint_weightName => 'مثال: الجيب العلوي';
+
+  @override
   String get diveLog_edit_marineLifeHint => 'انقر \"إضافة\" لتسجيل المشاهدات';
 
   @override
@@ -49149,6 +49155,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_weights_amount => 'الكمية';
+
+  @override
+  String get query_weights_label => 'الاسم';
 
   @override
   String get query_weights_notes => 'ملاحظات';

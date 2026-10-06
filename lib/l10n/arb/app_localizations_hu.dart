@@ -6945,6 +6945,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_edit_label_waterType => 'Víz típusa';
 
   @override
+  String get diveLog_edit_label_weightName => 'Név (nem kötelező)';
+
+  @override
+  String get diveLog_edit_hint_weightName => 'pl. felső zseb';
+
+  @override
   String get diveLog_edit_marineLifeHint =>
       'Koppintson a \"Hozzáadás\" gombra az észlelések rögzítéséhez';
 
@@ -48299,6 +48305,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get query_weights_amount => 'Mennyiség';
+
+  @override
+  String get query_weights_label => 'Név';
 
   @override
   String get query_weights_notes => 'Jegyzetek';

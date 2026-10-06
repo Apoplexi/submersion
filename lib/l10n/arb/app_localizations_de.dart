@@ -6965,6 +6965,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_edit_label_waterType => 'Wasserart';
 
   @override
+  String get diveLog_edit_label_weightName => 'Name (optional)';
+
+  @override
+  String get diveLog_edit_hint_weightName => 'z. B. obere Tasche';
+
+  @override
   String get diveLog_edit_marineLifeHint =>
       'Tippen Sie auf \"Hinzufügen\" um Sichtungen zu erfassen';
 
@@ -48436,6 +48442,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get query_weights_amount => 'Menge';
+
+  @override
+  String get query_weights_label => 'Name';
 
   @override
   String get query_weights_notes => 'Notizen';

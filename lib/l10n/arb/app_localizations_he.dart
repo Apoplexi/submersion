@@ -6811,6 +6811,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_edit_label_waterType => 'סוג מים';
 
   @override
+  String get diveLog_edit_label_weightName => 'שם (אופציונלי)';
+
+  @override
+  String get diveLog_edit_hint_weightName => 'לדוגמה: כיס עליון';
+
+  @override
   String get diveLog_edit_marineLifeHint => 'הקש \"הוספה\" לרישום תצפיות';
 
   @override
@@ -47529,6 +47535,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get query_weights_amount => 'כמות';
+
+  @override
+  String get query_weights_label => 'שם';
 
   @override
   String get query_weights_notes => 'הערות';
