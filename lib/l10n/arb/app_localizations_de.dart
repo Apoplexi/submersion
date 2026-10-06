@@ -7294,6 +7294,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_edit_row_addSite => 'Tauchplatz hinzufügen';
 
   @override
+  String get diveLog_edit_row_course => 'Kurs';
+
+  @override
   String get diveLog_edit_row_diveCenter => 'Tauchbasis';
 
   @override

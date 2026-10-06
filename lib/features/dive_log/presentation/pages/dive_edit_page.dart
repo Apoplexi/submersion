@@ -1402,6 +1402,19 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                 ),
               ),
               _gatedRow(
+                BulkField.course,
+                FormRow.picker(
+                  label: l10n.diveLog_edit_row_course,
+                  value: _selectedCourse?.name,
+                  placeholder: l10n.diveLog_edit_row_notSet,
+                  onTap: _showBulkCoursePicker,
+                  onClear: _selectedCourse == null
+                      ? null
+                      : () => setState(() => _selectedCourse = null),
+                  clearTooltip: l10n.courses_picker_clearSelection,
+                ),
+              ),
+              _gatedRow(
                 BulkField.rating,
                 FormRow.rating(
                   label: l10n.diveLog_edit_section_rating,
@@ -3096,6 +3109,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       }
     }
   }
+
+  Future<void> _showBulkCoursePicker() => showCoursePickerSheet(
+    context,
+    selectedCourse: _selectedCourse,
+    onCourseSelected: (course) {
+      _markDirty();
+      setState(() => _selectedCourse = course);
+    },
+  );
 
   Widget _buildCourseGroupSection() {
     return RareSection(
