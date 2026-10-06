@@ -354,6 +354,8 @@ class SyncData {
   final List<Map<String, dynamic>> siteSpecies;
   final List<Map<String, dynamic>> siteTypes;
   final List<Map<String, dynamic>> siteSiteTypes;
+  final List<Map<String, dynamic>> diveDiverRoles;
+  final List<Map<String, dynamic>> diveBuddyRoles;
   final List<Map<String, dynamic>> siteTags;
   final List<Map<String, dynamic>> equipmentTags;
   final List<Map<String, dynamic>> equipmentShares;
@@ -465,6 +467,8 @@ class SyncData {
     this.siteSpecies = const [],
     this.siteTypes = const [],
     this.siteSiteTypes = const [],
+    this.diveDiverRoles = const [],
+    this.diveBuddyRoles = const [],
     this.siteTags = const [],
     this.equipmentTags = const [],
     this.equipmentShares = const [],
@@ -575,6 +579,8 @@ class SyncData {
     'siteSpecies': siteSpecies,
     'siteTypes': siteTypes,
     'siteSiteTypes': siteSiteTypes,
+    'diveDiverRoles': diveDiverRoles,
+    'diveBuddyRoles': diveBuddyRoles,
     'siteTags': siteTags,
     'equipmentTags': equipmentTags,
     'equipmentShares': equipmentShares,
@@ -700,6 +706,8 @@ class SyncData {
       siteSpecies: _parseList(json['siteSpecies']),
       siteTypes: _parseList(json['siteTypes']),
       siteSiteTypes: _parseList(json['siteSiteTypes']),
+      diveDiverRoles: _parseList(json['diveDiverRoles']),
+      diveBuddyRoles: _parseList(json['diveBuddyRoles']),
       siteTags: _parseList(json['siteTags']),
       equipmentTags: _parseList(json['equipmentTags']),
       equipmentShares: _parseList(json['equipmentShares']),
@@ -1260,6 +1268,8 @@ class SyncDataSerializer {
       full: () => _exportSiteTypes(null),
     ),
     (key: 'siteSiteTypes', table: _db.siteSiteTypes, blob: false, full: null),
+    (key: 'diveDiverRoles', table: _db.diveDiverRoles, blob: false, full: null),
+    (key: 'diveBuddyRoles', table: _db.diveBuddyRoles, blob: false, full: null),
     (key: 'siteTags', table: _db.siteTags, blob: false, full: null),
     (key: 'equipmentTags', table: _db.equipmentTags, blob: false, full: null),
     (
@@ -1675,6 +1685,8 @@ class SyncDataSerializer {
     'courseRequirementDives',
     'diveTags',
     'diveDiveTypes',
+    'diveDiverRoles',
+    'diveBuddyRoles',
     'siteSiteTypes',
     'siteTags',
     'equipmentTags',
@@ -1903,6 +1915,8 @@ class SyncDataSerializer {
     'courseRequirementDives': 'course_requirement_dives',
     'diveTags': 'dive_tags',
     'siteSiteTypes': 'site_site_types',
+    'diveDiverRoles': 'dive_diver_roles',
+    'diveBuddyRoles': 'dive_buddy_roles',
     'siteTags': 'site_tags',
     'equipmentTags': 'equipment_tags',
     'equipmentShares': 'equipment_shares',
@@ -2302,6 +2316,30 @@ class SyncDataSerializer {
         () async => _withPendingChildren(
           'diveDiveTypes',
           await _exportDiveDiveTypes(hlcSince),
+          pendingChildren,
+        ),
+      ),
+      diveDiverRoles: await _safeExport(
+        'diveDiverRoles',
+        () async => _withPendingChildren(
+          'diveDiverRoles',
+          await _exportDiveRoleRows(hlcSince, (diveIds) {
+            final query = _db.select(_db.diveDiverRoles);
+            if (diveIds != null) query.where((t) => t.diveId.isIn(diveIds));
+            return query.get();
+          }),
+          pendingChildren,
+        ),
+      ),
+      diveBuddyRoles: await _safeExport(
+        'diveBuddyRoles',
+        () async => _withPendingChildren(
+          'diveBuddyRoles',
+          await _exportDiveRoleRows(hlcSince, (diveIds) {
+            final query = _db.select(_db.diveBuddyRoles);
+            if (diveIds != null) query.where((t) => t.diveId.isIn(diveIds));
+            return query.get();
+          }),
           pendingChildren,
         ),
       ),
@@ -3063,6 +3101,16 @@ class SyncDataSerializer {
       case 'siteSiteTypes':
         final row = await (_db.select(
           _db.siteSiteTypes,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'diveDiverRoles':
+        final row = await (_db.select(
+          _db.diveDiverRoles,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'diveBuddyRoles':
+        final row = await (_db.select(
+          _db.diveBuddyRoles,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'siteTags':
@@ -4166,6 +4214,57 @@ class SyncDataSerializer {
         );
   }
 
+  /// Applies one incoming `dive_diver_roles` row (v272, issue #1221): the
+  /// (dive, role) key is unique, so a peer's copy under another id is
+  /// reconciled to the lower id and then skipped with DO NOTHING, for the
+  /// reasons [_applyDiveDiveTypeRecord] gives.
+  Future<void> _applyDiveDiverRoleRecord(DiveDiverRole record) async {
+    await _reconcileJunctionIds(
+      'dive_diver_roles',
+      parentColumn: 'dive_id',
+      childColumn: 'role_id',
+      pairs: [(parent: record.diveId, child: record.roleId, id: record.id)],
+    );
+    await _db
+        .into(_db.diveDiverRoles)
+        .insert(
+          record,
+          onConflict: DoNothing<$DiveDiverRolesTable, DiveDiverRole>(
+            target: const [],
+          ),
+        );
+  }
+
+  /// Applies one incoming `dive_buddy_roles` row (v272). Its key is a
+  /// triple, so it reconciles through [_reconcileBuddyRoleIds].
+  Future<void> _applyDiveBuddyRoleRecord(DiveBuddyRole record) async {
+    await _reconcileBuddyRoleIds([record]);
+    await _db
+        .into(_db.diveBuddyRoles)
+        .insert(
+          record,
+          onConflict: DoNothing<$DiveBuddyRolesTable, DiveBuddyRole>(
+            target: const [],
+          ),
+        );
+  }
+
+  /// [_reconcileJunctionIds] for the (dive, buddy, role) key of
+  /// `dive_buddy_roles`: this device's row goes whenever the incoming id
+  /// sorts below it.
+  Future<void> _reconcileBuddyRoleIds(List<DiveBuddyRole> rows) async {
+    if (rows.isEmpty) return;
+    await _db.batch((batch) {
+      for (final row in rows) {
+        batch.customStatement(
+          'DELETE FROM dive_buddy_roles WHERE dive_id = ? AND buddy_id = ? '
+          'AND role_id = ? AND id > ?',
+          [row.diveId, row.buddyId, row.roleId, row.id],
+        );
+      }
+    });
+  }
+
   /// Applies one incoming `site_tags` row (v217, issue #1765), the site twin
   /// of [_applyDiveTagRecord].
   Future<void> _applySiteTagRecord(SiteTag record) async {
@@ -4742,6 +4841,12 @@ class SyncDataSerializer {
         return;
       case 'siteSiteTypes':
         await _applySiteSiteTypeRecord(SiteSiteType.fromJson(data));
+        return;
+      case 'diveDiverRoles':
+        await _applyDiveDiverRoleRecord(DiveDiverRole.fromJson(data));
+        return;
+      case 'diveBuddyRoles':
+        await _applyDiveBuddyRoleRecord(DiveBuddyRole.fromJson(data));
         return;
       case 'siteTags':
         await _applySiteTagRecord(SiteTag.fromJson(_withTagAlias(data)));
@@ -5922,6 +6027,53 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'diveDiverRoles':
+        // DoNothing: see [_applyDiveDiverRoleRecord].
+        final diverRoleRows = _lowestIdPerPair(
+          records.map((r) => DiveDiverRole.fromJson(r)).toList(),
+          (row) => (parent: row.diveId, child: row.roleId, id: row.id),
+        );
+        await _reconcileJunctionIds(
+          'dive_diver_roles',
+          parentColumn: 'dive_id',
+          childColumn: 'role_id',
+          pairs: [
+            for (final row in diverRoleRows)
+              (parent: row.diveId, child: row.roleId, id: row.id),
+          ],
+        );
+        await _db.batch(
+          (b) => b.insertAll(
+            _db.diveDiverRoles,
+            diverRoleRows,
+            onConflict: DoNothing<$DiveDiverRolesTable, DiveDiverRole>(
+              target: const [],
+            ),
+          ),
+        );
+        return;
+      case 'diveBuddyRoles':
+        // The pair key folds (dive, buddy) into one string; it only keys
+        // the in-memory dedupe, never SQL.
+        final buddyRoleRows = _lowestIdPerPair(
+          records.map((r) => DiveBuddyRole.fromJson(r)).toList(),
+          (row) => (
+            parent: '${row.diveId}|${row.buddyId}',
+            child: row.roleId,
+            id: row.id,
+          ),
+        );
+        await _reconcileBuddyRoleIds(buddyRoleRows);
+        await _db.batch(
+          (b) => b.insertAll(
+            _db.diveBuddyRoles,
+            buddyRoleRows,
+            onConflict: DoNothing<$DiveBuddyRolesTable, DiveBuddyRole>(
+              target: const [],
+            ),
+          ),
+        );
+        return;
       case 'siteTags':
         final siteTagsOffScope = await _tagsOutsideScope(siteTagScopeTable);
         final siteTagRows = _lowestIdPerPair(
@@ -6630,6 +6782,10 @@ class SyncDataSerializer {
         return plain(_db.siteTypes, _db.siteTypes.id);
       case 'siteSiteTypes':
         return plain(_db.siteSiteTypes, _db.siteSiteTypes.id);
+      case 'diveDiverRoles':
+        return plain(_db.diveDiverRoles, _db.diveDiverRoles.id);
+      case 'diveBuddyRoles':
+        return plain(_db.diveBuddyRoles, _db.diveBuddyRoles.id);
       case 'siteTags':
         return plain(_db.siteTags, _db.siteTags.id);
       case 'equipmentTags':
@@ -7083,6 +7239,10 @@ class SyncDataSerializer {
         return _db.siteTypes;
       case 'siteSiteTypes':
         return _db.siteSiteTypes;
+      case 'diveDiverRoles':
+        return _db.diveDiverRoles;
+      case 'diveBuddyRoles':
+        return _db.diveBuddyRoles;
       case 'siteTags':
         return _db.siteTags;
       case 'equipmentTags':
@@ -7581,6 +7741,16 @@ class SyncDataSerializer {
       case 'siteSiteTypes':
         await (_db.delete(
           _db.siteSiteTypes,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'diveDiverRoles':
+        await (_db.delete(
+          _db.diveDiverRoles,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'diveBuddyRoles':
+        await (_db.delete(
+          _db.diveBuddyRoles,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'siteTags':
@@ -8687,6 +8857,30 @@ class SyncDataSerializer {
     }
     final rows = await _db.select(_db.diveDiveTypes).get();
     return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// A role junction's rows (v272, issue #1221), gated on the parent dive's
+  /// clock like [_exportDiveDiveTypes]. [select] reads the junction rows of
+  /// the given dives, or every row when passed null (a full export).
+  Future<List<Map<String, dynamic>>> _exportDiveRoleRows<R extends DataClass>(
+    String? hlcSince,
+    Future<List<R>> Function(List<String>? diveIds) select,
+  ) async {
+    if (hlcSince == null) {
+      return [for (final row in await select(null)) row.toJson()];
+    }
+    final diveIds = await _diveIdsModifiedSince(hlcSince);
+    if (diveIds.isEmpty) return [];
+    return _childRowsOf(diveIds, select);
+  }
+
+  Future<Set<String>> _diveIdsModifiedSince(String hlcSince) async {
+    final rows =
+        await (_db.selectOnly(_db.dives)
+              ..addColumns([_db.dives.id])
+              ..where(_db.dives.hlc.isBiggerThanValue(hlcSince)))
+            .get();
+    return {for (final r in rows) r.read(_db.dives.id)!};
   }
 
   Future<List<Map<String, dynamic>>> _exportDiveTypes(String? hlcSince) async {

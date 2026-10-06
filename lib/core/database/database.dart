@@ -117,6 +117,9 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     DiveDiveTypes,
     DiveTypes,
     DiveRoles,
+    // Several roles per person on a dive (v272, issue #1221)
+    DiveDiverRoles,
+    DiveBuddyRoles,
     // Custom certification agencies and levels (v261, issue #690)
     CustomCertificationAgencies,
     CustomCertificationLevels,
@@ -245,7 +248,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 271;
+  static const int currentSchemaVersion = 272;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -1143,6 +1146,12 @@ class AppDatabase extends _$AppDatabase {
     // beforeOpen. Renumbered from 261, 262, 266, 267 and 269 as main shipped
     // those first (and then 270); 268 is held by an open branch.
     271,
+    // v272: dive_diver_roles and dive_buddy_roles, several roles per person
+    // on a dive (issue #1221). New synced child tables, no backfill: an
+    // older peer ignores them and its scalar role writes still resolve, so
+    // the floor stays. Renumbered from 262, 264, 267, 270 and 271 as main
+    // shipped those; 268 is held by an open branch (#3043).
+    272,
   ];
 
   /// Returns the number of migration steps that will execute when upgrading

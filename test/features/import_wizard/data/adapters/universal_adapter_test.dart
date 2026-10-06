@@ -4080,7 +4080,7 @@ void main() {
 
         final mockBuddyRepo = MockBuddyRepository();
         when(
-          mockBuddyRepo.addBuddyToDive(any, any, any),
+          mockBuddyRepo.addBuddyToDiveWithRoles(any, any, any),
         ).thenAnswer((_) async {});
 
         final mockTankPresetRepo = MockTankPresetRepository();
@@ -4119,7 +4119,9 @@ void main() {
             );
 
             verifyNever(mockBuddyRepo.createBuddy(any));
-            verify(mockBuddyRepo.addBuddyToDive(any, 'buddy-1', any)).called(1);
+            verify(
+              mockBuddyRepo.addBuddyToDiveWithRoles(any, 'buddy-1', any),
+            ).called(1);
           },
         );
       },

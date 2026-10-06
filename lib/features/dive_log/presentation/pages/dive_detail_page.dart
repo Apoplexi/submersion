@@ -122,7 +122,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/sac_volume_hin
 import 'package:submersion/features/dive_log/presentation/widgets/sac_segments_no_pressure_note.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
-import 'package:submersion/features/dive_roles/presentation/dive_role_display.dart';
+import 'package:submersion/features/dive_roles/presentation/dive_role_list_display.dart';
 import 'package:submersion/features/dive_roles/presentation/providers/dive_role_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/pages/site_detail_page.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label.dart';
@@ -3141,6 +3141,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         diver: diver,
         diverPhoto: diverPhoto,
         diveTypesById: diveTypesById,
+        diveRolesById: await diveRoleMapOrEmpty(
+          ref.read(diveRoleMapProvider.future),
+        ),
       );
 
       // Close loading dialog BEFORE opening file picker to avoid navigator lock issues
@@ -4562,11 +4565,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   ],
                 ),
                 const Divider(),
-                if (dive.diverRoleId != null)
+                if (dive.diverRoleIds.isNotEmpty)
                   _buildMyRoleTile(context, ref, dive),
                 if (showLegacyText)
                   LegacyBuddyTextSection(dive: dive)
-                else if (buddies.isEmpty && dive.diverRoleId == null)
+                else if (buddies.isEmpty && dive.diverRoleIds.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
@@ -4605,18 +4608,21 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
       title: Text(bwr.buddy.name),
-      subtitle: Text(bwr.role.localizedName(context.l10n)),
+      subtitle: Text(bwr.roles.joinedLocalizedNames(context.l10n)),
       trailing: const Icon(Icons.chevron_right, size: 20),
       onTap: () => context.push('/buddies/${bwr.buddy.id}'),
     );
   }
 
-  /// The active diver's own role on this dive (#547), shown above buddies.
+  /// The active diver's own roles on this dive (#547, #1221), shown above
+  /// buddies.
   Widget _buildMyRoleTile(BuildContext context, WidgetRef ref, Dive dive) {
     final rolesById =
         ref.watch(diveRoleMapProvider).value ?? const <String, DiveRole>{};
-    final role =
-        rolesById[dive.diverRoleId!] ?? DiveRole.synthetic(dive.diverRoleId!);
+    final label = rolesForIds(
+      dive.diverRoleIds,
+      rolesById,
+    ).joinedLocalizedNames(context.l10n);
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: CircleAvatar(
@@ -4627,7 +4633,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         ),
       ),
       title: Text(context.l10n.buddies_picker_me),
-      subtitle: Text(role.localizedName(context.l10n)),
+      subtitle: Text(label),
     );
   }
 

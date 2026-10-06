@@ -266,5 +266,13 @@ extension RungsFromV231 on AppDatabase {
       await _assertCertificationCurrencySchema();
     }
     if (from < 271) await reportProgress();
+    // v272: the role junctions (issue #1221), several roles per person on a
+    // dive. Table-only rung, no backfill; re-asserted in beforeOpen.
+    // Renumbered from 262, 264, 267, 270 and 271 as main shipped those; 268
+    // is held by an open branch (#3043).
+    if (from < 272) {
+      await _assertDiveRoleLinkSchema();
+    }
+    if (from < 272) await reportProgress();
   }
 }

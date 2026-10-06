@@ -87,6 +87,8 @@ import 'package:submersion/features/trips/domain/entities/trip.dart' as domain;
 import 'package:submersion/features/buddies/domain/entities/buddy.dart'
     as domain;
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
+import 'package:submersion/features/dive_roles/data/repositories/dive_role_link_repository.dart';
+import 'package:submersion/features/dive_roles/domain/services/dive_role_set.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_observation_repository.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 
@@ -152,6 +154,7 @@ class DiveRepository {
   final _log = LoggerService.forClass(DiveRepository);
   final TagRepository _tagRepository = TagRepository();
   final BuddyRepository _buddyRepository = BuddyRepository();
+  final DiveRoleLinkRepository _roleLinks = DiveRoleLinkRepository();
   final EquipmentObservationRepository _observationRepository =
       EquipmentObservationRepository();
   late final DiveCustomFieldRepository _customFieldRepository =
@@ -282,6 +285,10 @@ class DiveRepository {
   List<TableUpdateQuery> get _buddyLinkTables => [
     TableUpdateQuery.onTable(_db.diveBuddies),
     TableUpdateQuery.onTable(_db.buddies),
+    // The role junctions (#1221): a non-primary role change, or a synced
+    // role row, writes only these.
+    TableUpdateQuery.onTable(_db.diveDiverRoles),
+    TableUpdateQuery.onTable(_db.diveBuddyRoles),
   ];
 
   /// Aggregate change-tick for the dive DETAIL page: fires when ANY table that
@@ -339,6 +346,9 @@ class DiveRepository {
           TableUpdateQuery.onTable(_db.courses),
           TableUpdateQuery.onTable(_db.diveBuddies),
           TableUpdateQuery.onTable(_db.buddies),
+          // Role sets (#1221): a non-primary role writes only these.
+          TableUpdateQuery.onTable(_db.diveDiverRoles),
+          TableUpdateQuery.onTable(_db.diveBuddyRoles),
           TableUpdateQuery.onTable(_db.sightings),
           TableUpdateQuery.onTable(_db.species),
           TableUpdateQuery.onTable(_db.media),
@@ -556,6 +566,9 @@ class DiveRepository {
         // Load all tags for these dives in one query
         final tagsByDive = await _tagRepository.getTagsForDives(diveIds);
         final diveTypesByDive = await _diveTypesForDives(diveIds);
+        final diverRolesByDive = await _roleLinks.resolveDiverRoleIds({
+          for (final row in rows) row.id: row.diverRole,
+        });
 
         // Load all custom fields for these dives in one query
         final customFieldsByDive = await _customFieldRepository
@@ -584,6 +597,7 @@ class DiveRepository {
                 trip: row.tripId != null ? tripsById[row.tripId] : null,
                 tags: tagsByDive[row.id] ?? [],
                 diveTypeIds: diveTypesByDive[row.id],
+                diverRoleIds: diverRolesByDive[row.id],
                 customFields: customFieldsByDive[row.id] ?? [],
                 buddies: buddiesByDive[row.id] ?? const [],
               ),
@@ -1591,7 +1605,7 @@ class DiveRepository {
                 diveType: Value(dive.diveTypeId),
                 buddy: Value(dive.buddy),
                 diveMaster: Value(dive.diveMaster),
-                diverRole: Value(dive.diverRoleId),
+                diverRole: Value(DiveRoleSet.primary(dive.diverRoleIds)),
                 notes: Value(dive.notes),
                 name: Value(dive.name),
                 siteId: Value(dive.site?.id),
@@ -1686,6 +1700,7 @@ class DiveRepository {
           localUpdatedAt: now,
         );
         await _replaceDiveTypeRows(id, dive.diveTypeIds, now);
+        await _roleLinks.writeDiverRoles(id, dive.diverRoleIds, now: now);
 
         // Child ids are resolved before the batch rather than inside it:
         // _db.batch takes a synchronous closure, so an id minted in there is
@@ -1916,7 +1931,7 @@ class DiveRepository {
             diveType: Value(dive.diveTypeId),
             buddy: Value(dive.buddy),
             diveMaster: Value(dive.diveMaster),
-            diverRole: Value(dive.diverRoleId),
+            diverRole: Value(DiveRoleSet.primary(dive.diverRoleIds)),
             notes: Value(dive.notes),
             name: Value(dive.name),
             siteId: Value(dive.site?.id),
@@ -2001,6 +2016,7 @@ class DiveRepository {
           localUpdatedAt: now,
         );
         await _replaceDiveTypeRows(dive.id, dive.diveTypeIds, now);
+        await _roleLinks.writeDiverRoles(dive.id, dive.diverRoleIds, now: now);
 
         // Update tanks:
         // Try to match existing tanks by ID to do updates instead of delete+insert when possible,
@@ -3771,6 +3787,7 @@ class DiveRepository {
     Trip? trip,
     List<domain.Tag> tags = const [],
     List<String>? diveTypeIds,
+    List<String>? diverRoleIds,
     List<domain.DiveCustomField> customFields = const [],
     List<domain.BuddyWithRole> buddies = const [],
   }) {
@@ -3865,7 +3882,7 @@ class DiveRepository {
       buddy: row.buddy,
       diveMaster: row.diveMaster,
       buddies: buddies,
-      diverRoleId: row.diverRole,
+      diverRoleIds: diverRoleIds ?? [?row.diverRole],
       notes: row.notes,
       name: row.name,
       site: domainSite,
@@ -4261,6 +4278,11 @@ class DiveRepository {
     final tags = await _tagRepository.getTagsForDive(row.id);
     final diveTypesByDive = await _diveTypesForDives([row.id]);
     final diveTypeIds = diveTypesByDive[row.id] ?? [row.diveType];
+    final diverRoleIds =
+        (await _roleLinks.resolveDiverRoleIds({
+          row.id: row.diverRole,
+        }))[row.id] ??
+        const <String>[];
 
     // Derive waterTemp from the profile if not set on the dive row. Some
     // imports populate per-sample temperature but miss the dive-level field.
@@ -4304,7 +4326,7 @@ class DiveRepository {
       diveTypeIds: diveTypeIds,
       buddy: row.buddy,
       diveMaster: row.diveMaster,
-      diverRoleId: row.diverRole,
+      diverRoleIds: diverRoleIds,
       notes: row.notes,
       name: row.name,
       site: site,

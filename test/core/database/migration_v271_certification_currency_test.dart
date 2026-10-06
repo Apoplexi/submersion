@@ -47,12 +47,15 @@ Future<Set<String>> columnsOf(AppDatabase db, String table) async {
 }
 
 void main() {
-  test('v271 is the current schema version and is in the ladder', () {
-    // The newest rung owns the exact assertion; relax it to
-    // greaterThanOrEqualTo when the next one lands.
-    expect(AppDatabase.currentSchemaVersion, 271);
+  test('v271 is at or below the current schema version and in the ladder', () {
+    // Relaxed once v272 (the role junctions, #1221) landed on top; the
+    // newest rung owns the exact assertion.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(271));
     expect(AppDatabase.migrationVersions, contains(271));
-    expect(AppDatabase.migrationStepCount(270), 1);
+    expect(
+      AppDatabase.migrationStepCount(270),
+      AppDatabase.migrationStepCount(271) + 1,
+    );
     expect(AppDatabase.minimumCompatibleSchemaVersion, 240);
   });
 
