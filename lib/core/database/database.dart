@@ -1093,6 +1093,10 @@ class AppDatabase extends _$AppDatabase {
     // column default, so nothing it applies is lost or misread and the floor
     // stays. Inbound, the generated fromJson ignores the legacy key.
     261,
+    // v262: diver_settings certification/course list view modes and the
+    // formerly device-local profile "metrics follow viewport" and pSCR
+    // ratio (issue #2948). Additive columns, so the floor stays.
+    262,
     263,
     // v264: diver_settings.default_show_late_gas_switches (issue #2939).
     // Additive column with a default, so the floor stays.

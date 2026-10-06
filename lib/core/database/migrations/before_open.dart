@@ -30,7 +30,8 @@ extension BeforeOpenBackstops on AppDatabase {
     // consolidated dive that arrived since with nothing recorded.
     await _assertTankSharedComputerIds();
 
-    // v263 and v237 backstops: the distance unit and the dive figure switch.
+    // v263, v262 and v237 backstops: the distance unit, the synced view
+    // mode and device-preference columns, and the dive figure switch.
     await _assertDiverSettingsDisplayColumns();
 
     // v229 backstop: the per-set diver figure switch.
