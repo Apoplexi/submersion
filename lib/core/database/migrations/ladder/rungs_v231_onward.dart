@@ -236,5 +236,13 @@ extension RungsFromV231 on AppDatabase {
       await _assertMediaSiteAttachmentColumns();
     }
     if (from < 266) await reportProgress();
+    // v267: custom certification agencies and levels (issue #690). Table
+    // and index only, no backfill: stored agency/level text are built-in
+    // enum names, which stay valid ids. Re-asserted in beforeOpen.
+    // Renumbered from 265 and 266, which main shipped first.
+    if (from < 267) {
+      await _assertCustomCertificationSchema();
+    }
+    if (from < 267) await reportProgress();
   }
 }

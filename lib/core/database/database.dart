@@ -115,6 +115,9 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     DiveDiveTypes,
     DiveTypes,
     DiveRoles,
+    // Custom certification agencies and levels (v261, issue #690)
+    CustomCertificationAgencies,
+    CustomCertificationLevels,
     TankPresets,
     WeightPresets,
     WeightPresetEntries,
@@ -236,7 +239,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 266;
+  static const int currentSchemaVersion = 267;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -1111,6 +1114,10 @@ class AppDatabase extends _$AppDatabase {
     // so the floor stays. Renumbered from 263, which main shipped first
     // (#2030); 262 is claimed by an open branch.
     266,
+    // v267: custom certification agencies and levels (issue #690). Two new
+    // synced tables and an index, no data migration, so the floor stays.
+    // Renumbered from 265 and 266, which main shipped first.
+    267,
   ];
 
   /// Returns the number of migration steps that will execute when upgrading
