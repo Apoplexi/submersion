@@ -15898,6 +15898,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible d\'ouvrir ce bloc. Réessayez.';
 
   @override
+  String gasCalculators_blender_cylinderNoVolume(String name) {
+    return 'Aucun volume d\'eau enregistré pour $name';
+  }
+
+  @override
+  String get gasCalculators_blender_noCylinders =>
+      'Aucun bloc dans votre matériel pour l\'instant. Saisissez plutôt le volume d\'eau.';
+
+  @override
   String gasCalculators_blender_filledFrom(String name, String mix) {
     return '$name : $mix';
   }
@@ -16070,16 +16079,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_cylinderVolume => 'Volume d\'eau du bloc';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => 'Préréglages';
-
-  @override
   String gasCalculators_blender_unitPrice(String unit) {
     return 'Prix pour 100 $unit';
   }
-
-  @override
-  String get gasCalculators_blender_manageCylinderSizes =>
-      'Gérer les tailles de blocs';
 
   @override
   String get gasCalculators_blender_costTotal => 'Total';

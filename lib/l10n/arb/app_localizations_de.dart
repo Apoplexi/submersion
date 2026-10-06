@@ -15840,6 +15840,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Flasche konnte nicht geöffnet werden. Versuche es erneut.';
 
   @override
+  String gasCalculators_blender_cylinderNoVolume(String name) {
+    return 'Für $name ist kein Wasservolumen erfasst';
+  }
+
+  @override
+  String get gasCalculators_blender_noCylinders =>
+      'Noch keine Flaschen in deiner Ausrüstung. Gib stattdessen das Wasservolumen ein.';
+
+  @override
   String gasCalculators_blender_filledFrom(String name, String mix) {
     return '$name: $mix';
   }
@@ -16013,16 +16022,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wasservolumen der Flasche';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => 'Voreinstellungen';
-
-  @override
   String gasCalculators_blender_unitPrice(String unit) {
     return 'Preis pro 100 $unit';
   }
-
-  @override
-  String get gasCalculators_blender_manageCylinderSizes =>
-      'Flaschengrößen verwalten';
 
   @override
   String get gasCalculators_blender_costTotal => 'Gesamt';

@@ -15118,6 +15118,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_cylinderFailed => '无法打开该气瓶，请重试。';
 
   @override
+  String gasCalculators_blender_cylinderNoVolume(String name) {
+    return '$name 未记录水容积';
+  }
+
+  @override
+  String get gasCalculators_blender_noCylinders => '你的装备中还没有气瓶。请直接输入水容积。';
+
+  @override
   String gasCalculators_blender_filledFrom(String name, String mix) {
     return '$name：$mix';
   }
@@ -15282,15 +15290,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_cylinderVolume => '气瓶水容积';
 
   @override
-  String get gasCalculators_blender_cylinderPresets => '预设';
-
-  @override
   String gasCalculators_blender_unitPrice(String unit) {
     return '每 100 $unit 价格';
   }
-
-  @override
-  String get gasCalculators_blender_manageCylinderSizes => '管理气瓶尺寸';
 
   @override
   String get gasCalculators_blender_costTotal => '合计';
