@@ -26,7 +26,7 @@ void main() {
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(269));
     expect(AppDatabase.migrationVersions, contains(269));
     expect(
-      AppDatabase.migrationStepCount(267),
+      AppDatabase.migrationStepCount(268),
       AppDatabase.migrationStepCount(269) + 1,
     );
   });

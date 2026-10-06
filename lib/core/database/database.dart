@@ -12,6 +12,7 @@ import 'package:submersion/core/database/tables/dive_profile_tables.dart';
 import 'package:submersion/core/database/tables/dive_tables.dart';
 import 'package:submersion/core/database/tables/diver_tables.dart';
 import 'package:submersion/core/database/tables/equipment_condition_tables.dart';
+import 'package:submersion/core/database/tables/equipment_location_tables.dart';
 import 'package:submersion/core/database/tables/equipment_service_status_tables.dart';
 import 'package:submersion/core/database/tables/equipment_tables.dart';
 import 'package:submersion/core/database/tables/marine_life_tables.dart';
@@ -41,6 +42,7 @@ export 'package:submersion/core/database/tables/dive_profile_tables.dart';
 export 'package:submersion/core/database/tables/dive_tables.dart';
 export 'package:submersion/core/database/tables/diver_tables.dart';
 export 'package:submersion/core/database/tables/equipment_condition_tables.dart';
+export 'package:submersion/core/database/tables/equipment_location_tables.dart';
 export 'package:submersion/core/database/tables/equipment_service_status_tables.dart';
 export 'package:submersion/core/database/tables/equipment_tables.dart';
 export 'package:submersion/core/database/tables/marine_life_tables.dart';
@@ -156,6 +158,9 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     // Equipment sharing and its event log (v234, issue #2046)
     EquipmentShares,
     EquipmentOwnershipEvents,
+    // Equipment locations and their move log (v268)
+    EquipmentLocations,
+    EquipmentLocationMoves,
     // Equipment service cache for the query language (v242, issue
     // #2365), local only
     EquipmentServiceStatus,
@@ -1127,17 +1132,19 @@ class AppDatabase extends _$AppDatabase {
     // synced tables and an index, no data migration, so the floor stays.
     // Renumbered from 265 and 266, which main shipped first.
     267,
+    // v268: equipment locations and their move log (issue #3037). Two new
+    // tables, so the floor stays.
+    268,
     // v269: diver_settings.hidden_built_in_ids, the built-in dive types,
     // roles, site types, service types and pre-dive templates each diver hid
     // from the pickers (issue #401). Additive nullable column, no backfill,
-    // so the floor stays. Renumbered several times while this was open; 268
-    // is held by an open branch (#3043).
+    // so the floor stays. Renumbered several times while this was open.
     269,
     // v270: dive_weights.label and weight_preset_entries.label, a diver's own
     // name for a weight (issue #956). Additive defaulted columns, so the
     // floor stays: an older peer's payload omits the key and the row keeps
     // its local value or the '' default. Renumbered as other rungs shipped
-    // first (261 through 269); 268 is held by an open branch (#3043).
+    // first (261 through 269).
     270,
     // v271: certification currency (issue #2267): the rule catalog with its
     // built-in seed, per certification overrides and the event ledger. New

@@ -15140,6 +15140,264 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_filter_section_category => 'الفئة';
 
   @override
+  String get equipment_location_kind_storage => 'تخزين';
+
+  @override
+  String get equipment_location_kind_serviceShop => 'ورشة صيانة';
+
+  @override
+  String get equipment_location_kind_person => 'شخص';
+
+  @override
+  String get equipment_location_kind_other => 'أخرى';
+
+  @override
+  String get equipment_location_noLocation => 'بلا موقع';
+
+  @override
+  String get equipment_location_picker_title => 'اختر مكانًا';
+
+  @override
+  String get equipment_location_picker_search => 'البحث عن أماكن';
+
+  @override
+  String get equipment_location_picker_newPlace => 'مكان جديد';
+
+  @override
+  String equipment_location_move_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'نقل $count عنصر',
+      many: 'نقل $count عنصرًا',
+      few: 'نقل $count عناصر',
+      two: 'نقل عنصرين',
+      one: 'نقل عنصر واحد',
+      zero: 'نقل $count عنصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_move_to => 'إلى';
+
+  @override
+  String get equipment_location_move_choose => 'اختر مكانًا';
+
+  @override
+  String get equipment_location_move_date => 'التاريخ';
+
+  @override
+  String get equipment_location_move_time => 'الوقت';
+
+  @override
+  String get equipment_location_move_note => 'ملاحظة';
+
+  @override
+  String get equipment_location_move_noteHint =>
+      'مثال: الصيانة السنوية لمنظم الهواء';
+
+  @override
+  String get equipment_location_move_confirm => 'نقل';
+
+  @override
+  String get equipment_location_parts_title => 'نقل الأجزاء أيضًا؟';
+
+  @override
+  String equipment_location_parts_body(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'هل تنقل $count من أجزائه أيضًا إلى المكان نفسه؟',
+      many: 'هل تنقل $count من أجزائه أيضًا إلى المكان نفسه؟',
+      few: 'هل تنقل $count من أجزائه أيضًا إلى المكان نفسه؟',
+      two: 'هل تنقل جزأيه أيضًا إلى المكان نفسه؟',
+      one: 'هل تنقل جزأه أيضًا إلى المكان نفسه؟',
+      zero: 'هل تنقل أجزاءه أيضًا إلى المكان نفسه؟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_parts_yes => 'نقل الأجزاء';
+
+  @override
+  String get equipment_location_parts_no => 'هذا فقط';
+
+  @override
+  String get equipment_location_status_title => 'تحديث الحالة؟';
+
+  @override
+  String equipment_location_status_body(int count, String status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'وضع الحالة $status على $count عنصر أيضًا؟',
+      many: 'وضع الحالة $status على $count عنصرًا أيضًا؟',
+      few: 'وضع الحالة $status على $count عناصر أيضًا؟',
+      two: 'وضع الحالة $status على عنصرين أيضًا؟',
+      one: 'وضع الحالة $status على عنصر واحد أيضًا؟',
+      zero: 'وضع الحالة $status على $count عنصر أيضًا؟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_status_yes => 'تحديث';
+
+  @override
+  String get equipment_location_status_no => 'الإبقاء على الحالة';
+
+  @override
+  String equipment_location_moved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم نقل $count عنصر',
+      many: 'تم نقل $count عنصرًا',
+      few: 'تم نقل $count عناصر',
+      two: 'تم نقل عنصرين',
+      one: 'تم نقل عنصر واحد',
+      zero: 'لم يُنقل أي عنصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_card_title => 'الموقع';
+
+  @override
+  String get equipment_location_none => 'لم يُحدَّد موقع';
+
+  @override
+  String equipment_location_since(String date) {
+    return 'منذ $date';
+  }
+
+  @override
+  String get equipment_location_moveButton => 'نقل';
+
+  @override
+  String get equipment_location_showAll => 'عرض الكل';
+
+  @override
+  String get equipment_location_history_cleared => 'تم مسح الموقع';
+
+  @override
+  String get equipment_location_editMove_title => 'تعديل النقل';
+
+  @override
+  String get equipment_location_editMove_delete => 'حذف النقل';
+
+  @override
+  String get equipment_location_deleteMoveConfirm =>
+      'حذف هذا الإدخال من السجل؟ يُحسب موقع العنصر من جديد من التنقلات المتبقية.';
+
+  @override
+  String get equipment_location_bulkAction => 'نقل إلى موقع';
+
+  @override
+  String equipment_location_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عنصر',
+      many: '$count عنصرًا',
+      few: '$count عناصر',
+      two: 'عنصران',
+      one: 'عنصر واحد',
+      zero: 'لا عناصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_activeFilter => 'الموقع';
+
+  @override
+  String get equipment_filter_section_location => 'الموقع';
+
+  @override
+  String get equipment_arrange_groupByLocation => 'التجميع حسب الموقع';
+
+  @override
+  String get equipment_arrange_groupByLocationSubtitle =>
+      'عنوان لكل مكان، في هذه الصفحة فقط';
+
+  @override
+  String get equipment_edit_locationLabel => 'الموقع';
+
+  @override
+  String get equipment_edit_locationNone => 'غير محدد';
+
+  @override
+  String get equipment_edit_locationFailed =>
+      'تم الحفظ، لكن تعذّر تعيين موقعه. استخدم «نقل» على العنصر لتعيينه.';
+
+  @override
+  String get equipment_locations_title => 'المواقع';
+
+  @override
+  String get equipment_locations_empty =>
+      'لا توجد أماكن بعد. أضف مكانًا لتتبع مكان معداتك.';
+
+  @override
+  String get equipment_locations_add => 'إضافة مكان';
+
+  @override
+  String equipment_locations_archivedSection(int count) {
+    return 'المؤرشفة ($count)';
+  }
+
+  @override
+  String get equipment_locations_archive => 'أرشفة';
+
+  @override
+  String get equipment_locations_restore => 'استعادة';
+
+  @override
+  String get equipment_locations_delete => 'حذف';
+
+  @override
+  String equipment_locations_deleteConfirm(String name) {
+    return 'حذف $name؟';
+  }
+
+  @override
+  String get equipment_locations_itemsHere => 'العناصر هنا';
+
+  @override
+  String get equipment_locations_noItemsHere => 'لا يوجد شيء هنا حاليًا.';
+
+  @override
+  String get equipment_locations_moveItems => 'نقل العناصر الموجودة هنا';
+
+  @override
+  String get equipment_locations_newTitle => 'مكان جديد';
+
+  @override
+  String get equipment_locations_editTitle => 'تعديل المكان';
+
+  @override
+  String get equipment_locations_nameLabel => 'الاسم';
+
+  @override
+  String get equipment_locations_nameRequired => 'أدخل اسمًا';
+
+  @override
+  String get equipment_locations_duplicateWarning =>
+      'لديك مكان بهذا الاسم بالفعل';
+
+  @override
+  String get equipment_locations_kindLabel => 'النوع';
+
+  @override
+  String get equipment_locations_notesLabel => 'ملاحظات';
+
+  @override
+  String get equipment_locations_notesHint => 'العنوان، الهاتف، رقم الخزانة';
+
+  @override
   String get equipment_list_retryButton => 'إعادة المحاولة';
 
   @override
@@ -21672,6 +21930,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_field_intervalHours => 'الفاصل بالساعات';
 
   @override
+  String get settings_conflict_field_isArchived => 'مؤرشف';
+
+  @override
   String get settings_conflict_field_isBuiltIn => 'مدمج';
 
   @override
@@ -21822,6 +22083,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_field_mode => 'وضع التنفس';
+
+  @override
+  String get settings_conflict_field_movedAt => 'تاريخ النقل';
 
   @override
   String get settings_conflict_field_name => 'الاسم';
@@ -22724,6 +22988,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_equipment => 'المعدات';
+
+  @override
+  String get settings_conflict_ref_equipmentLocation => 'موقع المعدات';
 
   @override
   String get settings_conflict_ref_equipmentSet => 'طقم المعدات';
@@ -23656,6 +23923,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_manage_serviceTypes_subtitle =>
       'الصيانة التي تحتاجها معداتك، وعدد مراتها';
+
+  @override
+  String get settings_manage_locations => 'المواقع';
+
+  @override
+  String get settings_manage_locations_subtitle =>
+      'أين تُخزَّن معداتك أو تُصان أو تُعار';
 
   @override
   String get settings_manage_currencyRules => 'صلاحية الشهادات';
@@ -49356,6 +49630,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_equipment_lastDived => 'آخر استخدام';
+
+  @override
+  String get query_equipment_location => 'الموقع';
 
   @override
   String get query_equipment_model => 'الطراز';

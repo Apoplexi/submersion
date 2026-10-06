@@ -58,5 +58,9 @@ extension TableBackstopsFromV217 on AppDatabase {
     // v267 backstop: the custom certification tables (parallel-branch
     // version-collision self-heal; idempotent).
     await _assertCustomCertificationSchema();
+
+    // v268 backstop: the equipment location tables (parallel-branch
+    // version-collision self-heal; idempotent).
+    await _assertEquipmentLocationSchema();
   }
 }

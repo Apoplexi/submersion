@@ -14270,6 +14270,234 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_filter_section_category => '类别';
 
   @override
+  String get equipment_location_kind_storage => '存放处';
+
+  @override
+  String get equipment_location_kind_serviceShop => '维修店';
+
+  @override
+  String get equipment_location_kind_person => '个人';
+
+  @override
+  String get equipment_location_kind_other => '其他';
+
+  @override
+  String get equipment_location_noLocation => '无位置';
+
+  @override
+  String get equipment_location_picker_title => '选择地点';
+
+  @override
+  String get equipment_location_picker_search => '搜索地点';
+
+  @override
+  String get equipment_location_picker_newPlace => '新地点';
+
+  @override
+  String equipment_location_move_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '移动 $count 件装备',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_move_to => '移至';
+
+  @override
+  String get equipment_location_move_choose => '选择地点';
+
+  @override
+  String get equipment_location_move_date => '日期';
+
+  @override
+  String get equipment_location_move_time => '时间';
+
+  @override
+  String get equipment_location_move_note => '备注';
+
+  @override
+  String get equipment_location_move_noteHint => '例如：调节器年度保养';
+
+  @override
+  String get equipment_location_move_confirm => '移动';
+
+  @override
+  String get equipment_location_parts_title => '同时移动部件？';
+
+  @override
+  String equipment_location_parts_body(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '将其 $count 个部件也移至同一地点？',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_parts_yes => '移动部件';
+
+  @override
+  String get equipment_location_parts_no => '仅此项';
+
+  @override
+  String get equipment_location_status_title => '更新状态？';
+
+  @override
+  String equipment_location_status_body(int count, String status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '同时将 $count 件装备标记为$status？',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_status_yes => '更新';
+
+  @override
+  String get equipment_location_status_no => '保持状态';
+
+  @override
+  String equipment_location_moved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已移动 $count 件装备',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_card_title => '位置';
+
+  @override
+  String get equipment_location_none => '未设置位置';
+
+  @override
+  String equipment_location_since(String date) {
+    return '自 $date 起';
+  }
+
+  @override
+  String get equipment_location_moveButton => '移动';
+
+  @override
+  String get equipment_location_showAll => '显示全部';
+
+  @override
+  String get equipment_location_history_cleared => '已清除位置';
+
+  @override
+  String get equipment_location_editMove_title => '编辑移动记录';
+
+  @override
+  String get equipment_location_editMove_delete => '删除移动记录';
+
+  @override
+  String get equipment_location_deleteMoveConfirm =>
+      '删除这条历史记录？将根据剩余的移动记录重新确定物品位置。';
+
+  @override
+  String get equipment_location_bulkAction => '移至位置';
+
+  @override
+  String equipment_location_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_activeFilter => '位置';
+
+  @override
+  String get equipment_filter_section_location => '位置';
+
+  @override
+  String get equipment_arrange_groupByLocation => '按位置分组';
+
+  @override
+  String get equipment_arrange_groupByLocationSubtitle => '每个地点一个标题，仅限此页';
+
+  @override
+  String get equipment_edit_locationLabel => '位置';
+
+  @override
+  String get equipment_edit_locationNone => '未设置';
+
+  @override
+  String get equipment_edit_locationFailed => '已保存，但无法设置其位置。请在该物品上使用“移动”进行设置。';
+
+  @override
+  String get equipment_locations_title => '位置';
+
+  @override
+  String get equipment_locations_empty => '还没有地点。添加一个，开始记录你的装备在哪里。';
+
+  @override
+  String get equipment_locations_add => '添加地点';
+
+  @override
+  String equipment_locations_archivedSection(int count) {
+    return '已归档（$count）';
+  }
+
+  @override
+  String get equipment_locations_archive => '归档';
+
+  @override
+  String get equipment_locations_restore => '恢复';
+
+  @override
+  String get equipment_locations_delete => '删除';
+
+  @override
+  String equipment_locations_deleteConfirm(String name) {
+    return '删除 $name？';
+  }
+
+  @override
+  String get equipment_locations_itemsHere => '此处物品';
+
+  @override
+  String get equipment_locations_noItemsHere => '目前这里没有物品。';
+
+  @override
+  String get equipment_locations_moveItems => '移动此处的物品';
+
+  @override
+  String get equipment_locations_newTitle => '新地点';
+
+  @override
+  String get equipment_locations_editTitle => '编辑地点';
+
+  @override
+  String get equipment_locations_nameLabel => '名称';
+
+  @override
+  String get equipment_locations_nameRequired => '请输入名称';
+
+  @override
+  String get equipment_locations_duplicateWarning => '你已有同名地点';
+
+  @override
+  String get equipment_locations_kindLabel => '类型';
+
+  @override
+  String get equipment_locations_notesLabel => '备注';
+
+  @override
+  String get equipment_locations_notesHint => '地址、电话、储物柜编号';
+
+  @override
   String get equipment_list_retryButton => '重试';
 
   @override
@@ -20324,6 +20552,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_conflict_field_intervalHours => '间隔（小时）';
 
   @override
+  String get settings_conflict_field_isArchived => '已归档';
+
+  @override
   String get settings_conflict_field_isBuiltIn => '内置';
 
   @override
@@ -20470,6 +20701,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_conflict_field_mode => '呼吸模式';
+
+  @override
+  String get settings_conflict_field_movedAt => '移动时间';
 
   @override
   String get settings_conflict_field_name => '名称';
@@ -21317,6 +21551,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_equipment => '装备';
+
+  @override
+  String get settings_conflict_ref_equipmentLocation => '装备位置';
 
   @override
   String get settings_conflict_ref_equipmentSet => '装备套装';
@@ -22204,6 +22441,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_manage_serviceTypes_subtitle => '装备需要的保养项目及其频率';
+
+  @override
+  String get settings_manage_locations => '位置';
+
+  @override
+  String get settings_manage_locations_subtitle => '装备存放、保养或借出的地方';
 
   @override
   String get settings_manage_currencyRules => '证书有效性';
@@ -45764,6 +46007,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get query_equipment_lastDived => '最近使用';
+
+  @override
+  String get query_equipment_location => '位置';
 
   @override
   String get query_equipment_model => '型号';

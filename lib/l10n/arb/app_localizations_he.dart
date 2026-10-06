@@ -14643,6 +14643,242 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_filter_section_category => 'קטגוריה';
 
   @override
+  String get equipment_location_kind_storage => 'אחסון';
+
+  @override
+  String get equipment_location_kind_serviceShop => 'מעבדת שירות';
+
+  @override
+  String get equipment_location_kind_person => 'אדם';
+
+  @override
+  String get equipment_location_kind_other => 'אחר';
+
+  @override
+  String get equipment_location_noLocation => 'אין מיקום';
+
+  @override
+  String get equipment_location_picker_title => 'בחירת מקום';
+
+  @override
+  String get equipment_location_picker_search => 'חיפוש מקומות';
+
+  @override
+  String get equipment_location_picker_newPlace => 'מקום חדש';
+
+  @override
+  String equipment_location_move_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'העברת $count פריטים',
+      one: 'העברת פריט אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_move_to => 'אל';
+
+  @override
+  String get equipment_location_move_choose => 'בחירת מקום';
+
+  @override
+  String get equipment_location_move_date => 'תאריך';
+
+  @override
+  String get equipment_location_move_time => 'שעה';
+
+  @override
+  String get equipment_location_move_note => 'הערה';
+
+  @override
+  String get equipment_location_move_noteHint => 'לדוגמה: טיפול שנתי בווסת';
+
+  @override
+  String get equipment_location_move_confirm => 'העברה';
+
+  @override
+  String get equipment_location_parts_title => 'להעביר גם את החלקים?';
+
+  @override
+  String equipment_location_parts_body(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'להעביר גם את $count החלקים שלו לאותו מקום?',
+      one: 'להעביר גם את החלק שלו לאותו מקום?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_parts_yes => 'העברת החלקים';
+
+  @override
+  String get equipment_location_parts_no => 'רק את זה';
+
+  @override
+  String get equipment_location_status_title => 'לעדכן סטטוס?';
+
+  @override
+  String equipment_location_status_body(int count, String status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לסמן גם $count פריטים כ$status?',
+      one: 'לסמן גם פריט אחד כ$status?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_status_yes => 'עדכון';
+
+  @override
+  String get equipment_location_status_no => 'השארת הסטטוס';
+
+  @override
+  String equipment_location_moved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים הועברו',
+      one: 'פריט אחד הועבר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_card_title => 'מיקום';
+
+  @override
+  String get equipment_location_none => 'לא הוגדר מיקום';
+
+  @override
+  String equipment_location_since(String date) {
+    return 'מאז $date';
+  }
+
+  @override
+  String get equipment_location_moveButton => 'העברה';
+
+  @override
+  String get equipment_location_showAll => 'הצגת הכול';
+
+  @override
+  String get equipment_location_history_cleared => 'המיקום נוקה';
+
+  @override
+  String get equipment_location_editMove_title => 'עריכת העברה';
+
+  @override
+  String get equipment_location_editMove_delete => 'מחיקת העברה';
+
+  @override
+  String get equipment_location_deleteMoveConfirm =>
+      'למחוק את הרשומה הזו מההיסטוריה? מיקום הפריט יחושב מחדש מההעברות שנותרו.';
+
+  @override
+  String get equipment_location_bulkAction => 'העברה למיקום';
+
+  @override
+  String equipment_location_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים',
+      one: 'פריט אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_activeFilter => 'מיקום';
+
+  @override
+  String get equipment_filter_section_location => 'מיקום';
+
+  @override
+  String get equipment_arrange_groupByLocation => 'קיבוץ לפי מיקום';
+
+  @override
+  String get equipment_arrange_groupByLocationSubtitle =>
+      'כותרת אחת לכל מקום, רק בעמוד זה';
+
+  @override
+  String get equipment_edit_locationLabel => 'מיקום';
+
+  @override
+  String get equipment_edit_locationNone => 'לא הוגדר';
+
+  @override
+  String get equipment_edit_locationFailed =>
+      'נשמר, אך לא ניתן היה להגדיר את המיקום. השתמש בהעברה בפריט כדי להגדיר אותו.';
+
+  @override
+  String get equipment_locations_title => 'מיקומים';
+
+  @override
+  String get equipment_locations_empty =>
+      'עדיין אין מקומות. הוסף אחד כדי לעקוב אחר מיקום הציוד שלך.';
+
+  @override
+  String get equipment_locations_add => 'הוספת מקום';
+
+  @override
+  String equipment_locations_archivedSection(int count) {
+    return 'בארכיון ($count)';
+  }
+
+  @override
+  String get equipment_locations_archive => 'העברה לארכיון';
+
+  @override
+  String get equipment_locations_restore => 'שחזור';
+
+  @override
+  String get equipment_locations_delete => 'מחיקה';
+
+  @override
+  String equipment_locations_deleteConfirm(String name) {
+    return 'למחוק את $name?';
+  }
+
+  @override
+  String get equipment_locations_itemsHere => 'פריטים כאן';
+
+  @override
+  String get equipment_locations_noItemsHere => 'אין כאן כלום כרגע.';
+
+  @override
+  String get equipment_locations_moveItems => 'העברת הפריטים שכאן';
+
+  @override
+  String get equipment_locations_newTitle => 'מקום חדש';
+
+  @override
+  String get equipment_locations_editTitle => 'עריכת מקום';
+
+  @override
+  String get equipment_locations_nameLabel => 'שם';
+
+  @override
+  String get equipment_locations_nameRequired => 'הזן שם';
+
+  @override
+  String get equipment_locations_duplicateWarning => 'כבר יש לך מקום בשם הזה';
+
+  @override
+  String get equipment_locations_kindLabel => 'סוג';
+
+  @override
+  String get equipment_locations_notesLabel => 'הערות';
+
+  @override
+  String get equipment_locations_notesHint => 'כתובת, טלפון, מספר לוקר';
+
+  @override
   String get equipment_list_retryButton => 'נסה שוב';
 
   @override
@@ -20945,6 +21181,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_conflict_field_intervalHours => 'מרווח בשעות';
 
   @override
+  String get settings_conflict_field_isArchived => 'בארכיון';
+
+  @override
   String get settings_conflict_field_isBuiltIn => 'מובנה';
 
   @override
@@ -21096,6 +21335,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_conflict_field_mode => 'מצב נשימה';
+
+  @override
+  String get settings_conflict_field_movedAt => 'הועבר בתאריך';
 
   @override
   String get settings_conflict_field_name => 'שם';
@@ -21984,6 +22226,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_equipment => 'ציוד';
+
+  @override
+  String get settings_conflict_ref_equipmentLocation => 'מיקום ציוד';
 
   @override
   String get settings_conflict_ref_equipmentSet => 'סט ציוד';
@@ -22900,6 +23145,13 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_manage_serviceTypes_subtitle =>
       'הטיפולים שהציוד שלך צריך, ובאיזו תדירות';
+
+  @override
+  String get settings_manage_locations => 'מיקומים';
+
+  @override
+  String get settings_manage_locations_subtitle =>
+      'היכן הציוד שלך מאוחסן, בטיפול או מושאל';
 
   @override
   String get settings_manage_currencyRules => 'תוקף הסמכות';
@@ -47719,6 +47971,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get query_equipment_lastDived => 'שימוש אחרון';
+
+  @override
+  String get query_equipment_location => 'מיקום';
 
   @override
   String get query_equipment_model => 'דגם';

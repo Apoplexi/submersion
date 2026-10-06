@@ -14858,6 +14858,244 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_filter_section_category => 'Categorie';
 
   @override
+  String get equipment_location_kind_storage => 'Opslag';
+
+  @override
+  String get equipment_location_kind_serviceShop => 'Servicewerkplaats';
+
+  @override
+  String get equipment_location_kind_person => 'Persoon';
+
+  @override
+  String get equipment_location_kind_other => 'Overig';
+
+  @override
+  String get equipment_location_noLocation => 'Geen locatie';
+
+  @override
+  String get equipment_location_picker_title => 'Kies een plek';
+
+  @override
+  String get equipment_location_picker_search => 'Plekken zoeken';
+
+  @override
+  String get equipment_location_picker_newPlace => 'Nieuwe plek';
+
+  @override
+  String equipment_location_move_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items verplaatsen',
+      one: '$count item verplaatsen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_move_to => 'Naar';
+
+  @override
+  String get equipment_location_move_choose => 'Kies een plek';
+
+  @override
+  String get equipment_location_move_date => 'Datum';
+
+  @override
+  String get equipment_location_move_time => 'Tijd';
+
+  @override
+  String get equipment_location_move_note => 'Notitie';
+
+  @override
+  String get equipment_location_move_noteHint =>
+      'bv. jaarlijkse ademautomaatservice';
+
+  @override
+  String get equipment_location_move_confirm => 'Verplaatsen';
+
+  @override
+  String get equipment_location_parts_title => 'Onderdelen ook verplaatsen?';
+
+  @override
+  String equipment_location_parts_body(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ook de $count onderdelen naar dezelfde plek verplaatsen?',
+      one: 'Ook het $count onderdeel naar dezelfde plek verplaatsen?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_parts_yes => 'Onderdelen verplaatsen';
+
+  @override
+  String get equipment_location_parts_no => 'Alleen dit';
+
+  @override
+  String get equipment_location_status_title => 'Status bijwerken?';
+
+  @override
+  String equipment_location_status_body(int count, String status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ook $count items markeren als $status?',
+      one: 'Ook $count item markeren als $status?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_status_yes => 'Bijwerken';
+
+  @override
+  String get equipment_location_status_no => 'Status behouden';
+
+  @override
+  String equipment_location_moved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items verplaatst',
+      one: '$count item verplaatst',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_card_title => 'Locatie';
+
+  @override
+  String get equipment_location_none => 'Geen locatie ingesteld';
+
+  @override
+  String equipment_location_since(String date) {
+    return 'Sinds $date';
+  }
+
+  @override
+  String get equipment_location_moveButton => 'Verplaatsen';
+
+  @override
+  String get equipment_location_showAll => 'Alles tonen';
+
+  @override
+  String get equipment_location_history_cleared => 'Locatie gewist';
+
+  @override
+  String get equipment_location_editMove_title => 'Verplaatsing bewerken';
+
+  @override
+  String get equipment_location_editMove_delete => 'Verplaatsing verwijderen';
+
+  @override
+  String get equipment_location_deleteMoveConfirm =>
+      'Dit item uit de geschiedenis verwijderen? De locatie van het item wordt opnieuw bepaald uit de resterende verplaatsingen.';
+
+  @override
+  String get equipment_location_bulkAction => 'Naar locatie verplaatsen';
+
+  @override
+  String equipment_location_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '$count item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_location_activeFilter => 'Locatie';
+
+  @override
+  String get equipment_filter_section_location => 'Locatie';
+
+  @override
+  String get equipment_arrange_groupByLocation => 'Groeperen op locatie';
+
+  @override
+  String get equipment_arrange_groupByLocationSubtitle =>
+      'Eén kop per plek, alleen op deze pagina';
+
+  @override
+  String get equipment_edit_locationLabel => 'Locatie';
+
+  @override
+  String get equipment_edit_locationNone => 'Niet ingesteld';
+
+  @override
+  String get equipment_edit_locationFailed =>
+      'Opgeslagen, maar de locatie kon niet worden ingesteld. Gebruik Verplaatsen bij het item om die in te stellen.';
+
+  @override
+  String get equipment_locations_title => 'Locaties';
+
+  @override
+  String get equipment_locations_empty =>
+      'Nog geen plekken. Voeg er een toe om bij te houden waar je uitrusting is.';
+
+  @override
+  String get equipment_locations_add => 'Plek toevoegen';
+
+  @override
+  String equipment_locations_archivedSection(int count) {
+    return 'Gearchiveerd ($count)';
+  }
+
+  @override
+  String get equipment_locations_archive => 'Archiveren';
+
+  @override
+  String get equipment_locations_restore => 'Herstellen';
+
+  @override
+  String get equipment_locations_delete => 'Verwijderen';
+
+  @override
+  String equipment_locations_deleteConfirm(String name) {
+    return '$name verwijderen?';
+  }
+
+  @override
+  String get equipment_locations_itemsHere => 'Items hier';
+
+  @override
+  String get equipment_locations_noItemsHere => 'Er is hier nu niets.';
+
+  @override
+  String get equipment_locations_moveItems => 'Items hier verplaatsen';
+
+  @override
+  String get equipment_locations_newTitle => 'Nieuwe plek';
+
+  @override
+  String get equipment_locations_editTitle => 'Plek bewerken';
+
+  @override
+  String get equipment_locations_nameLabel => 'Naam';
+
+  @override
+  String get equipment_locations_nameRequired => 'Voer een naam in';
+
+  @override
+  String get equipment_locations_duplicateWarning =>
+      'Je hebt al een plek met deze naam';
+
+  @override
+  String get equipment_locations_kindLabel => 'Soort';
+
+  @override
+  String get equipment_locations_notesLabel => 'Notities';
+
+  @override
+  String get equipment_locations_notesHint => 'Adres, telefoon, kluisjesnummer';
+
+  @override
   String get equipment_list_retryButton => 'Opnieuw proberen';
 
   @override
@@ -21333,6 +21571,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_conflict_field_intervalHours => 'Interval in uren';
 
   @override
+  String get settings_conflict_field_isArchived => 'Gearchiveerd';
+
+  @override
   String get settings_conflict_field_isBuiltIn => 'Ingebouwd';
 
   @override
@@ -21486,6 +21727,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_conflict_field_mode => 'Ademmodus';
+
+  @override
+  String get settings_conflict_field_movedAt => 'Verplaatst op';
 
   @override
   String get settings_conflict_field_name => 'Naam';
@@ -22414,6 +22658,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_conflict_ref_equipment => 'Uitrusting';
 
   @override
+  String get settings_conflict_ref_equipmentLocation => 'Uitrustingslocatie';
+
+  @override
   String get settings_conflict_ref_equipmentSet => 'Uitrustingsset';
 
   @override
@@ -23337,6 +23584,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_manage_serviceTypes_subtitle =>
       'Welk onderhoud je uitrusting nodig heeft, en hoe vaak';
+
+  @override
+  String get settings_manage_locations => 'Locaties';
+
+  @override
+  String get settings_manage_locations_subtitle =>
+      'Waar je uitrusting ligt, in onderhoud is of is uitgeleend';
 
   @override
   String get settings_manage_currencyRules => 'Geldigheid certificeringen';
@@ -48420,6 +48674,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get query_equipment_lastDived => 'Laatst gebruikt';
+
+  @override
+  String get query_equipment_location => 'Locatie';
 
   @override
   String get query_equipment_model => 'Model';
