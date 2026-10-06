@@ -4528,7 +4528,7 @@
   "equipment_summary_wantedValue": "Valor Desejado ({currency})",
   "equipment_tab_equipment": "Equipamento",
   "equipment_tab_sets": "Conjuntos",
-  "formatter_connector_at": "em",
+  "formatter_connector_at": "às",
   "formatter_connector_from": "De",
   "formatter_connector_until": "Até",
   "gasCalculators_bestMix_commonMixesRef": "Referência de Misturas Comuns",

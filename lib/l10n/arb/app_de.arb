@@ -4644,7 +4644,7 @@
   "equipment_summary_wantedValue": "Wunschwert ({currency})",
   "equipment_tab_equipment": "Ausrüstung",
   "equipment_tab_sets": "Sets",
-  "formatter_connector_at": "bei",
+  "formatter_connector_at": "um",
   "formatter_connector_from": "Von",
   "formatter_connector_until": "Bis",
   "gasCalculators_bestMix_commonMixesRef": "Gebräuchliche Gemische - Referenz",

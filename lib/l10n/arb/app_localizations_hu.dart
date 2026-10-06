@@ -15554,7 +15554,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_tab_sets => 'Készletek';
 
   @override
-  String get formatter_connector_at => 'helyen';
+  String get formatter_connector_at => '–';
 
   @override
   String get formatter_connector_from => 'Ettől';

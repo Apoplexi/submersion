@@ -4426,7 +4426,7 @@
   "equipment_summary_wantedValue": "Valore desiderato ({currency})",
   "equipment_tab_equipment": "Attrezzatura",
   "equipment_tab_sets": "Set",
-  "formatter_connector_at": "a",
+  "formatter_connector_at": "alle",
   "formatter_connector_from": "Da",
   "formatter_connector_until": "Fino a",
   "gasCalculators_bestMix_commonMixesRef": "Riferimento Miscele Comuni",

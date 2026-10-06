@@ -15499,7 +15499,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_tab_sets => 'Sets';
 
   @override
-  String get formatter_connector_at => 'op';
+  String get formatter_connector_at => 'om';
 
   @override
   String get formatter_connector_from => 'Van';
