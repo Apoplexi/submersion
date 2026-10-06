@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:ui' show Rect;
 
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/services/export/models/currency_backup_data.dart';
 import 'package:submersion/core/services/export/csv/codec/csv_export_units.dart';
 import 'package:submersion/core/services/export/csv/csv_export_service.dart';
 import 'package:submersion/core/services/export/excel/blender_invoice_excel_export_service.dart';
@@ -599,6 +600,7 @@ class ExportService {
     List<EquipmentItem>? equipment,
     List<Buddy>? buddies,
     List<Certification>? certifications,
+    CurrencyBackupData currency = const CurrencyBackupData(),
     CertificationCatalog? certificationCatalog,
     List<DiveCenter>? diveCenters,
     List<Species>? species,
@@ -635,6 +637,7 @@ class ExportService {
     equipment: equipment,
     buddies: buddies,
     certifications: certifications,
+    currency: currency,
     certificationCatalog: certificationCatalog,
     diveCenters: diveCenters,
     species: species,
@@ -671,6 +674,7 @@ class ExportService {
     List<EquipmentItem>? equipment,
     List<Buddy>? buddies,
     List<Certification>? certifications,
+    CurrencyBackupData currency = const CurrencyBackupData(),
     CertificationCatalog? certificationCatalog,
     List<DiveCenter>? diveCenters,
     List<Species>? species,
@@ -707,6 +711,7 @@ class ExportService {
     equipment: equipment,
     buddies: buddies,
     certifications: certifications,
+    currency: currency,
     certificationCatalog: certificationCatalog,
     diveCenters: diveCenters,
     species: species,
