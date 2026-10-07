@@ -45807,6 +45807,41 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de changer de révision du profil.';
 
   @override
+  String get diveLog_profileEditor_deleteProfile_button =>
+      'Supprimer le profil';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_tooltip =>
+      'Supprimer ce profil et son historique de révisions';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmTitle =>
+      'Supprimer le profil?';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmBody =>
+      'Supprimer ce profil est permanent et ne peut pas être annulé.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning =>
+      'Ce profil a été importé depuis un ordinateur de plongée et contient probablement des données originales.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_cancel => 'Annuler';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_delete => 'Supprimer';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_success =>
+      'Profil supprimé avec succès';
+
+  @override
+  String diveLog_profileEditor_deleteProfile_error(String error) {
+    return 'Impossible de supprimer le profil: $error';
+  }
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

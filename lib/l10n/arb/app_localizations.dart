@@ -72661,6 +72661,60 @@ abstract class AppLocalizations {
   /// **'Could not switch profile revision.'**
   String get diveLog_profileEditor_revisionSwitchFailed;
 
+  /// No description provided for @diveLog_profileEditor_deleteProfile_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Profile'**
+  String get diveLog_profileEditor_deleteProfile_button;
+
+  /// No description provided for @diveLog_profileEditor_deleteProfile_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this profile and its revision history'**
+  String get diveLog_profileEditor_deleteProfile_tooltip;
+
+  /// No description provided for @diveLog_profileEditor_deleteProfile_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Profile?'**
+  String get diveLog_profileEditor_deleteProfile_confirmTitle;
+
+  /// No description provided for @diveLog_profileEditor_deleteProfile_confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting this profile is permanent and cannot be undone.'**
+  String get diveLog_profileEditor_deleteProfile_confirmBody;
+
+  /// No description provided for @diveLog_profileEditor_deleteProfile_computerImportWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This profile was imported from a dive computer and likely contains original data.'**
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning;
+
+  /// No description provided for @diveLog_profileEditor_deleteProfile_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get diveLog_profileEditor_deleteProfile_cancel;
+
+  /// No description provided for @diveLog_profileEditor_deleteProfile_delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get diveLog_profileEditor_deleteProfile_delete;
+
+  /// No description provided for @diveLog_profileEditor_deleteProfile_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile deleted successfully'**
+  String get diveLog_profileEditor_deleteProfile_success;
+
+  /// No description provided for @diveLog_profileEditor_deleteProfile_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete profile: {error}'**
+  String diveLog_profileEditor_deleteProfile_error(String error);
+
   /// Header of the dive-detail section listing where a dive's data came from (dive computers, imported files, manual entry).
   ///
   /// In en, this message translates to:

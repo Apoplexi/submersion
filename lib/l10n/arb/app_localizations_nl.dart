@@ -45402,6 +45402,41 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kan niet wisselen van profielrevisie.';
 
   @override
+  String get diveLog_profileEditor_deleteProfile_button =>
+      'Profiel verwijderen';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_tooltip =>
+      'Dit profiel en de revisiegeschiedenis ervan verwijderen';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmTitle =>
+      'Profiel verwijderen?';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmBody =>
+      'Het verwijderen van dit profiel is permanent en kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning =>
+      'Dit profiel is geïmporteerd van een duikcomputer en bevat waarschijnlijk originele gegevens.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_cancel => 'Annuleren';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_delete => 'Verwijderen';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_success =>
+      'Profiel succesvol verwijderd';
+
+  @override
+  String diveLog_profileEditor_deleteProfile_error(String error) {
+    return 'Kan het profiel niet verwijderen: $error';
+  }
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

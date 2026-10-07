@@ -42918,6 +42918,37 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_profileEditor_revisionSwitchFailed => '无法切换剖面版本。';
 
   @override
+  String get diveLog_profileEditor_deleteProfile_button => '删除剖面';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_tooltip => '删除此剖面及其版本历史';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmTitle => '删除剖面?';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmBody =>
+      '删除此剖面是永久性的，无法撤销。';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning =>
+      '此剖面是从潜水电脑导入的，可能包含原始数据。';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_cancel => '取消';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_delete => '删除';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_success => '剖面已成功删除';
+
+  @override
+  String diveLog_profileEditor_deleteProfile_error(String error) {
+    return '删除剖面失败: $error';
+  }
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

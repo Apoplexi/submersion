@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/data/services/profile_editing_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_waypoint.dart';
+import 'package:submersion/features/dive_log/presentation/dialogs/delete_profile_series_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_editor_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/editor_context_panel.dart';
@@ -133,6 +134,65 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
 
     if (mounted) {
       context.pop();
+    }
+  }
+
+  Future<void> _handleDeleteProfileSeries(
+    BuildContext context,
+    WidgetRef ref,
+    String diveId,
+    String seriesId,
+    String revisionKind,
+    bool isComputerImport,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => DeleteProfileSeriesDialog(
+        revisionKind: revisionKind,
+        isComputerImport: isComputerImport,
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    try {
+      final repository = ref.read(diveRepositoryProvider);
+      await repository.deleteProfileSeriesWithHistoryForDive(diveId, seriesId);
+
+      if (!mounted) return;
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            // ignore: use_build_context_synchronously
+            context.l10n.diveLog_profileEditor_deleteProfile_success,
+          ),
+        ),
+      );
+
+      // Invalidate providers and navigate back
+      ref.invalidate(diveProvider(diveId));
+      ref.invalidate(diveProfileProvider(diveId));
+      ref.invalidate(profileSeriesHistoryProvider(diveId));
+
+      if (mounted) {
+        // ignore: use_build_context_synchronously
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              // ignore: use_build_context_synchronously
+              context.l10n.diveLog_profileEditor_deleteProfile_error('$e'),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -291,83 +351,112 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
             '${_revisionKindLabel(context, active.revisionKind)} · '
             '${_formatRevisionCreatedAt(units, active.createdAt)}';
 
-        return PopupMenuButton<String>(
-          tooltip: context.l10n.diveLog_profileEditor_revisionSelectorTooltip,
-          enabled: enabled,
-          onSelected: (seriesId) async {
-            if (seriesId == active.seriesId) return;
-            try {
-              await ref
-                  .read(diveRepositoryProvider)
-                  .setActiveProfileSeries(diveId, seriesId);
-              // Invalidate profile-related providers to refresh the editor
-              ref.invalidate(diveProvider(diveId));
-              ref.invalidate(diveProfileProvider(diveId));
-              ref.invalidate(profileSeriesHistoryProvider(diveId));
-            } catch (_) {
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    context.l10n.diveLog_profileEditor_revisionSwitchFailed,
+        // Button is enabled if: there's more than 1 revision AND no unsaved changes
+        final canDelete = enabled && revisions.length > 1;
+        final isComputerImport = active.revisionKind == 'computer_import';
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Revision selector PopupMenuButton
+            PopupMenuButton<String>(
+              tooltip:
+                  context.l10n.diveLog_profileEditor_revisionSelectorTooltip,
+              enabled: enabled,
+              onSelected: (seriesId) async {
+                if (seriesId == active.seriesId) return;
+                try {
+                  await ref
+                      .read(diveRepositoryProvider)
+                      .setActiveProfileSeries(diveId, seriesId);
+                  // Invalidate profile-related providers to refresh the editor
+                  ref.invalidate(diveProvider(diveId));
+                  ref.invalidate(diveProfileProvider(diveId));
+                  ref.invalidate(profileSeriesHistoryProvider(diveId));
+                } catch (_) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        context.l10n.diveLog_profileEditor_revisionSwitchFailed,
+                      ),
+                    ),
+                  );
+                }
+              },
+              itemBuilder: (_) => [
+                for (final revision in revisions)
+                  CheckedPopupMenuItem<String>(
+                    value: revision.seriesId,
+                    checked: revision.isActive,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _revisionKindLabel(context, revision.revisionKind),
+                        ),
+                        Text(
+                          _formatRevisionCreatedAt(units, revision.createdAt),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
                   ),
+              ],
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 ),
-              );
-            }
-          },
-          itemBuilder: (_) => [
-            for (final revision in revisions)
-              CheckedPopupMenuItem<String>(
-                value: revision.seriesId,
-                checked: revision.isActive,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(_revisionKindLabel(context, revision.revisionKind)),
-                    Text(
-                      _formatRevisionCreatedAt(units, revision.createdAt),
-                      style: Theme.of(context).textTheme.bodySmall,
+                    Icon(
+                      Icons.history,
+                      size: 16,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        activeLabel,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ],
                 ),
               ),
+            ),
+            const SizedBox(width: 8),
+            // Delete button - always shown but disabled if only 1 revision or unsaved changes
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: context.l10n.diveLog_profileEditor_deleteProfile_tooltip,
+              onPressed: canDelete
+                  ? () => _handleDeleteProfileSeries(
+                      context,
+                      ref,
+                      diveId,
+                      active.seriesId,
+                      active.revisionKind,
+                      isComputerImport,
+                    )
+                  : null,
+            ),
           ],
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outlineVariant,
-              ),
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.history,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Text(
-                    activeLabel,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
-                const SizedBox(width: 2),
-                Icon(
-                  Icons.arrow_drop_down,
-                  size: 18,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ],
-            ),
-          ),
         );
       },
     );

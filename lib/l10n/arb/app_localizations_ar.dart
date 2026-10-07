@@ -46322,6 +46322,40 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذر تبديل مراجعة الملف الشخصي.';
 
   @override
+  String get diveLog_profileEditor_deleteProfile_button => 'حذف الملف الشخصي';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_tooltip =>
+      'حذف هذا الملف الشخصي وسجل مراجعاته';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmTitle =>
+      'حذف الملف الشخصي؟';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmBody =>
+      'حذف هذا الملف الشخصي دائم ولا يمكن التراجع عنه.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning =>
+      'تم استيراد هذا الملف الشخصي من جهاز كمبيوتر الغوص وقد يحتوي على بيانات أصلية.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_cancel => 'إلغاء';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_delete => 'حذف';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_success =>
+      'تم حذف الملف الشخصي بنجاح';
+
+  @override
+  String diveLog_profileEditor_deleteProfile_error(String error) {
+    return 'فشل في حذف الملف الشخصي: $error';
+  }
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

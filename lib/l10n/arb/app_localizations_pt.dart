@@ -45709,6 +45709,40 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não foi possível alternar a revisão do perfil.';
 
   @override
+  String get diveLog_profileEditor_deleteProfile_button => 'Excluir perfil';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_tooltip =>
+      'Excluir este perfil e seu histórico de revisões';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmTitle =>
+      'Excluir perfil?';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmBody =>
+      'Excluir este perfil é permanente e não pode ser desfeito.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning =>
+      'Este perfil foi importado de um computador de mergulho e provavelmente contém dados originais.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_cancel => 'Cancelar';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_delete => 'Excluir';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_success =>
+      'Perfil excluído com sucesso';
+
+  @override
+  String diveLog_profileEditor_deleteProfile_error(String error) {
+    return 'Falha ao excluir o perfil: $error';
+  }
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

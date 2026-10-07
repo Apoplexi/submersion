@@ -45451,6 +45451,40 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerült a profilverzió váltása.';
 
   @override
+  String get diveLog_profileEditor_deleteProfile_button => 'Profil törlése';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_tooltip =>
+      'Profil és verzióelőzményeinek törlése';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmTitle =>
+      'Profil törlése?';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmBody =>
+      'A profil törlése véglegeset és nem lehet visszavonni.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning =>
+      'Ezt a profilt merülőszámítógépből importálták, és valószínűleg eredeti adatokat tartalmaz.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_cancel => 'Mégse';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_delete => 'Törlés';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_success =>
+      'Profil sikeresen törölve';
+
+  @override
+  String diveLog_profileEditor_deleteProfile_error(String error) {
+    return 'Profil törlése sikertelen: $error';
+  }
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

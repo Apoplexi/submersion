@@ -44995,6 +44995,40 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not switch profile revision.';
 
   @override
+  String get diveLog_profileEditor_deleteProfile_button => 'Delete Profile';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_tooltip =>
+      'Delete this profile and its revision history';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmTitle =>
+      'Delete Profile?';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmBody =>
+      'Deleting this profile is permanent and cannot be undone.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning =>
+      'This profile was imported from a dive computer and likely contains original data.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_cancel => 'Cancel';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_delete => 'Delete';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_success =>
+      'Profile deleted successfully';
+
+  @override
+  String diveLog_profileEditor_deleteProfile_error(String error) {
+    return 'Failed to delete profile: $error';
+  }
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

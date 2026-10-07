@@ -44758,6 +44758,40 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא ניתן להחליף את גרסת הפרופיל.';
 
   @override
+  String get diveLog_profileEditor_deleteProfile_button => 'מחק פרופיל';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_tooltip =>
+      'מחק את הפרופיל הזה ואת היסטוריית הגרסאות שלו';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmTitle =>
+      'למחוק את הפרופיל?';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_confirmBody =>
+      'מחיקת הפרופיל הזה היא קבועה ולא ניתן לבטל אותה.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_computerImportWarning =>
+      'פרופיל זה יובא ממחשב צלילה וכנראה מכיל נתונים מקוריים.';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_cancel => 'בטל';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_delete => 'מחק';
+
+  @override
+  String get diveLog_profileEditor_deleteProfile_success =>
+      'הפרופיל נמחק בהצלחה';
+
+  @override
+  String diveLog_profileEditor_deleteProfile_error(String error) {
+    return 'נכשל מחיקת הפרופיל: $error';
+  }
+
+  @override
   String diveLog_sources_sectionTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
