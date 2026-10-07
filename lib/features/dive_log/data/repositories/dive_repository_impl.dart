@@ -5646,10 +5646,9 @@ class DiveRepository {
   ///
   /// Takes the series rather than reading them so [getMergedProfilesForDives]
   /// can batch the read and still land on the same points as the single-dive
-  /// path. The extra [_primarySourceComputer] query is skipped unless a
-  /// demoted series actually carries a computer id, which is the only case
-  /// where the primary computer decides family membership; a single-source
-  /// dive resolves with no further SQL.
+  /// path. The extra [_primarySourceComputer] query is skipped unless the
+  /// series set mixes promoted and demoted rows, which is the only state where
+  /// supersession may need the primary computer to decide family membership.
   Future<List<domain.DiveProfilePoint>> _pointsForSeries(
     String diveId,
     List<ProfileSeries> series,
@@ -5670,13 +5669,14 @@ class DiveRepository {
 
   /// Whether [series] needs the primary `dive_data_sources` row to resolve.
   ///
-  /// Only a promoted series alongside a demoted one that still names a
-  /// computer lets the primary computer decide family membership; a
-  /// single-source dive resolves with no further SQL. Shared by the
-  /// single-dive and batched paths so the condition cannot drift.
+  /// Supersession runs only when promoted and demoted rows coexist. In that
+  /// state, a demoted edited row often has no computer id while the active
+  /// original row does; resolving the primary computer is still required to
+  /// place both in one family and drop the demoted edit from merged reads.
+  /// Shared by the single-dive and batched paths so the condition cannot
+  /// drift.
   bool _needsPrimarySource(List<ProfileSeries> series) =>
-      series.any((s) => s.isPrimary) &&
-      series.any((s) => !s.isPrimary && s.computerId != null);
+      series.any((s) => s.isPrimary) && series.any((s) => !s.isPrimary);
 
   /// [series] reduced to displayable points. Pure: every read it depends on
   /// has already happened.
