@@ -5634,9 +5634,19 @@ class DiveRepository {
   Future<List<domain.DiveProfilePoint>> _mergedSeriesPoints(
     String diveId,
   ) async {
+    final series = await _profileSeries.getSeriesForDive(diveId);
+    final revisions = await _profileSeries.getRevisionsForDive(diveId);
+    final hiddenRevisionIds = {
+      for (final revision in revisions)
+        if (revision.parentSeriesId != null && !revision.isActive)
+          revision.seriesId,
+    };
     return _pointsForSeries(
       diveId,
-      await _profileSeries.getSeriesForDive(diveId),
+      [
+        for (final s in series)
+          if (!hiddenRevisionIds.contains(s.id)) s,
+      ],
     );
   }
 

@@ -250,7 +250,8 @@ List<ProfileSeries> dropSupersededSeries(
       !hasSources || s.computerId == null || s.computerId == primaryComputerId;
   final family = series.where(isFamily);
   final edited =
-      family.any((s) => s.isPrimary) && family.any((s) => !s.isPrimary);
+      family.any((s) => s.isPrimary && s.computerId == null) &&
+      family.any((s) => !s.isPrimary);
   if (!edited) return series;
   return [
     for (final s in series)
