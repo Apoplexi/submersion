@@ -196,6 +196,49 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
     }
   }
 
+  Widget _buildDeleteProfileButton(
+    BuildContext context,
+    WidgetRef ref,
+    String diveId, {
+    required bool enabled,
+  }) {
+    final historyAsync = ref.watch(profileSeriesHistoryProvider(diveId));
+
+    return historyAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (revisions) {
+        if (revisions.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final active = revisions.firstWhere(
+          (r) => r.isActive,
+          orElse: () => revisions.first,
+        );
+
+        // Button is enabled if: there's more than 1 revision AND no unsaved changes
+        final canDelete = enabled && revisions.length > 1;
+        final isComputerImport = active.revisionKind == 'computer_import';
+
+        return IconButton(
+          icon: const Icon(Icons.delete_outline),
+          tooltip: context.l10n.diveLog_profileEditor_deleteProfile_button,
+          onPressed: canDelete
+              ? () => _handleDeleteProfileSeries(
+                  context,
+                  ref,
+                  diveId,
+                  active.seriesId,
+                  active.revisionKind,
+                  isComputerImport,
+                )
+              : null,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final diveAsync = ref.watch(diveProvider(widget.diveId));
@@ -262,6 +305,12 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
             ],
           ),
           actions: [
+            _buildDeleteProfileButton(
+              context,
+              ref,
+              widget.diveId,
+              enabled: !state.hasChanges,
+            ),
             IconButton(
               icon: const Icon(Icons.undo),
               onPressed: state.undoStack.isNotEmpty
@@ -439,22 +488,6 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
                   ],
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            // Delete button - always shown but disabled if only 1 revision or unsaved changes
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              tooltip: context.l10n.diveLog_profileEditor_deleteProfile_tooltip,
-              onPressed: canDelete
-                  ? () => _handleDeleteProfileSeries(
-                      context,
-                      ref,
-                      diveId,
-                      active.seriesId,
-                      active.revisionKind,
-                      isComputerImport,
-                    )
-                  : null,
             ),
           ],
         );

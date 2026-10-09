@@ -19,7 +19,9 @@ void main() {
     ).readAsStringSync();
     final start = state.indexOf('class CourseFilterState');
     expect(start, isNonNegative);
-    final body = state.substring(start, state.indexOf('\n}\n', start));
+    final end = state.lastIndexOf('}');
+    expect(end, isNonNegative);
+    final body = state.substring(start, end);
     final fields = RegExp(
       r'^  final [\w<>?, .]+ (\w+);',
       multiLine: true,
