@@ -70,9 +70,12 @@ void main() {
           findsOneWidget,
         );
 
-        // Verify history icon is in AppBar (right of title)
+        // Verify compact revision selector icon is in AppBar (right of title)
         expect(
-          find.descendant(of: appBar, matching: find.byIcon(Icons.history)),
+          find.descendant(
+            of: appBar,
+            matching: find.byIcon(Icons.add_circle_outline),
+          ),
           findsOneWidget,
         );
       },
@@ -191,8 +194,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
 
-      // Verify history icon is not shown
-      expect(find.byIcon(Icons.history), findsNothing);
+      // Verify selector is not shown
+      expect(find.byTooltip('Revision history'), findsNothing);
     });
   });
 }

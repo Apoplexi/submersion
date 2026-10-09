@@ -196,49 +196,6 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
     }
   }
 
-  Widget _buildDeleteProfileButton(
-    BuildContext context,
-    WidgetRef ref,
-    String diveId, {
-    required bool enabled,
-  }) {
-    final historyAsync = ref.watch(profileSeriesHistoryProvider(diveId));
-
-    return historyAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-      data: (revisions) {
-        if (revisions.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        final active = revisions.firstWhere(
-          (r) => r.isActive,
-          orElse: () => revisions.first,
-        );
-
-        // Button is enabled if: there's more than 1 revision AND no unsaved changes
-        final canDelete = enabled && revisions.length > 1;
-        final isComputerImport = active.revisionKind == 'computer_import';
-
-        return IconButton(
-          icon: const Icon(Icons.delete_outline),
-          tooltip: context.l10n.diveLog_profileEditor_deleteProfile_button,
-          onPressed: canDelete
-              ? () => _handleDeleteProfileSeries(
-                  context,
-                  ref,
-                  diveId,
-                  active.seriesId,
-                  active.revisionKind,
-                  isComputerImport,
-                )
-              : null,
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final diveAsync = ref.watch(diveProvider(widget.diveId));
@@ -305,12 +262,6 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
             ],
           ),
           actions: [
-            _buildDeleteProfileButton(
-              context,
-              ref,
-              widget.diveId,
-              enabled: !state.hasChanges,
-            ),
             IconButton(
               icon: const Icon(Icons.undo),
               onPressed: state.undoStack.isNotEmpty
@@ -396,98 +347,129 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
           orElse: () => revisions.first,
         );
 
-        final activeLabel =
-            '${_revisionKindLabel(context, active.revisionKind)} · '
-            '${_formatRevisionCreatedAt(units, active.createdAt)}';
+        final activeCreatedAt = _formatRevisionCreatedAt(
+          units,
+          active.createdAt,
+        );
+        final activeIcon = _revisionKindIcon(active.revisionKind);
+        final activeTooltip = _revisionKindLabel(context, active.revisionKind);
 
         // Button is enabled if: there's more than 1 revision AND no unsaved changes
         final canDelete = enabled && revisions.length > 1;
         final isComputerImport = active.revisionKind == 'computer_import';
 
         return Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           children: [
             // Revision selector PopupMenuButton
-            PopupMenuButton<String>(
-              tooltip:
-                  context.l10n.diveLog_profileEditor_revisionSelectorTooltip,
-              enabled: enabled,
-              onSelected: (seriesId) async {
-                if (seriesId == active.seriesId) return;
-                try {
-                  await ref
-                      .read(diveRepositoryProvider)
-                      .setActiveProfileSeries(diveId, seriesId);
-                  // Invalidate profile-related providers to refresh the editor
-                  ref.invalidate(diveProvider(diveId));
-                  ref.invalidate(diveProfileProvider(diveId));
-                  ref.invalidate(profileSeriesHistoryProvider(diveId));
-                } catch (_) {
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        context.l10n.diveLog_profileEditor_revisionSwitchFailed,
+            Flexible(
+              child: PopupMenuButton<String>(
+                tooltip:
+                    context.l10n.diveLog_profileEditor_revisionSelectorTooltip,
+                enabled: enabled,
+                onSelected: (seriesId) async {
+                  if (seriesId == active.seriesId) return;
+                  try {
+                    await ref
+                        .read(diveRepositoryProvider)
+                        .setActiveProfileSeries(diveId, seriesId);
+                    // Invalidate profile-related providers to refresh the editor
+                    ref.invalidate(diveProvider(diveId));
+                    ref.invalidate(diveProfileProvider(diveId));
+                    ref.invalidate(profileSeriesHistoryProvider(diveId));
+                  } catch (_) {
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          context
+                              .l10n
+                              .diveLog_profileEditor_revisionSwitchFailed,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                itemBuilder: (_) => [
+                  for (final revision in revisions)
+                    CheckedPopupMenuItem<String>(
+                      value: revision.seriesId,
+                      checked: revision.isActive,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _revisionKindLabel(context, revision.revisionKind),
+                          ),
+                          Text(
+                            _formatRevisionCreatedAt(units, revision.createdAt),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                }
-              },
-              itemBuilder: (_) => [
-                for (final revision in revisions)
-                  CheckedPopupMenuItem<String>(
-                    value: revision.seriesId,
-                    checked: revision.isActive,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _revisionKindLabel(context, revision.revisionKind),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Tooltip(
+                        message: activeTooltip,
+                        child: Icon(
+                          activeIcon,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
-                        Text(
-                          _formatRevisionCreatedAt(units, revision.createdAt),
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          activeCreatedAt,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
-                      ],
-                    ),
-                  ),
-              ],
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.history,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        activeLabel,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: Theme.of(context).textTheme.bodySmall,
                       ),
-                    ),
-                    const SizedBox(width: 2),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      size: 18,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ],
+                      const SizedBox(width: 2),
+                      Icon(
+                        Icons.arrow_drop_down,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
                 ),
               ),
+            ),
+            const SizedBox(width: 8),
+            // Delete button - always shown but disabled if only 1 revision or unsaved changes
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: context.l10n.diveLog_profileEditor_deleteProfile_tooltip,
+              onPressed: canDelete
+                  ? () => _handleDeleteProfileSeries(
+                      context,
+                      ref,
+                      diveId,
+                      active.seriesId,
+                      active.revisionKind,
+                      isComputerImport,
+                    )
+                  : null,
             ),
           ],
         );
@@ -507,6 +489,15 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
         'legacy' => context.l10n.diveLog_detail_profileRevision_kind_legacy,
         _ => revisionKind,
       };
+
+  IconData _revisionKindIcon(String revisionKind) => switch (revisionKind) {
+    final String s when _extractEditTypeToken(s) != null => Icons.edit,
+    'edit' => Icons.edit,
+    'create' => Icons.add_circle_outline,
+    'computer_import' => Icons.download,
+    'legacy' => Icons.inventory_2_outlined,
+    _ => Icons.history,
+  };
 
   String? _extractEditTypeToken(String revisionKind) {
     if (revisionKind.startsWith('Edit: ')) {

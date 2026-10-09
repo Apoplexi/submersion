@@ -60,7 +60,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.history), findsWidgets);
+      expect(find.byIcon(Icons.add_circle_outline), findsWidgets);
     });
 
     testWidgets('formats computer_import revision', (tester) async {
@@ -96,7 +96,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.history), findsWidgets);
+      expect(find.byIcon(Icons.download), findsWidgets);
     });
 
     testWidgets('formats legacy revision', (tester) async {
@@ -132,7 +132,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.history), findsWidgets);
+      expect(find.byIcon(Icons.inventory_2_outlined), findsWidgets);
     });
 
     testWidgets('formats edit with single edit type', (tester) async {
@@ -168,7 +168,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.history), findsWidgets);
+      expect(find.byIcon(Icons.edit), findsWidgets);
     });
 
     testWidgets('formats edit with multiple edit types', (tester) async {
@@ -204,7 +204,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.history), findsWidgets);
+      expect(find.byIcon(Icons.edit), findsWidgets);
     });
 
     testWidgets('handles empty revision history', (tester) async {
@@ -294,7 +294,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.history), findsWidgets);
+      expect(find.byIcon(Icons.edit), findsWidgets);
     });
   });
 }
