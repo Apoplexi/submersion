@@ -5641,13 +5641,10 @@ class DiveRepository {
         if (revision.parentSeriesId != null && !revision.isActive)
           revision.seriesId,
     };
-    return _pointsForSeries(
-      diveId,
-      [
-        for (final s in series)
-          if (!hiddenRevisionIds.contains(s.id)) s,
-      ],
-    );
+    return _pointsForSeries(diveId, [
+      for (final s in series)
+        if (!hiddenRevisionIds.contains(s.id)) s,
+    ]);
   }
 
   /// [series] reduced to the points a reader should see: the superseded
