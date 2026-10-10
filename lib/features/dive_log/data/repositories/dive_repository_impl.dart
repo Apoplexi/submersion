@@ -5635,7 +5635,11 @@ class DiveRepository {
     String diveId,
   ) async {
     final series = await _profileSeries.getSeriesForDive(diveId);
-    final revisions = await _profileSeries.getRevisionsForDive(diveId);
+    // History metadata is only needed to identify inactive child revisions,
+    // which are always represented as demoted rows.
+    final revisions = series.any((s) => !s.isPrimary)
+        ? await _profileSeries.getRevisionsForDive(diveId)
+        : const <ProfileSeriesRevision>[];
     final hiddenRevisionIds = {
       for (final revision in revisions)
         if (revision.parentSeriesId != null && !revision.isActive)
