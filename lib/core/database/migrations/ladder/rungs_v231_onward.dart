@@ -331,5 +331,8 @@ extension RungsFromV231 on AppDatabase {
       await _healShearwaterDownloadSerialsOnUpgrade();
     }
     if (from < 279) await reportProgress();
+    // v280: no data change (issue #2361). Carries the sync floor past the
+    // builds that cannot parse AccountKind.webdav.
+    if (from < 280) await reportProgress();
   }
 }
