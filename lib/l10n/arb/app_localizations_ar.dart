@@ -47581,9 +47581,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_sources_badge_viewing => 'قيد العرض';
 
   @override
-  String get diveLog_sources_badge_secondary => 'ثانوي';
-
-  @override
   String diveLog_sources_created(String date) {
     return 'أُنشئ في $date';
   }
@@ -47596,6 +47593,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_sources_detail_imported => 'تاريخ الاستيراد';
+
+  @override
+  String get diveLog_sources_detail_times => 'الأوقات';
+
+  @override
+  String get diveLog_sources_detail_file => 'الملف';
+
+  @override
+  String diveLog_sources_timeRange(String start, String end) {
+    return '$start–$end';
+  }
+
+  @override
+  String get diveLog_sources_sectionMenuTooltip => 'إجراءات مصادر البيانات';
 
   @override
   String diveLog_detail_semantics_viewDiveComputer(String name) {

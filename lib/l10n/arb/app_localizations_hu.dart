@@ -46694,9 +46694,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_sources_badge_viewing => 'Megtekintve';
 
   @override
-  String get diveLog_sources_badge_secondary => 'Másodlagos';
-
-  @override
   String diveLog_sources_created(String date) {
     return 'Létrehozva: $date';
   }
@@ -46709,6 +46706,20 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_sources_detail_imported => 'Importálva';
+
+  @override
+  String get diveLog_sources_detail_times => 'Időpontok';
+
+  @override
+  String get diveLog_sources_detail_file => 'Fájl';
+
+  @override
+  String diveLog_sources_timeRange(String start, String end) {
+    return '$start–$end';
+  }
+
+  @override
+  String get diveLog_sources_sectionMenuTooltip => 'Adatforrás-műveletek';
 
   @override
   String diveLog_detail_semantics_viewDiveComputer(String name) {

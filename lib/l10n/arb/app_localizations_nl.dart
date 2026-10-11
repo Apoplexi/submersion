@@ -46650,9 +46650,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_sources_badge_viewing => 'Wordt bekeken';
 
   @override
-  String get diveLog_sources_badge_secondary => 'Secundair';
-
-  @override
   String diveLog_sources_created(String date) {
     return 'Aangemaakt op $date';
   }
@@ -46665,6 +46662,20 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_sources_detail_imported => 'Geïmporteerd';
+
+  @override
+  String get diveLog_sources_detail_times => 'Tijden';
+
+  @override
+  String get diveLog_sources_detail_file => 'Bestand';
+
+  @override
+  String diveLog_sources_timeRange(String start, String end) {
+    return '$start–$end';
+  }
+
+  @override
+  String get diveLog_sources_sectionMenuTooltip => 'Databronacties';
 
   @override
   String diveLog_detail_semantics_viewDiveComputer(String name) {

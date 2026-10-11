@@ -46845,9 +46845,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_sources_badge_viewing => 'Angezeigt';
 
   @override
-  String get diveLog_sources_badge_secondary => 'Sekundär';
-
-  @override
   String diveLog_sources_created(String date) {
     return 'Erstellt $date';
   }
@@ -46860,6 +46857,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_sources_detail_imported => 'Importiert';
+
+  @override
+  String get diveLog_sources_detail_times => 'Zeiten';
+
+  @override
+  String get diveLog_sources_detail_file => 'Datei';
+
+  @override
+  String diveLog_sources_timeRange(String start, String end) {
+    return '$start–$end';
+  }
+
+  @override
+  String get diveLog_sources_sectionMenuTooltip => 'Aktionen für Datenquellen';
 
   @override
   String diveLog_detail_semantics_viewDiveComputer(String name) {
