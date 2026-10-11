@@ -30344,6 +30344,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Egy másik merülés duplikátuma ebben az importálási kötegben.';
 
   @override
+  String get universalImport_review_inFileDuplicateHint =>
+      'Ez a merülés kétszer szerepel az importban. A Kihagyás a másik példányt tartja meg, az Importálás újként helyette ezt.';
+
+  @override
+  String get universalImport_compare_otherCopy => 'Másik példány';
+
+  @override
   String get universalImport_summary_filesTitle => 'Fájlok';
 
   @override

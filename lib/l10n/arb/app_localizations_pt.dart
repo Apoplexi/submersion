@@ -30499,6 +30499,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Duplicata de outro mergulho neste lote de importação.';
 
   @override
+  String get universalImport_review_inFileDuplicateHint =>
+      'Este mergulho aparece duas vezes na importação. Pular mantém a outra cópia; Importar como novo mantém esta no lugar.';
+
+  @override
+  String get universalImport_compare_otherCopy => 'Outra cópia';
+
+  @override
   String get universalImport_summary_filesTitle => 'Arquivos';
 
   @override
