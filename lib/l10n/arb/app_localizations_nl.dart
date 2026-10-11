@@ -24275,6 +24275,192 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_section_manage_title => 'Beheren';
 
   @override
+  String get settings_network_mode_header => 'Proxy';
+
+  @override
+  String get settings_network_mode_system => 'Systeemproxy';
+
+  @override
+  String get settings_network_mode_system_subtitle =>
+      'De proxy uit de netwerkinstellingen van je apparaat gebruiken';
+
+  @override
+  String get settings_network_mode_manual => 'Handmatig';
+
+  @override
+  String get settings_network_mode_manual_subtitle =>
+      'Een proxyserver invoeren';
+
+  @override
+  String get settings_network_mode_none => 'Geen proxy';
+
+  @override
+  String get settings_network_mode_none_subtitle =>
+      'Altijd rechtstreeks verbinden';
+
+  @override
+  String get settings_network_status_detecting =>
+      'Proxy-instellingen van dit apparaat worden gecontroleerd';
+
+  @override
+  String get settings_network_status_none =>
+      'Op dit apparaat is geen proxy ingesteld';
+
+  @override
+  String settings_network_status_fixed(String endpoint) {
+    return 'Gebruikt $endpoint';
+  }
+
+  @override
+  String settings_network_status_fixedPac(String endpoint) {
+    return 'Gebruikt $endpoint (via automatische configuratie)';
+  }
+
+  @override
+  String settings_network_status_fixedSocks(String endpoint) {
+    return 'Gebruikt $endpoint (SOCKS5)';
+  }
+
+  @override
+  String get settings_network_status_pacUnsupported =>
+      'Automatische proxyconfiguratie wordt op dit apparaat niet ondersteund. Kies Handmatig en voer de proxy in.';
+
+  @override
+  String get settings_network_status_pacFailed =>
+      'De automatische proxyconfiguratie kon niet worden gelezen. Kies Handmatig en voer de proxy in.';
+
+  @override
+  String get settings_network_status_error =>
+      'De proxy-instellingen van dit apparaat konden niet worden gelezen.';
+
+  @override
+  String get settings_network_status_refresh => 'Opnieuw controleren';
+
+  @override
+  String get settings_network_manual_typeHttp => 'HTTP';
+
+  @override
+  String get settings_network_manual_typeSocks => 'SOCKS5';
+
+  @override
+  String get settings_network_manual_host => 'Host';
+
+  @override
+  String get settings_network_manual_port => 'Poort';
+
+  @override
+  String get settings_network_manual_username => 'Gebruikersnaam (optioneel)';
+
+  @override
+  String get settings_network_manual_password => 'Wachtwoord (optioneel)';
+
+  @override
+  String get settings_network_manual_showPassword => 'Wachtwoord tonen';
+
+  @override
+  String get settings_network_manual_hidePassword => 'Wachtwoord verbergen';
+
+  @override
+  String get settings_network_manual_save => 'Opslaan';
+
+  @override
+  String get settings_network_manual_saved => 'Proxy-instellingen opgeslagen';
+
+  @override
+  String get settings_network_manual_saveFailed =>
+      'De proxy-instellingen konden niet worden opgeslagen.';
+
+  @override
+  String get settings_network_manual_nativeNote =>
+      'Inlogschermen van het besturingssysteem gebruiken de systeemproxy.';
+
+  @override
+  String get settings_network_validation_hostRequired => 'Voer de proxyhost in';
+
+  @override
+  String get settings_network_validation_portInvalid =>
+      'Voer een poort van 1 tot 65535 in';
+
+  @override
+  String get settings_network_validation_passwordRequired =>
+      'Voer het wachtwoord voor deze gebruikersnaam in';
+
+  @override
+  String get settings_network_validation_usernameColon =>
+      'De gebruikersnaam mag geen dubbele punt bevatten';
+
+  @override
+  String get settings_network_validation_usernameSemicolon =>
+      'De gebruikersnaam mag geen puntkomma bevatten';
+
+  @override
+  String get settings_network_validation_usernameWhitespace =>
+      'De gebruikersnaam mag niet met een spatie beginnen of eindigen';
+
+  @override
+  String get settings_network_validation_passwordSemicolon =>
+      'Het wachtwoord mag geen puntkomma bevatten';
+
+  @override
+  String get settings_network_validation_passwordWhitespace =>
+      'Het wachtwoord mag niet met een spatie beginnen of eindigen';
+
+  @override
+  String get settings_network_validation_tooLong => 'Maximaal 255 bytes';
+
+  @override
+  String get settings_network_test_button => 'Verbinding testen';
+
+  @override
+  String get settings_network_test_running => 'Bezig met testen';
+
+  @override
+  String settings_network_test_successProxy(
+    String endpoint,
+    String type,
+    int ms,
+  ) {
+    return 'Verbonden via $endpoint ($type) in $ms ms';
+  }
+
+  @override
+  String settings_network_test_successDirect(int ms) {
+    return 'Rechtstreeks verbonden in $ms ms';
+  }
+
+  @override
+  String settings_network_test_unreachable(String endpoint) {
+    return '$endpoint is niet bereikbaar. Controleer de host en poort.';
+  }
+
+  @override
+  String get settings_network_test_authRejected =>
+      'De proxy heeft de gebruikersnaam of het wachtwoord geweigerd.';
+
+  @override
+  String get settings_network_test_authRequiredSystem =>
+      'Deze proxy vereist een gebruikersnaam en wachtwoord. Kies Handmatig en voer ze in.';
+
+  @override
+  String get settings_network_test_tls =>
+      'Beveiligde verbinding mislukt. Je netwerk inspecteert mogelijk HTTPS-verkeer; het certificaat daarvan moet op dit apparaat vertrouwd zijn.';
+
+  @override
+  String get settings_network_test_timeout =>
+      'Er is een time-out opgetreden bij de verbinding.';
+
+  @override
+  String settings_network_test_failed(String detail) {
+    return 'Verbinding mislukt: $detail. Het foutopsporingslogboek bevat de volledige fout.';
+  }
+
+  @override
+  String get settings_section_network_subtitle => 'Proxyserver';
+
+  @override
+  String get settings_section_network_title => 'Netwerk';
+
+  @override
   String get settings_section_notifications_subtitle =>
       'Onderhoudsherinneringen';
 

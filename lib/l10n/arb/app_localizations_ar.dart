@@ -24619,6 +24619,188 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_section_manage_title => 'الإدارة';
 
   @override
+  String get settings_network_mode_header => 'الوكيل';
+
+  @override
+  String get settings_network_mode_system => 'وكيل النظام';
+
+  @override
+  String get settings_network_mode_system_subtitle =>
+      'استخدام الوكيل المضبوط في إعدادات الشبكة على جهازك';
+
+  @override
+  String get settings_network_mode_manual => 'يدوي';
+
+  @override
+  String get settings_network_mode_manual_subtitle => 'إدخال خادم وكيل';
+
+  @override
+  String get settings_network_mode_none => 'بدون وكيل';
+
+  @override
+  String get settings_network_mode_none_subtitle => 'الاتصال مباشرة دائماً';
+
+  @override
+  String get settings_network_status_detecting =>
+      'جارٍ التحقق من إعدادات الوكيل على هذا الجهاز';
+
+  @override
+  String get settings_network_status_none =>
+      'لا يوجد وكيل مضبوط على هذا الجهاز';
+
+  @override
+  String settings_network_status_fixed(String endpoint) {
+    return 'يستخدم $endpoint';
+  }
+
+  @override
+  String settings_network_status_fixedPac(String endpoint) {
+    return 'يستخدم $endpoint (من الإعداد التلقائي)';
+  }
+
+  @override
+  String settings_network_status_fixedSocks(String endpoint) {
+    return 'يستخدم $endpoint (SOCKS5)';
+  }
+
+  @override
+  String get settings_network_status_pacUnsupported =>
+      'الإعداد التلقائي للوكيل غير مدعوم على هذا الجهاز. اختر يدوي وأدخل الوكيل.';
+
+  @override
+  String get settings_network_status_pacFailed =>
+      'تعذّرت قراءة الإعداد التلقائي للوكيل. اختر يدوي وأدخل الوكيل.';
+
+  @override
+  String get settings_network_status_error =>
+      'تعذّرت قراءة إعدادات الوكيل على هذا الجهاز.';
+
+  @override
+  String get settings_network_status_refresh => 'التحقق مرة أخرى';
+
+  @override
+  String get settings_network_manual_typeHttp => 'HTTP';
+
+  @override
+  String get settings_network_manual_typeSocks => 'SOCKS5';
+
+  @override
+  String get settings_network_manual_host => 'المضيف';
+
+  @override
+  String get settings_network_manual_port => 'المنفذ';
+
+  @override
+  String get settings_network_manual_username => 'اسم المستخدم (اختياري)';
+
+  @override
+  String get settings_network_manual_password => 'كلمة المرور (اختيارية)';
+
+  @override
+  String get settings_network_manual_showPassword => 'إظهار كلمة المرور';
+
+  @override
+  String get settings_network_manual_hidePassword => 'إخفاء كلمة المرور';
+
+  @override
+  String get settings_network_manual_save => 'حفظ';
+
+  @override
+  String get settings_network_manual_saved => 'تم حفظ إعدادات الوكيل';
+
+  @override
+  String get settings_network_manual_saveFailed => 'تعذّر حفظ إعدادات الوكيل.';
+
+  @override
+  String get settings_network_manual_nativeNote =>
+      'تستخدم شاشات تسجيل الدخول التي يوفرها نظام التشغيل وكيلَ النظام.';
+
+  @override
+  String get settings_network_validation_hostRequired => 'أدخل مضيف الوكيل';
+
+  @override
+  String get settings_network_validation_portInvalid =>
+      'أدخل منفذاً من 1 إلى 65535';
+
+  @override
+  String get settings_network_validation_passwordRequired =>
+      'أدخل كلمة المرور لاسم المستخدم هذا';
+
+  @override
+  String get settings_network_validation_usernameColon =>
+      'لا يمكن أن يحتوي اسم المستخدم على نقطتين';
+
+  @override
+  String get settings_network_validation_usernameSemicolon =>
+      'لا يمكن أن يحتوي اسم المستخدم على فاصلة منقوطة';
+
+  @override
+  String get settings_network_validation_usernameWhitespace =>
+      'لا يمكن أن يبدأ اسم المستخدم بمسافة أو ينتهي بها';
+
+  @override
+  String get settings_network_validation_passwordSemicolon =>
+      'لا يمكن أن تحتوي كلمة المرور على فاصلة منقوطة';
+
+  @override
+  String get settings_network_validation_passwordWhitespace =>
+      'لا يمكن أن تبدأ كلمة المرور بمسافة أو تنتهي بها';
+
+  @override
+  String get settings_network_validation_tooLong => 'يجب ألا يتجاوز 255 بايت';
+
+  @override
+  String get settings_network_test_button => 'اختبار الاتصال';
+
+  @override
+  String get settings_network_test_running => 'جارٍ الاختبار';
+
+  @override
+  String settings_network_test_successProxy(
+    String endpoint,
+    String type,
+    int ms,
+  ) {
+    return 'تم الاتصال عبر $endpoint ($type) خلال $ms مللي ثانية';
+  }
+
+  @override
+  String settings_network_test_successDirect(int ms) {
+    return 'تم الاتصال مباشرة خلال $ms مللي ثانية';
+  }
+
+  @override
+  String settings_network_test_unreachable(String endpoint) {
+    return 'تعذّر الوصول إلى $endpoint. تحقق من المضيف والمنفذ.';
+  }
+
+  @override
+  String get settings_network_test_authRejected =>
+      'رفض الوكيل اسم المستخدم أو كلمة المرور.';
+
+  @override
+  String get settings_network_test_authRequiredSystem =>
+      'يتطلب هذا الوكيل اسم مستخدم وكلمة مرور. اختر يدوي وأدخلهما.';
+
+  @override
+  String get settings_network_test_tls =>
+      'فشل الاتصال الآمن. قد تفحص شبكتك حركة HTTPS؛ ويجب أن يثق هذا الجهاز بشهادتها.';
+
+  @override
+  String get settings_network_test_timeout => 'انتهت مهلة الاتصال.';
+
+  @override
+  String settings_network_test_failed(String detail) {
+    return 'فشل الاتصال: $detail. يحتوي سجل التصحيح على الخطأ كاملاً.';
+  }
+
+  @override
+  String get settings_section_network_subtitle => 'خادم الوكيل';
+
+  @override
+  String get settings_section_network_title => 'الشبكة';
+
+  @override
   String get settings_section_notifications_subtitle => 'تذكيرات الصيانة';
 
   @override

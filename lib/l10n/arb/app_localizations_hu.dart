@@ -24345,6 +24345,194 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_section_manage_title => 'Kezelés';
 
   @override
+  String get settings_network_mode_header => 'Proxy';
+
+  @override
+  String get settings_network_mode_system => 'Rendszerproxy';
+
+  @override
+  String get settings_network_mode_system_subtitle =>
+      'Az eszköz hálózati beállításaiban megadott proxy használata';
+
+  @override
+  String get settings_network_mode_manual => 'Kézi';
+
+  @override
+  String get settings_network_mode_manual_subtitle =>
+      'Proxykiszolgáló megadása';
+
+  @override
+  String get settings_network_mode_none => 'Nincs proxy';
+
+  @override
+  String get settings_network_mode_none_subtitle =>
+      'Mindig közvetlen kapcsolat';
+
+  @override
+  String get settings_network_status_detecting =>
+      'Az eszköz proxybeállításainak ellenőrzése';
+
+  @override
+  String get settings_network_status_none =>
+      'Ezen az eszközön nincs proxy beállítva';
+
+  @override
+  String settings_network_status_fixed(String endpoint) {
+    return 'Használatban: $endpoint';
+  }
+
+  @override
+  String settings_network_status_fixedPac(String endpoint) {
+    return 'Használatban: $endpoint (automatikus konfigurációból)';
+  }
+
+  @override
+  String settings_network_status_fixedSocks(String endpoint) {
+    return 'Használatban: $endpoint (SOCKS5)';
+  }
+
+  @override
+  String get settings_network_status_pacUnsupported =>
+      'Az automatikus proxykonfiguráció ezen az eszközön nem támogatott. Válassza a Kézi lehetőséget, és adja meg a proxyt.';
+
+  @override
+  String get settings_network_status_pacFailed =>
+      'Az automatikus proxykonfiguráció nem olvasható. Válassza a Kézi lehetőséget, és adja meg a proxyt.';
+
+  @override
+  String get settings_network_status_error =>
+      'Az eszköz proxybeállításai nem olvashatók.';
+
+  @override
+  String get settings_network_status_refresh => 'Újraellenőrzés';
+
+  @override
+  String get settings_network_manual_typeHttp => 'HTTP';
+
+  @override
+  String get settings_network_manual_typeSocks => 'SOCKS5';
+
+  @override
+  String get settings_network_manual_host => 'Kiszolgáló';
+
+  @override
+  String get settings_network_manual_port => 'Port';
+
+  @override
+  String get settings_network_manual_username =>
+      'Felhasználónév (nem kötelező)';
+
+  @override
+  String get settings_network_manual_password => 'Jelszó (nem kötelező)';
+
+  @override
+  String get settings_network_manual_showPassword => 'Jelszó megjelenítése';
+
+  @override
+  String get settings_network_manual_hidePassword => 'Jelszó elrejtése';
+
+  @override
+  String get settings_network_manual_save => 'Mentés';
+
+  @override
+  String get settings_network_manual_saved => 'Proxybeállítások mentve';
+
+  @override
+  String get settings_network_manual_saveFailed =>
+      'A proxybeállítások nem menthetők.';
+
+  @override
+  String get settings_network_manual_nativeNote =>
+      'Az operációs rendszer által biztosított bejelentkezési képernyők a rendszerproxyt használják.';
+
+  @override
+  String get settings_network_validation_hostRequired =>
+      'Adja meg a proxykiszolgálót';
+
+  @override
+  String get settings_network_validation_portInvalid =>
+      'Adjon meg egy portot 1 és 65535 között';
+
+  @override
+  String get settings_network_validation_passwordRequired =>
+      'Adja meg a felhasználónévhez tartozó jelszót';
+
+  @override
+  String get settings_network_validation_usernameColon =>
+      'A felhasználónév nem tartalmazhat kettőspontot';
+
+  @override
+  String get settings_network_validation_usernameSemicolon =>
+      'A felhasználónév nem tartalmazhat pontosvesszőt';
+
+  @override
+  String get settings_network_validation_usernameWhitespace =>
+      'A felhasználónév nem kezdődhet és nem végződhet szóközzel';
+
+  @override
+  String get settings_network_validation_passwordSemicolon =>
+      'A jelszó nem tartalmazhat pontosvesszőt';
+
+  @override
+  String get settings_network_validation_passwordWhitespace =>
+      'A jelszó nem kezdődhet és nem végződhet szóközzel';
+
+  @override
+  String get settings_network_validation_tooLong => 'Legfeljebb 255 bájt lehet';
+
+  @override
+  String get settings_network_test_button => 'Kapcsolat tesztelése';
+
+  @override
+  String get settings_network_test_running => 'Tesztelés';
+
+  @override
+  String settings_network_test_successProxy(
+    String endpoint,
+    String type,
+    int ms,
+  ) {
+    return 'Kapcsolódva ezen keresztül: $endpoint ($type), $ms ms alatt';
+  }
+
+  @override
+  String settings_network_test_successDirect(int ms) {
+    return 'Közvetlen kapcsolat $ms ms alatt';
+  }
+
+  @override
+  String settings_network_test_unreachable(String endpoint) {
+    return '$endpoint nem érhető el. Ellenőrizze a kiszolgálót és a portot.';
+  }
+
+  @override
+  String get settings_network_test_authRejected =>
+      'A proxy elutasította a felhasználónevet vagy a jelszót.';
+
+  @override
+  String get settings_network_test_authRequiredSystem =>
+      'Ez a proxy felhasználónevet és jelszót kér. Válassza a Kézi lehetőséget, és adja meg őket.';
+
+  @override
+  String get settings_network_test_tls =>
+      'A biztonságos kapcsolat sikertelen. Lehet, hogy a hálózat ellenőrzi a HTTPS-forgalmat; a tanúsítványának megbízhatónak kell lennie ezen az eszközön.';
+
+  @override
+  String get settings_network_test_timeout =>
+      'A kapcsolat túllépte az időkorlátot.';
+
+  @override
+  String settings_network_test_failed(String detail) {
+    return 'A kapcsolat sikertelen: $detail. A hibakeresési napló tartalmazza a teljes hibát.';
+  }
+
+  @override
+  String get settings_section_network_subtitle => 'Proxykiszolgáló';
+
+  @override
+  String get settings_section_network_title => 'Hálózat';
+
+  @override
   String get settings_section_notifications_subtitle => 'Szerviz emlékeztetők';
 
   @override

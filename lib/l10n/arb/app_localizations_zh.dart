@@ -23089,6 +23089,174 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_section_manage_title => '管理';
 
   @override
+  String get settings_network_mode_header => '代理';
+
+  @override
+  String get settings_network_mode_system => '系统代理';
+
+  @override
+  String get settings_network_mode_system_subtitle => '使用设备网络设置中配置的代理';
+
+  @override
+  String get settings_network_mode_manual => '手动';
+
+  @override
+  String get settings_network_mode_manual_subtitle => '输入代理服务器';
+
+  @override
+  String get settings_network_mode_none => '不使用代理';
+
+  @override
+  String get settings_network_mode_none_subtitle => '始终直接连接';
+
+  @override
+  String get settings_network_status_detecting => '正在检查此设备的代理设置';
+
+  @override
+  String get settings_network_status_none => '此设备未配置代理';
+
+  @override
+  String settings_network_status_fixed(String endpoint) {
+    return '正在使用 $endpoint';
+  }
+
+  @override
+  String settings_network_status_fixedPac(String endpoint) {
+    return '正在使用 $endpoint（来自自动配置）';
+  }
+
+  @override
+  String settings_network_status_fixedSocks(String endpoint) {
+    return '正在使用 $endpoint（SOCKS5）';
+  }
+
+  @override
+  String get settings_network_status_pacUnsupported =>
+      '此设备不支持自动代理配置。请选择手动并输入代理。';
+
+  @override
+  String get settings_network_status_pacFailed => '无法读取自动代理配置。请选择手动并输入代理。';
+
+  @override
+  String get settings_network_status_error => '无法读取此设备的代理设置。';
+
+  @override
+  String get settings_network_status_refresh => '重新检查';
+
+  @override
+  String get settings_network_manual_typeHttp => 'HTTP';
+
+  @override
+  String get settings_network_manual_typeSocks => 'SOCKS5';
+
+  @override
+  String get settings_network_manual_host => '主机';
+
+  @override
+  String get settings_network_manual_port => '端口';
+
+  @override
+  String get settings_network_manual_username => '用户名（可选）';
+
+  @override
+  String get settings_network_manual_password => '密码（可选）';
+
+  @override
+  String get settings_network_manual_showPassword => '显示密码';
+
+  @override
+  String get settings_network_manual_hidePassword => '隐藏密码';
+
+  @override
+  String get settings_network_manual_save => '保存';
+
+  @override
+  String get settings_network_manual_saved => '代理设置已保存';
+
+  @override
+  String get settings_network_manual_saveFailed => '无法保存代理设置。';
+
+  @override
+  String get settings_network_manual_nativeNote => '操作系统提供的登录界面使用系统代理。';
+
+  @override
+  String get settings_network_validation_hostRequired => '请输入代理主机';
+
+  @override
+  String get settings_network_validation_portInvalid => '请输入 1 到 65535 之间的端口';
+
+  @override
+  String get settings_network_validation_passwordRequired => '请输入此用户名的密码';
+
+  @override
+  String get settings_network_validation_usernameColon => '用户名不能包含冒号';
+
+  @override
+  String get settings_network_validation_usernameSemicolon => '用户名不能包含分号';
+
+  @override
+  String get settings_network_validation_usernameWhitespace => '用户名不能以空格开头或结尾';
+
+  @override
+  String get settings_network_validation_passwordSemicolon => '密码不能包含分号';
+
+  @override
+  String get settings_network_validation_passwordWhitespace => '密码不能以空格开头或结尾';
+
+  @override
+  String get settings_network_validation_tooLong => '不能超过 255 字节';
+
+  @override
+  String get settings_network_test_button => '测试连接';
+
+  @override
+  String get settings_network_test_running => '正在测试';
+
+  @override
+  String settings_network_test_successProxy(
+    String endpoint,
+    String type,
+    int ms,
+  ) {
+    return '已通过 $endpoint（$type）连接，用时 $ms 毫秒';
+  }
+
+  @override
+  String settings_network_test_successDirect(int ms) {
+    return '已直接连接，用时 $ms 毫秒';
+  }
+
+  @override
+  String settings_network_test_unreachable(String endpoint) {
+    return '无法连接到 $endpoint。请检查主机和端口。';
+  }
+
+  @override
+  String get settings_network_test_authRejected => '代理拒绝了用户名或密码。';
+
+  @override
+  String get settings_network_test_authRequiredSystem =>
+      '此代理需要用户名和密码。请选择手动并输入。';
+
+  @override
+  String get settings_network_test_tls =>
+      '安全连接失败。你的网络可能会检查 HTTPS 流量；此设备必须信任其证书。';
+
+  @override
+  String get settings_network_test_timeout => '连接超时。';
+
+  @override
+  String settings_network_test_failed(String detail) {
+    return '连接失败：$detail。调试日志中有完整的错误信息。';
+  }
+
+  @override
+  String get settings_section_network_subtitle => '代理服务器';
+
+  @override
+  String get settings_section_network_title => '网络';
+
+  @override
   String get settings_section_notifications_subtitle => '维护提醒';
 
   @override

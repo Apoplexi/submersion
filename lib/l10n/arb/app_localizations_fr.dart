@@ -24523,6 +24523,192 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_section_manage_title => 'Gestion';
 
   @override
+  String get settings_network_mode_header => 'Proxy';
+
+  @override
+  String get settings_network_mode_system => 'Proxy système';
+
+  @override
+  String get settings_network_mode_system_subtitle =>
+      'Utiliser le proxy configuré dans les réglages réseau de votre appareil';
+
+  @override
+  String get settings_network_mode_manual => 'Manuel';
+
+  @override
+  String get settings_network_mode_manual_subtitle => 'Saisir un serveur proxy';
+
+  @override
+  String get settings_network_mode_none => 'Aucun proxy';
+
+  @override
+  String get settings_network_mode_none_subtitle =>
+      'Toujours se connecter directement';
+
+  @override
+  String get settings_network_status_detecting =>
+      'Vérification des réglages proxy de cet appareil';
+
+  @override
+  String get settings_network_status_none =>
+      'Aucun proxy configuré sur cet appareil';
+
+  @override
+  String settings_network_status_fixed(String endpoint) {
+    return 'Utilise $endpoint';
+  }
+
+  @override
+  String settings_network_status_fixedPac(String endpoint) {
+    return 'Utilise $endpoint (configuration automatique)';
+  }
+
+  @override
+  String settings_network_status_fixedSocks(String endpoint) {
+    return 'Utilise $endpoint (SOCKS5)';
+  }
+
+  @override
+  String get settings_network_status_pacUnsupported =>
+      'La configuration automatique du proxy n\'est pas prise en charge sur cet appareil. Choisissez Manuel et saisissez le proxy.';
+
+  @override
+  String get settings_network_status_pacFailed =>
+      'La configuration automatique du proxy n\'a pas pu être lue. Choisissez Manuel et saisissez le proxy.';
+
+  @override
+  String get settings_network_status_error =>
+      'Les réglages proxy de cet appareil n\'ont pas pu être lus.';
+
+  @override
+  String get settings_network_status_refresh => 'Vérifier à nouveau';
+
+  @override
+  String get settings_network_manual_typeHttp => 'HTTP';
+
+  @override
+  String get settings_network_manual_typeSocks => 'SOCKS5';
+
+  @override
+  String get settings_network_manual_host => 'Hôte';
+
+  @override
+  String get settings_network_manual_port => 'Port';
+
+  @override
+  String get settings_network_manual_username =>
+      'Nom d\'utilisateur (facultatif)';
+
+  @override
+  String get settings_network_manual_password => 'Mot de passe (facultatif)';
+
+  @override
+  String get settings_network_manual_showPassword => 'Afficher le mot de passe';
+
+  @override
+  String get settings_network_manual_hidePassword => 'Masquer le mot de passe';
+
+  @override
+  String get settings_network_manual_save => 'Enregistrer';
+
+  @override
+  String get settings_network_manual_saved => 'Réglages proxy enregistrés';
+
+  @override
+  String get settings_network_manual_saveFailed =>
+      'Impossible d\'enregistrer les réglages proxy.';
+
+  @override
+  String get settings_network_manual_nativeNote =>
+      'Les écrans de connexion fournis par le système d\'exploitation utilisent le proxy système.';
+
+  @override
+  String get settings_network_validation_hostRequired =>
+      'Saisissez l\'hôte du proxy';
+
+  @override
+  String get settings_network_validation_portInvalid =>
+      'Saisissez un port entre 1 et 65535';
+
+  @override
+  String get settings_network_validation_passwordRequired =>
+      'Saisissez le mot de passe de ce nom d\'utilisateur';
+
+  @override
+  String get settings_network_validation_usernameColon =>
+      'Le nom d\'utilisateur ne peut pas contenir de deux-points';
+
+  @override
+  String get settings_network_validation_usernameSemicolon =>
+      'Le nom d\'utilisateur ne peut pas contenir de point-virgule';
+
+  @override
+  String get settings_network_validation_usernameWhitespace =>
+      'Le nom d\'utilisateur ne peut pas commencer ni se terminer par une espace';
+
+  @override
+  String get settings_network_validation_passwordSemicolon =>
+      'Le mot de passe ne peut pas contenir de point-virgule';
+
+  @override
+  String get settings_network_validation_passwordWhitespace =>
+      'Le mot de passe ne peut pas commencer ni se terminer par une espace';
+
+  @override
+  String get settings_network_validation_tooLong => '255 octets au maximum';
+
+  @override
+  String get settings_network_test_button => 'Tester la connexion';
+
+  @override
+  String get settings_network_test_running => 'Test en cours';
+
+  @override
+  String settings_network_test_successProxy(
+    String endpoint,
+    String type,
+    int ms,
+  ) {
+    return 'Connecté via $endpoint ($type) en $ms ms';
+  }
+
+  @override
+  String settings_network_test_successDirect(int ms) {
+    return 'Connecté directement en $ms ms';
+  }
+
+  @override
+  String settings_network_test_unreachable(String endpoint) {
+    return 'Impossible de joindre $endpoint. Vérifiez l\'hôte et le port.';
+  }
+
+  @override
+  String get settings_network_test_authRejected =>
+      'Le proxy a refusé le nom d\'utilisateur ou le mot de passe.';
+
+  @override
+  String get settings_network_test_authRequiredSystem =>
+      'Ce proxy exige un nom d\'utilisateur et un mot de passe. Choisissez Manuel et saisissez-les.';
+
+  @override
+  String get settings_network_test_tls =>
+      'La connexion sécurisée a échoué. Votre réseau inspecte peut-être le trafic HTTPS ; son certificat doit être approuvé par cet appareil.';
+
+  @override
+  String get settings_network_test_timeout => 'La connexion a expiré.';
+
+  @override
+  String settings_network_test_failed(String detail) {
+    return 'La connexion a échoué : $detail. Le journal de débogage contient l\'erreur complète.';
+  }
+
+  @override
+  String get settings_section_network_subtitle => 'Serveur proxy';
+
+  @override
+  String get settings_section_network_title => 'Réseau';
+
+  @override
   String get settings_section_notifications_subtitle => 'Rappels d\'entretien';
 
   @override

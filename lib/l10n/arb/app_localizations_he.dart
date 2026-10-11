@@ -23823,6 +23823,189 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_section_manage_title => 'ניהול';
 
   @override
+  String get settings_network_mode_header => 'פרוקסי';
+
+  @override
+  String get settings_network_mode_system => 'פרוקסי מערכת';
+
+  @override
+  String get settings_network_mode_system_subtitle =>
+      'שימוש בפרוקסי שהוגדר בהגדרות הרשת של המכשיר';
+
+  @override
+  String get settings_network_mode_manual => 'ידני';
+
+  @override
+  String get settings_network_mode_manual_subtitle => 'הזנת שרת פרוקסי';
+
+  @override
+  String get settings_network_mode_none => 'ללא פרוקסי';
+
+  @override
+  String get settings_network_mode_none_subtitle => 'תמיד להתחבר ישירות';
+
+  @override
+  String get settings_network_status_detecting =>
+      'בודק את הגדרות הפרוקסי של המכשיר';
+
+  @override
+  String get settings_network_status_none => 'לא הוגדר פרוקסי במכשיר זה';
+
+  @override
+  String settings_network_status_fixed(String endpoint) {
+    return 'בשימוש: $endpoint';
+  }
+
+  @override
+  String settings_network_status_fixedPac(String endpoint) {
+    return 'בשימוש: $endpoint (מהגדרה אוטומטית)';
+  }
+
+  @override
+  String settings_network_status_fixedSocks(String endpoint) {
+    return 'בשימוש: $endpoint (SOCKS5)';
+  }
+
+  @override
+  String get settings_network_status_pacUnsupported =>
+      'הגדרת פרוקסי אוטומטית אינה נתמכת במכשיר זה. יש לבחור ידני ולהזין את הפרוקסי.';
+
+  @override
+  String get settings_network_status_pacFailed =>
+      'לא ניתן לקרוא את הגדרת הפרוקסי האוטומטית. יש לבחור ידני ולהזין את הפרוקסי.';
+
+  @override
+  String get settings_network_status_error =>
+      'לא ניתן לקרוא את הגדרות הפרוקסי של המכשיר.';
+
+  @override
+  String get settings_network_status_refresh => 'בדיקה חוזרת';
+
+  @override
+  String get settings_network_manual_typeHttp => 'HTTP';
+
+  @override
+  String get settings_network_manual_typeSocks => 'SOCKS5';
+
+  @override
+  String get settings_network_manual_host => 'מארח';
+
+  @override
+  String get settings_network_manual_port => 'פורט';
+
+  @override
+  String get settings_network_manual_username => 'שם משתמש (אופציונלי)';
+
+  @override
+  String get settings_network_manual_password => 'סיסמה (אופציונלי)';
+
+  @override
+  String get settings_network_manual_showPassword => 'הצגת סיסמה';
+
+  @override
+  String get settings_network_manual_hidePassword => 'הסתרת סיסמה';
+
+  @override
+  String get settings_network_manual_save => 'שמירה';
+
+  @override
+  String get settings_network_manual_saved => 'הגדרות הפרוקסי נשמרו';
+
+  @override
+  String get settings_network_manual_saveFailed =>
+      'לא ניתן לשמור את הגדרות הפרוקסי.';
+
+  @override
+  String get settings_network_manual_nativeNote =>
+      'מסכי התחברות שמספקת מערכת ההפעלה משתמשים בפרוקסי המערכת.';
+
+  @override
+  String get settings_network_validation_hostRequired =>
+      'יש להזין את מארח הפרוקסי';
+
+  @override
+  String get settings_network_validation_portInvalid =>
+      'יש להזין פורט בין 1 ל-65535';
+
+  @override
+  String get settings_network_validation_passwordRequired =>
+      'יש להזין את הסיסמה של שם המשתמש';
+
+  @override
+  String get settings_network_validation_usernameColon =>
+      'שם המשתמש לא יכול להכיל נקודתיים';
+
+  @override
+  String get settings_network_validation_usernameSemicolon =>
+      'שם המשתמש לא יכול להכיל נקודה-פסיק';
+
+  @override
+  String get settings_network_validation_usernameWhitespace =>
+      'שם המשתמש לא יכול להתחיל או להסתיים ברווח';
+
+  @override
+  String get settings_network_validation_passwordSemicolon =>
+      'הסיסמה לא יכולה להכיל נקודה-פסיק';
+
+  @override
+  String get settings_network_validation_passwordWhitespace =>
+      'הסיסמה לא יכולה להתחיל או להסתיים ברווח';
+
+  @override
+  String get settings_network_validation_tooLong => 'עד 255 בתים';
+
+  @override
+  String get settings_network_test_button => 'בדיקת חיבור';
+
+  @override
+  String get settings_network_test_running => 'בודק';
+
+  @override
+  String settings_network_test_successProxy(
+    String endpoint,
+    String type,
+    int ms,
+  ) {
+    return 'מחובר דרך $endpoint ($type) תוך $ms אלפיות שנייה';
+  }
+
+  @override
+  String settings_network_test_successDirect(int ms) {
+    return 'מחובר ישירות תוך $ms אלפיות שנייה';
+  }
+
+  @override
+  String settings_network_test_unreachable(String endpoint) {
+    return 'לא ניתן להגיע אל $endpoint. יש לבדוק את המארח והפורט.';
+  }
+
+  @override
+  String get settings_network_test_authRejected =>
+      'הפרוקסי דחה את שם המשתמש או הסיסמה.';
+
+  @override
+  String get settings_network_test_authRequiredSystem =>
+      'פרוקסי זה דורש שם משתמש וסיסמה. יש לבחור ידני ולהזין אותם.';
+
+  @override
+  String get settings_network_test_tls =>
+      'החיבור המאובטח נכשל. ייתכן שהרשת בודקת תעבורת HTTPS; המכשיר צריך לסמוך על האישור שלה.';
+
+  @override
+  String get settings_network_test_timeout => 'תם הזמן הקצוב לחיבור.';
+
+  @override
+  String settings_network_test_failed(String detail) {
+    return 'החיבור נכשל: $detail. יומן הניפוי מכיל את השגיאה המלאה.';
+  }
+
+  @override
+  String get settings_section_network_subtitle => 'שרת פרוקסי';
+
+  @override
+  String get settings_section_network_title => 'רשת';
+
+  @override
   String get settings_section_notifications_subtitle => 'תזכורות תחזוקה';
 
   @override
