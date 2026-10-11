@@ -156,6 +156,9 @@ class _FocusResultsState extends ConsumerState<FocusResults> {
                                       ),
                                     ),
                               dateFormat: ref.watch(dateFormatProvider),
+                              gapThreshold: ref.watch(
+                                trendGapThresholdProvider,
+                              ),
                               valueFormatter: (v) =>
                                   metricUnits.format(v, l10n),
                               yAxisFormatter: (v) =>
