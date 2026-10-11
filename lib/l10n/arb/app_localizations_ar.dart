@@ -234,6 +234,128 @@ class AppLocalizationsAr extends AppLocalizations {
   String get connections_highlight_recency => 'الحداثة';
 
   @override
+  String get connections_display_title => 'العرض';
+
+  @override
+  String get connections_layout_title => 'التخطيط';
+
+  @override
+  String get connections_layout_web => 'شبكة';
+
+  @override
+  String get connections_layout_radial => 'شعاعي';
+
+  @override
+  String get connections_layout_circle => 'دائرة';
+
+  @override
+  String get connections_layout_columns => 'أعمدة';
+
+  @override
+  String get connections_layout_clusters => 'تجمعات';
+
+  @override
+  String get connections_layout_timeline => 'خط زمني';
+
+  @override
+  String get connections_labels_title => 'التسميات';
+
+  @override
+  String get connections_labels_auto => 'تلقائي';
+
+  @override
+  String get connections_labels_all => 'الكل';
+
+  @override
+  String get connections_labels_off => 'إيقاف';
+
+  @override
+  String get connections_nodeSize_title => 'حجم العقدة';
+
+  @override
+  String get connections_nodeSize_byDives => 'حسب الغوصات';
+
+  @override
+  String get connections_nodeSize_uniform => 'موحّد';
+
+  @override
+  String get connections_edges_title => 'الخطوط';
+
+  @override
+  String get connections_edges_weighted => 'مرجّحة';
+
+  @override
+  String get connections_edges_thin => 'رفيعة';
+
+  @override
+  String get connections_edges_selectedOnly => 'المحدد فقط';
+
+  @override
+  String get connections_hideUnconnected => 'إخفاء غير المرتبط';
+
+  @override
+  String get connections_spacing_title => 'التباعد';
+
+  @override
+  String get connections_spacing_tight => 'متقارب';
+
+  @override
+  String get connections_spacing_spread => 'متباعد';
+
+  @override
+  String get connections_view_tooltip => 'تغيير العرض';
+
+  @override
+  String get connections_view_graph => 'المخطط';
+
+  @override
+  String get connections_view_pairs => 'أزواج';
+
+  @override
+  String get connections_view_entities => 'العناصر';
+
+  @override
+  String get connections_view_matrix => 'مصفوفة';
+
+  @override
+  String get connections_table_entity => 'العنصر';
+
+  @override
+  String get connections_table_linkedWith => 'مرتبط بـ';
+
+  @override
+  String get connections_table_sharedDives => 'الغوصات المشتركة';
+
+  @override
+  String get connections_table_lastShared => 'آخر غوصة مشتركة';
+
+  @override
+  String get connections_table_firstShared => 'أول غوصة مشتركة';
+
+  @override
+  String get connections_table_name => 'الاسم';
+
+  @override
+  String get connections_table_kind => 'النوع';
+
+  @override
+  String get connections_table_dives => 'الغوصات';
+
+  @override
+  String get connections_table_links => 'الروابط';
+
+  @override
+  String get connections_table_strongest => 'أقوى رابط';
+
+  @override
+  String get connections_table_firstDive => 'أول غوصة';
+
+  @override
+  String connections_matrix_semantics(int rows, int columns, int links) {
+    return 'مصفوفة، الصفوف: $rows، الأعمدة: $columns، الروابط: $links';
+  }
+
+  @override
   String get connections_legend_group => 'اللون: المجموعة';
 
   @override

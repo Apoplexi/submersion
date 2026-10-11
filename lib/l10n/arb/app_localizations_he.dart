@@ -222,6 +222,128 @@ class AppLocalizationsHe extends AppLocalizations {
   String get connections_highlight_recency => 'עדכניות';
 
   @override
+  String get connections_display_title => 'תצוגה';
+
+  @override
+  String get connections_layout_title => 'פריסה';
+
+  @override
+  String get connections_layout_web => 'רשת';
+
+  @override
+  String get connections_layout_radial => 'רדיאלית';
+
+  @override
+  String get connections_layout_circle => 'מעגל';
+
+  @override
+  String get connections_layout_columns => 'עמודות';
+
+  @override
+  String get connections_layout_clusters => 'אשכולות';
+
+  @override
+  String get connections_layout_timeline => 'ציר זמן';
+
+  @override
+  String get connections_labels_title => 'תוויות';
+
+  @override
+  String get connections_labels_auto => 'אוטומטי';
+
+  @override
+  String get connections_labels_all => 'הכול';
+
+  @override
+  String get connections_labels_off => 'כבוי';
+
+  @override
+  String get connections_nodeSize_title => 'גודל צומת';
+
+  @override
+  String get connections_nodeSize_byDives => 'לפי צלילות';
+
+  @override
+  String get connections_nodeSize_uniform => 'אחיד';
+
+  @override
+  String get connections_edges_title => 'קווים';
+
+  @override
+  String get connections_edges_weighted => 'משוקללים';
+
+  @override
+  String get connections_edges_thin => 'דקים';
+
+  @override
+  String get connections_edges_selectedOnly => 'רק הנבחר';
+
+  @override
+  String get connections_hideUnconnected => 'הסתרת פריטים ללא קשרים';
+
+  @override
+  String get connections_spacing_title => 'ריווח';
+
+  @override
+  String get connections_spacing_tight => 'צפוף';
+
+  @override
+  String get connections_spacing_spread => 'מרווח';
+
+  @override
+  String get connections_view_tooltip => 'החלפת תצוגה';
+
+  @override
+  String get connections_view_graph => 'גרף';
+
+  @override
+  String get connections_view_pairs => 'זוגות';
+
+  @override
+  String get connections_view_entities => 'פריטים';
+
+  @override
+  String get connections_view_matrix => 'מטריצה';
+
+  @override
+  String get connections_table_entity => 'פריט';
+
+  @override
+  String get connections_table_linkedWith => 'מקושר אל';
+
+  @override
+  String get connections_table_sharedDives => 'צלילות משותפות';
+
+  @override
+  String get connections_table_lastShared => 'משותפת אחרונה';
+
+  @override
+  String get connections_table_firstShared => 'משותפת ראשונה';
+
+  @override
+  String get connections_table_name => 'שם';
+
+  @override
+  String get connections_table_kind => 'סוג';
+
+  @override
+  String get connections_table_dives => 'צלילות';
+
+  @override
+  String get connections_table_links => 'קשרים';
+
+  @override
+  String get connections_table_strongest => 'הקשר החזק ביותר';
+
+  @override
+  String get connections_table_firstDive => 'צלילה ראשונה';
+
+  @override
+  String connections_matrix_semantics(int rows, int columns, int links) {
+    return 'מטריצה, שורות: $rows, עמודות: $columns, קשרים: $links';
+  }
+
+  @override
   String get connections_legend_group => 'צבע: קבוצה';
 
   @override

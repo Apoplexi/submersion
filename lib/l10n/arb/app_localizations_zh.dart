@@ -220,6 +220,128 @@ class AppLocalizationsZh extends AppLocalizations {
   String get connections_highlight_recency => '新近程度';
 
   @override
+  String get connections_display_title => '显示';
+
+  @override
+  String get connections_layout_title => '布局';
+
+  @override
+  String get connections_layout_web => '网状';
+
+  @override
+  String get connections_layout_radial => '放射状';
+
+  @override
+  String get connections_layout_circle => '环形';
+
+  @override
+  String get connections_layout_columns => '分列';
+
+  @override
+  String get connections_layout_clusters => '聚类';
+
+  @override
+  String get connections_layout_timeline => '时间线';
+
+  @override
+  String get connections_labels_title => '标签';
+
+  @override
+  String get connections_labels_auto => '自动';
+
+  @override
+  String get connections_labels_all => '全部';
+
+  @override
+  String get connections_labels_off => '关闭';
+
+  @override
+  String get connections_nodeSize_title => '节点大小';
+
+  @override
+  String get connections_nodeSize_byDives => '按潜水次数';
+
+  @override
+  String get connections_nodeSize_uniform => '统一';
+
+  @override
+  String get connections_edges_title => '连线';
+
+  @override
+  String get connections_edges_weighted => '加权';
+
+  @override
+  String get connections_edges_thin => '细线';
+
+  @override
+  String get connections_edges_selectedOnly => '仅选中项';
+
+  @override
+  String get connections_hideUnconnected => '隐藏无关联项';
+
+  @override
+  String get connections_spacing_title => '间距';
+
+  @override
+  String get connections_spacing_tight => '紧凑';
+
+  @override
+  String get connections_spacing_spread => '宽松';
+
+  @override
+  String get connections_view_tooltip => '切换视图';
+
+  @override
+  String get connections_view_graph => '图';
+
+  @override
+  String get connections_view_pairs => '配对';
+
+  @override
+  String get connections_view_entities => '条目';
+
+  @override
+  String get connections_view_matrix => '矩阵';
+
+  @override
+  String get connections_table_entity => '条目';
+
+  @override
+  String get connections_table_linkedWith => '关联对象';
+
+  @override
+  String get connections_table_sharedDives => '共同潜水';
+
+  @override
+  String get connections_table_lastShared => '最近共同';
+
+  @override
+  String get connections_table_firstShared => '首次共同';
+
+  @override
+  String get connections_table_name => '名称';
+
+  @override
+  String get connections_table_kind => '类型';
+
+  @override
+  String get connections_table_dives => '潜水';
+
+  @override
+  String get connections_table_links => '关联';
+
+  @override
+  String get connections_table_strongest => '最强关联';
+
+  @override
+  String get connections_table_firstDive => '首次潜水';
+
+  @override
+  String connections_matrix_semantics(int rows, int columns, int links) {
+    return '矩阵，$rows 行，$columns 列，$links 条关联';
+  }
+
+  @override
   String get connections_legend_group => '颜色：群组';
 
   @override

@@ -222,6 +222,128 @@ class AppLocalizationsIt extends AppLocalizations {
   String get connections_highlight_recency => 'Attualità';
 
   @override
+  String get connections_display_title => 'Visualizzazione';
+
+  @override
+  String get connections_layout_title => 'Disposizione';
+
+  @override
+  String get connections_layout_web => 'Rete';
+
+  @override
+  String get connections_layout_radial => 'Radiale';
+
+  @override
+  String get connections_layout_circle => 'Cerchio';
+
+  @override
+  String get connections_layout_columns => 'Colonne';
+
+  @override
+  String get connections_layout_clusters => 'Raggruppamenti';
+
+  @override
+  String get connections_layout_timeline => 'Cronologia';
+
+  @override
+  String get connections_labels_title => 'Etichette';
+
+  @override
+  String get connections_labels_auto => 'Auto';
+
+  @override
+  String get connections_labels_all => 'Tutte';
+
+  @override
+  String get connections_labels_off => 'Nessuna';
+
+  @override
+  String get connections_nodeSize_title => 'Dimensione nodi';
+
+  @override
+  String get connections_nodeSize_byDives => 'Per immersioni';
+
+  @override
+  String get connections_nodeSize_uniform => 'Uniforme';
+
+  @override
+  String get connections_edges_title => 'Linee';
+
+  @override
+  String get connections_edges_weighted => 'Ponderate';
+
+  @override
+  String get connections_edges_thin => 'Sottili';
+
+  @override
+  String get connections_edges_selectedOnly => 'Solo selezione';
+
+  @override
+  String get connections_hideUnconnected => 'Nascondi non collegati';
+
+  @override
+  String get connections_spacing_title => 'Spaziatura';
+
+  @override
+  String get connections_spacing_tight => 'Stretta';
+
+  @override
+  String get connections_spacing_spread => 'Ampia';
+
+  @override
+  String get connections_view_tooltip => 'Cambia vista';
+
+  @override
+  String get connections_view_graph => 'Grafo';
+
+  @override
+  String get connections_view_pairs => 'Coppie';
+
+  @override
+  String get connections_view_entities => 'Elementi';
+
+  @override
+  String get connections_view_matrix => 'Matrice';
+
+  @override
+  String get connections_table_entity => 'Elemento';
+
+  @override
+  String get connections_table_linkedWith => 'Collegato con';
+
+  @override
+  String get connections_table_sharedDives => 'Immersioni condivise';
+
+  @override
+  String get connections_table_lastShared => 'Ultima condivisa';
+
+  @override
+  String get connections_table_firstShared => 'Prima condivisa';
+
+  @override
+  String get connections_table_name => 'Nome';
+
+  @override
+  String get connections_table_kind => 'Tipo';
+
+  @override
+  String get connections_table_dives => 'Immersioni';
+
+  @override
+  String get connections_table_links => 'Connessioni';
+
+  @override
+  String get connections_table_strongest => 'Connessione più forte';
+
+  @override
+  String get connections_table_firstDive => 'Prima immersione';
+
+  @override
+  String connections_matrix_semantics(int rows, int columns, int links) {
+    return 'Matrice, righe: $rows, colonne: $columns, connessioni: $links';
+  }
+
+  @override
   String get connections_legend_group => 'Colore: gruppo';
 
   @override

@@ -222,6 +222,128 @@ class AppLocalizationsNl extends AppLocalizations {
   String get connections_highlight_recency => 'Recentheid';
 
   @override
+  String get connections_display_title => 'Weergave';
+
+  @override
+  String get connections_layout_title => 'Indeling';
+
+  @override
+  String get connections_layout_web => 'Web';
+
+  @override
+  String get connections_layout_radial => 'Radiaal';
+
+  @override
+  String get connections_layout_circle => 'Cirkel';
+
+  @override
+  String get connections_layout_columns => 'Kolommen';
+
+  @override
+  String get connections_layout_clusters => 'Clusters';
+
+  @override
+  String get connections_layout_timeline => 'Tijdlijn';
+
+  @override
+  String get connections_labels_title => 'Labels';
+
+  @override
+  String get connections_labels_auto => 'Auto';
+
+  @override
+  String get connections_labels_all => 'Alle';
+
+  @override
+  String get connections_labels_off => 'Uit';
+
+  @override
+  String get connections_nodeSize_title => 'Knooppuntgrootte';
+
+  @override
+  String get connections_nodeSize_byDives => 'Op duiken';
+
+  @override
+  String get connections_nodeSize_uniform => 'Gelijk';
+
+  @override
+  String get connections_edges_title => 'Lijnen';
+
+  @override
+  String get connections_edges_weighted => 'Gewogen';
+
+  @override
+  String get connections_edges_thin => 'Dun';
+
+  @override
+  String get connections_edges_selectedOnly => 'Alleen selectie';
+
+  @override
+  String get connections_hideUnconnected => 'Niet-verbonden verbergen';
+
+  @override
+  String get connections_spacing_title => 'Afstand';
+
+  @override
+  String get connections_spacing_tight => 'Dicht';
+
+  @override
+  String get connections_spacing_spread => 'Ruim';
+
+  @override
+  String get connections_view_tooltip => 'Weergave wijzigen';
+
+  @override
+  String get connections_view_graph => 'Graaf';
+
+  @override
+  String get connections_view_pairs => 'Paren';
+
+  @override
+  String get connections_view_entities => 'Items';
+
+  @override
+  String get connections_view_matrix => 'Matrix';
+
+  @override
+  String get connections_table_entity => 'Item';
+
+  @override
+  String get connections_table_linkedWith => 'Verbonden met';
+
+  @override
+  String get connections_table_sharedDives => 'Gedeelde duiken';
+
+  @override
+  String get connections_table_lastShared => 'Laatst gedeeld';
+
+  @override
+  String get connections_table_firstShared => 'Eerst gedeeld';
+
+  @override
+  String get connections_table_name => 'Naam';
+
+  @override
+  String get connections_table_kind => 'Soort';
+
+  @override
+  String get connections_table_dives => 'Duiken';
+
+  @override
+  String get connections_table_links => 'Verbindingen';
+
+  @override
+  String get connections_table_strongest => 'Sterkste verbinding';
+
+  @override
+  String get connections_table_firstDive => 'Eerste duik';
+
+  @override
+  String connections_matrix_semantics(int rows, int columns, int links) {
+    return 'Matrix, rijen: $rows, kolommen: $columns, verbindingen: $links';
+  }
+
+  @override
   String get connections_legend_group => 'Kleur: groep';
 
   @override

@@ -222,6 +222,128 @@ class AppLocalizationsHu extends AppLocalizations {
   String get connections_highlight_recency => 'Frissesség';
 
   @override
+  String get connections_display_title => 'Megjelenítés';
+
+  @override
+  String get connections_layout_title => 'Elrendezés';
+
+  @override
+  String get connections_layout_web => 'Háló';
+
+  @override
+  String get connections_layout_radial => 'Sugaras';
+
+  @override
+  String get connections_layout_circle => 'Kör';
+
+  @override
+  String get connections_layout_columns => 'Oszlopok';
+
+  @override
+  String get connections_layout_clusters => 'Fürtök';
+
+  @override
+  String get connections_layout_timeline => 'Idővonal';
+
+  @override
+  String get connections_labels_title => 'Feliratok';
+
+  @override
+  String get connections_labels_auto => 'Auto';
+
+  @override
+  String get connections_labels_all => 'Mind';
+
+  @override
+  String get connections_labels_off => 'Ki';
+
+  @override
+  String get connections_nodeSize_title => 'Csomópontméret';
+
+  @override
+  String get connections_nodeSize_byDives => 'Merülések szerint';
+
+  @override
+  String get connections_nodeSize_uniform => 'Egyforma';
+
+  @override
+  String get connections_edges_title => 'Vonalak';
+
+  @override
+  String get connections_edges_weighted => 'Súlyozott';
+
+  @override
+  String get connections_edges_thin => 'Vékony';
+
+  @override
+  String get connections_edges_selectedOnly => 'Csak a kijelölt';
+
+  @override
+  String get connections_hideUnconnected => 'Kapcsolat nélküliek elrejtése';
+
+  @override
+  String get connections_spacing_title => 'Térköz';
+
+  @override
+  String get connections_spacing_tight => 'Szoros';
+
+  @override
+  String get connections_spacing_spread => 'Tág';
+
+  @override
+  String get connections_view_tooltip => 'Nézet váltása';
+
+  @override
+  String get connections_view_graph => 'Gráf';
+
+  @override
+  String get connections_view_pairs => 'Párok';
+
+  @override
+  String get connections_view_entities => 'Elemek';
+
+  @override
+  String get connections_view_matrix => 'Mátrix';
+
+  @override
+  String get connections_table_entity => 'Elem';
+
+  @override
+  String get connections_table_linkedWith => 'Kapcsolódik';
+
+  @override
+  String get connections_table_sharedDives => 'Közös merülések';
+
+  @override
+  String get connections_table_lastShared => 'Utolsó közös';
+
+  @override
+  String get connections_table_firstShared => 'Első közös';
+
+  @override
+  String get connections_table_name => 'Név';
+
+  @override
+  String get connections_table_kind => 'Típus';
+
+  @override
+  String get connections_table_dives => 'Merülések';
+
+  @override
+  String get connections_table_links => 'Kapcsolatok';
+
+  @override
+  String get connections_table_strongest => 'Legerősebb kapcsolat';
+
+  @override
+  String get connections_table_firstDive => 'Első merülés';
+
+  @override
+  String connections_matrix_semantics(int rows, int columns, int links) {
+    return 'Mátrix, sorok: $rows, oszlopok: $columns, kapcsolatok: $links';
+  }
+
+  @override
   String get connections_legend_group => 'Szín: csoport';
 
   @override
