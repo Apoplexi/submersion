@@ -7137,6 +7137,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_label_visibility => '能见度';
 
   @override
+  String get diveLog_edit_visibility_modeRange => '范围';
+
+  @override
+  String get diveLog_edit_visibility_modePrecise => '精确';
+
+  @override
   String get diveLog_edit_label_waterTemp => '水温';
 
   @override
@@ -35751,6 +35757,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String insights_conditions_visibility_legacySuffix(String band) {
     return '$band（测量功能之前记录）';
   }
+
+  @override
+  String get insights_conditions_visibility_spansBands => '跨多个等级';
 
   @override
   String common_selection_countSelected(Object count) {

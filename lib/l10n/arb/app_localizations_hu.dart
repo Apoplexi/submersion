@@ -7483,6 +7483,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_edit_label_visibility => 'Látásviszonyok';
 
   @override
+  String get diveLog_edit_visibility_modeRange => 'Tartomány';
+
+  @override
+  String get diveLog_edit_visibility_modePrecise => 'Pontos';
+
+  @override
   String get diveLog_edit_label_waterTemp => 'Víz hőm.';
 
   @override
@@ -37677,6 +37683,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String insights_conditions_visibility_legacySuffix(String band) {
     return '$band (mérés előtt rögzítve)';
   }
+
+  @override
+  String get insights_conditions_visibility_spansBands => 'Több sávot átfog';
 
   @override
   String common_selection_countSelected(Object count) {

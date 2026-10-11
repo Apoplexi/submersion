@@ -11911,6 +11911,18 @@ abstract class AppLocalizations {
   /// **'Visibility'**
   String get diveLog_edit_label_visibility;
 
+  /// No description provided for @diveLog_edit_visibility_modeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Range'**
+  String get diveLog_edit_visibility_modeRange;
+
+  /// No description provided for @diveLog_edit_visibility_modePrecise.
+  ///
+  /// In en, this message translates to:
+  /// **'Precise'**
+  String get diveLog_edit_visibility_modePrecise;
+
   /// No description provided for @diveLog_edit_label_waterTemp.
   ///
   /// In en, this message translates to:
@@ -59807,6 +59819,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{band} (logged before measurement)'**
   String insights_conditions_visibility_legacySuffix(String band);
+
+  /// No description provided for @insights_conditions_visibility_spansBands.
+  ///
+  /// In en, this message translates to:
+  /// **'Spans bands'**
+  String get insights_conditions_visibility_spansBands;
 
   /// No description provided for @common_selection_countSelected.
   ///

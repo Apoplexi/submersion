@@ -314,5 +314,11 @@ extension RungsFromV231 on AppDatabase {
       await _migrateLegacyDocuments();
     }
     if (from < 277) await reportProgress();
+    // v278: dives.visibility_min_meters / visibility_max_meters (issue
+    // #3226). Columns only; re-asserted in beforeOpen.
+    if (from < 278) {
+      await _assertVisibilityRangeColumns();
+    }
+    if (from < 278) await reportProgress();
   }
 }

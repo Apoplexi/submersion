@@ -4477,6 +4477,8 @@
   "diveLog_edit_label_surfaceConditions": "Surface Conditions",
   "diveLog_edit_label_type": "Type",
   "diveLog_edit_label_visibility": "Visibility",
+  "diveLog_edit_visibility_modeRange": "Range",
+  "diveLog_edit_visibility_modePrecise": "Precise",
   "diveLog_edit_label_waterTemp": "Water Temp",
   "diveLog_edit_label_waterType": "Water Type",
   "diveLog_edit_label_weightName": "Name (optional)",
@@ -23425,6 +23427,7 @@
       }
     }
   },
+  "insights_conditions_visibility_spansBands": "Spans bands",
   "common_selection_countSelected": "{count} selected",
   "common_listCount_shownOfTotal": "{shown} of {total}",
   "@common_listCount_shownOfTotal": {

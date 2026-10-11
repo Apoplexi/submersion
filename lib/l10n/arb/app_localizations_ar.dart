@@ -7605,6 +7605,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_label_visibility => 'الرؤية';
 
   @override
+  String get diveLog_edit_visibility_modeRange => 'نطاق';
+
+  @override
+  String get diveLog_edit_visibility_modePrecise => 'دقيق';
+
+  @override
   String get diveLog_edit_label_waterTemp => 'درجة حرارة الماء';
 
   @override
@@ -38387,6 +38393,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String insights_conditions_visibility_legacySuffix(String band) {
     return '$band (مسجلة قبل القياس)';
   }
+
+  @override
+  String get insights_conditions_visibility_spansBands => 'يمتد عبر عدة فئات';
 
   @override
   String common_selection_countSelected(Object count) {

@@ -7501,6 +7501,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_edit_label_visibility => 'Visibilità';
 
   @override
+  String get diveLog_edit_visibility_modeRange => 'Intervallo';
+
+  @override
+  String get diveLog_edit_visibility_modePrecise => 'Preciso';
+
+  @override
   String get diveLog_edit_label_waterTemp => 'Temp. acqua';
 
   @override
@@ -37885,6 +37891,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String insights_conditions_visibility_legacySuffix(String band) {
     return '$band (registrato prima della misurazione)';
   }
+
+  @override
+  String get insights_conditions_visibility_spansBands => 'Copre più fasce';
 
   @override
   String common_selection_countSelected(Object count) {
