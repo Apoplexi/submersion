@@ -11918,14 +11918,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get divers_edit_bloodTypeLabel => 'Blood Type';
 
   @override
-  String get divers_edit_clearInsuranceExpiryTooltip =>
-      'Clear insurance expiry date';
-
-  @override
-  String get divers_edit_clearMedicalClearanceTooltip =>
-      'Clear medical clearance date';
-
-  @override
   String get divers_edit_contactNameLabel => 'Contact Name';
 
   @override
@@ -11953,45 +11945,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get divers_edit_expiryDateNotSet => 'Not set';
-
-  @override
-  String get divers_edit_expiryDateTitle => 'Expiry Date';
-
-  @override
-  String get divers_edit_insuranceEmergencyPhoneHelper =>
-      'Shown first on your emergency card.';
-
-  @override
-  String get divers_edit_insuranceEmergencyPhoneHint => 'e.g., +1 919 684 9111';
-
-  @override
-  String get divers_edit_insuranceEmergencyPhoneLabel =>
-      '24h Emergency Assistance Number';
-
-  @override
-  String get divers_edit_insurancePhoneLabel => 'Insurance Office Number';
-
-  @override
-  String get divers_edit_insuranceProviderHint => 'e.g., DAN, DiveAssure';
-
-  @override
-  String get divers_edit_insuranceProviderLabel => 'Insurance Provider';
-
-  @override
   String get divers_edit_keepEditingButton => 'Keep Editing';
-
-  @override
-  String get divers_edit_medicalClearanceExpired => 'Expired';
-
-  @override
-  String get divers_edit_medicalClearanceExpiringSoon => 'Expiring Soon';
-
-  @override
-  String get divers_edit_medicalClearanceNotSet => 'Not set';
-
-  @override
-  String get divers_edit_medicalClearanceTitle => 'Medical Clearance Expiry';
 
   @override
   String get divers_edit_medicalNotesLabel => 'Medical Notes';
@@ -12015,9 +11969,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get divers_edit_phoneLabel => 'Phone';
 
   @override
-  String get divers_edit_policyNumberLabel => 'Policy Number';
-
-  @override
   String get divers_edit_primaryContactTitle => 'Primary Contact';
 
   @override
@@ -12031,14 +11982,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get divers_edit_secondaryContactTitle => 'Secondary Contact';
-
-  @override
-  String get divers_edit_selectInsuranceExpiryTooltip =>
-      'Select insurance expiry date';
-
-  @override
-  String get divers_edit_selectMedicalClearanceTooltip =>
-      'Select medical clearance date';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -22877,6 +22820,325 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_buddy => 'Buddy';
+
+  @override
+  String get nav_documents => 'Documents';
+
+  @override
+  String get documents_title => 'Documents';
+
+  @override
+  String get documents_type_insurance => 'Insurance';
+
+  @override
+  String get documents_type_medicalClearance => 'Medical clearance';
+
+  @override
+  String get documents_type_certificationCard => 'Certification card';
+
+  @override
+  String get documents_type_permit => 'Permit';
+
+  @override
+  String get documents_type_booking => 'Booking';
+
+  @override
+  String get documents_type_receipt => 'Receipt';
+
+  @override
+  String get documents_type_manual => 'Manual';
+
+  @override
+  String get documents_type_map => 'Map';
+
+  @override
+  String get documents_type_other => 'Document';
+
+  @override
+  String get documents_owner_personal => 'Personal';
+
+  @override
+  String get documents_owner_dive => 'Dives';
+
+  @override
+  String get documents_owner_site => 'Sites';
+
+  @override
+  String get documents_owner_trip => 'Trips';
+
+  @override
+  String get documents_owner_equipment => 'Equipment';
+
+  @override
+  String get documents_owner_course => 'Courses';
+
+  @override
+  String get documents_owner_certification => 'Certifications';
+
+  @override
+  String get documents_owner_buddy => 'Buddies';
+
+  @override
+  String get documents_owner_diveCenter => 'Dive centers';
+
+  @override
+  String get documents_expiring_title => 'Needs attention';
+
+  @override
+  String get documents_badge_expired => 'Expired';
+
+  @override
+  String documents_badge_expiresInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Expires in $count days',
+      one: 'Expires tomorrow',
+      zero: 'Expires today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get documents_empty => 'No documents yet';
+
+  @override
+  String get documents_search_hint => 'Search documents';
+
+  @override
+  String get documents_add => 'Add document';
+
+  @override
+  String get documents_section_title => 'Documents';
+
+  @override
+  String get documents_section_empty => 'No documents attached';
+
+  @override
+  String get documents_edit_newTitle => 'New document';
+
+  @override
+  String get documents_edit_editTitle => 'Edit document';
+
+  @override
+  String get documents_field_type => 'Type';
+
+  @override
+  String get documents_field_title => 'Title';
+
+  @override
+  String get documents_field_issuer => 'Issued by';
+
+  @override
+  String get documents_field_issuerInsurance => 'Insurer';
+
+  @override
+  String get documents_field_referenceNumber => 'Number';
+
+  @override
+  String get documents_field_referenceNumberInsurance => 'Policy number';
+
+  @override
+  String get documents_field_issueDate => 'Issued';
+
+  @override
+  String get documents_field_expiryDate => 'Expires';
+
+  @override
+  String get documents_field_reminderLead => 'Remind me';
+
+  @override
+  String documents_field_reminderLeadDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days before',
+      one: '$count day before',
+      zero: 'Off',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get documents_field_emergencyPhone => '24-hour emergency line';
+
+  @override
+  String get documents_field_phone => 'Office phone';
+
+  @override
+  String get documents_field_isPrimary => 'Primary insurance';
+
+  @override
+  String get documents_field_isPrimary_subtitle =>
+      'Shown on the emergency card and the home screen';
+
+  @override
+  String get documents_field_notes => 'Notes';
+
+  @override
+  String get documents_pages_title => 'Pages';
+
+  @override
+  String get documents_pages_front => 'Front';
+
+  @override
+  String get documents_pages_back => 'Back';
+
+  @override
+  String get documents_pages_add => 'Add page';
+
+  @override
+  String get documents_pages_addCamera => 'Take photo';
+
+  @override
+  String get documents_pages_addGallery => 'Choose photo';
+
+  @override
+  String get documents_pages_addFile => 'Choose file';
+
+  @override
+  String get documents_pages_remove => 'Remove page';
+
+  @override
+  String documents_pages_tooLarge(String size) {
+    return 'This file is $size. The limit is 10 MB.';
+  }
+
+  @override
+  String documents_pages_unsupported(String extension) {
+    return '$extension files are not supported. Use a photo, PDF, Word or text file.';
+  }
+
+  @override
+  String get documents_page_cannotDisplay => 'Can\'t display this page';
+
+  @override
+  String get documents_page_openWith => 'Open with...';
+
+  @override
+  String documents_page_counter(int current, int total) {
+    return '$current of $total';
+  }
+
+  @override
+  String get documents_delete_title => 'Delete document?';
+
+  @override
+  String get documents_delete_content =>
+      'This deletes the document and all its pages on every synced device.';
+
+  @override
+  String get documents_deleted => 'Document deleted';
+
+  @override
+  String get documents_saved => 'Document saved';
+
+  @override
+  String documents_error_save(String error) {
+    return 'Couldn\'t save the document: $error';
+  }
+
+  @override
+  String documents_error_load(String error) {
+    return 'Couldn\'t load documents: $error';
+  }
+
+  @override
+  String get documents_filter_all => 'All';
+
+  @override
+  String get documents_detail_owner => 'Filed under';
+
+  @override
+  String get documents_profileHub_documents => 'Documents';
+
+  @override
+  String documents_profileHub_documents_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents',
+      one: '$count document',
+      zero: 'None yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get documents_medical_clearances => 'Medical clearances';
+
+  @override
+  String get documents_medical_addClearance => 'Add clearance';
+
+  @override
+  String get documents_medical_clearancesEmpty =>
+      'No medical clearance recorded';
+
+  @override
+  String dashboard_gauges_documentExpires(String title, String date) {
+    return '$title expires $date';
+  }
+
+  @override
+  String dashboard_gauges_documentExpired(String title) {
+    return '$title expired';
+  }
+
+  @override
+  String dashboard_gauges_documentsNeedAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents need attention',
+      one: '$count document needs attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_homeChips_documents => 'Documents';
+
+  @override
+  String notifications_document_expiresSoon_title(String title) {
+    return '$title expires soon';
+  }
+
+  @override
+  String notifications_document_expiresSoon_body(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Expires in $count days.',
+      one: 'Expires tomorrow.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notifications_document_expiresToday_title(String title) {
+    return '$title expires today';
+  }
+
+  @override
+  String get notifications_document_expiresToday_body =>
+      'Renew it before your next dive.';
+
+  @override
+  String get settings_conflict_field_pageOrder => 'Page order';
+
+  @override
+  String get settings_conflict_field_cardSide => 'Card side';
+
+  @override
+  String get diveDetailSection_documents_description =>
+      'Permits, receipts and other papers filed under the dive';
+
+  @override
+  String get siteDetailSection_documents_description =>
+      'Maps, permits and other papers for the site';
+
+  @override
+  String get settings_conflict_ref_document => 'Document';
 
   @override
   String get settings_conflict_ref_certification => 'Certification';

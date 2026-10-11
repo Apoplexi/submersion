@@ -11840,13 +11840,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divers_edit_bloodTypeLabel => 'סוג דם';
 
   @override
-  String get divers_edit_clearInsuranceExpiryTooltip => 'נקה תאריך תפוגת ביטוח';
-
-  @override
-  String get divers_edit_clearMedicalClearanceTooltip =>
-      'נקה תאריך אישור רפואי';
-
-  @override
   String get divers_edit_contactNameLabel => 'שם איש קשר';
 
   @override
@@ -11874,46 +11867,7 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get divers_edit_expiryDateNotSet => 'לא הוגדר';
-
-  @override
-  String get divers_edit_expiryDateTitle => 'תאריך תפוגה';
-
-  @override
-  String get divers_edit_insuranceEmergencyPhoneHelper =>
-      'מוצג ראשון בכרטיס החירום שלך.';
-
-  @override
-  String get divers_edit_insuranceEmergencyPhoneHint =>
-      'לדוגמה, +1 919 684 9111';
-
-  @override
-  String get divers_edit_insuranceEmergencyPhoneLabel =>
-      'מספר סיוע חירום 24 שעות';
-
-  @override
-  String get divers_edit_insurancePhoneLabel => 'מספר משרד חברת הביטוח';
-
-  @override
-  String get divers_edit_insuranceProviderHint => 'לדוגמה, DAN, DiveAssure';
-
-  @override
-  String get divers_edit_insuranceProviderLabel => 'ספק ביטוח';
-
-  @override
   String get divers_edit_keepEditingButton => 'המשך עריכה';
-
-  @override
-  String get divers_edit_medicalClearanceExpired => 'פג תוקף';
-
-  @override
-  String get divers_edit_medicalClearanceExpiringSoon => 'פג בקרוב';
-
-  @override
-  String get divers_edit_medicalClearanceNotSet => 'לא הוגדר';
-
-  @override
-  String get divers_edit_medicalClearanceTitle => 'תפוגת אישור רפואי';
 
   @override
   String get divers_edit_medicalNotesLabel => 'הערות רפואיות';
@@ -11937,9 +11891,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divers_edit_phoneLabel => 'טלפון';
 
   @override
-  String get divers_edit_policyNumberLabel => 'מספר פוליסה';
-
-  @override
   String get divers_edit_primaryContactTitle => 'איש קשר ראשי';
 
   @override
@@ -11953,14 +11904,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get divers_edit_secondaryContactTitle => 'איש קשר משני';
-
-  @override
-  String get divers_edit_selectInsuranceExpiryTooltip =>
-      'בחר תאריך תפוגת ביטוח';
-
-  @override
-  String get divers_edit_selectMedicalClearanceTooltip =>
-      'בחר תאריך אישור רפואי';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -22683,6 +22626,324 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_buddy => 'שותף';
+
+  @override
+  String get nav_documents => 'מסמכים';
+
+  @override
+  String get documents_title => 'מסמכים';
+
+  @override
+  String get documents_type_insurance => 'ביטוח';
+
+  @override
+  String get documents_type_medicalClearance => 'אישור רפואי';
+
+  @override
+  String get documents_type_certificationCard => 'כרטיס הסמכה';
+
+  @override
+  String get documents_type_permit => 'היתר';
+
+  @override
+  String get documents_type_booking => 'הזמנה';
+
+  @override
+  String get documents_type_receipt => 'קבלה';
+
+  @override
+  String get documents_type_manual => 'מדריך';
+
+  @override
+  String get documents_type_map => 'מפה';
+
+  @override
+  String get documents_type_other => 'מסמך';
+
+  @override
+  String get documents_owner_personal => 'אישי';
+
+  @override
+  String get documents_owner_dive => 'צלילות';
+
+  @override
+  String get documents_owner_site => 'אתרים';
+
+  @override
+  String get documents_owner_trip => 'טיולים';
+
+  @override
+  String get documents_owner_equipment => 'ציוד';
+
+  @override
+  String get documents_owner_course => 'קורסים';
+
+  @override
+  String get documents_owner_certification => 'הסמכות';
+
+  @override
+  String get documents_owner_buddy => 'שותפים';
+
+  @override
+  String get documents_owner_diveCenter => 'מרכזי צלילה';
+
+  @override
+  String get documents_expiring_title => 'דורש תשומת לב';
+
+  @override
+  String get documents_badge_expired => 'פג תוקף';
+
+  @override
+  String documents_badge_expiresInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'פג בעוד $count ימים',
+      one: 'פג מחר',
+      zero: 'פג היום',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get documents_empty => 'אין עדיין מסמכים';
+
+  @override
+  String get documents_search_hint => 'חיפוש מסמכים';
+
+  @override
+  String get documents_add => 'הוספת מסמך';
+
+  @override
+  String get documents_section_title => 'מסמכים';
+
+  @override
+  String get documents_section_empty => 'אין מסמכים מצורפים';
+
+  @override
+  String get documents_edit_newTitle => 'מסמך חדש';
+
+  @override
+  String get documents_edit_editTitle => 'עריכת מסמך';
+
+  @override
+  String get documents_field_type => 'סוג';
+
+  @override
+  String get documents_field_title => 'כותרת';
+
+  @override
+  String get documents_field_issuer => 'הונפק על ידי';
+
+  @override
+  String get documents_field_issuerInsurance => 'חברת הביטוח';
+
+  @override
+  String get documents_field_referenceNumber => 'מספר';
+
+  @override
+  String get documents_field_referenceNumberInsurance => 'מספר פוליסה';
+
+  @override
+  String get documents_field_issueDate => 'תאריך הנפקה';
+
+  @override
+  String get documents_field_expiryDate => 'תוקף עד';
+
+  @override
+  String get documents_field_reminderLead => 'תזכורת';
+
+  @override
+  String documents_field_reminderLeadDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ימים לפני',
+      one: 'יום אחד לפני',
+      zero: 'כבוי',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get documents_field_emergencyPhone => 'קו חירום 24 שעות';
+
+  @override
+  String get documents_field_phone => 'טלפון משרד';
+
+  @override
+  String get documents_field_isPrimary => 'ביטוח ראשי';
+
+  @override
+  String get documents_field_isPrimary_subtitle =>
+      'מוצג בכרטיס החירום ובמסך הבית';
+
+  @override
+  String get documents_field_notes => 'הערות';
+
+  @override
+  String get documents_pages_title => 'עמודים';
+
+  @override
+  String get documents_pages_front => 'חזית';
+
+  @override
+  String get documents_pages_back => 'גב';
+
+  @override
+  String get documents_pages_add => 'הוספת עמוד';
+
+  @override
+  String get documents_pages_addCamera => 'צילום תמונה';
+
+  @override
+  String get documents_pages_addGallery => 'בחירת תמונה';
+
+  @override
+  String get documents_pages_addFile => 'בחירת קובץ';
+
+  @override
+  String get documents_pages_remove => 'הסרת עמוד';
+
+  @override
+  String documents_pages_tooLarge(String size) {
+    return 'גודל הקובץ $size. המגבלה היא 10 MB.';
+  }
+
+  @override
+  String documents_pages_unsupported(String extension) {
+    return 'קובצי $extension אינם נתמכים. השתמשו בתמונה או בקובץ PDF, Word או טקסט.';
+  }
+
+  @override
+  String get documents_page_cannotDisplay => 'לא ניתן להציג עמוד זה';
+
+  @override
+  String get documents_page_openWith => 'פתיחה באמצעות...';
+
+  @override
+  String documents_page_counter(int current, int total) {
+    return '$current מתוך $total';
+  }
+
+  @override
+  String get documents_delete_title => 'למחוק את המסמך?';
+
+  @override
+  String get documents_delete_content =>
+      'פעולה זו מוחקת את המסמך ואת כל עמודיו בכל המכשירים המסונכרנים.';
+
+  @override
+  String get documents_deleted => 'המסמך נמחק';
+
+  @override
+  String get documents_saved => 'המסמך נשמר';
+
+  @override
+  String documents_error_save(String error) {
+    return 'לא ניתן לשמור את המסמך: $error';
+  }
+
+  @override
+  String documents_error_load(String error) {
+    return 'לא ניתן לטעון מסמכים: $error';
+  }
+
+  @override
+  String get documents_filter_all => 'הכול';
+
+  @override
+  String get documents_detail_owner => 'מתויק תחת';
+
+  @override
+  String get documents_profileHub_documents => 'מסמכים';
+
+  @override
+  String documents_profileHub_documents_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מסמכים',
+      one: 'מסמך אחד',
+      zero: 'אין עדיין',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get documents_medical_clearances => 'אישורים רפואיים';
+
+  @override
+  String get documents_medical_addClearance => 'הוספת אישור';
+
+  @override
+  String get documents_medical_clearancesEmpty => 'לא נרשם אישור רפואי';
+
+  @override
+  String dashboard_gauges_documentExpires(String title, String date) {
+    return '$title פג ב-$date';
+  }
+
+  @override
+  String dashboard_gauges_documentExpired(String title) {
+    return '$title פג תוקף';
+  }
+
+  @override
+  String dashboard_gauges_documentsNeedAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מסמכים דורשים תשומת לב',
+      one: 'מסמך אחד דורש תשומת לב',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_homeChips_documents => 'מסמכים';
+
+  @override
+  String notifications_document_expiresSoon_title(String title) {
+    return '$title יפוג בקרוב';
+  }
+
+  @override
+  String notifications_document_expiresSoon_body(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'פג בעוד $count ימים.',
+      one: 'פג מחר.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notifications_document_expiresToday_title(String title) {
+    return '$title פג היום';
+  }
+
+  @override
+  String get notifications_document_expiresToday_body =>
+      'חדשו אותו לפני הצלילה הבאה.';
+
+  @override
+  String get settings_conflict_field_pageOrder => 'סדר העמודים';
+
+  @override
+  String get settings_conflict_field_cardSide => 'צד הכרטיס';
+
+  @override
+  String get diveDetailSection_documents_description =>
+      'היתרים, קבלות ומסמכים נוספים שמתויקים תחת הצלילה';
+
+  @override
+  String get siteDetailSection_documents_description =>
+      'מפות, היתרים ומסמכים נוספים של האתר';
+
+  @override
+  String get settings_conflict_ref_document => 'מסמך';
 
   @override
   String get settings_conflict_ref_certification => 'הסמכה';
