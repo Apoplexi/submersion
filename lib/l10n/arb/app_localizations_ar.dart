@@ -365,10 +365,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get connections_legend_old => 'قديم';
 
   @override
-  String get connections_yearPlay_play => 'تشغيل الأعوام';
+  String get connections_yearPlay_pause => 'إيقاف مؤقت';
 
   @override
-  String get connections_yearPlay_pause => 'إيقاف مؤقت';
+  String get connections_timeline_play => 'تشغيل المخطط الزمني';
 
   @override
   String get connections_share_tooltip => 'مشاركة الصورة';
@@ -5170,8 +5170,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get connections_legend_title => 'مفتاح الرسم';
 
   @override
-  String connections_yearRange_label(int first, int last) {
-    return 'الأعوام من $first إلى $last';
+  String connections_timeline_range(String start, String end) {
+    return 'من $start إلى $end';
   }
 
   @override

@@ -354,10 +354,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get connections_legend_old => 'Ancien';
 
   @override
-  String get connections_yearPlay_play => 'Lire les années';
+  String get connections_yearPlay_pause => 'Pause';
 
   @override
-  String get connections_yearPlay_pause => 'Pause';
+  String get connections_timeline_play => 'Lire la chronologie';
 
   @override
   String get connections_share_tooltip => 'Partager l\'image';
@@ -5099,8 +5099,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get connections_legend_title => 'Légende';
 
   @override
-  String connections_yearRange_label(int first, int last) {
-    return 'Années $first à $last';
+  String connections_timeline_range(String start, String end) {
+    return 'Du $start au $end';
   }
 
   @override

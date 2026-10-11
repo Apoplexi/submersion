@@ -354,10 +354,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get connections_legend_old => 'Alt';
 
   @override
-  String get connections_yearPlay_play => 'Jahre abspielen';
+  String get connections_yearPlay_pause => 'Pause';
 
   @override
-  String get connections_yearPlay_pause => 'Pause';
+  String get connections_timeline_play => 'Zeitleiste abspielen';
 
   @override
   String get connections_share_tooltip => 'Bild teilen';
@@ -5096,8 +5096,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get connections_legend_title => 'Legende';
 
   @override
-  String connections_yearRange_label(int first, int last) {
-    return 'Jahre $first bis $last';
+  String connections_timeline_range(String start, String end) {
+    return '$start bis $end';
   }
 
   @override

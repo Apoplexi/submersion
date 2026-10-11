@@ -353,10 +353,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get connections_legend_old => 'ישן';
 
   @override
-  String get connections_yearPlay_play => 'הפעלת השנים';
+  String get connections_yearPlay_pause => 'השהיה';
 
   @override
-  String get connections_yearPlay_pause => 'השהיה';
+  String get connections_timeline_play => 'הפעלת ציר הזמן';
 
   @override
   String get connections_share_tooltip => 'שיתוף תמונה';
@@ -4982,8 +4982,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get connections_legend_title => 'מקרא';
 
   @override
-  String connections_yearRange_label(int first, int last) {
-    return 'השנים $first עד $last';
+  String connections_timeline_range(String start, String end) {
+    return '$start עד $end';
   }
 
   @override
