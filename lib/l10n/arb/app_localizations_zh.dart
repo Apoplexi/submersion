@@ -6483,6 +6483,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_label_diveMaster => '潜水长';
 
   @override
+  String get diveLog_detail_label_diveOperator => '运营商';
+
+  @override
+  String get diveLog_detail_label_boatName => '船';
+
+  @override
+  String get diveLog_detail_label_boatCaptain => '船长';
+
+  @override
   String get diveLog_detail_label_diveType => '潜水类型';
 
   @override
@@ -6532,6 +6541,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_detail_label_swellHeight => '涌浪高度';
+
+  @override
+  String get diveLog_detail_label_surfaceConditions => '水面状况';
 
   @override
   String get diveLog_detail_label_total => '总计：';
@@ -6944,6 +6956,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_label_swellHeight => '涌浪高度';
 
   @override
+  String get diveLog_edit_label_surfaceConditions => '水面状况';
+
+  @override
   String get diveLog_edit_label_type => '类型';
 
   @override
@@ -7022,6 +7037,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_edit_row_diveCenter => '潜水中心';
+
+  @override
+  String get diveLog_edit_row_diveOperator => '运营商';
+
+  @override
+  String get diveLog_edit_row_boatName => '船';
+
+  @override
+  String get diveLog_edit_row_boatCaptain => '船长';
 
   @override
   String get diveLog_edit_row_diveProfile => '潜水曲线';
@@ -13266,6 +13290,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pdf_currentDirection => '流向';
 
   @override
+  String get pdf_surfaceConditions => '水面';
+
+  @override
   String get pdf_waterType => '水类型';
 
   @override
@@ -13285,6 +13312,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pdf_diveCenter => '潜水中心';
+
+  @override
+  String get pdf_diveOperator => '运营商';
+
+  @override
+  String get pdf_boatName => '船';
+
+  @override
+  String get pdf_boatCaptain => '船长';
 
   @override
   String get pdf_trip => '行程';
@@ -35426,6 +35462,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_diveField_weatherDescription => '天气';
 
   @override
+  String get enum_diveField_surfaceConditions => '水面状况';
+
+  @override
   String get enum_diveField_primaryGas => '主用气体';
 
   @override
@@ -35499,6 +35538,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_diveField_diveCenterName => '潜水中心';
+
+  @override
+  String get enum_diveField_diveOperator => '潜水运营商';
+
+  @override
+  String get enum_diveField_boatName => '船';
+
+  @override
+  String get enum_diveField_boatCaptain => '船长';
 
   @override
   String get enum_diveField_siteLatitude => '纬度';
@@ -35603,6 +35651,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_diveField_weatherDescription_short => '天气';
 
   @override
+  String get enum_diveField_surfaceConditions_short => '水面';
+
+  @override
   String get enum_diveField_primaryGas_short => '气体';
 
   @override
@@ -35676,6 +35727,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_diveField_diveCenterName_short => '潜店';
+
+  @override
+  String get enum_diveField_diveOperator_short => '运营商';
+
+  @override
+  String get enum_diveField_boatName_short => '船';
+
+  @override
+  String get enum_diveField_boatCaptain_short => '船长';
 
   @override
   String get enum_diveField_siteLatitude_short => '纬度';
@@ -46348,6 +46408,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get query_dives_boatName => '船';
+
+  @override
+  String get query_dives_boatCaptain => '船长';
 
   @override
   String get query_dives_bottomTime => '水底时间';

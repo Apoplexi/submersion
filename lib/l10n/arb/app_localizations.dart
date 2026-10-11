@@ -10765,6 +10765,24 @@ abstract class AppLocalizations {
   /// **'Dive Master'**
   String get diveLog_detail_label_diveMaster;
 
+  /// No description provided for @diveLog_detail_label_diveOperator.
+  ///
+  /// In en, this message translates to:
+  /// **'Operator'**
+  String get diveLog_detail_label_diveOperator;
+
+  /// No description provided for @diveLog_detail_label_boatName.
+  ///
+  /// In en, this message translates to:
+  /// **'Boat'**
+  String get diveLog_detail_label_boatName;
+
+  /// No description provided for @diveLog_detail_label_boatCaptain.
+  ///
+  /// In en, this message translates to:
+  /// **'Captain'**
+  String get diveLog_detail_label_boatCaptain;
+
   /// No description provided for @diveLog_detail_label_diveType.
   ///
   /// In en, this message translates to:
@@ -10866,6 +10884,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Swell Height'**
   String get diveLog_detail_label_swellHeight;
+
+  /// No description provided for @diveLog_detail_label_surfaceConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface Conditions'**
+  String get diveLog_detail_label_surfaceConditions;
 
   /// No description provided for @diveLog_detail_label_total.
   ///
@@ -11587,6 +11611,12 @@ abstract class AppLocalizations {
   /// **'Swell Height'**
   String get diveLog_edit_label_swellHeight;
 
+  /// No description provided for @diveLog_edit_label_surfaceConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface Conditions'**
+  String get diveLog_edit_label_surfaceConditions;
+
   /// No description provided for @diveLog_edit_label_type.
   ///
   /// In en, this message translates to:
@@ -11718,6 +11748,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dive center'**
   String get diveLog_edit_row_diveCenter;
+
+  /// No description provided for @diveLog_edit_row_diveOperator.
+  ///
+  /// In en, this message translates to:
+  /// **'Operator'**
+  String get diveLog_edit_row_diveOperator;
+
+  /// No description provided for @diveLog_edit_row_boatName.
+  ///
+  /// In en, this message translates to:
+  /// **'Boat'**
+  String get diveLog_edit_row_boatName;
+
+  /// No description provided for @diveLog_edit_row_boatCaptain.
+  ///
+  /// In en, this message translates to:
+  /// **'Captain'**
+  String get diveLog_edit_row_boatCaptain;
 
   /// Row label: dive profile (points count / draw affordance)
   ///
@@ -22615,6 +22663,12 @@ abstract class AppLocalizations {
   /// **'Current Dir'**
   String get pdf_currentDirection;
 
+  /// No description provided for @pdf_surfaceConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface'**
+  String get pdf_surfaceConditions;
+
   /// No description provided for @pdf_waterType.
   ///
   /// In en, this message translates to:
@@ -22656,6 +22710,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dive Center'**
   String get pdf_diveCenter;
+
+  /// No description provided for @pdf_diveOperator.
+  ///
+  /// In en, this message translates to:
+  /// **'Operator'**
+  String get pdf_diveOperator;
+
+  /// No description provided for @pdf_boatName.
+  ///
+  /// In en, this message translates to:
+  /// **'Boat'**
+  String get pdf_boatName;
+
+  /// No description provided for @pdf_boatCaptain.
+  ///
+  /// In en, this message translates to:
+  /// **'Captain'**
+  String get pdf_boatCaptain;
 
   /// No description provided for @pdf_trip.
   ///
@@ -59286,6 +59358,12 @@ abstract class AppLocalizations {
   /// **'Weather'**
   String get enum_diveField_weatherDescription;
 
+  /// No description provided for @enum_diveField_surfaceConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface Conditions'**
+  String get enum_diveField_surfaceConditions;
+
   /// No description provided for @enum_diveField_primaryGas.
   ///
   /// In en, this message translates to:
@@ -59435,6 +59513,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dive Center'**
   String get enum_diveField_diveCenterName;
+
+  /// No description provided for @enum_diveField_diveOperator.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Operator'**
+  String get enum_diveField_diveOperator;
+
+  /// No description provided for @enum_diveField_boatName.
+  ///
+  /// In en, this message translates to:
+  /// **'Boat'**
+  String get enum_diveField_boatName;
+
+  /// No description provided for @enum_diveField_boatCaptain.
+  ///
+  /// In en, this message translates to:
+  /// **'Boat Captain'**
+  String get enum_diveField_boatCaptain;
 
   /// No description provided for @enum_diveField_siteLatitude.
   ///
@@ -59640,6 +59736,12 @@ abstract class AppLocalizations {
   /// **'Weather'**
   String get enum_diveField_weatherDescription_short;
 
+  /// No description provided for @enum_diveField_surfaceConditions_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface'**
+  String get enum_diveField_surfaceConditions_short;
+
   /// No description provided for @enum_diveField_primaryGas_short.
   ///
   /// In en, this message translates to:
@@ -59789,6 +59891,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dive Ctr'**
   String get enum_diveField_diveCenterName_short;
+
+  /// No description provided for @enum_diveField_diveOperator_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Operator'**
+  String get enum_diveField_diveOperator_short;
+
+  /// No description provided for @enum_diveField_boatName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Boat'**
+  String get enum_diveField_boatName_short;
+
+  /// No description provided for @enum_diveField_boatCaptain_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Captain'**
+  String get enum_diveField_boatCaptain_short;
 
   /// No description provided for @enum_diveField_siteLatitude_short.
   ///
@@ -78325,6 +78445,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Boat'**
   String get query_dives_boatName;
+
+  /// Field label in the query builder
+  ///
+  /// In en, this message translates to:
+  /// **'Captain'**
+  String get query_dives_boatCaptain;
 
   /// Field label in the query builder
   ///

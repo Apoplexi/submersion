@@ -6918,6 +6918,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_label_diveMaster => 'مدرب الغوص الرئيسي';
 
   @override
+  String get diveLog_detail_label_diveOperator => 'المشغّل';
+
+  @override
+  String get diveLog_detail_label_boatName => 'القارب';
+
+  @override
+  String get diveLog_detail_label_boatCaptain => 'القبطان';
+
+  @override
   String get diveLog_detail_label_diveType => 'نوع الغوصة';
 
   @override
@@ -6967,6 +6976,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_detail_label_swellHeight => 'ارتفاع الموج';
+
+  @override
+  String get diveLog_detail_label_surfaceConditions => 'أحوال السطح';
 
   @override
   String get diveLog_detail_label_total => 'الإجمالي:';
@@ -7400,6 +7412,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_label_swellHeight => 'ارتفاع الموج';
 
   @override
+  String get diveLog_edit_label_surfaceConditions => 'أحوال السطح';
+
+  @override
   String get diveLog_edit_label_type => 'النوع';
 
   @override
@@ -7487,6 +7502,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_edit_row_diveCenter => 'مركز الغوص';
+
+  @override
+  String get diveLog_edit_row_diveOperator => 'المشغّل';
+
+  @override
+  String get diveLog_edit_row_boatName => 'القارب';
+
+  @override
+  String get diveLog_edit_row_boatCaptain => 'القبطان';
 
   @override
   String get diveLog_edit_row_diveProfile => 'ملف الغوص';
@@ -14057,6 +14081,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pdf_currentDirection => 'اتجاه التيار';
 
   @override
+  String get pdf_surfaceConditions => 'السطح';
+
+  @override
   String get pdf_waterType => 'نوع المياه';
 
   @override
@@ -14076,6 +14103,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pdf_diveCenter => 'مركز الغوص';
+
+  @override
+  String get pdf_diveOperator => 'المشغّل';
+
+  @override
+  String get pdf_boatName => 'القارب';
+
+  @override
+  String get pdf_boatCaptain => 'القبطان';
 
   @override
   String get pdf_trip => 'الرحلة';
@@ -38045,6 +38081,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_diveField_weatherDescription => 'الطقس';
 
   @override
+  String get enum_diveField_surfaceConditions => 'أحوال السطح';
+
+  @override
   String get enum_diveField_primaryGas => 'الغاز الأساسي';
 
   @override
@@ -38118,6 +38157,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_diveField_diveCenterName => 'مركز الغوص';
+
+  @override
+  String get enum_diveField_diveOperator => 'مشغل الغوص';
+
+  @override
+  String get enum_diveField_boatName => 'القارب';
+
+  @override
+  String get enum_diveField_boatCaptain => 'قبطان القارب';
 
   @override
   String get enum_diveField_siteLatitude => 'خط العرض';
@@ -38222,6 +38270,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_diveField_weatherDescription_short => 'الطقس';
 
   @override
+  String get enum_diveField_surfaceConditions_short => 'السطح';
+
+  @override
   String get enum_diveField_primaryGas_short => 'الغاز';
 
   @override
@@ -38295,6 +38346,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_diveField_diveCenterName_short => 'المركز';
+
+  @override
+  String get enum_diveField_diveOperator_short => 'المشغّل';
+
+  @override
+  String get enum_diveField_boatName_short => 'القارب';
+
+  @override
+  String get enum_diveField_boatCaptain_short => 'القبطان';
 
   @override
   String get enum_diveField_siteLatitude_short => 'العرض';
@@ -50005,6 +50065,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_dives_boatName => 'القارب';
+
+  @override
+  String get query_dives_boatCaptain => 'القبطان';
 
   @override
   String get query_dives_bottomTime => 'زمن القاع';

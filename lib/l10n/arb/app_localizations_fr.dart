@@ -6841,6 +6841,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_detail_label_diveMaster => 'Directeur de plongée';
 
   @override
+  String get diveLog_detail_label_diveOperator => 'Opérateur';
+
+  @override
+  String get diveLog_detail_label_boatName => 'Bateau';
+
+  @override
+  String get diveLog_detail_label_boatCaptain => 'Capitaine';
+
+  @override
   String get diveLog_detail_label_diveType => 'Type de plongée';
 
   @override
@@ -6890,6 +6899,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveLog_detail_label_swellHeight => 'Hauteur de houle';
+
+  @override
+  String get diveLog_detail_label_surfaceConditions => 'Conditions en surface';
 
   @override
   String get diveLog_detail_label_total => 'Total :';
@@ -7326,6 +7338,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_edit_label_swellHeight => 'Hauteur de houle';
 
   @override
+  String get diveLog_edit_label_surfaceConditions => 'Conditions en surface';
+
+  @override
   String get diveLog_edit_label_type => 'Type';
 
   @override
@@ -7408,6 +7423,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveLog_edit_row_diveCenter => 'Centre de plongée';
+
+  @override
+  String get diveLog_edit_row_diveOperator => 'Opérateur';
+
+  @override
+  String get diveLog_edit_row_boatName => 'Bateau';
+
+  @override
+  String get diveLog_edit_row_boatCaptain => 'Capitaine';
 
   @override
   String get diveLog_edit_row_diveProfile => 'Profil de plongée';
@@ -13947,6 +13971,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pdf_currentDirection => 'Dir. courant';
 
   @override
+  String get pdf_surfaceConditions => 'Surface';
+
+  @override
   String get pdf_waterType => 'Type d\'eau';
 
   @override
@@ -13966,6 +13993,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get pdf_diveCenter => 'Centre de plongée';
+
+  @override
+  String get pdf_diveOperator => 'Opérateur';
+
+  @override
+  String get pdf_boatName => 'Bateau';
+
+  @override
+  String get pdf_boatCaptain => 'Capitaine';
 
   @override
   String get pdf_trip => 'Voyage';
@@ -37667,6 +37703,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enum_diveField_weatherDescription => 'Météo';
 
   @override
+  String get enum_diveField_surfaceConditions => 'Conditions en surface';
+
+  @override
   String get enum_diveField_primaryGas => 'Gaz principal';
 
   @override
@@ -37740,6 +37779,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get enum_diveField_diveCenterName => 'Centre de plongée';
+
+  @override
+  String get enum_diveField_diveOperator => 'Opérateur de plongée';
+
+  @override
+  String get enum_diveField_boatName => 'Bateau';
+
+  @override
+  String get enum_diveField_boatCaptain => 'Capitaine du bateau';
 
   @override
   String get enum_diveField_siteLatitude => 'Latitude';
@@ -37844,6 +37892,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enum_diveField_weatherDescription_short => 'Météo';
 
   @override
+  String get enum_diveField_surfaceConditions_short => 'Surface';
+
+  @override
   String get enum_diveField_primaryGas_short => 'Gaz';
 
   @override
@@ -37917,6 +37968,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get enum_diveField_diveCenterName_short => 'Centre';
+
+  @override
+  String get enum_diveField_diveOperator_short => 'Opérateur';
+
+  @override
+  String get enum_diveField_boatName_short => 'Bateau';
+
+  @override
+  String get enum_diveField_boatCaptain_short => 'Capitaine';
 
   @override
   String get enum_diveField_siteLatitude_short => 'Lat';
@@ -49496,6 +49556,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get query_dives_boatName => 'Bateau';
+
+  @override
+  String get query_dives_boatCaptain => 'Capitaine';
 
   @override
   String get query_dives_bottomTime => 'Temps au fond';
