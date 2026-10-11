@@ -45290,6 +45290,65 @@ class AppLocalizationsNl extends AppLocalizations {
       'Alle synchronisatiegegevens op deze provider wissen';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return 'Alleen duiken met $column';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return 'Minstens $value';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return 'Hoogstens $value';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return '$value uitsluiten';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return 'Alleen duiken zonder $column';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return 'Vanaf $value';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return 'Tot en met $value';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return 'Alleen $value';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return 'Met $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return 'Zonder $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => 'Filter toevoegen';
+
+  @override
+  String get tableMode_menu_hideColumn => 'Kolom verbergen';
+
+  @override
+  String get tableMode_menu_resetFilter => 'Filter wissen';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane =>
       'Detailpaneel tonen of verbergen';
 

@@ -46202,6 +46202,65 @@ class AppLocalizationsAr extends AppLocalizations {
       'مسح جميع بيانات المزامنة على هذه الخدمة';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return 'فقط الغوصات التي لها $column';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return '$value على الأقل';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return '$value على الأكثر';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return 'استبعاد $value';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return 'فقط الغوصات بدون $column';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return 'في $value أو بعده';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return 'في $value أو قبله';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return '$value فقط';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return 'مع $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return 'بدون $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => 'إضافة تصفية';
+
+  @override
+  String get tableMode_menu_hideColumn => 'إخفاء العمود';
+
+  @override
+  String get tableMode_menu_resetFilter => 'إعادة تعيين التصفية';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane => 'تبديل لوحة التفاصيل';
 
   @override

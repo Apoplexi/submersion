@@ -44640,6 +44640,65 @@ class AppLocalizationsHe extends AppLocalizations {
       'מחיקת כל נתוני הסנכרון בשירות זה';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return 'רק צלילות עם $column';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return 'לפחות $value';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return 'לכל היותר $value';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return 'החרגת $value';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return 'רק צלילות ללא $column';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return 'החל מ-$value';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return 'עד $value';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return 'רק $value';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return 'עם $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return 'בלי $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => 'הוספת סינון';
+
+  @override
+  String get tableMode_menu_hideColumn => 'הסתרת עמודה';
+
+  @override
+  String get tableMode_menu_resetFilter => 'איפוס סינון';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane => 'הצגת חלונית הפרטים';
 
   @override

@@ -42842,6 +42842,65 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_troubleshootSync_wipeAll_title => '清除此后端上的所有同步数据';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return '仅显示有$column的潜水';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return '至少 $value';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return '至多 $value';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return '排除 $value';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return '仅显示无$column的潜水';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return '$value 及之后';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return '$value 及之前';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return '仅 $value';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return '包含 $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return '不含 $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => '添加筛选';
+
+  @override
+  String get tableMode_menu_hideColumn => '隐藏列';
+
+  @override
+  String get tableMode_menu_resetFilter => '重置筛选';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane => '切换详情面板';
 
   @override

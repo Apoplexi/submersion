@@ -45684,6 +45684,65 @@ class AppLocalizationsFr extends AppLocalizations {
       'Effacer toutes les données de synchronisation sur ce service';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return 'Uniquement les plongées avec $column';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return 'Au moins $value';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return 'Au plus $value';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return 'Exclure $value';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return 'Uniquement les plongées sans $column';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return 'À partir du $value';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return 'Jusqu\'au $value';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return 'Uniquement $value';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return 'Avec $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return 'Sans $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => 'Ajouter un filtre';
+
+  @override
+  String get tableMode_menu_hideColumn => 'Masquer la colonne';
+
+  @override
+  String get tableMode_menu_resetFilter => 'Réinitialiser le filtre';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane =>
       'Afficher ou masquer le volet de détail';
 

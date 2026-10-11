@@ -45590,6 +45590,65 @@ class AppLocalizationsPt extends AppLocalizations {
       'Apagar todos os dados de sincronização neste provedor';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return 'Apenas mergulhos com $column';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return 'Pelo menos $value';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return 'No máximo $value';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return 'Excluir $value';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return 'Apenas mergulhos sem $column';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return 'A partir de $value';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return 'Até $value';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return 'Apenas $value';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return 'Com $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return 'Sem $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => 'Adicionar filtro';
+
+  @override
+  String get tableMode_menu_hideColumn => 'Ocultar coluna';
+
+  @override
+  String get tableMode_menu_resetFilter => 'Redefinir filtro';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane =>
       'Alternar painel de detalhes';
 

@@ -45485,6 +45485,65 @@ class AppLocalizationsDe extends AppLocalizations {
       'Alle Synchronisierungsdaten auf diesem Backend löschen';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return 'Nur Tauchgänge mit $column';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return 'Mindestens $value';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return 'Höchstens $value';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return '$value ausschließen';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return 'Nur Tauchgänge ohne $column';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return 'Ab $value';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return 'Bis $value';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return 'Nur $value';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return 'Mit $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return 'Ohne $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => 'Filter hinzufügen';
+
+  @override
+  String get tableMode_menu_hideColumn => 'Spalte ausblenden';
+
+  @override
+  String get tableMode_menu_resetFilter => 'Filter zurücksetzen';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane => 'Detailbereich umschalten';
 
   @override

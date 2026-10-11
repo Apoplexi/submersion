@@ -45618,6 +45618,65 @@ class AppLocalizationsEs extends AppLocalizations {
       'Borrar todos los datos de sincronización de este servicio';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return 'Solo inmersiones con $column';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return 'Al menos $value';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return 'Como máximo $value';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return 'Excluir $value';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return 'Solo inmersiones sin $column';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return 'Desde $value';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return 'Hasta $value';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return 'Solo $value';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return 'Con $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return 'Sin $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => 'Agregar filtro';
+
+  @override
+  String get tableMode_menu_hideColumn => 'Ocultar columna';
+
+  @override
+  String get tableMode_menu_resetFilter => 'Restablecer filtro';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane =>
       'Mostrar u ocultar el panel de detalle';
 

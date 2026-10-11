@@ -45332,6 +45332,65 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az összes szinkronizálási adat törlése ezen a szolgáltatón';
 
   @override
+  String tableMode_cell_anyValue(String column) {
+    return 'Csak $column értékkel rendelkező merülések';
+  }
+
+  @override
+  String tableMode_cell_atLeast(String value) {
+    return 'Legalább $value';
+  }
+
+  @override
+  String tableMode_cell_atMost(String value) {
+    return 'Legfeljebb $value';
+  }
+
+  @override
+  String tableMode_cell_exclude(String value) {
+    return '$value kizárása';
+  }
+
+  @override
+  String tableMode_cell_noValue(String column) {
+    return 'Csak $column nélküli merülések';
+  }
+
+  @override
+  String tableMode_cell_onOrAfter(String value) {
+    return '$value vagy később';
+  }
+
+  @override
+  String tableMode_cell_onOrBefore(String value) {
+    return '$value vagy korábban';
+  }
+
+  @override
+  String tableMode_cell_only(String value) {
+    return 'Csak $value';
+  }
+
+  @override
+  String tableMode_cell_with(String value) {
+    return 'Ezzel: $value';
+  }
+
+  @override
+  String tableMode_cell_without(String value) {
+    return 'Enélkül: $value';
+  }
+
+  @override
+  String get tableMode_menu_addFilter => 'Szűrő hozzáadása';
+
+  @override
+  String get tableMode_menu_hideColumn => 'Oszlop elrejtése';
+
+  @override
+  String get tableMode_menu_resetFilter => 'Szűrő visszaállítása';
+
+  @override
   String get tableMode_tooltip_toggleDetailPane => 'Részletek panel ki/be';
 
   @override
