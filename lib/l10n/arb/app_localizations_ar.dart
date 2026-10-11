@@ -13960,6 +13960,21 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String gearPassport_scan_retired(String name) {
+    return 'حالة $name: متقاعد';
+  }
+
+  @override
+  String gearPassport_scan_sold(String name) {
+    return 'حالة $name: تم بيعه';
+  }
+
+  @override
+  String gearPassport_scan_lost(String name) {
+    return 'حالة $name: مفقود';
+  }
+
+  @override
   String get pdf_unknownSite => 'موقع غير معروف';
 
   @override
