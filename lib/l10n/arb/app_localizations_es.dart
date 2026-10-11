@@ -12578,6 +12578,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enum_equipmentType_rashGuard => 'Licra';
 
   @override
+  String get enum_equipmentType_vest => 'Chaleco de neopreno';
+
+  @override
   String get enum_equipmentType_wing => 'Ala';
 
   @override
@@ -34518,6 +34521,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get attrLabel_upf_rating => 'Índice UPF';
 
   @override
+  String get attrLabel_hooded => 'Con capucha';
+
+  @override
+  String get attrLabel_vest_layer => 'Uso';
+
+  @override
+  String get attrLabel_vest_closure => 'Cierre';
+
+  @override
   String get attrLabel_snorkel_type => 'Tipo';
 
   @override
@@ -34946,6 +34958,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get attrChoice_sleeve_length_sleeveless => 'Sin mangas';
+
+  @override
+  String get attrChoice_vest_layer_over_suit => 'Sobre el traje';
+
+  @override
+  String get attrChoice_vest_layer_under_suit => 'Bajo el traje';
+
+  @override
+  String get attrChoice_vest_closure_front_zip => 'Cremallera frontal';
+
+  @override
+  String get attrChoice_vest_closure_side_zip => 'Cremallera lateral';
+
+  @override
+  String get attrChoice_vest_closure_pullover => 'Sin cremallera';
 
   @override
   String get attrChoice_snorkel_type_classic => 'Clásico';

@@ -12312,6 +12312,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_equipmentType_rashGuard => 'חולצת ליקרה';
 
   @override
+  String get enum_equipmentType_vest => 'אפוד ניאופרן';
+
+  @override
   String get enum_equipmentType_wing => 'כנף';
 
   @override
@@ -33627,6 +33630,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_upf_rating => 'דירוג UPF';
 
   @override
+  String get attrLabel_hooded => 'עם כיסוי ראש';
+
+  @override
+  String get attrLabel_vest_layer => 'אופן לבישה';
+
+  @override
+  String get attrLabel_vest_closure => 'סגירה';
+
+  @override
   String get attrLabel_snorkel_type => 'סוג';
 
   @override
@@ -34051,6 +34063,21 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get attrChoice_sleeve_length_sleeveless => 'ללא שרוולים';
+
+  @override
+  String get attrChoice_vest_layer_over_suit => 'מעל החליפה';
+
+  @override
+  String get attrChoice_vest_layer_under_suit => 'מתחת לחליפה';
+
+  @override
+  String get attrChoice_vest_closure_front_zip => 'רוכסן קדמי';
+
+  @override
+  String get attrChoice_vest_closure_side_zip => 'רוכסן צדדי';
+
+  @override
+  String get attrChoice_vest_closure_pullover => 'ללא רוכסן';
 
   @override
   String get attrChoice_snorkel_type_classic => 'קלאסי';
