@@ -12536,6 +12536,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentType_boots => 'Botinhas';
 
   @override
+  String get enum_equipmentType_socks => 'Meias';
+
+  @override
   String get enum_equipmentType_camera => 'Câmera';
 
   @override
@@ -34908,6 +34911,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_sole_type => 'Sola';
 
   @override
+  String get attrLabel_sock_type => 'Tipo';
+
+  @override
   String get attrLabel_buoyancy_kg => 'Flutuabilidade';
 
   @override
@@ -35383,6 +35389,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Sola macia';
+
+  @override
+  String get attrChoice_sock_type_neoprene => 'Neoprene (úmidas)';
+
+  @override
+  String get attrChoice_sock_type_drysuit => 'Roupa seca (térmicas)';
 
   @override
   String get attrChoice_dpv_style_tow_behind => 'De reboque';

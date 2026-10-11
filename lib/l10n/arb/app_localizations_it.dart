@@ -12540,6 +12540,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enum_equipmentType_boots => 'Calzari';
 
   @override
+  String get enum_equipmentType_socks => 'Calze';
+
+  @override
   String get enum_equipmentType_camera => 'Fotocamera';
 
   @override
@@ -34917,6 +34920,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get attrLabel_sole_type => 'Suola';
 
   @override
+  String get attrLabel_sock_type => 'Tipo';
+
+  @override
   String get attrLabel_buoyancy_kg => 'Galleggiabilità';
 
   @override
@@ -35391,6 +35397,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Suola morbida';
+
+  @override
+  String get attrChoice_sock_type_neoprene => 'Neoprene (umide)';
+
+  @override
+  String get attrChoice_sock_type_drysuit => 'Muta stagna (termiche)';
 
   @override
   String get attrChoice_dpv_style_tow_behind => 'A traino';

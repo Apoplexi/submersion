@@ -12511,6 +12511,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_equipmentType_boots => 'Cipők';
 
   @override
+  String get enum_equipmentType_socks => 'Zoknik';
+
+  @override
   String get enum_equipmentType_camera => 'Kamera';
 
   @override
@@ -34719,6 +34722,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_sole_type => 'Talp';
 
   @override
+  String get attrLabel_sock_type => 'Típus';
+
+  @override
   String get attrLabel_buoyancy_kg => 'Felhajtóerő';
 
   @override
@@ -35192,6 +35198,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Puha talp';
+
+  @override
+  String get attrChoice_sock_type_neoprene => 'Neoprén (nedves)';
+
+  @override
+  String get attrChoice_sock_type_drysuit => 'Száraz ruha (hőszigetelő)';
 
   @override
   String get attrChoice_dpv_style_tow_behind => 'Vontatott';
