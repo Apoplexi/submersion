@@ -19088,6 +19088,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get plannerCanvas_convert_view => 'Vedi';
 
   @override
+  String plannerCanvas_export_failed(String error) {
+    return 'Esportazione non riuscita: $error';
+  }
+
+  @override
   String plannerCanvas_follow_chip(String name) {
     return 'Segue $name';
   }
@@ -19253,13 +19258,19 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get plannerCanvas_share_menu => 'Condividi file del piano';
+  String get plannerCanvas_share_menu => 'Esporta file del piano';
+
+  @override
+  String get plannerCanvas_share_saved => 'File del piano salvato';
 
   @override
   String get plannerCanvas_slate_menu => 'Esporta lavagnetta (PDF)';
 
   @override
   String get plannerCanvas_slate_minGas => 'Gas minimo';
+
+  @override
+  String get plannerCanvas_slate_saved => 'Lavagnetta salvata';
 
   @override
   String get plannerCanvas_slate_turn => 'Rientro';

@@ -19331,6 +19331,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get plannerCanvas_convert_view => 'عرض';
 
   @override
+  String plannerCanvas_export_failed(String error) {
+    return 'فشل التصدير: $error';
+  }
+
+  @override
   String plannerCanvas_follow_chip(String name) {
     return 'يتبع $name';
   }
@@ -19495,13 +19500,19 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get plannerCanvas_share_menu => 'مشاركة ملف الخطة';
+  String get plannerCanvas_share_menu => 'تصدير ملف الخطة';
+
+  @override
+  String get plannerCanvas_share_saved => 'تم حفظ ملف الخطة';
 
   @override
   String get plannerCanvas_slate_menu => 'تصدير اللوح (PDF)';
 
   @override
   String get plannerCanvas_slate_minGas => 'الحد الأدنى من الغاز';
+
+  @override
+  String get plannerCanvas_slate_saved => 'تم حفظ اللوح';
 
   @override
   String get plannerCanvas_slate_turn => 'العودة';

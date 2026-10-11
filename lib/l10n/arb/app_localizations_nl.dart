@@ -18962,6 +18962,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get plannerCanvas_convert_view => 'Bekijk';
 
   @override
+  String plannerCanvas_export_failed(String error) {
+    return 'Exporteren mislukt: $error';
+  }
+
+  @override
   String plannerCanvas_follow_chip(String name) {
     return 'Volgt $name';
   }
@@ -19126,13 +19131,19 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get plannerCanvas_share_menu => 'Planbestand delen';
+  String get plannerCanvas_share_menu => 'Planbestand exporteren';
+
+  @override
+  String get plannerCanvas_share_saved => 'Planbestand opgeslagen';
 
   @override
   String get plannerCanvas_slate_menu => 'Slate exporteren (PDF)';
 
   @override
   String get plannerCanvas_slate_minGas => 'Minimum gas';
+
+  @override
+  String get plannerCanvas_slate_saved => 'Slate opgeslagen';
 
   @override
   String get plannerCanvas_slate_turn => 'Keerpunt';

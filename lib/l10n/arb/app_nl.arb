@@ -5443,6 +5443,14 @@
   "plannerCanvas_contingency_turnRule": "Keerdruk-regel",
   "plannerCanvas_convert_success": "Duik aangemaakt vanuit plan",
   "plannerCanvas_convert_view": "Bekijk",
+  "plannerCanvas_export_failed": "Exporteren mislukt: {error}",
+  "@plannerCanvas_export_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "plannerCanvas_follow_chip": "Volgt {name}",
   "plannerCanvas_follow_empty": "Nog geen gelogde duiken",
   "plannerCanvas_follow_noTissues": "Geen profielgegevens voor die duik — oppervlakte-interval ingesteld zonder weefselverzadiging",
@@ -5483,9 +5491,11 @@
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importeren",
   "plannerCanvas_share_importFailed": "Kon plan niet importeren: {reason}",
-  "plannerCanvas_share_menu": "Planbestand delen",
+  "plannerCanvas_share_menu": "Planbestand exporteren",
+  "plannerCanvas_share_saved": "Planbestand opgeslagen",
   "plannerCanvas_slate_menu": "Slate exporteren (PDF)",
   "plannerCanvas_slate_minGas": "Minimum gas",
+  "plannerCanvas_slate_saved": "Slate opgeslagen",
   "plannerCanvas_slate_turn": "Keerpunt",
   "plannerCanvas_table_depth": "Diepte",
   "plannerCanvas_table_gas": "Gas",

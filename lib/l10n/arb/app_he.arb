@@ -5341,6 +5341,14 @@
   "plannerCanvas_contingency_turnRule": "כלל לחץ פנייה",
   "plannerCanvas_convert_success": "נוצרה צלילה מהתוכנית",
   "plannerCanvas_convert_view": "הצג",
+  "plannerCanvas_export_failed": "הייצוא נכשל: {error}",
+  "@plannerCanvas_export_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "plannerCanvas_follow_chip": "עוקב אחרי {name}",
   "plannerCanvas_follow_empty": "אין עדיין צלילות מתועדות",
   "plannerCanvas_follow_noTissues": "אין נתוני פרופיל לצלילה זו — מרווח הפנים נקבע ללא העמסת רקמות",
@@ -5381,9 +5389,11 @@
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "ייבוא",
   "plannerCanvas_share_importFailed": "לא ניתן לייבא את התוכנית: {reason}",
-  "plannerCanvas_share_menu": "שיתוף קובץ תוכנית",
+  "plannerCanvas_share_menu": "ייצוא קובץ תוכנית",
+  "plannerCanvas_share_saved": "קובץ התוכנית נשמר",
   "plannerCanvas_slate_menu": "ייצוא לוח (PDF)",
   "plannerCanvas_slate_minGas": "גז מינימלי",
+  "plannerCanvas_slate_saved": "הלוח נשמר",
   "plannerCanvas_slate_turn": "נקודת חזרה",
   "plannerCanvas_table_depth": "עומק",
   "plannerCanvas_table_gas": "גז",

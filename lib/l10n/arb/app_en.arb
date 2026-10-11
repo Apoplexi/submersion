@@ -11936,6 +11936,14 @@
   "plannerCanvas_contingency_turnRule": "Turn pressure rule",
   "plannerCanvas_convert_success": "Dive created from plan",
   "plannerCanvas_convert_view": "View",
+  "plannerCanvas_export_failed": "Export failed: {error}",
+  "@plannerCanvas_export_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "plannerCanvas_follow_chip": "Following {name}",
   "@plannerCanvas_follow_chip": {
     "placeholders": {
@@ -12095,9 +12103,11 @@
       }
     }
   },
-  "plannerCanvas_share_menu": "Share plan file",
+  "plannerCanvas_share_menu": "Export plan file",
+  "plannerCanvas_share_saved": "Plan file saved",
   "plannerCanvas_slate_menu": "Export slate (PDF)",
   "plannerCanvas_slate_minGas": "Min gas",
+  "plannerCanvas_slate_saved": "Slate saved",
   "plannerCanvas_slate_turn": "Turn",
   "plannerCanvas_table_depth": "Depth",
   "plannerCanvas_table_gas": "Gas",

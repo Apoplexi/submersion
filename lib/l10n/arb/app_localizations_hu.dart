@@ -19023,6 +19023,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get plannerCanvas_convert_view => 'Megtekintés';
 
   @override
+  String plannerCanvas_export_failed(String error) {
+    return 'Az exportálás sikertelen: $error';
+  }
+
+  @override
   String plannerCanvas_follow_chip(String name) {
     return '$name követése';
   }
@@ -19187,13 +19192,19 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get plannerCanvas_share_menu => 'Tervfájl megosztása';
+  String get plannerCanvas_share_menu => 'Tervfájl exportálása';
+
+  @override
+  String get plannerCanvas_share_saved => 'Tervfájl mentve';
 
   @override
   String get plannerCanvas_slate_menu => 'Tábla exportálása (PDF)';
 
   @override
   String get plannerCanvas_slate_minGas => 'Minimális gáz';
+
+  @override
+  String get plannerCanvas_slate_saved => 'Tábla mentve';
 
   @override
   String get plannerCanvas_slate_turn => 'Forduló';

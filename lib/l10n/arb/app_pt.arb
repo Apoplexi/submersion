@@ -5443,6 +5443,14 @@
   "plannerCanvas_contingency_turnRule": "Regra de pressão de retorno",
   "plannerCanvas_convert_success": "Mergulho criado a partir do plano",
   "plannerCanvas_convert_view": "Ver",
+  "plannerCanvas_export_failed": "Falha na exportação: {error}",
+  "@plannerCanvas_export_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "plannerCanvas_follow_chip": "Seguindo {name}",
   "plannerCanvas_follow_empty": "Ainda não há mergulhos registrados",
   "plannerCanvas_follow_noTissues": "Sem dados de perfil nesse mergulho — intervalo de superfície definido sem saturação dos tecidos",
@@ -5483,9 +5491,11 @@
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importar",
   "plannerCanvas_share_importFailed": "Não foi possível importar o plano: {reason}",
-  "plannerCanvas_share_menu": "Compartilhar arquivo do plano",
+  "plannerCanvas_share_menu": "Exportar arquivo do plano",
+  "plannerCanvas_share_saved": "Arquivo do plano salvo",
   "plannerCanvas_slate_menu": "Exportar prancheta (PDF)",
   "plannerCanvas_slate_minGas": "Gás mínimo",
+  "plannerCanvas_slate_saved": "Prancheta salva",
   "plannerCanvas_slate_turn": "Retorno",
   "plannerCanvas_table_depth": "Profundidade",
   "plannerCanvas_table_gas": "Gás",

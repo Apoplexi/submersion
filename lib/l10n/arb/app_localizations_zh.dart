@@ -18167,6 +18167,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get plannerCanvas_convert_view => '查看';
 
   @override
+  String plannerCanvas_export_failed(String error) {
+    return '导出失败：$error';
+  }
+
+  @override
   String plannerCanvas_follow_chip(String name) {
     return '跟随 $name';
   }
@@ -18325,13 +18330,19 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get plannerCanvas_share_menu => '分享计划文件';
+  String get plannerCanvas_share_menu => '导出计划文件';
+
+  @override
+  String get plannerCanvas_share_saved => '计划文件已保存';
 
   @override
   String get plannerCanvas_slate_menu => '导出潜水板（PDF）';
 
   @override
   String get plannerCanvas_slate_minGas => '最低气量';
+
+  @override
+  String get plannerCanvas_slate_saved => '潜水板已保存';
 
   @override
   String get plannerCanvas_slate_turn => '折返';
