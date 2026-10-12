@@ -46324,6 +46324,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get maps_regionDownload_downloadButton => 'Télécharger';
 
   @override
+  String get maps_regionDownload_presetOverview => 'Aperçu';
+
+  @override
+  String get maps_regionDownload_presetDetail => 'Détail';
+
+  @override
+  String get maps_regionDownload_presetFull => 'Complet';
+
+  @override
+  String get maps_regionDownload_tooManyTiles =>
+      'Plus de 100 000 tuiles : réduisez la zone ou baissez le zoom maximal.';
+
+  @override
+  String get maps_regionDownload_socks5Unsupported =>
+      'Les téléchargements de régions ne peuvent pas utiliser de proxy SOCKS5 : passez à un proxy HTTP ou à « Aucun proxy » dans les réglages réseau.';
+
+  @override
   String get diveLog_map_title => 'Activité de plongée';
 
   @override

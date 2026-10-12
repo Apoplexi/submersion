@@ -46840,6 +46840,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get maps_regionDownload_downloadButton => 'تنزيل';
 
   @override
+  String get maps_regionDownload_presetOverview => 'نظرة عامة';
+
+  @override
+  String get maps_regionDownload_presetDetail => 'تفصيلي';
+
+  @override
+  String get maps_regionDownload_presetFull => 'كامل';
+
+  @override
+  String get maps_regionDownload_tooManyTiles =>
+      'أكثر من 100,000 بلاطة: صغّر المنطقة أو اخفض أقصى تكبير.';
+
+  @override
+  String get maps_regionDownload_socks5Unsupported =>
+      'لا يمكن لتنزيلات المناطق استخدام وكيل SOCKS5: انتقل إلى وكيل HTTP أو إلى «بدون وكيل» في إعدادات الشبكة.';
+
+  @override
   String get diveLog_map_title => 'نشاط الغوص';
 
   @override
