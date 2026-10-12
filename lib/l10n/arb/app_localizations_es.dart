@@ -2485,6 +2485,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esta copia de seguridad se eliminará permanentemente. Esta acción no se puede deshacer.';
 
   @override
+  String get backup_delete_dialog_content_otherDevice =>
+      'Esta copia de seguridad solo está en tu almacenamiento en la nube y nada indica que la haya creado este dispositivo. Puede ser la única copia de otro dispositivo, o una que este dispositivo creó antes de una reinstalación. Eliminarla no se puede deshacer.';
+
+  @override
   String get backup_delete_dialog_delete => 'Eliminar';
 
   @override
@@ -49488,6 +49492,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String backup_history_preDowngradeSubtitle(String size) {
     return 'Base de datos más reciente, conservada al volver atrás - $size';
+  }
+
+  @override
+  String backup_history_cloudOnlySubtitle(String size) {
+    return 'En el almacenamiento en la nube ($size)';
   }
 
   @override
