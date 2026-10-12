@@ -34172,7 +34172,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get safetySettings_noFlyHeader => '潜水后飞行';
 
   @override
-  String get safetySettings_cnsOtuHeader => '当前CNS/OTU负荷';
+  String get safetySettings_cnsOtuHeader => '当前潜水负荷';
 
   @override
   String get safetySettings_noFlyPreset_standard => '标准(12/18/24 小时)';
@@ -34242,6 +34242,20 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get safetyHub_cnsOtu_noProfile_body =>
       '没有深度剖面，无法计算其 CNS% 和 OTU。下方合计不包含此次潜水。';
+
+  @override
+  String get safetyHub_cnsOtu_about_title => '关于 CNS 和 OTU';
+
+  @override
+  String get safetyHub_cnsOtu_about_body =>
+      '潜水后 CNS%（氧气钟）以 90 分钟的半衰期衰减——大约一天后基本降回 0。\n\n每日 OTU 每晚午夜重置。每周 OTU 是过去 7 天的滚动总和：较早的潜水一旦超出该时间窗口，就会自动从计算中剔除。';
+
+  @override
+  String get safetyHub_tissueLoading_about_title => '关于组织饱和度';
+
+  @override
+  String get safetyHub_tissueLoading_about_body =>
+      '你的身体有 16 个组织舱室，以不同速度吸收和释放氮气（在三元气体或循环呼吸器潜水中，还有氦气）。快速组织饱和与脱饱和都很快；慢速组织两者都需要更长时间。\n\n使用氦气潜水后，同一舱室中的氮气和氦气可能会短暂地朝相反方向变化：氦气仍在释放的同时，同一舱室可能同时在吸收少量氮气，直到两种气体都与你呼吸的空气达到平衡。这就是为什么一个舱室可能短暂显示\"Ongassing\"，即使其总负荷仍在下降。';
 
   @override
   String safetyHub_noFly_category_single(int hours) {

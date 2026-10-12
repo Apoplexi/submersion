@@ -36677,7 +36677,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetySettings_noFlyHeader => 'الطيران بعد الغوص';
 
   @override
-  String get safetySettings_cnsOtuHeader => 'الحمل الحالي لـ CNS/OTU';
+  String get safetySettings_cnsOtuHeader => 'حمل الغطس الحالي';
 
   @override
   String get safetySettings_noFlyPreset_standard => 'قياسي (12/18/24 س)';
@@ -36750,6 +36750,20 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get safetyHub_cnsOtu_noProfile_body =>
       'لا يمكن حساب CNS% و OTU لها بدون بيانات العمق. المجاميع أدناه لا تشملها.';
+
+  @override
+  String get safetyHub_cnsOtu_about_title => 'حول CNS وOTU';
+
+  @override
+  String get safetyHub_cnsOtu_about_body =>
+      'تنخفض نسبة CNS% (ساعة الأكسجين) بعد الغطسة بعمر نصف 90 دقيقة — تعود عمليًا إلى 0 بعد نحو يوم واحد.\n\nيُعاد ضبط OTU اليومي كل ليلة عند منتصف الليل. أما OTU الأسبوعي فهو مجموع متجدد لآخر 7 أيام: تسقط الغطسات الأقدم تلقائيًا من الحساب بمجرد خروجها من هذا النطاق.';
+
+  @override
+  String get safetyHub_tissueLoading_about_title => 'حول تشبّع الأنسجة';
+
+  @override
+  String get safetyHub_tissueLoading_about_body =>
+      'يحتوي جسمك على 16 حجرة نسيجية تمتص وتطلق النيتروجين (وكذلك الهيليوم في غطسات التريميكس أو أجهزة إعادة التنفس) بسرعات مختلفة. الأنسجة السريعة تتشبّع وتتخلّص من التشبّع بسرعة؛ أما الأنسجة البطيئة فتحتاج وقتًا أطول بكثير لكليهما.\n\nبعد غطسة بالهيليوم، يمكن أن يتحرك النيتروجين والهيليوم في نفس الحجرة لفترة وجيزة باتجاهين متعاكسين: بينما لا يزال الهيليوم يتحرر، يمكن لنفس الحجرة أن تمتص القليل من النيتروجين في الوقت نفسه، حتى يصل الغازان إلى التوازن مع الهواء الذي تتنفسه. لهذا قد تُظهر الحجرة مؤقتًا \"Ongassing\" حتى وإن استمر حملها الإجمالي بالانخفاض.';
 
   @override
   String safetyHub_noFly_category_single(int hours) {

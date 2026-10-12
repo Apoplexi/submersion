@@ -36244,7 +36244,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get safetySettings_noFlyHeader => 'Volar después de bucear';
 
   @override
-  String get safetySettings_cnsOtuHeader => 'Carga actual de CNS/OTU';
+  String get safetySettings_cnsOtuHeader => 'Carga de inmersión actual';
 
   @override
   String get safetySettings_noFlyPreset_standard => 'Estándar (12/18/24 h)';
@@ -36318,6 +36318,20 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get safetyHub_cnsOtu_noProfile_body =>
       'Sin perfil de profundidad no se pueden calcular su CNS% ni sus OTU. Los totales de abajo no la incluyen.';
+
+  @override
+  String get safetyHub_cnsOtu_about_title => 'Sobre CNS y OTU';
+
+  @override
+  String get safetyHub_cnsOtu_about_body =>
+      'Su CNS% (reloj de oxígeno) decae tras la inmersión con una semivida de 90 minutos; prácticamente vuelve a 0 al cabo de un día.\n\nLa OTU diaria se reinicia cada noche a medianoche. La OTU semanal es un total móvil de los últimos 7 días: las inmersiones más antiguas salen automáticamente del cálculo en cuanto quedan fuera de esa ventana.';
+
+  @override
+  String get safetyHub_tissueLoading_about_title => 'Sobre la carga tisular';
+
+  @override
+  String get safetyHub_tissueLoading_about_body =>
+      'Su cuerpo tiene 16 compartimentos tisulares que absorben y liberan nitrógeno (y, en inmersiones con trimix o reciclador, también helio) a distintas velocidades. Los tejidos rápidos se saturan y desaturan deprisa; los lentos tardan mucho más en ambas cosas.\n\nTras una inmersión con helio, el nitrógeno y el helio de un mismo compartimento pueden moverse brevemente en direcciones opuestas: mientras el helio aún se está liberando, ese mismo compartimento puede estar absorbiendo algo de nitrógeno a la vez, hasta que ambos gases alcanzan el equilibrio con el aire que respira. Por eso un compartimento puede mostrar brevemente \"Ongassing\" incluso mientras su carga total sigue bajando.';
 
   @override
   String safetyHub_noFly_category_single(int hours) {
