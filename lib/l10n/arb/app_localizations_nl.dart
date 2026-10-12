@@ -21160,7 +21160,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_cloudSync_provider_webdav_subtitle =>
-      'Nextcloud, ownCloud, Synology, Koofr en andere WebDAV-servers';
+      'Elke WebDAV-server';
 
   @override
   String get settings_cloudSync_provider_webdav_title => 'WebDAV';
@@ -25150,9 +25150,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_webdavConfig_appBar_title => 'WebDAV';
 
   @override
-  String get settings_webdavConfig_davRoot_label => 'WebDAV-adres';
-
-  @override
   String get settings_webdavConfig_error_conflict =>
       'De map kon niet op de server worden aangemaakt.';
 
@@ -25174,7 +25171,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_webdavConfig_error_notFound =>
-      'Geen WebDAV-map op dit adres. Controleer het servertype en het adres.';
+      'Geen WebDAV-map op dit adres. Controleer het adres.';
 
   @override
   String get settings_webdavConfig_error_notWebDav =>
@@ -25230,52 +25227,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_webdavConfig_field_password_label => 'Wachtwoord';
 
   @override
-  String get settings_webdavConfig_field_preset_label => 'Servertype';
+  String get settings_webdavConfig_field_serverUrl_helper =>
+      'Het volledige WebDAV-adres uit de instellingen van uw server, inclusief pad';
 
   @override
   String get settings_webdavConfig_field_serverUrl_hintDav =>
       'https://example.com/dav';
 
   @override
-  String get settings_webdavConfig_field_serverUrl_hintHost =>
-      'https://cloud.example.com';
-
-  @override
-  String get settings_webdavConfig_field_serverUrl_hintSynology =>
-      'https://nas.local:5006';
-
-  @override
-  String get settings_webdavConfig_field_serverUrl_label => 'Serveradres';
+  String get settings_webdavConfig_field_serverUrl_label => 'WebDAV-adres';
 
   @override
   String get settings_webdavConfig_field_username_label => 'Gebruikersnaam';
-
-  @override
-  String get settings_webdavConfig_preset_fastmail => 'Fastmail Files';
-
-  @override
-  String get settings_webdavConfig_preset_koofr => 'Koofr';
-
-  @override
-  String get settings_webdavConfig_preset_nextcloud => 'Nextcloud';
-
-  @override
-  String get settings_webdavConfig_preset_other => 'Andere WebDAV-server';
-
-  @override
-  String get settings_webdavConfig_preset_owncloud => 'ownCloud';
-
-  @override
-  String get settings_webdavConfig_preset_pcloudEu => 'pCloud (EU)';
-
-  @override
-  String get settings_webdavConfig_preset_pcloudUs => 'pCloud (VS)';
-
-  @override
-  String get settings_webdavConfig_preset_synology => 'Synology-NAS';
-
-  @override
-  String get settings_webdavConfig_preset_yandex => 'Yandex Disk';
 
   @override
   String get settings_webdavConfig_remove_confirm_action => 'Verwijderen';
@@ -25293,10 +25256,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_webdavConfig_saved => 'WebDAV-configuratie opgeslagen';
-
-  @override
-  String get settings_webdavConfig_synology_helper =>
-      'Schakel WebDAV Server in via Pakketcentrum. De HTTPS-poort is meestal 5006.';
 
   @override
   String get settings_webdavConfig_test_success => 'Verbinding geslaagd';
