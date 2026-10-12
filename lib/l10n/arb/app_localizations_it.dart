@@ -11564,6 +11564,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveSites_group_noCountry => 'Nessun paese';
 
   @override
+  String get diveSites_group_noBodyOfWater => 'Nessuno specchio d\'acqua';
+
+  @override
   String diveSites_group_siteCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -11584,7 +11587,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveSites_list_groupBy_location => 'Paese e regione';
 
   @override
+  String get diveSites_list_groupBy_locationAndWater =>
+      'Paese e specchio d\'acqua';
+
+  @override
   String get diveSites_list_groupBy_none => 'Nessuno';
+
+  @override
+  String get diveSites_list_groupBy_water => 'Specchio d\'acqua';
 
   @override
   String diveSites_list_tile_diveCount(int count) {

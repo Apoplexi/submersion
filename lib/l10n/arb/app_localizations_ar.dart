@@ -11710,6 +11710,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_group_noCountry => 'بلا دولة';
 
   @override
+  String get diveSites_group_noBodyOfWater => 'بلا مسطح مائي';
+
+  @override
   String diveSites_group_siteCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -11734,7 +11737,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_list_groupBy_location => 'الدولة والمنطقة';
 
   @override
+  String get diveSites_list_groupBy_locationAndWater => 'الدولة والمسطح المائي';
+
+  @override
   String get diveSites_list_groupBy_none => 'بلا';
+
+  @override
+  String get diveSites_list_groupBy_water => 'المسطح المائي';
 
   @override
   String diveSites_list_tile_diveCount(int count) {
