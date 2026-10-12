@@ -13712,10 +13712,76 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String passport_scan_filledFromUsed(String name, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'مُلئ من $name. استُخدمت في $count غطسة سابقة.',
+      many: 'مُلئ من $name. استُخدمت في $count غطسة سابقة.',
+      few: 'مُلئ من $name. استُخدمت في $count غطسات سابقة.',
+      two: 'مُلئ من $name. استُخدمت في غطستين سابقتين.',
+      one: 'مُلئ من $name. استُخدمت في $count غطسة سابقة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get passport_foreign_title => 'بطاقة الأسطوانة';
 
   @override
   String get passport_foreign_notInGear => 'هذه الأسطوانة ليست ضمن معداتك.';
+
+  @override
+  String passport_usage_foreignTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'لقد استخدمت هذه الأسطوانة $count مرة',
+      many: 'لقد استخدمت هذه الأسطوانة $count مرة',
+      few: 'لقد استخدمت هذه الأسطوانة $count مرات',
+      two: 'لقد استخدمت هذه الأسطوانة مرتين',
+      one: 'لقد استخدمت هذه الأسطوانة $count مرة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get passport_usage_title => 'الغطسات';
+
+  @override
+  String passport_usage_ownTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'استُخدمت في $count غطسة',
+      many: 'استُخدمت في $count غطسة',
+      few: 'استُخدمت في $count غطسات',
+      two: 'استُخدمت في غطستين',
+      one: 'استُخدمت في $count غطسة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String passport_usage_lastUsed(String date) {
+    return 'آخر استخدام: $date';
+  }
+
+  @override
+  String get passport_usage_noSite => 'لا يوجد موقع';
+
+  @override
+  String passport_usage_diveNumber(int number) {
+    return 'الغطسة $number';
+  }
+
+  @override
+  String passport_usage_showAll(int count) {
+    return 'عرض الكل ($count)';
+  }
+
+  @override
+  String get passport_usage_loadFailed => 'تعذّر تحميل غطساتك بهذه الأسطوانة';
 
   @override
   String passport_foreign_writtenOn(String date) {

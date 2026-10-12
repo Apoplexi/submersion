@@ -366,5 +366,13 @@ extension RungsFromV231 on AppDatabase {
       await _assertEquipmentDefaultStatusesColumn();
     }
     if (from < 286) await reportProgress();
+    // v287: dive_tanks.passport_id (issue #2650). Column only, no backfill:
+    // nothing recorded which tag an older tank came from. Re-asserted in
+    // beforeOpen; the index is in performance_indexes.dart. Renumbered from
+    // 285 and 286, which #3306 and #3319 shipped first.
+    if (from < 287) {
+      await _assertTankPassportIdColumn();
+    }
+    if (from < 287) await reportProgress();
   }
 }
