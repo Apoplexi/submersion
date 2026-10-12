@@ -47874,6 +47874,12 @@ abstract class AppLocalizations {
   /// **'View All'**
   String get trips_photos_viewAll;
 
+  /// No description provided for @trips_picker_alreadyPacked.
+  ///
+  /// In en, this message translates to:
+  /// **'Already packed'**
+  String get trips_picker_alreadyPacked;
+
   /// No description provided for @trips_picker_clearTooltip.
   ///
   /// In en, this message translates to:
@@ -73994,6 +74000,16 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name}, {startDate} to {endDate}, selected'**
   String trips_picker_tileSemanticsSelected(
+    Object name,
+    Object startDate,
+    Object endDate,
+  );
+
+  /// No description provided for @trips_picker_tileSemanticsPacked.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {startDate} to {endDate}, already packed'**
+  String trips_picker_tileSemanticsPacked(
     Object name,
     Object startDate,
     Object endDate,
