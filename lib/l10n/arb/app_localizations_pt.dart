@@ -15233,6 +15233,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Adicione seu equipamento de mergulho para acompanhar uso e manutenção';
 
   @override
+  String get equipment_list_emptyState_defaultView_subtitle =>
+      'Sua visualização padrão oculta o restante dos seus equipamentos.';
+
+  @override
+  String get equipment_list_emptyState_defaultView_title =>
+      'Nenhum equipamento na sua visualização padrão';
+
+  @override
   String get equipment_list_emptyState_filterText_equipment => 'equipamento';
 
   @override
@@ -15279,6 +15287,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum equipamento nesta categoria';
 
   @override
+  String get equipment_list_emptyState_showAll =>
+      'Mostrar Todos os Equipamentos';
+
+  @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
       'Todo o seu equipamento está em dia com a manutenção!';
 
@@ -15299,7 +15311,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_list_filterAll => 'Todos os Equipamentos';
 
   @override
-  String get equipment_list_filterCurrent => 'Equipamentos Atuais';
+  String get equipment_list_filterCurrent => 'Visualização Padrão';
 
   @override
   String get equipment_list_filterServiceDue => 'Manutenção Pendente';
@@ -15338,6 +15350,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_editDefault => 'Editar padrão';
 
   @override
   String get equipment_filter_section_tags => 'Etiquetas';
@@ -22219,6 +22234,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_conflict_field_equipmentComponents_role => 'Função';
 
   @override
+  String get settings_conflict_field_equipmentDefaultStatuses =>
+      'Visualização padrão dos equipamentos';
+
+  @override
   String get settings_conflict_field_equipmentFindings_severity => 'Gravidade';
 
   @override
@@ -24836,6 +24855,17 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_manage_locations_subtitle =>
       'Onde o equipamento está guardado, em manutenção ou emprestado';
+
+  @override
+  String get settings_equipmentDefaultView_intro =>
+      'Sem filtro, a lista de equipamentos mostra os equipamentos com estes status.';
+
+  @override
+  String get settings_equipmentDefaultView_listSeparator => ', ';
+
+  @override
+  String get settings_equipmentDefaultView_title =>
+      'Visualização padrão dos equipamentos';
 
   @override
   String get settings_manage_currencyRules => 'Validade das certificações';

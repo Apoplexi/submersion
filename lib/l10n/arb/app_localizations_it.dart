@@ -15239,6 +15239,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Aggiungi la tua attrezzatura subacquea per monitorare utilizzo e manutenzione';
 
   @override
+  String get equipment_list_emptyState_defaultView_subtitle =>
+      'La vista predefinita nasconde il resto della tua attrezzatura.';
+
+  @override
+  String get equipment_list_emptyState_defaultView_title =>
+      'Nessuna attrezzatura nella vista predefinita';
+
+  @override
   String get equipment_list_emptyState_filterText_equipment => 'attrezzatura';
 
   @override
@@ -15285,6 +15293,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessuna attrezzatura in questa categoria';
 
   @override
+  String get equipment_list_emptyState_showAll =>
+      'Mostra tutta l\'attrezzatura';
+
+  @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
       'Tutta la tua attrezzatura è in regola con la manutenzione!';
 
@@ -15305,7 +15317,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_list_filterAll => 'Tutta l\'attrezzatura';
 
   @override
-  String get equipment_list_filterCurrent => 'Attrezzatura attuale';
+  String get equipment_list_filterCurrent => 'Vista predefinita';
 
   @override
   String get equipment_list_filterServiceDue => 'Manutenzione prevista';
@@ -15344,6 +15356,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get equipment_filter_section_status => 'Stato';
+
+  @override
+  String get equipment_filter_editDefault => 'Modifica predefinita';
 
   @override
   String get equipment_filter_section_tags => 'Tag';
@@ -22235,6 +22250,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_conflict_field_equipmentComponents_role => 'Ruolo';
 
   @override
+  String get settings_conflict_field_equipmentDefaultStatuses =>
+      'Vista predefinita dell\'attrezzatura';
+
+  @override
   String get settings_conflict_field_equipmentFindings_severity => 'Gravità';
 
   @override
@@ -24856,6 +24875,17 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_manage_locations_subtitle =>
       'Dove la tua attrezzatura è riposta, in assistenza o in prestito';
+
+  @override
+  String get settings_equipmentDefaultView_intro =>
+      'Senza filtri, l\'elenco dell\'attrezzatura mostra l\'attrezzatura con questi stati.';
+
+  @override
+  String get settings_equipmentDefaultView_listSeparator => ', ';
+
+  @override
+  String get settings_equipmentDefaultView_title =>
+      'Vista predefinita dell\'attrezzatura';
 
   @override
   String get settings_manage_currencyRules => 'Validità delle certificazioni';

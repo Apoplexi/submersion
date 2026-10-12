@@ -15020,6 +15020,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add your diving equipment to track usage and service';
 
   @override
+  String get equipment_list_emptyState_defaultView_subtitle =>
+      'Your default view hides the rest of your gear.';
+
+  @override
+  String get equipment_list_emptyState_defaultView_title =>
+      'No equipment in your default view';
+
+  @override
   String get equipment_list_emptyState_filterText_equipment => 'equipment';
 
   @override
@@ -15066,6 +15074,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'No equipment in this category';
 
   @override
+  String get equipment_list_emptyState_showAll => 'Show All Equipment';
+
+  @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
       'All your equipment is up to date on service!';
 
@@ -15086,7 +15097,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_list_filterAll => 'All Equipment';
 
   @override
-  String get equipment_list_filterCurrent => 'Current Equipment';
+  String get equipment_list_filterCurrent => 'Default View';
 
   @override
   String get equipment_list_filterServiceDue => 'Service Due';
@@ -15125,6 +15136,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_editDefault => 'Edit default';
 
   @override
   String get equipment_filter_section_tags => 'Tags';
@@ -21870,6 +21884,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_conflict_field_equipmentComponents_role => 'Role';
 
   @override
+  String get settings_conflict_field_equipmentDefaultStatuses =>
+      'Default equipment view';
+
+  @override
   String get settings_conflict_field_equipmentFindings_severity => 'Severity';
 
   @override
@@ -24418,6 +24436,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_manage_locations_subtitle =>
       'Where your gear is kept, serviced or lent';
+
+  @override
+  String get settings_equipmentDefaultView_intro =>
+      'When no filter is set, the Equipment list shows gear with these statuses.';
+
+  @override
+  String get settings_equipmentDefaultView_listSeparator => ', ';
+
+  @override
+  String get settings_equipmentDefaultView_title => 'Default equipment view';
 
   @override
   String get settings_manage_currencyRules => 'Certification currency';
