@@ -354,5 +354,11 @@ extension RungsFromV231 on AppDatabase {
       await _assertProfileMetricColorColumns();
     }
     if (from < 284) await reportProgress();
+    // v285: nav_tracks.source_metadata (issue #3047). Column only, no
+    // backfill; re-asserted in beforeOpen through _assertNavTracksSchema.
+    if (from < 285) {
+      await _assertNavTrackSourceMetadataColumn();
+    }
+    if (from < 285) await reportProgress();
   }
 }

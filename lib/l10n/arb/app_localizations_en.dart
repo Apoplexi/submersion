@@ -22611,6 +22611,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_conflict_field_sourceItemId => 'Linked item';
 
   @override
+  String get settings_conflict_field_sourceMetadata =>
+      'Extra data from the source';
+
+  @override
   String get settings_conflict_field_sourceRef => 'Source file or device';
 
   @override

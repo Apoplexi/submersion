@@ -23011,6 +23011,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_conflict_field_sourceItemId => 'Elemento vinculado';
 
   @override
+  String get settings_conflict_field_sourceMetadata =>
+      'Datos adicionales del origen';
+
+  @override
   String get settings_conflict_field_sourceRef =>
       'Archivo o dispositivo de origen';
 

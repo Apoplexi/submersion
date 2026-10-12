@@ -22418,6 +22418,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_conflict_field_sourceItemId => 'פריט מקושר';
 
   @override
+  String get settings_conflict_field_sourceMetadata => 'נתונים נוספים מהמקור';
+
+  @override
   String get settings_conflict_field_sourceRef => 'קובץ או מכשיר המקור';
 
   @override
