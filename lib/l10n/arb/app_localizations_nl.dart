@@ -5589,6 +5589,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_lastDiveSpan(String span) {
+    return 'Laatste duik $span geleden';
+  }
+
+  @override
   String get dashboard_gauges_lastDiveToday => 'Vandaag gedoken';
 
   @override
@@ -13855,11 +13860,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String pdf_minutesShort(String minutes) {
-    return '${minutes}m';
-  }
-
-  @override
   String pdf_minutes(String minutes) {
     return '$minutes min';
   }
@@ -14140,8 +14140,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pdf_pressureEnd => 'Eind';
 
   @override
-  String pdf_surfaceIntervalShort(String minutes) {
-    return 'OI: ${minutes}min';
+  String pdf_surfaceIntervalSpan(String interval) {
+    return 'OI: $interval';
   }
 
   @override
@@ -27536,6 +27536,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String insights_observations_diveGapSpan(String span) {
+    return 'Uw laatste duik was $span geleden';
+  }
+
+  @override
   String insights_observations_favouriteSite(
     String site,
     String dives,
@@ -27783,19 +27788,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get insights_timePatterns_surfaceInterval_error =>
       'Kan oppervlakte-intervalgegevens niet laden';
-
-  @override
-  String insights_timePatterns_surfaceInterval_formatHoursMinutes(
-    Object hours,
-    Object minutes,
-  ) {
-    return '${hours}u ${minutes}m';
-  }
-
-  @override
-  String insights_timePatterns_surfaceInterval_formatMinutes(Object minutes) {
-    return '$minutes min';
-  }
 
   @override
   String get insights_timePatterns_surfaceInterval_maximum => 'Maximum';
@@ -44385,6 +44377,36 @@ class AppLocalizationsNl extends AppLocalizations {
       one: 'over ${count}d',
     );
     return '$_temp0';
+  }
+
+  @override
+  String common_elapsed_minutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String common_elapsed_hoursMinutes(int hours, int minutes) {
+    return '${hours}u ${minutes}m';
+  }
+
+  @override
+  String common_elapsed_daysHours(int days, int hours) {
+    return '${days}d ${hours}u';
+  }
+
+  @override
+  String common_elapsed_yearsDays(int years, int days) {
+    return '${years}j ${days}d';
+  }
+
+  @override
+  String common_elapsed_daysHoursMinutes(int days, int hours, int minutes) {
+    return '${days}d ${hours}u ${minutes}m';
+  }
+
+  @override
+  String common_elapsed_yearsDaysHours(int years, int days, int hours) {
+    return '${years}j ${days}d ${hours}u';
   }
 
   @override

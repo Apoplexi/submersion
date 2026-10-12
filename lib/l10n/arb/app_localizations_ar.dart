@@ -5705,6 +5705,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_lastDiveSpan(String span) {
+    return 'آخر غطسة منذ $span';
+  }
+
+  @override
   String get dashboard_gauges_lastDiveToday => 'غطست اليوم';
 
   @override
@@ -14110,11 +14115,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String pdf_minutesShort(String minutes) {
-    return '$minutes د';
-  }
-
-  @override
   String pdf_minutes(String minutes) {
     return '$minutes دقيقة';
   }
@@ -14399,8 +14399,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pdf_pressureEnd => 'النهاية';
 
   @override
-  String pdf_surfaceIntervalShort(String minutes) {
-    return 'فترة السطح: $minutes د';
+  String pdf_surfaceIntervalSpan(String interval) {
+    return 'فترة السطح: $interval';
   }
 
   @override
@@ -27912,6 +27912,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String insights_observations_diveGapSpan(String span) {
+    return 'كانت آخر غوصة لك قبل $span';
+  }
+
+  @override
   String insights_observations_favouriteSite(
     String site,
     String dives,
@@ -28152,19 +28157,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get insights_timePatterns_surfaceInterval_error =>
       'فشل تحميل بيانات فترة السطح';
-
-  @override
-  String insights_timePatterns_surfaceInterval_formatHoursMinutes(
-    Object hours,
-    Object minutes,
-  ) {
-    return '$hours س $minutes د';
-  }
-
-  @override
-  String insights_timePatterns_surfaceInterval_formatMinutes(Object minutes) {
-    return '$minutes min';
-  }
 
   @override
   String get insights_timePatterns_surfaceInterval_maximum => 'الأقصى';
@@ -45196,6 +45188,36 @@ class AppLocalizationsAr extends AppLocalizations {
       zero: 'خلال $count يوم',
     );
     return '$_temp0';
+  }
+
+  @override
+  String common_elapsed_minutes(int minutes) {
+    return '$minutes دقيقة';
+  }
+
+  @override
+  String common_elapsed_hoursMinutes(int hours, int minutes) {
+    return '$hours س $minutes د';
+  }
+
+  @override
+  String common_elapsed_daysHours(int days, int hours) {
+    return '$days ي $hours س';
+  }
+
+  @override
+  String common_elapsed_yearsDays(int years, int days) {
+    return '$years سنة $days ي';
+  }
+
+  @override
+  String common_elapsed_daysHoursMinutes(int days, int hours, int minutes) {
+    return '$days ي $hours س $minutes د';
+  }
+
+  @override
+  String common_elapsed_yearsDaysHours(int years, int days, int hours) {
+    return '$years سنة $days ي $hours س';
   }
 
   @override
