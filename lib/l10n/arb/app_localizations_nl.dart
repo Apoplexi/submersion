@@ -15052,6 +15052,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_edit_thicknessDesignationHint => 'bijv. 5, 5/4, 7/5/3';
 
   @override
+  String get equipment_edit_focalLengthHint => 'bijv. 60 of 15-45';
+
+  @override
   String get equipment_edit_webLinkHint => 'bijv. shop.example.com/product';
 
   @override
@@ -35837,6 +35840,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_edit_invalidThickness => 'Gebruik 5, 5/4 of 7/5/3';
+
+  @override
+  String get equipment_edit_invalidFocalLength => 'Gebruik 60 of 15-45';
 
   @override
   String get equipment_edit_invalidWebLink =>

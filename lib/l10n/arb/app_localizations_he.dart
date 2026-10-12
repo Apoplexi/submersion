@@ -14839,6 +14839,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_edit_thicknessDesignationHint => 'למשל, 5, 5/4, 7/5/3';
 
   @override
+  String get equipment_edit_focalLengthHint => 'לדוגמה 60 או 15-45';
+
+  @override
   String get equipment_edit_webLinkHint => 'למשל shop.example.com/product';
 
   @override
@@ -35204,6 +35207,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_edit_invalidThickness => 'השתמשו ב-5, 5/4 או 7/5/3';
+
+  @override
+  String get equipment_edit_invalidFocalLength => 'השתמשו ב-60 או 15-45';
 
   @override
   String get equipment_edit_invalidWebLink =>

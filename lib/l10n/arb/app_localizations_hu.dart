@@ -15100,6 +15100,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_edit_thicknessDesignationHint => 'pl. 5, 5/4, 7/5/3';
 
   @override
+  String get equipment_edit_focalLengthHint => 'pl. 60 vagy 15-45';
+
+  @override
   String get equipment_edit_webLinkHint => 'pl. shop.example.com/product';
 
   @override
@@ -35881,6 +35884,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_edit_invalidThickness => 'Formátum: 5, 5/4 vagy 7/5/3';
+
+  @override
+  String get equipment_edit_invalidFocalLength => 'Formátum: 60 vagy 15-45';
 
   @override
   String get equipment_edit_invalidWebLink =>
