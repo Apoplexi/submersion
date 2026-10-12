@@ -14462,7 +14462,7 @@ class AppLocalizationsNl extends AppLocalizations {
     int remaining,
     int total,
   ) {
-    return '$used duiken, $remaining van $total resterend';
+    return '$used van $total duiken, $remaining resterend';
   }
 
   @override
@@ -14592,7 +14592,7 @@ class AppLocalizationsNl extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used uur, $remaining van $total resterend';
+    return '$used van $total uur, $remaining resterend';
   }
 
   @override
@@ -14601,7 +14601,7 @@ class AppLocalizationsNl extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used uren in zout water, $remaining van $total over';
+    return '$used van $total uren in zout water, $remaining resterend';
   }
 
   @override
@@ -14610,7 +14610,7 @@ class AppLocalizationsNl extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used koudwaterduiken, $remaining van $total over';
+    return '$used van $total koudwaterduiken, $remaining resterend';
   }
 
   @override
@@ -14619,7 +14619,7 @@ class AppLocalizationsNl extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used uren met hoog O2, $remaining van $total over';
+    return '$used van $total uren met hoog O2, $remaining resterend';
   }
 
   @override
@@ -14628,7 +14628,7 @@ class AppLocalizationsNl extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used diepe duiken, $remaining van $total over';
+    return '$used van $total diepe duiken, $remaining resterend';
   }
 
   @override
@@ -14637,7 +14637,7 @@ class AppLocalizationsNl extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used batterijcycli, $remaining van $total over';
+    return '$used van $total batterijcycli, $remaining resterend';
   }
 
   @override

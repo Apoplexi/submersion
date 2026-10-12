@@ -14259,7 +14259,7 @@ class AppLocalizationsHe extends AppLocalizations {
     int remaining,
     int total,
   ) {
-    return '$used צלילות, נותרו $remaining מתוך $total';
+    return '$used מתוך $total צלילות, נותרו $remaining';
   }
 
   @override
@@ -14387,7 +14387,7 @@ class AppLocalizationsHe extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used שעות, נותרו $remaining מתוך $total';
+    return '$used מתוך $total שעות, נותרו $remaining';
   }
 
   @override
@@ -14396,7 +14396,7 @@ class AppLocalizationsHe extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used שעות במים מלוחים, נותרו $remaining מתוך $total';
+    return '$used מתוך $total שעות במים מלוחים, נותרו $remaining';
   }
 
   @override
@@ -14405,7 +14405,7 @@ class AppLocalizationsHe extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used צלילות במים קרים, נותרו $remaining מתוך $total';
+    return '$used מתוך $total צלילות במים קרים, נותרו $remaining';
   }
 
   @override
@@ -14414,7 +14414,7 @@ class AppLocalizationsHe extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used שעות בחמצן גבוה, נותרו $remaining מתוך $total';
+    return '$used מתוך $total שעות בחמצן גבוה, נותרו $remaining';
   }
 
   @override
@@ -14423,7 +14423,7 @@ class AppLocalizationsHe extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used צלילות עמוקות, נותרו $remaining מתוך $total';
+    return '$used מתוך $total צלילות עמוקות, נותרו $remaining';
   }
 
   @override
@@ -14432,7 +14432,7 @@ class AppLocalizationsHe extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used מחזורי סוללה, נותרו $remaining מתוך $total';
+    return '$used מתוך $total מחזורי סוללה, נותרו $remaining';
   }
 
   @override

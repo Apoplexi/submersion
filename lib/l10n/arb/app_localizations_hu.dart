@@ -14515,7 +14515,7 @@ class AppLocalizationsHu extends AppLocalizations {
     int remaining,
     int total,
   ) {
-    return '$used merülés, $remaining / $total van hátra';
+    return '$used/$total merülésből $remaining van hátra';
   }
 
   @override
@@ -14642,7 +14642,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used óra, $remaining / $total van hátra';
+    return '$used/$total órából $remaining van hátra';
   }
 
   @override
@@ -14651,7 +14651,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used sós vízi óra, $remaining / $total van hátra';
+    return '$used/$total sós vízi órából $remaining van hátra';
   }
 
   @override
@@ -14660,7 +14660,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used hideg vízi merülés, $remaining / $total van hátra';
+    return '$used/$total hideg vízi merülésből $remaining van hátra';
   }
 
   @override
@@ -14669,7 +14669,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used magas O2-tartalmú óra, $remaining / $total van hátra';
+    return '$used/$total magas O2-tartalmú órából $remaining van hátra';
   }
 
   @override
@@ -14678,7 +14678,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used mély merülés, $remaining / $total van hátra';
+    return '$used/$total mély merülésből $remaining van hátra';
   }
 
   @override
@@ -14687,7 +14687,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used akkumulátorciklus, $remaining / $total van hátra';
+    return '$used/$total akkumulátorciklusból $remaining van hátra';
   }
 
   @override

@@ -14554,7 +14554,7 @@ class AppLocalizationsPt extends AppLocalizations {
     int remaining,
     int total,
   ) {
-    return '$used mergulhos, restam $remaining de $total';
+    return '$used de $total mergulhos, restam $remaining';
   }
 
   @override
@@ -14685,7 +14685,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used horas, restam $remaining de $total';
+    return '$used de $total horas, restam $remaining';
   }
 
   @override
@@ -14694,7 +14694,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used horas em água salgada, restam $remaining de $total';
+    return '$used de $total horas em água salgada, restam $remaining';
   }
 
   @override
@@ -14703,7 +14703,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used mergulhos em água fria, restam $remaining de $total';
+    return '$used de $total mergulhos em água fria, restam $remaining';
   }
 
   @override
@@ -14712,7 +14712,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used horas com O2 elevado, restam $remaining de $total';
+    return '$used de $total horas com O2 elevado, restam $remaining';
   }
 
   @override
@@ -14721,7 +14721,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used mergulhos profundos, restam $remaining de $total';
+    return '$used de $total mergulhos profundos, restam $remaining';
   }
 
   @override
@@ -14730,7 +14730,7 @@ class AppLocalizationsPt extends AppLocalizations {
     String remaining,
     String total,
   ) {
-    return '$used ciclos de bateria, restam $remaining de $total';
+    return '$used de $total ciclos de bateria, restam $remaining';
   }
 
   @override
