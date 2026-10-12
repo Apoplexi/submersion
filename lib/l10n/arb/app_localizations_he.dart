@@ -18749,6 +18749,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_apply => 'החל';
 
   @override
+  String get media_library_thumbnailSize => 'גודל התמונות הממוזערות';
+
+  @override
   String get media_library_sort_title => 'מיון מדיה';
 
   @override
