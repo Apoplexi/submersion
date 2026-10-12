@@ -20705,6 +20705,111 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo guardar el diseño de navegación. Inténtalo de nuevo.';
 
   @override
+  String get navShortcut_noFly => 'Tiempo sin volar';
+
+  @override
+  String get navShortcut_cnsOtu => 'CNS/OTU';
+
+  @override
+  String get navShortcut_records => 'Récords';
+
+  @override
+  String get navShortcut_sitesMap => 'Mapa de puntos de buceo';
+
+  @override
+  String get navShortcut_diveActivityMap => 'Mapa de actividad de buceo';
+
+  @override
+  String get navShortcut_diveCentersMap => 'Mapa de centros de buceo';
+
+  @override
+  String get navShortcut_diverProfile => 'Perfil de buceador';
+
+  @override
+  String get navShortcut_cloudSync => 'Sincronización en la nube';
+
+  @override
+  String get navShortcut_offlineMaps => 'Mapas sin conexión';
+
+  @override
+  String get navShortcut_short_deco => 'Deco';
+
+  @override
+  String get navShortcut_short_gasCalculators => 'Calc. gas';
+
+  @override
+  String get navShortcut_short_weighting => 'Lastre';
+
+  @override
+  String get navShortcut_short_surfaceInterval => 'Int. superficie';
+
+  @override
+  String get navShortcut_short_blender => 'Mezclador';
+
+  @override
+  String get navShortcut_short_airUse => 'Consumo';
+
+  @override
+  String get navShortcut_short_patterns => 'Patrones';
+
+  @override
+  String get navShortcut_short_profiles => 'Perfiles';
+
+  @override
+  String get navShortcut_short_diveMap => 'Mapa buceo';
+
+  @override
+  String get navShortcut_short_centersMap => 'Mapa centros';
+
+  @override
+  String get navShortcut_short_gearSets => 'Conjuntos';
+
+  @override
+  String get navShortcut_short_certWallet => 'Cartera';
+
+  @override
+  String get navShortcut_short_emergency => 'Emergencia';
+
+  @override
+  String get navShortcut_short_backup => 'Copia';
+
+  @override
+  String get navShortcut_short_speciesStats => 'Estad. especies';
+
+  @override
+  String get navShortcut_short_gearStats => 'Estad. equipo';
+
+  @override
+  String get settings_navCustomization_addShortcut => 'Añadir acceso directo';
+
+  @override
+  String get settings_navCustomization_shortcutPickerTitle =>
+      'Nuevo acceso directo';
+
+  @override
+  String get settings_navCustomization_shortcutSearchHint => 'Buscar páginas';
+
+  @override
+  String get settings_navCustomization_shortcutNoMatches =>
+      'No hay páginas que coincidan';
+
+  @override
+  String get settings_navCustomization_shortcutAlreadyAdded =>
+      'Ya está en este diseño';
+
+  @override
+  String settings_navCustomization_removeShortcutLabel(String destination) {
+    return 'Quitar $destination';
+  }
+
+  @override
+  String get settings_navCustomization_group_views => 'Vistas';
+
+  @override
+  String get settings_navCustomization_group_settingsAndTools =>
+      'Configuración y herramientas';
+
+  @override
   String get settings_backToSettings_tooltip => 'Volver a ajustes';
 
   @override

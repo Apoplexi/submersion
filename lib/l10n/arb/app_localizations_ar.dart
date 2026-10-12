@@ -20961,6 +20961,110 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذّر حفظ تخطيط التنقل. حاول مرة أخرى.';
 
   @override
+  String get navShortcut_noFly => 'وقت حظر الطيران';
+
+  @override
+  String get navShortcut_cnsOtu => 'CNS/OTU';
+
+  @override
+  String get navShortcut_records => 'الأرقام القياسية';
+
+  @override
+  String get navShortcut_sitesMap => 'خريطة المواقع';
+
+  @override
+  String get navShortcut_diveActivityMap => 'خريطة نشاط الغوص';
+
+  @override
+  String get navShortcut_diveCentersMap => 'خريطة مراكز الغوص';
+
+  @override
+  String get navShortcut_diverProfile => 'ملف الغواص';
+
+  @override
+  String get navShortcut_cloudSync => 'المزامنة السحابية';
+
+  @override
+  String get navShortcut_offlineMaps => 'الخرائط غير المتصلة';
+
+  @override
+  String get navShortcut_short_deco => 'إزالة الضغط';
+
+  @override
+  String get navShortcut_short_gasCalculators => 'حاسبات الغاز';
+
+  @override
+  String get navShortcut_short_weighting => 'الأوزان';
+
+  @override
+  String get navShortcut_short_surfaceInterval => 'فترة السطح';
+
+  @override
+  String get navShortcut_short_blender => 'الخلاط';
+
+  @override
+  String get navShortcut_short_airUse => 'الاستهلاك';
+
+  @override
+  String get navShortcut_short_patterns => 'الأنماط';
+
+  @override
+  String get navShortcut_short_profiles => 'الملفات';
+
+  @override
+  String get navShortcut_short_diveMap => 'خريطة الغوص';
+
+  @override
+  String get navShortcut_short_centersMap => 'خريطة المراكز';
+
+  @override
+  String get navShortcut_short_gearSets => 'المجموعات';
+
+  @override
+  String get navShortcut_short_certWallet => 'المحفظة';
+
+  @override
+  String get navShortcut_short_emergency => 'الطوارئ';
+
+  @override
+  String get navShortcut_short_backup => 'النسخ الاحتياطي';
+
+  @override
+  String get navShortcut_short_speciesStats => 'إحصاءات الأنواع';
+
+  @override
+  String get navShortcut_short_gearStats => 'إحصاءات المعدات';
+
+  @override
+  String get settings_navCustomization_addShortcut => 'إضافة اختصار';
+
+  @override
+  String get settings_navCustomization_shortcutPickerTitle => 'اختصار جديد';
+
+  @override
+  String get settings_navCustomization_shortcutSearchHint => 'البحث في الصفحات';
+
+  @override
+  String get settings_navCustomization_shortcutNoMatches =>
+      'لا توجد صفحات مطابقة';
+
+  @override
+  String get settings_navCustomization_shortcutAlreadyAdded =>
+      'موجود بالفعل في هذا التخطيط';
+
+  @override
+  String settings_navCustomization_removeShortcutLabel(String destination) {
+    return 'إزالة $destination';
+  }
+
+  @override
+  String get settings_navCustomization_group_views => 'العروض';
+
+  @override
+  String get settings_navCustomization_group_settingsAndTools =>
+      'الإعدادات والأدوات';
+
+  @override
   String get settings_backToSettings_tooltip => 'العودة إلى الإعدادات';
 
   @override
