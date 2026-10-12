@@ -31805,6 +31805,38 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeLogbookImagesTitle =>
+      'لم يتم استيراد بعض الصور';
+
+  @override
+  String universalImport_summary_noticeLogbookImagesBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'تعذّر استيراد $count صورة محفوظة في ملف السجل (صور معدات أو خرائط مواقع أو ما شابه). احتفظ بالملف الأصلي لكي لا تفقدها.',
+      many:
+          'تعذّر استيراد $count صورة محفوظة في ملف السجل (صور معدات أو خرائط مواقع أو ما شابه). احتفظ بالملف الأصلي لكي لا تفقدها.',
+      few:
+          'تعذّر استيراد $count صور محفوظة في ملف السجل (صور معدات أو خرائط مواقع أو ما شابه). احتفظ بالملف الأصلي لكي لا تفقدها.',
+      two:
+          'تعذّر استيراد صورتين محفوظتين في ملف السجل (صور معدات أو خرائط مواقع أو ما شابه). احتفظ بالملف الأصلي لكي لا تفقدهما.',
+      one:
+          'تعذّر استيراد صورة واحدة محفوظة في ملف السجل (صورة معدات أو خريطة موقع أو ما شابه). احتفظ بالملف الأصلي لكي لا تفقدها.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticeTripsNotImportedTitle =>
+      'لم يتم استيراد بعض الرحلات';
+
+  @override
+  String universalImport_summary_noticeTripsNotImportedBody(String names) {
+    return 'لا تحمل هذه الرحلات تواريخ، ولا تحمل أي من غطساتها تاريخًا، لذا تعذّر استيرادها: $names. يمكنك إضافتها مجددًا من قسم الرحلات.';
+  }
+
+  @override
   String get universalImport_summary_noticeSitesUnresolvedTitle =>
       'بعض الغطسات بلا موقع غوص';
 

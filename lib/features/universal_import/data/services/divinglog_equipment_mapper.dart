@@ -58,6 +58,8 @@ class DivingLogEquipmentMapper {
       final material = DiveMateValues.tankMaterial(item.materialCode);
       final isCylinder = read?.type == EquipmentType.tank;
       final attributes = <Map<String, dynamic>>[
+        if (item.purchaseShop != null)
+          {'key': EquipmentAttrKeys.retailer, 'valueText': item.purchaseShop},
         if (weight != null)
           {'key': EquipmentAttrKeys.dryWeightKg, 'valueNum': weight},
         // DiveMate keeps a cylinder's size and material on the gear row.
@@ -73,6 +75,13 @@ class DivingLogEquipmentMapper {
       final price = positiveOrNull(item.price);
       if (price != null) map['purchasePrice'] = price;
       if (item.purchaseDate != null) map['purchaseDate'] = item.purchaseDate;
+      if (item.lastServiceDate != null) {
+        map['lastServiceDate'] = item.lastServiceDate;
+        final days = item.nextServiceDate
+            ?.difference(item.lastServiceDate!)
+            .inDays;
+        if (days != null && days > 0) map['serviceIntervalDays'] = days;
+      }
       // Diving Log's inactive gear is retired gear, and the importer reads
       // `status` and `isActive`, not `isRetired`. Both markers, as MacDive
       // sets them, or every retired item imports as active.
@@ -81,6 +90,12 @@ class DivingLogEquipmentMapper {
         map['isActive'] = false;
       }
       final notes = [
+        // With a last service date, the service record from
+        // [serviceRecords] carries the next one in its own field. Without
+        // one there is no record, and the notes are all that keep it.
+        if (item.nextServiceDate != null && item.lastServiceDate == null)
+          'Next service: '
+              '${item.nextServiceDate!.toIso8601String().substring(0, 10)}',
         if (item.o2ServiceDate != null)
           'O2 service: '
               '${item.o2ServiceDate!.toIso8601String().substring(0, 10)}',
@@ -91,6 +106,17 @@ class DivingLogEquipmentMapper {
     }
     return out;
   }
+
+  static List<Map<String, dynamic>> serviceRecords(DivingLogLogbook book) => [
+    for (final item in book.equipmentById.values)
+      if (_isImportable(item) && item.lastServiceDate != null)
+        {
+          'equipmentRef': _uddfId(item.id),
+          'serviceDate': item.lastServiceDate,
+          if (item.nextServiceDate != null)
+            'nextServiceDue': item.nextServiceDate,
+        },
+  ];
 
   /// Every distinct `Logbook.Computer` value, the names the import
   /// registers dive computers under.

@@ -31369,6 +31369,32 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeLogbookImagesTitle =>
+      'Algumas imagens não importadas';
+
+  @override
+  String universalImport_summary_noticeLogbookImagesBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count imagens guardadas no arquivo do logbook (fotos de equipamento, mapas de pontos de mergulho e semelhantes) não puderam ser importadas. Mantenha o arquivo original para não as perder.',
+      one:
+          'Imagens guardadas no arquivo do logbook que não puderam ser importadas (fotos de equipamento, mapas de pontos de mergulho e semelhantes): $count. Mantenha o arquivo original para não as perder.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticeTripsNotImportedTitle =>
+      'Algumas viagens não importadas';
+
+  @override
+  String universalImport_summary_noticeTripsNotImportedBody(String names) {
+    return 'Estas viagens não têm datas e nenhum dos seus mergulhos tem uma, por isso não puderam ser importadas: $names. Pode adicioná-las novamente em Viagens.';
+  }
+
+  @override
   String get universalImport_summary_noticeSitesUnresolvedTitle =>
       'Alguns mergulhos sem ponto de mergulho';
 

@@ -30843,6 +30843,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeLogbookImagesTitle =>
+      'Some pictures not imported';
+
+  @override
+  String universalImport_summary_noticeLogbookImagesBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count pictures stored in the logbook file (gear photos, site maps and the like) could not be imported. Keep the original file to hold on to them.',
+      one:
+          '$count picture stored in the logbook file (a gear photo, site map or the like) could not be imported. Keep the original file to hold on to it.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticeTripsNotImportedTitle =>
+      'Some trips not imported';
+
+  @override
+  String universalImport_summary_noticeTripsNotImportedBody(String names) {
+    return 'These trips have no dates, and none of their dives has one, so they could not be imported: $names. You can add them again under Trips.';
+  }
+
+  @override
   String get universalImport_summary_noticeSitesUnresolvedTitle =>
       'Some dives have no dive site';
 

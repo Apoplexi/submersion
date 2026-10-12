@@ -11,6 +11,7 @@ import 'package:submersion/features/cylinder_passports/data/repositories/cylinde
 import 'package:submersion/features/cylinder_passports/data/repositories/cylinder_passport_repository.dart';
 import 'package:submersion/features/cylinder_passports/data/services/csv_fill_importer.dart';
 import 'package:submersion/features/dive_import/data/repositories/imported_file_repository.dart';
+import 'package:submersion/features/dive_import/data/services/imported_image.dart';
 import 'package:submersion/features/dive_import/data/services/additional_computer_writer.dart';
 import 'package:submersion/features/dive_import/data/services/currency_restorer.dart';
 import 'package:submersion/features/dive_import/data/services/import_map_readers.dart';
@@ -29,6 +30,7 @@ import 'package:submersion/features/equipment/data/services/equipment_set_for_co
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_observation.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
+import 'package:submersion/core/services/images/profile_photo_codec.dart';
 import 'package:submersion/core/services/location_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/geo_math.dart';
@@ -374,6 +376,7 @@ class UddfEntityImporter {
   final TankPresetEntity? _defaultTankPreset;
   final double _defaultStartPressure;
   final bool _applyDefaultTankToImports;
+  final String _defaultPurchaseCurrency;
 
   /// ISO 639-1 code for reverse-geocoded country/region (issue #1187).
   final String _placeNameLanguage;
@@ -392,6 +395,7 @@ class UddfEntityImporter {
     TankPresetEntity? defaultTankPreset,
     double defaultStartPressure = 200.0,
     bool applyDefaultTankToImports = false,
+    String defaultPurchaseCurrency = 'USD',
     String placeNameLanguage = LocationService.defaultLanguageCode,
     ImportedFileRepository? importedFiles,
     CustomCertificationRepository? customCertifications,
@@ -402,6 +406,7 @@ class UddfEntityImporter {
        _shareCustomAgenciesByDefault = shareCustomAgenciesByDefault,
        _defaultStartPressure = defaultStartPressure,
        _applyDefaultTankToImports = applyDefaultTankToImports,
+       _defaultPurchaseCurrency = defaultPurchaseCurrency,
        _placeNameLanguage = placeNameLanguage,
        _importedFiles = importedFiles ?? ImportedFileRepository();
 
@@ -1044,7 +1049,9 @@ class UddfEntityImporter {
         status: equipStatus,
         purchaseDate: equipData['purchaseDate'] as DateTime?,
         purchasePrice: equipData['purchasePrice'] as double?,
-        purchaseCurrency: equipData['purchaseCurrency'] as String? ?? 'USD',
+        purchaseCurrency:
+            equipData['purchaseCurrency'] as String? ??
+            _defaultPurchaseCurrency,
         lastServiceDate: equipData['lastServiceDate'] as DateTime?,
         serviceIntervalDays: equipData['serviceIntervalDays'] as int?,
         notes: equipData['notes'] as String? ?? '',
@@ -1201,6 +1208,7 @@ class UddfEntityImporter {
         name: name,
         email: buddyData['email'] as String?,
         phone: buddyData['phone'] as String?,
+        photo: await importedImage(buddyData['photo'], ImageEncodeSpec.avatar),
         notes: buddyData['notes'] as String? ?? '',
         createdAt: now,
         updatedAt: now,
@@ -1345,6 +1353,14 @@ class UddfEntityImporter {
         expiryDate: certData['expiryDate'] as DateTime?,
         instructorName: certData['instructorName'] as String?,
         instructorNumber: certData['instructorNumber'] as String?,
+        photoFront: await importedImage(
+          certData['photoFront'],
+          ImageEncodeSpec.certificationCard,
+        ),
+        photoBack: await importedImage(
+          certData['photoBack'],
+          ImageEncodeSpec.certificationCard,
+        ),
         notes: certData['notes'] as String? ?? '',
         createdAt: now,
         updatedAt: now,

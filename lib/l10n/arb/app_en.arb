@@ -18397,6 +18397,24 @@
       }
     }
   },
+  "universalImport_summary_noticeLogbookImagesTitle": "Some pictures not imported",
+  "universalImport_summary_noticeLogbookImagesBody": "{count, plural, one{{count} picture stored in the logbook file (a gear photo, site map or the like) could not be imported. Keep the original file to hold on to it.} other{{count} pictures stored in the logbook file (gear photos, site maps and the like) could not be imported. Keep the original file to hold on to them.}}",
+  "@universalImport_summary_noticeLogbookImagesBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "universalImport_summary_noticeTripsNotImportedTitle": "Some trips not imported",
+  "universalImport_summary_noticeTripsNotImportedBody": "These trips have no dates, and none of their dives has one, so they could not be imported: {names}. You can add them again under Trips.",
+  "@universalImport_summary_noticeTripsNotImportedBody": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
   "universalImport_summary_noticeSitesUnresolvedTitle": "Some dives have no dive site",
   "universalImport_summary_noticeSitesUnresolvedBody": "These dives referred to a dive site the file does not describe, so they were imported without one. You can set a site by editing the dive.",
   "universalImport_summary_noticeGearUnavailableTitle": "Gear not imported",

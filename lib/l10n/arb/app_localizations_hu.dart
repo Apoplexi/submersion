@@ -31212,6 +31212,32 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeLogbookImagesTitle =>
+      'Néhány kép nem lett importálva';
+
+  @override
+  String universalImport_summary_noticeLogbookImagesBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'A naplófájlban tárolt $count képet (felszerelésfotókat, merülőhely-térképeket vagy hasonlókat) nem sikerült importálni. Őrizd meg az eredeti fájlt, hogy ne vesszenek el.',
+      one:
+          'A naplófájlban tárolt $count képet (felszerelésfotót, merülőhely-térképet vagy hasonlót) nem sikerült importálni. Őrizd meg az eredeti fájlt, hogy ne vesszen el.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticeTripsNotImportedTitle =>
+      'Néhány út nem lett importálva';
+
+  @override
+  String universalImport_summary_noticeTripsNotImportedBody(String names) {
+    return 'Ezeknek az utaknak nincs dátuma, és egyik merülésüknek sincs, ezért nem sikerült importálni őket: $names. Az Utak résznél újra felveheted őket.';
+  }
+
+  @override
   String get universalImport_summary_noticeSitesUnresolvedTitle =>
       'Néhány merülésnek nincs merülőhelye';
 

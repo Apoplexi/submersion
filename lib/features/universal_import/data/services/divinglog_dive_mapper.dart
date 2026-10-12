@@ -3,6 +3,7 @@ import 'package:submersion/features/universal_import/data/models/import_enums.da
 import 'package:submersion/features/universal_import/data/models/import_payload.dart';
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
 import 'package:submersion/features/universal_import/data/services/divemate_dive_fields.dart';
+import 'package:submersion/features/universal_import/data/services/divinglog_dive_fields.dart';
 import 'package:submersion/features/universal_import/data/services/divinglog_equipment_mapper.dart';
 import 'package:submersion/features/universal_import/data/services/divinglog_raw_types.dart';
 import 'package:submersion/features/universal_import/data/services/divinglog_reference_mapper.dart';
@@ -44,6 +45,35 @@ class DivingLogDiveMapper {
     ];
     final equipment = DivingLogEquipmentMapper.entities(logbook);
     final trips = DivingLogReferenceMapper.trips(logbook);
+    for (final trip in logbook.tripsById.values) {
+      if (trip.name != null &&
+          !trips.containsKey('divinglog_trip_${trip.id}')) {
+        warnings.add(
+          ImportWarning(
+            severity: ImportWarningSeverity.warning,
+            code: ImportWarningCode.tripsNotImported,
+            message:
+                'Trip "${trip.name}" has no dates or dated dives and '
+                'could not be imported.',
+            entityType: ImportEntityType.trips,
+            names: [trip.name!],
+          ),
+        );
+      }
+    }
+    final images = logbook.unsupportedImageCounts;
+    if (images.isNotEmpty) {
+      warnings.add(
+        ImportWarning(
+          severity: ImportWarningSeverity.warning,
+          code: ImportWarningCode.logbookImagesNotImported,
+          message: [
+            for (final MapEntry(:key, :value) in images.entries) '$value $key',
+          ].join(', '),
+          count: images.values.fold(0, (sum, n) => sum + n),
+        ),
+      );
+    }
     final diveCenters = DivingLogReferenceMapper.diveCenters(logbook);
     final referenceDiveTypes = DivingLogReferenceMapper.diveTypes(logbook);
     final certifications = DivingLogReferenceMapper.certifications(logbook);
@@ -151,7 +181,7 @@ class DivingLogDiveMapper {
       if (buddyRefs.isNotEmpty) map['buddyRefs'] = buddyRefs;
       if (guideRefs.isNotEmpty) map['diveGuideRefs'] = guideRefs;
 
-      if (raw.supplyType != null) {
+      if (raw.supplyType != null && int.tryParse(raw.supplyType!) == null) {
         map['tagRefs'] = _refs([raw.supplyType!], tagsByName);
       }
 
@@ -206,6 +236,7 @@ class DivingLogDiveMapper {
           DivingLogReferenceMapper.unresolvedDiveTypeCount(logbook, raw);
 
       DiveMateDiveFields.applyToDive(map, raw, logbook);
+      DivingLogDiveFields.apply(map, raw, logbook);
       dives.add(map);
     }
 
@@ -284,6 +315,10 @@ class DivingLogDiveMapper {
     }
     if (equipment.isNotEmpty) {
       entities[ImportEntityType.equipment] = equipment.values.toList();
+    }
+    final serviceRecords = DivingLogEquipmentMapper.serviceRecords(logbook);
+    if (serviceRecords.isNotEmpty) {
+      entities[ImportEntityType.serviceRecords] = serviceRecords;
     }
     if (trips.isNotEmpty) {
       entities[ImportEntityType.trips] = trips.values.toList();
@@ -435,6 +470,7 @@ class DivingLogDiveMapper {
       <String, dynamic>{
         'order': i,
         'uddfTankId': 'divinglog:${tanks[i].tankId}',
+        'material': ?_tankMaterial(tanks[i].materialCode),
         'gasMix': GasMix(
           o2: tanks[i].o2Percent ?? 21.0,
           he: tanks[i].hePercent ?? 0.0,
@@ -451,6 +487,13 @@ class DivingLogDiveMapper {
           'workingPressure': tanks[i].workingPressureBar,
       },
   ];
+
+  static String? _tankMaterial(int? code) => switch (code) {
+    1 => 'aluminum',
+    2 => 'steel',
+    3 => 'carbonFiber',
+    _ => null,
+  };
 
   /// The position in [tanks] that a profile tank id refers to, or null when
   /// it refers to no cylinder we have.

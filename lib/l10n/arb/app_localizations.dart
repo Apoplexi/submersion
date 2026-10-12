@@ -49637,6 +49637,30 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 photo had no file name and could not be linked.} other{{count} photos had no file name and could not be linked.}}'**
   String universalImport_summary_noticePhotosSkippedBody(int count);
 
+  /// No description provided for @universalImport_summary_noticeLogbookImagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Some pictures not imported'**
+  String get universalImport_summary_noticeLogbookImagesTitle;
+
+  /// No description provided for @universalImport_summary_noticeLogbookImagesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} picture stored in the logbook file (a gear photo, site map or the like) could not be imported. Keep the original file to hold on to it.} other{{count} pictures stored in the logbook file (gear photos, site maps and the like) could not be imported. Keep the original file to hold on to them.}}'**
+  String universalImport_summary_noticeLogbookImagesBody(int count);
+
+  /// No description provided for @universalImport_summary_noticeTripsNotImportedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Some trips not imported'**
+  String get universalImport_summary_noticeTripsNotImportedTitle;
+
+  /// No description provided for @universalImport_summary_noticeTripsNotImportedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'These trips have no dates, and none of their dives has one, so they could not be imported: {names}. You can add them again under Trips.'**
+  String universalImport_summary_noticeTripsNotImportedBody(String names);
+
   /// No description provided for @universalImport_summary_noticeSitesUnresolvedTitle.
   ///
   /// In en, this message translates to:

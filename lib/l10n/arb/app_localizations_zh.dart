@@ -29590,6 +29590,27 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeLogbookImagesTitle => '部分图片未导入';
+
+  @override
+  String universalImport_summary_noticeLogbookImagesBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '日志簿文件中存储的 $count 张图片（装备照片、潜水点地图等）无法导入。请保留原始文件以免丢失。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticeTripsNotImportedTitle => '部分旅行未导入';
+
+  @override
+  String universalImport_summary_noticeTripsNotImportedBody(String names) {
+    return '这些旅行没有日期，其潜水记录也都没有日期，因此无法导入：$names。您可以在旅行页面中重新添加。';
+  }
+
+  @override
   String get universalImport_summary_noticeSitesUnresolvedTitle => '部分潜水没有潜水点';
 
   @override

@@ -30599,6 +30599,32 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeLogbookImagesTitle =>
+      'חלק מהתמונות לא יובאו';
+
+  @override
+  String universalImport_summary_noticeLogbookImagesBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'לא ניתן היה לייבא $count תמונות השמורות בקובץ היומן (תמונות ציוד, מפות אתרים וכדומה). שמרו את הקובץ המקורי כדי לא לאבד אותן.',
+      one:
+          'לא ניתן היה לייבא תמונה אחת השמורה בקובץ היומן (תמונת ציוד, מפת אתר וכדומה). שמרו את הקובץ המקורי כדי לא לאבד אותה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticeTripsNotImportedTitle =>
+      'חלק מהטיולים לא יובאו';
+
+  @override
+  String universalImport_summary_noticeTripsNotImportedBody(String names) {
+    return 'לטיולים אלה אין תאריכים, ולאף אחת מהצלילות שלהם אין תאריך, ולכן לא ניתן היה לייבא אותם: $names. אפשר להוסיף אותם שוב בקטע הטיולים.';
+  }
+
+  @override
   String get universalImport_summary_noticeSitesUnresolvedTitle =>
       'לחלק מהצלילות אין אתר צלילה';
 

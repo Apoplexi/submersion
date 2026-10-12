@@ -31467,6 +31467,32 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeLogbookImagesTitle =>
+      'Certaines images non importées';
+
+  @override
+  String universalImport_summary_noticeLogbookImagesBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count images enregistrées dans le fichier du carnet (photos d\'équipement, cartes de sites ou autres) n\'ont pas pu être importées. Conservez le fichier d\'origine pour les garder.',
+      one:
+          '$count image enregistrée dans le fichier du carnet (photo d\'équipement, carte de site ou autre) n\'a pas pu être importée. Conservez le fichier d\'origine pour la garder.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticeTripsNotImportedTitle =>
+      'Certains voyages non importés';
+
+  @override
+  String universalImport_summary_noticeTripsNotImportedBody(String names) {
+    return 'Ces voyages n\'ont pas de dates et aucune de leurs plongées n\'en a, ils n\'ont donc pas pu être importés : $names. Vous pouvez les ajouter à nouveau dans Voyages.';
+  }
+
+  @override
   String get universalImport_summary_noticeSitesUnresolvedTitle =>
       'Certaines plongées sans site de plongée';
 

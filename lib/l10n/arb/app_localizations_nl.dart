@@ -31150,6 +31150,32 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeLogbookImagesTitle =>
+      'Sommige afbeeldingen niet geïmporteerd';
+
+  @override
+  String universalImport_summary_noticeLogbookImagesBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count afbeeldingen die in het logboekbestand zijn opgeslagen (uitrustingsfoto\'s, duikstekkaarten en dergelijke) konden niet worden geïmporteerd. Bewaar het originele bestand om ze te behouden.',
+      one:
+          '$count afbeelding die in het logboekbestand is opgeslagen (een uitrustingsfoto, duikstekkaart of iets dergelijks) kon niet worden geïmporteerd. Bewaar het originele bestand om deze te behouden.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticeTripsNotImportedTitle =>
+      'Sommige reizen niet geïmporteerd';
+
+  @override
+  String universalImport_summary_noticeTripsNotImportedBody(String names) {
+    return 'Deze reizen hebben geen datums en geen van hun duiken heeft er een, dus ze konden niet worden geïmporteerd: $names. Je kunt ze opnieuw toevoegen onder Reizen.';
+  }
+
+  @override
   String get universalImport_summary_noticeSitesUnresolvedTitle =>
       'Sommige duiken zonder duikstek';
 
