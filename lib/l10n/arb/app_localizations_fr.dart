@@ -7938,6 +7938,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Retire des éléments pour en ajouter d\'autres';
 
   @override
+  String get diveLog_equipmentPicker_showLeftKit =>
+      'Afficher l\'équipement réformé et vendu';
+
+  @override
   String get diveLog_equipmentPicker_spareHint =>
       'Passe le statut d\'un élément à Actif pour l\'ajouter à une plongée';
 
@@ -10076,6 +10080,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveLog_tank_regulatorNone => 'Aucun';
+
+  @override
+  String get diveLog_tank_regulatorShowLeftKit =>
+      'Afficher les détendeurs réformés et vendus';
 
   @override
   String get diveLog_tank_tripCylinderLabel => 'Bloc du voyage';

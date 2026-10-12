@@ -7799,6 +7799,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Remove items to add different ones';
 
   @override
+  String get diveLog_equipmentPicker_showLeftKit =>
+      'Show retired and sold gear';
+
+  @override
   String get diveLog_equipmentPicker_spareHint =>
       'Set an item\'s status to Active to add it to a dive';
 
@@ -9879,6 +9883,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_tank_regulatorNone => 'None';
+
+  @override
+  String get diveLog_tank_regulatorShowLeftKit =>
+      'Show retired and sold regulators';
 
   @override
   String get diveLog_tank_tripCylinderLabel => 'Trip cylinder';

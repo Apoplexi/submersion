@@ -12529,6 +12529,12 @@ abstract class AppLocalizations {
   /// **'Remove items to add different ones'**
   String get diveLog_equipmentPicker_removeToAdd;
 
+  /// No description provided for @diveLog_equipmentPicker_showLeftKit.
+  ///
+  /// In en, this message translates to:
+  /// **'Show retired and sold gear'**
+  String get diveLog_equipmentPicker_showLeftKit;
+
   /// No description provided for @diveLog_equipmentPicker_spareHint.
   ///
   /// In en, this message translates to:
@@ -16074,6 +16080,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'None'**
   String get diveLog_tank_regulatorNone;
+
+  /// No description provided for @diveLog_tank_regulatorShowLeftKit.
+  ///
+  /// In en, this message translates to:
+  /// **'Show retired and sold regulators'**
+  String get diveLog_tank_regulatorShowLeftKit;
 
   /// No description provided for @diveLog_tank_tripCylinderLabel.
   ///

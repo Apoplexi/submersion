@@ -7919,6 +7919,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Remova itens para adicionar outros';
 
   @override
+  String get diveLog_equipmentPicker_showLeftKit =>
+      'Mostrar equipamento aposentado e vendido';
+
+  @override
   String get diveLog_equipmentPicker_spareHint =>
       'Defina o status de um item como Ativo para adicioná-lo a um mergulho';
 
@@ -10038,6 +10042,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_tank_regulatorNone => 'Nenhum';
+
+  @override
+  String get diveLog_tank_regulatorShowLeftKit =>
+      'Mostrar reguladores aposentados e vendidos';
 
   @override
   String get diveLog_tank_tripCylinderLabel => 'Cilindro da viagem';
