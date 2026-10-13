@@ -24204,6 +24204,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get documents_detail_owner => 'Classé dans';
 
   @override
+  String get documents_owner_pickerTitle => 'Classer dans';
+
+  @override
+  String get documents_owner_search => 'Rechercher';
+
+  @override
+  String get documents_owner_none => 'Rien dans lequel classer pour l\'instant';
+
+  @override
+  String get documents_owner_locked => 'Une carte reste avec sa certification';
+
+  @override
   String get documents_profileHub_documents => 'Documents';
 
   @override
@@ -45720,18 +45732,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get common_action_remove => 'Retirer';
 
   @override
-  String get equipment_documents_title => 'Documents';
+  String get equipment_documents_linkedTitle => 'Fichiers liés';
 
   @override
-  String get equipment_documents_subtitle =>
-      'Factures, reçus et documents de garantie';
-
-  @override
-  String get equipment_documents_attachButton => 'Joindre';
-
-  @override
-  String get equipment_documents_empty =>
-      'Aucun document joint pour l\'instant';
+  String get equipment_documents_linkedSubtitle =>
+      'Trop volumineux, ou dans un format que Documents ne peut pas conserver';
 
   @override
   String get equipment_documents_removeTitle => 'Retirer le document ?';
@@ -47672,6 +47677,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return 'Mise à niveau de la base de données... étape $currentStep sur $totalSteps';
   }
+
+  @override
+  String get startup_compacting => 'Optimisation du stockage...';
 
   @override
   String get startup_error_title => 'Submersion n’a pas pu démarrer';
@@ -49824,6 +49832,29 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_storageUsage_category_database =>
       'Base de données du carnet de plongée';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size récupérables';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'Compacter';
+
+  @override
+  String get settings_storageUsage_compactTitle =>
+      'Compacter la base de données ?';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'S\'exécute au prochain lancement de Submersion. Un grand carnet peut prendre une minute et nécessite un espace libre proche de la taille de la base de données.';
+
+  @override
+  String get settings_storageUsage_compactScheduled =>
+      'Prévu au prochain lancement';
+
+  @override
+  String get settings_storageUsage_quitNow => 'Quitter maintenant';
 
   @override
   String get settings_storageUsage_category_localCache =>

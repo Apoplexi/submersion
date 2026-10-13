@@ -24089,6 +24089,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get documents_detail_owner => 'Abgelegt unter';
 
   @override
+  String get documents_owner_pickerTitle => 'Ablegen unter';
+
+  @override
+  String get documents_owner_search => 'Suchen';
+
+  @override
+  String get documents_owner_none => 'Noch nichts zum Ablegen vorhanden';
+
+  @override
+  String get documents_owner_locked => 'Eine Karte bleibt bei ihrem Brevet';
+
+  @override
   String get documents_profileHub_documents => 'Dokumente';
 
   @override
@@ -45518,17 +45530,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get common_action_remove => 'Entfernen';
 
   @override
-  String get equipment_documents_title => 'Dokumente';
+  String get equipment_documents_linkedTitle => 'Verknüpfte Dateien';
 
   @override
-  String get equipment_documents_subtitle =>
-      'Rechnungen, Belege und Garantieunterlagen';
-
-  @override
-  String get equipment_documents_attachButton => 'Anhängen';
-
-  @override
-  String get equipment_documents_empty => 'Noch keine Dokumente angehängt';
+  String get equipment_documents_linkedSubtitle =>
+      'Zu groß oder ein Format, das Dokumente nicht aufnehmen kann';
 
   @override
   String get equipment_documents_removeTitle => 'Dokument entfernen?';
@@ -47456,6 +47462,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return 'Datenbank wird aktualisiert... Schritt $currentStep von $totalSteps';
   }
+
+  @override
+  String get startup_compacting => 'Speicher wird optimiert...';
 
   @override
   String get startup_error_title => 'Submersion konnte nicht starten';
@@ -49603,6 +49612,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_database => 'Tauchbuch-Datenbank';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size freigebbar';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'Komprimieren';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'Datenbank komprimieren?';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'Wird beim nächsten Start von Submersion ausgeführt. Ein großes Tauchbuch kann eine Minute dauern und braucht freien Speicher etwa in Größe der Datenbank.';
+
+  @override
+  String get settings_storageUsage_compactScheduled =>
+      'Für den nächsten Start geplant';
+
+  @override
+  String get settings_storageUsage_quitNow => 'Jetzt beenden';
 
   @override
   String get settings_storageUsage_category_localCache =>

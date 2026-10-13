@@ -23976,6 +23976,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get documents_detail_owner => 'Opgeslagen bij';
 
   @override
+  String get documents_owner_pickerTitle => 'Opslaan bij';
+
+  @override
+  String get documents_owner_search => 'Zoeken';
+
+  @override
+  String get documents_owner_none => 'Nog niets om bij op te slaan';
+
+  @override
+  String get documents_owner_locked => 'Een kaart blijft bij zijn brevet';
+
+  @override
   String get documents_profileHub_documents => 'Documenten';
 
   @override
@@ -45316,17 +45328,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get common_action_remove => 'Verwijderen';
 
   @override
-  String get equipment_documents_title => 'Documenten';
+  String get equipment_documents_linkedTitle => 'Gekoppelde bestanden';
 
   @override
-  String get equipment_documents_subtitle =>
-      'Facturen, bonnen en garantiepapieren';
-
-  @override
-  String get equipment_documents_attachButton => 'Bijvoegen';
-
-  @override
-  String get equipment_documents_empty => 'Nog geen documenten bijgevoegd';
+  String get equipment_documents_linkedSubtitle =>
+      'Te groot, of een formaat dat Documenten niet kan bewaren';
 
   @override
   String get equipment_documents_removeTitle => 'Document verwijderen?';
@@ -47262,6 +47268,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return 'Database upgraden... stap $currentStep van $totalSteps';
   }
+
+  @override
+  String get startup_compacting => 'Opslag optimaliseren...';
 
   @override
   String get startup_error_title => 'Submersion kon niet starten';
@@ -49389,6 +49398,28 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_database => 'Duiklogboekdatabase';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size terug te winnen';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'Comprimeren';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'Database comprimeren?';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'Wordt uitgevoerd bij de volgende start van Submersion. Een groot logboek kan een minuut duren en heeft ongeveer evenveel vrije ruimte nodig als de database groot is.';
+
+  @override
+  String get settings_storageUsage_compactScheduled =>
+      'Gepland voor de volgende start';
+
+  @override
+  String get settings_storageUsage_quitNow => 'Nu afsluiten';
 
   @override
   String get settings_storageUsage_category_localCache =>

@@ -41,9 +41,31 @@ String documentOwnerKindLabel(AppLocalizations l10n, DocumentOwnerKind kind) =>
       DocumentOwnerKind.diveCenter => l10n.documents_owner_diveCenter,
     };
 
+IconData documentOwnerKindIcon(DocumentOwnerKind kind) => switch (kind) {
+  DocumentOwnerKind.personal => Icons.person_outline,
+  DocumentOwnerKind.dive => Icons.scuba_diving,
+  DocumentOwnerKind.site => Icons.place_outlined,
+  DocumentOwnerKind.trip => Icons.luggage_outlined,
+  DocumentOwnerKind.equipment => Icons.backpack_outlined,
+  DocumentOwnerKind.course => Icons.school_outlined,
+  DocumentOwnerKind.certification => Icons.card_membership_outlined,
+  DocumentOwnerKind.buddy => Icons.people_outline,
+  DocumentOwnerKind.diveCenter => Icons.storefront_outlined,
+};
+
 /// The document's own title, or its type's name when it has none, so a
-/// default title follows the app language.
-String documentDisplayTitle(AppLocalizations l10n, Document document) {
+/// default title follows the app language. A certification card is titled
+/// by its certification ([ownerLabel], the certification's name), so a
+/// rename shows everywhere without a second write.
+String documentDisplayTitle(
+  AppLocalizations l10n,
+  Document document, {
+  String? ownerLabel,
+}) {
+  final label = ownerLabel?.trim() ?? '';
+  if (document.type == DocumentType.certificationCard && label.isNotEmpty) {
+    return label;
+  }
   final title = document.title.trim();
   return title.isEmpty ? documentTypeLabel(l10n, document.type) : title;
 }

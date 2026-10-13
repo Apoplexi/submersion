@@ -23719,6 +23719,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get documents_detail_owner => 'Filed under';
 
   @override
+  String get documents_owner_pickerTitle => 'File under';
+
+  @override
+  String get documents_owner_search => 'Search';
+
+  @override
+  String get documents_owner_none => 'Nothing to file under yet';
+
+  @override
+  String get documents_owner_locked => 'A card stays with its certification';
+
+  @override
   String get documents_profileHub_documents => 'Documents';
 
   @override
@@ -44934,17 +44946,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get common_action_remove => 'Remove';
 
   @override
-  String get equipment_documents_title => 'Documents';
+  String get equipment_documents_linkedTitle => 'Linked files';
 
   @override
-  String get equipment_documents_subtitle =>
-      'Invoices, receipts and warranty paperwork';
-
-  @override
-  String get equipment_documents_attachButton => 'Attach';
-
-  @override
-  String get equipment_documents_empty => 'No documents attached yet';
+  String get equipment_documents_linkedSubtitle =>
+      'Too large, or a format Documents cannot hold';
 
   @override
   String get equipment_documents_removeTitle => 'Remove document?';
@@ -46840,6 +46846,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return 'Upgrading database... step $currentStep of $totalSteps';
   }
+
+  @override
+  String get startup_compacting => 'Optimizing storage...';
 
   @override
   String get startup_error_title => 'Submersion could not start';
@@ -48928,6 +48937,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_database => 'Dive log database';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size reclaimable';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'Compact';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'Compact the database?';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'Runs the next time Submersion starts. A large log may take a minute and needs free space about the size of the database.';
+
+  @override
+  String get settings_storageUsage_compactScheduled =>
+      'Scheduled for next launch';
+
+  @override
+  String get settings_storageUsage_quitNow => 'Quit now';
 
   @override
   String get settings_storageUsage_category_localCache =>

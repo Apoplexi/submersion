@@ -23517,6 +23517,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get documents_detail_owner => 'מתויק תחת';
 
   @override
+  String get documents_owner_pickerTitle => 'תיוק תחת';
+
+  @override
+  String get documents_owner_search => 'חיפוש';
+
+  @override
+  String get documents_owner_none => 'עדיין אין במה לתייק';
+
+  @override
+  String get documents_owner_locked => 'כרטיס נשאר עם ההסמכה שלו';
+
+  @override
   String get documents_profileHub_documents => 'מסמכים';
 
   @override
@@ -44636,16 +44648,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get common_action_remove => 'הסר';
 
   @override
-  String get equipment_documents_title => 'מסמכים';
+  String get equipment_documents_linkedTitle => 'קבצים מקושרים';
 
   @override
-  String get equipment_documents_subtitle => 'חשבוניות, קבלות ומסמכי אחריות';
-
-  @override
-  String get equipment_documents_attachButton => 'צירוף';
-
-  @override
-  String get equipment_documents_empty => 'עדיין לא צורפו מסמכים';
+  String get equipment_documents_linkedSubtitle =>
+      'גדולים מדי, או בפורמט שמסמכים לא יכולים לשמור';
 
   @override
   String get equipment_documents_removeTitle => 'להסיר את המסמך?';
@@ -46585,6 +46592,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return 'משדרג את מסד הנתונים... שלב $currentStep מתוך $totalSteps';
   }
+
+  @override
+  String get startup_compacting => 'מייעל את האחסון...';
 
   @override
   String get startup_error_title => 'Submersion לא הצליחה להיפתח';
@@ -48661,6 +48671,27 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_storageUsage_category_database =>
       'מסד נתונים של יומן הצלילה';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size ניתנים לפינוי';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'דחיסה';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'לדחוס את מסד הנתונים?';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'יתבצע בהפעלה הבאה של Submersion. יומן גדול עשוי להימשך דקה ודורש שטח פנוי בערך בגודל מסד הנתונים.';
+
+  @override
+  String get settings_storageUsage_compactScheduled => 'מתוזמן להפעלה הבאה';
+
+  @override
+  String get settings_storageUsage_quitNow => 'יציאה עכשיו';
 
   @override
   String get settings_storageUsage_category_localCache =>

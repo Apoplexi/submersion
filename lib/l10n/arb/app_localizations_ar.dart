@@ -24322,6 +24322,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get documents_detail_owner => 'مُصنّف ضمن';
 
   @override
+  String get documents_owner_pickerTitle => 'تصنيف ضمن';
+
+  @override
+  String get documents_owner_search => 'بحث';
+
+  @override
+  String get documents_owner_none => 'لا يوجد ما يُصنَّف ضمنه بعد';
+
+  @override
+  String get documents_owner_locked => 'تبقى البطاقة مع شهادتها';
+
+  @override
   String get documents_profileHub_documents => 'المستندات';
 
   @override
@@ -46179,17 +46191,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get common_action_remove => 'إزالة';
 
   @override
-  String get equipment_documents_title => 'المستندات';
+  String get equipment_documents_linkedTitle => 'ملفات مرتبطة';
 
   @override
-  String get equipment_documents_subtitle =>
-      'الفواتير والإيصالات وأوراق الضمان';
-
-  @override
-  String get equipment_documents_attachButton => 'إرفاق';
-
-  @override
-  String get equipment_documents_empty => 'لا توجد مستندات مرفقة بعد';
+  String get equipment_documents_linkedSubtitle =>
+      'كبيرة جدًا، أو بتنسيق لا يمكن للمستندات حفظه';
 
   @override
   String get equipment_documents_removeTitle => 'إزالة المستند؟';
@@ -48218,6 +48224,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return 'جارٍ ترقية قاعدة البيانات... الخطوة $currentStep من $totalSteps';
   }
+
+  @override
+  String get startup_compacting => 'جارٍ تحسين التخزين...';
 
   @override
   String get startup_error_title => 'تعذّر بدء تشغيل Submersion';
@@ -50346,6 +50355,27 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_storageUsage_category_database =>
       'قاعدة بيانات سجل الغوص';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size قابلة للاسترداد';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'ضغط';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'ضغط قاعدة البيانات؟';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'يتم التنفيذ عند التشغيل التالي لـ Submersion. قد يستغرق السجل الكبير دقيقة ويحتاج إلى مساحة خالية بحجم قاعدة البيانات تقريبًا.';
+
+  @override
+  String get settings_storageUsage_compactScheduled => 'مجدول للتشغيل التالي';
+
+  @override
+  String get settings_storageUsage_quitNow => 'إنهاء الآن';
 
   @override
   String get settings_storageUsage_category_localCache =>

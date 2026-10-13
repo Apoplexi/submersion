@@ -24150,6 +24150,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get documents_detail_owner => 'Archiviato in';
 
   @override
+  String get documents_owner_pickerTitle => 'Archivia in';
+
+  @override
+  String get documents_owner_search => 'Cerca';
+
+  @override
+  String get documents_owner_none => 'Ancora niente in cui archiviare';
+
+  @override
+  String get documents_owner_locked => 'Una tessera resta con il suo brevetto';
+
+  @override
   String get documents_profileHub_documents => 'Documenti';
 
   @override
@@ -45622,17 +45634,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get common_action_remove => 'Rimuovi';
 
   @override
-  String get equipment_documents_title => 'Documenti';
+  String get equipment_documents_linkedTitle => 'File collegati';
 
   @override
-  String get equipment_documents_subtitle =>
-      'Fatture, ricevute e documenti di garanzia';
-
-  @override
-  String get equipment_documents_attachButton => 'Allega';
-
-  @override
-  String get equipment_documents_empty => 'Nessun documento allegato';
+  String get equipment_documents_linkedSubtitle =>
+      'Troppo grandi, o in un formato che Documenti non può conservare';
 
   @override
   String get equipment_documents_removeTitle => 'Rimuovere il documento?';
@@ -47567,6 +47573,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return 'Aggiornamento del database... passaggio $currentStep di $totalSteps';
   }
+
+  @override
+  String get startup_compacting => 'Ottimizzazione dello spazio...';
 
   @override
   String get startup_error_title => 'Submersion non è riuscito ad avviarsi';
@@ -49707,6 +49716,28 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_storageUsage_category_database =>
       'Database del diario immersioni';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size recuperabili';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'Compatta';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'Compattare il database?';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'Viene eseguito al prossimo avvio di Submersion. Un diario grande può richiedere un minuto e serve spazio libero pari circa alle dimensioni del database.';
+
+  @override
+  String get settings_storageUsage_compactScheduled =>
+      'Pianificato al prossimo avvio';
+
+  @override
+  String get settings_storageUsage_quitNow => 'Esci ora';
 
   @override
   String get settings_storageUsage_category_localCache =>

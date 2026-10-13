@@ -24023,6 +24023,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get documents_detail_owner => 'Ide sorolva';
 
   @override
+  String get documents_owner_pickerTitle => 'Ide sorolás';
+
+  @override
+  String get documents_owner_search => 'Keresés';
+
+  @override
+  String get documents_owner_none => 'Még nincs mihez sorolni';
+
+  @override
+  String get documents_owner_locked => 'A kártya a képesítésénél marad';
+
+  @override
   String get documents_profileHub_documents => 'Dokumentumok';
 
   @override
@@ -45368,17 +45380,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get common_action_remove => 'Eltávolítás';
 
   @override
-  String get equipment_documents_title => 'Dokumentumok';
+  String get equipment_documents_linkedTitle => 'Csatolt fájlok';
 
   @override
-  String get equipment_documents_subtitle =>
-      'Számlák, nyugták és garancialevelek';
-
-  @override
-  String get equipment_documents_attachButton => 'Csatolás';
-
-  @override
-  String get equipment_documents_empty => 'Még nincs csatolt dokumentum';
+  String get equipment_documents_linkedSubtitle =>
+      'Túl nagy, vagy olyan formátumú, amelyet a Dokumentumok nem tud tárolni';
 
   @override
   String get equipment_documents_removeTitle => 'Eltávolítja a dokumentumot?';
@@ -47301,6 +47307,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return 'Adatbázis frissítése... $currentStep. lépés, összesen $totalSteps';
   }
+
+  @override
+  String get startup_compacting => 'Tárhely optimalizálása...';
 
   @override
   String get startup_error_title => 'A Submersion nem tudott elindulni';
@@ -49443,6 +49452,28 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_storageUsage_category_database =>
       'Merülésnapló-adatbázis';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '$size felszabadítható';
+  }
+
+  @override
+  String get settings_storageUsage_compact => 'Tömörítés';
+
+  @override
+  String get settings_storageUsage_compactTitle => 'Tömöríted az adatbázist?';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      'A Submersion következő indításakor fut le. Egy nagy napló egy percig is eltarthat, és körülbelül az adatbázis méretének megfelelő szabad hely kell hozzá.';
+
+  @override
+  String get settings_storageUsage_compactScheduled =>
+      'A következő indításra ütemezve';
+
+  @override
+  String get settings_storageUsage_quitNow => 'Kilépés most';
 
   @override
   String get settings_storageUsage_category_localCache =>

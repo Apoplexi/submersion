@@ -22800,6 +22800,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get documents_detail_owner => '归档于';
 
   @override
+  String get documents_owner_pickerTitle => '归档到';
+
+  @override
+  String get documents_owner_search => '搜索';
+
+  @override
+  String get documents_owner_none => '暂无可归档的位置';
+
+  @override
+  String get documents_owner_locked => '证书卡始终归属于其证书';
+
+  @override
   String get documents_profileHub_documents => '文档';
 
   @override
@@ -42901,16 +42913,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get common_action_remove => '移除';
 
   @override
-  String get equipment_documents_title => '文档';
+  String get equipment_documents_linkedTitle => '已链接的文件';
 
   @override
-  String get equipment_documents_subtitle => '发票、收据和保修文件';
-
-  @override
-  String get equipment_documents_attachButton => '附加';
-
-  @override
-  String get equipment_documents_empty => '尚未附加任何文档';
+  String get equipment_documents_linkedSubtitle => '文件过大，或文档无法保存该格式';
 
   @override
   String get equipment_documents_removeTitle => '移除文档？';
@@ -44687,6 +44693,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String startup_migrating_progress(Object currentStep, Object totalSteps) {
     return '正在升级数据库... 第 $currentStep 步，共 $totalSteps 步';
   }
+
+  @override
+  String get startup_compacting => '正在优化存储...';
 
   @override
   String get startup_error_title => 'Submersion 无法启动';
@@ -46662,6 +46671,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_database => '潜水日志数据库';
+
+  @override
+  String settings_storageUsage_reclaimable(String size) {
+    return '可回收 $size';
+  }
+
+  @override
+  String get settings_storageUsage_compact => '压缩';
+
+  @override
+  String get settings_storageUsage_compactTitle => '压缩数据库？';
+
+  @override
+  String get settings_storageUsage_compactBody =>
+      '将在下次启动 Submersion 时执行。较大的日志可能需要一分钟，并需要与数据库大小相当的可用空间。';
+
+  @override
+  String get settings_storageUsage_compactScheduled => '已安排在下次启动时执行';
+
+  @override
+  String get settings_storageUsage_quitNow => '立即退出';
 
   @override
   String get settings_storageUsage_category_localCache => '本地缓存数据库';

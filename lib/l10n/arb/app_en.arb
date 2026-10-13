@@ -14110,6 +14110,10 @@
   },
   "documents_filter_all": "All",
   "documents_detail_owner": "Filed under",
+  "documents_owner_pickerTitle": "File under",
+  "documents_owner_search": "Search",
+  "documents_owner_none": "Nothing to file under yet",
+  "documents_owner_locked": "A card stays with its certification",
   "documents_profileHub_documents": "Documents",
   "documents_profileHub_documents_count": "{count, plural, =0{None yet} =1{{count} document} other{{count} documents}}",
   "@documents_profileHub_documents_count": {
@@ -26606,10 +26610,8 @@
   "common_action_add": "Add",
   "common_action_pin": "Pin",
   "common_action_remove": "Remove",
-  "equipment_documents_title": "Documents",
-  "equipment_documents_subtitle": "Invoices, receipts and warranty paperwork",
-  "equipment_documents_attachButton": "Attach",
-  "equipment_documents_empty": "No documents attached yet",
+  "equipment_documents_linkedTitle": "Linked files",
+  "equipment_documents_linkedSubtitle": "Too large, or a format Documents cannot hold",
   "equipment_documents_removeTitle": "Remove document?",
   "equipment_documents_removeContent": "It stops being attached to this item. Your original file is never touched.",
   "equipment_documents_removed": "Document removed",
@@ -27909,6 +27911,7 @@
   "lock_startFresh_confirm": "Set aside and start fresh",
   "lock_biometric_reason": "Unlock your dive log",
   "startup_migrating_progress": "Upgrading database... step {currentStep} of {totalSteps}",
+  "startup_compacting": "Optimizing storage...",
   "startup_error_title": "Submersion could not start",
   "startup_error_body": "Something went wrong before your dive log finished opening. Your data is still on disk and does not require a reinstall. Try restarting the app; if this persists, contact support.",
   "startup_engineUnavailable_title": "This build can't open a database",
@@ -29709,6 +29712,19 @@
   "settings_storageUsage_group_exports": "Exported Files",
   "settings_storageUsage_group_importedFiles": "Raw imported data",
   "settings_storageUsage_category_database": "Dive log database",
+  "settings_storageUsage_reclaimable": "{size} reclaimable",
+  "@settings_storageUsage_reclaimable": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_storageUsage_compact": "Compact",
+  "settings_storageUsage_compactTitle": "Compact the database?",
+  "settings_storageUsage_compactBody": "Runs the next time Submersion starts. A large log may take a minute and needs free space about the size of the database.",
+  "settings_storageUsage_compactScheduled": "Scheduled for next launch",
+  "settings_storageUsage_quitNow": "Quit now",
   "settings_storageUsage_category_localCache": "Local cache database",
   "settings_storageUsage_category_mediaCacheOriginals": "Original photos and videos",
   "settings_storageUsage_category_mediaCacheThumbs": "Thumbnails",

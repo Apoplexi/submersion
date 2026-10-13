@@ -38802,6 +38802,30 @@ abstract class AppLocalizations {
   /// **'Filed under'**
   String get documents_detail_owner;
 
+  /// No description provided for @documents_owner_pickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'File under'**
+  String get documents_owner_pickerTitle;
+
+  /// No description provided for @documents_owner_search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get documents_owner_search;
+
+  /// No description provided for @documents_owner_none.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to file under yet'**
+  String get documents_owner_none;
+
+  /// No description provided for @documents_owner_locked.
+  ///
+  /// In en, this message translates to:
+  /// **'A card stays with its certification'**
+  String get documents_owner_locked;
+
   /// No description provided for @documents_profileHub_documents.
   ///
   /// In en, this message translates to:
@@ -72772,29 +72796,17 @@ abstract class AppLocalizations {
   /// **'Remove'**
   String get common_action_remove;
 
-  /// No description provided for @equipment_documents_title.
+  /// No description provided for @equipment_documents_linkedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Documents'**
-  String get equipment_documents_title;
+  /// **'Linked files'**
+  String get equipment_documents_linkedTitle;
 
-  /// No description provided for @equipment_documents_subtitle.
+  /// No description provided for @equipment_documents_linkedSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Invoices, receipts and warranty paperwork'**
-  String get equipment_documents_subtitle;
-
-  /// No description provided for @equipment_documents_attachButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Attach'**
-  String get equipment_documents_attachButton;
-
-  /// No description provided for @equipment_documents_empty.
-  ///
-  /// In en, this message translates to:
-  /// **'No documents attached yet'**
-  String get equipment_documents_empty;
+  /// **'Too large, or a format Documents cannot hold'**
+  String get equipment_documents_linkedSubtitle;
 
   /// No description provided for @equipment_documents_removeTitle.
   ///
@@ -75503,6 +75515,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Upgrading database... step {currentStep} of {totalSteps}'**
   String startup_migrating_progress(Object currentStep, Object totalSteps);
+
+  /// No description provided for @startup_compacting.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimizing storage...'**
+  String get startup_compacting;
 
   /// Terminal startup screen title when the failure could not be classified. Deliberately neutral: it must NOT claim the database upgrade failed, since most failures reach this screen without a migration having been attempted.
   ///
@@ -78836,6 +78854,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dive log database'**
   String get settings_storageUsage_category_database;
+
+  /// No description provided for @settings_storageUsage_reclaimable.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} reclaimable'**
+  String settings_storageUsage_reclaimable(String size);
+
+  /// No description provided for @settings_storageUsage_compact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get settings_storageUsage_compact;
+
+  /// No description provided for @settings_storageUsage_compactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact the database?'**
+  String get settings_storageUsage_compactTitle;
+
+  /// No description provided for @settings_storageUsage_compactBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Runs the next time Submersion starts. A large log may take a minute and needs free space about the size of the database.'**
+  String get settings_storageUsage_compactBody;
+
+  /// No description provided for @settings_storageUsage_compactScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled for next launch'**
+  String get settings_storageUsage_compactScheduled;
+
+  /// No description provided for @settings_storageUsage_quitNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit now'**
+  String get settings_storageUsage_quitNow;
 
   /// No description provided for @settings_storageUsage_category_localCache.
   ///
