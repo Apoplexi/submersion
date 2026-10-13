@@ -20801,6 +20801,271 @@ class AppLocalizationsNl extends AppLocalizations {
       'Synchroniseren via cloudopslag';
 
   @override
+  String get sharedLibrary_settings_title => 'Gedeelde duikstekbibliotheken';
+
+  @override
+  String get sharedLibrary_settings_subtitle =>
+      'Duikstekken die je met andere duikers bijhoudt';
+
+  @override
+  String get sharedLibrary_list_empty =>
+      'Nog geen gedeelde duikstekbibliotheek verbonden.';
+
+  @override
+  String get sharedLibrary_connect_action => 'Bibliotheek verbinden';
+
+  @override
+  String get sharedLibrary_connect_addAccount => 'Opslagaccount toevoegen';
+
+  @override
+  String get sharedLibrary_connect_saveAccount => 'Account opslaan';
+
+  @override
+  String get sharedLibrary_connect_account_label => 'Opslagaccount';
+
+  @override
+  String get sharedLibrary_connect_prefix_label => 'Map (prefix)';
+
+  @override
+  String get sharedLibrary_connect_prefix_help =>
+      'Een map in submersion-sites, bovenaan de bucket of server, bijvoorbeeld site-sync.';
+
+  @override
+  String get sharedLibrary_connect_probe_action => 'Controleren';
+
+  @override
+  String sharedLibrary_connect_join_action(String name) {
+    return 'Deelnemen aan $name';
+  }
+
+  @override
+  String get sharedLibrary_connect_create_action => 'Bibliotheek maken';
+
+  @override
+  String get sharedLibrary_connect_create_name_label =>
+      'Naam van de bibliotheek';
+
+  @override
+  String get sharedLibrary_connect_displayName_label =>
+      'Je naam in deze bibliotheek';
+
+  @override
+  String get sharedLibrary_connect_notALibrary =>
+      'Hier is nog geen bibliotheek.';
+
+  @override
+  String get sharedLibrary_connect_needsNewerApp =>
+      'Deze bibliotheek vereist een nieuwere versie van Submersion.';
+
+  @override
+  String get sharedLibrary_connect_onlyS3Webdav =>
+      'Gedeelde duikstekbibliotheken werken met S3- en WebDAV-accounts.';
+
+  @override
+  String get sharedLibrary_role_reader => 'Lezer';
+
+  @override
+  String get sharedLibrary_role_editor => 'Bewerker';
+
+  @override
+  String get sharedLibrary_role_owner => 'Eigenaar';
+
+  @override
+  String get sharedLibrary_library_members => 'Leden';
+
+  @override
+  String sharedLibrary_library_memberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count leden',
+      one: '1 lid',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_library_syncNow => 'Nu synchroniseren';
+
+  @override
+  String sharedLibrary_library_lastSync(String when) {
+    return 'Laatste synchronisatie $when';
+  }
+
+  @override
+  String get sharedLibrary_library_neverSynced => 'Nog niet gesynchroniseerd';
+
+  @override
+  String get sharedLibrary_library_readOnlyBanner =>
+      'Je inloggegevens staan alleen lezen toe. Je kunt wijzigingen voorstellen; een beheerder past ze toe.';
+
+  @override
+  String sharedLibrary_library_errorBanner(String error) {
+    return 'Laatste synchronisatie mislukt: $error';
+  }
+
+  @override
+  String get sharedLibrary_library_addMySites => 'Mijn duikstekken toevoegen';
+
+  @override
+  String get sharedLibrary_library_suggestions => 'Suggesties';
+
+  @override
+  String get sharedLibrary_library_leave => 'Bibliotheek verlaten';
+
+  @override
+  String sharedLibrary_library_leaveConfirm_title(String name) {
+    return '$name verlaten?';
+  }
+
+  @override
+  String get sharedLibrary_library_leaveConfirm_body =>
+      'Gedeelde duikstekken die je duiken gebruiken blijven als persoonlijke kopieën. Andere gedeelde duikstekken worden van dit apparaat verwijderd.';
+
+  @override
+  String get sharedLibrary_library_rename_label => 'Weergavenaam';
+
+  @override
+  String get sharedLibrary_members_setRole => 'Rol wijzigen';
+
+  @override
+  String get sharedLibrary_members_lastOwner =>
+      'De laatste eigenaar kan niet worden gedegradeerd.';
+
+  @override
+  String get sharedLibrary_picker_none =>
+      'Geen gedeelde duikstekbibliotheek hier laat je duikplekken toevoegen.';
+
+  @override
+  String get sharedLibrary_list_notConnected =>
+      'Niet verbonden op dit apparaat';
+
+  @override
+  String get sharedLibrary_connect_exists =>
+      'Iemand heeft hier intussen een bibliotheek gemaakt. Controleer opnieuw om lid te worden.';
+
+  @override
+  String get sharedLibrary_library_lastOwnerLeave =>
+      'Maak een ander lid eigenaar voordat je vertrekt.';
+
+  @override
+  String sharedLibrary_site_badgeTooltip(String name) {
+    return 'In $name';
+  }
+
+  @override
+  String sharedLibrary_site_lastEdited(String name, String when) {
+    return 'Laatst bewerkt door $name, $when';
+  }
+
+  @override
+  String get sharedLibrary_site_history => 'Bewerkingsgeschiedenis';
+
+  @override
+  String get sharedLibrary_site_addToLibrary =>
+      'Toevoegen aan gedeelde duikstekbibliotheek';
+
+  @override
+  String get sharedLibrary_site_chooseLibrary => 'Kies een bibliotheek';
+
+  @override
+  String sharedLibrary_site_added(String name) {
+    return 'Toegevoegd aan $name';
+  }
+
+  @override
+  String sharedLibrary_site_notConnectedHere(String name) {
+    return 'Deze duikstek staat in $name, die niet is verbonden op dit apparaat.';
+  }
+
+  @override
+  String get sharedLibrary_site_connectHere => 'Verbinden op dit apparaat';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_title =>
+      'Verwijderen uit de gedeelde duikstekbibliotheek?';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_body =>
+      'Leden van wie de duiken deze duikstek gebruiken, houden een persoonlijke kopie.';
+
+  @override
+  String get sharedLibrary_site_readerCannotDelete =>
+      'Alleen bewerkers en eigenaren verwijderen gedeelde duikstekken.';
+
+  @override
+  String get sharedLibrary_suggest_title => 'Wijzigingen voorstellen';
+
+  @override
+  String get sharedLibrary_suggest_note_label => 'Opmerking voor de beheerders';
+
+  @override
+  String get sharedLibrary_suggest_send => 'Verzenden';
+
+  @override
+  String get sharedLibrary_suggest_sent => 'Suggestie verzonden';
+
+  @override
+  String get sharedLibrary_suggest_nothingChanged => 'Niets gewijzigd.';
+
+  @override
+  String sharedLibrary_suggest_pending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count suggesties in behandeling',
+      one: '1 suggestie in behandeling',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_suggest_withdraw => 'Intrekken';
+
+  @override
+  String get sharedLibrary_inbox_title => 'Suggesties';
+
+  @override
+  String get sharedLibrary_inbox_empty => 'Geen suggesties in behandeling.';
+
+  @override
+  String sharedLibrary_inbox_from(String name, String when) {
+    return 'Van $name, $when';
+  }
+
+  @override
+  String get sharedLibrary_inbox_accept => 'Accepteren';
+
+  @override
+  String get sharedLibrary_inbox_dismiss => 'Negeren';
+
+  @override
+  String get sharedLibrary_inbox_siteDeleted =>
+      'Deze duikstek is uit de bibliotheek verwijderd.';
+
+  @override
+  String get sharedLibrary_inbox_before => 'Voor';
+
+  @override
+  String get sharedLibrary_inbox_after => 'Na';
+
+  @override
+  String get sharedLibrary_filter_library => 'Bibliotheek';
+
+  @override
+  String get sharedLibrary_filter_personal => 'Persoonlijke duikstekken';
+
+  @override
+  String get sharedLibrary_groupBy_library => 'Bibliotheek';
+
+  @override
+  String get sharedLibrary_groupBy_personalGroup => 'Persoonlijk';
+
+  @override
+  String get sharedLibrary_bulk_addToLibrary =>
+      'Toevoegen aan gedeelde duikstekbibliotheek';
+
+  @override
   String get settings_cloudSync_adopt_confirm =>
       'Herstelde bibliotheek overnemen';
 
@@ -22431,6 +22696,27 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_conflict_field_isShared => 'Gedeeld';
+
+  @override
+  String get settings_conflict_field_sharedLibrary =>
+      'Gedeelde duikstekbibliotheek';
+
+  @override
+  String get settings_conflict_field_sharedLibraryMember => 'Lid-id';
+
+  @override
+  String get settings_conflict_field_sharedLibraryDisplayName => 'Weergavenaam';
+
+  @override
+  String get settings_conflict_field_sharedLibraryName =>
+      'Naam van de bibliotheek';
+
+  @override
+  String get settings_conflict_field_sharedLibraryBackend => 'Opslagtype';
+
+  @override
+  String get settings_conflict_field_sharedLibraryLocation =>
+      'Locatie van de bibliotheek';
 
   @override
   String get settings_conflict_field_isTravelGas => 'Travelgas';
@@ -51043,6 +51329,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get query_sites_coordinates => 'Coördinaten';
+
+  @override
+  String get query_sites_library => 'Bibliotheek';
 
   @override
   String get query_sites_country => 'Land';

@@ -20934,6 +20934,271 @@ class AppLocalizationsIt extends AppLocalizations {
       'Sincronizzazione tramite archiviazione cloud';
 
   @override
+  String get sharedLibrary_settings_title => 'Librerie di siti condivise';
+
+  @override
+  String get sharedLibrary_settings_subtitle =>
+      'Siti di immersione tenuti insieme ad altri subacquei';
+
+  @override
+  String get sharedLibrary_list_empty =>
+      'Nessuna libreria di siti condivisa ancora collegata.';
+
+  @override
+  String get sharedLibrary_connect_action => 'Collega una libreria';
+
+  @override
+  String get sharedLibrary_connect_addAccount =>
+      'Aggiungi account di archiviazione';
+
+  @override
+  String get sharedLibrary_connect_saveAccount => 'Salva account';
+
+  @override
+  String get sharedLibrary_connect_account_label => 'Account di archiviazione';
+
+  @override
+  String get sharedLibrary_connect_prefix_label => 'Cartella (prefisso)';
+
+  @override
+  String get sharedLibrary_connect_prefix_help =>
+      'Una cartella dentro submersion-sites, alla radice del bucket o del server, ad esempio site-sync.';
+
+  @override
+  String get sharedLibrary_connect_probe_action => 'Verifica';
+
+  @override
+  String sharedLibrary_connect_join_action(String name) {
+    return 'Unisciti a $name';
+  }
+
+  @override
+  String get sharedLibrary_connect_create_action => 'Crea libreria';
+
+  @override
+  String get sharedLibrary_connect_create_name_label => 'Nome della libreria';
+
+  @override
+  String get sharedLibrary_connect_displayName_label =>
+      'Il tuo nome in questa libreria';
+
+  @override
+  String get sharedLibrary_connect_notALibrary =>
+      'Qui non c\'è ancora nessuna libreria.';
+
+  @override
+  String get sharedLibrary_connect_needsNewerApp =>
+      'Questa libreria richiede una versione più recente di Submersion.';
+
+  @override
+  String get sharedLibrary_connect_onlyS3Webdav =>
+      'Le librerie di siti condivise funzionano con account S3 e WebDAV.';
+
+  @override
+  String get sharedLibrary_role_reader => 'Lettore';
+
+  @override
+  String get sharedLibrary_role_editor => 'Editor';
+
+  @override
+  String get sharedLibrary_role_owner => 'Proprietario';
+
+  @override
+  String get sharedLibrary_library_members => 'Membri';
+
+  @override
+  String sharedLibrary_library_memberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count membri',
+      one: '1 membro',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_library_syncNow => 'Sincronizza ora';
+
+  @override
+  String sharedLibrary_library_lastSync(String when) {
+    return 'Ultima sincronizzazione $when';
+  }
+
+  @override
+  String get sharedLibrary_library_neverSynced => 'Non ancora sincronizzata';
+
+  @override
+  String get sharedLibrary_library_readOnlyBanner =>
+      'Le tue credenziali consentono solo la lettura. Puoi suggerire modifiche; un referente le applicherà.';
+
+  @override
+  String sharedLibrary_library_errorBanner(String error) {
+    return 'Ultima sincronizzazione non riuscita: $error';
+  }
+
+  @override
+  String get sharedLibrary_library_addMySites => 'Aggiungi i miei siti';
+
+  @override
+  String get sharedLibrary_library_suggestions => 'Suggerimenti';
+
+  @override
+  String get sharedLibrary_library_leave => 'Lascia la libreria';
+
+  @override
+  String sharedLibrary_library_leaveConfirm_title(String name) {
+    return 'Lasciare $name?';
+  }
+
+  @override
+  String get sharedLibrary_library_leaveConfirm_body =>
+      'I siti condivisi usati dalle tue immersioni restano come copie personali. Gli altri siti condivisi vengono rimossi da questo dispositivo.';
+
+  @override
+  String get sharedLibrary_library_rename_label => 'Nome visualizzato';
+
+  @override
+  String get sharedLibrary_members_setRole => 'Cambia ruolo';
+
+  @override
+  String get sharedLibrary_members_lastOwner =>
+      'L\'ultimo proprietario non può essere retrocesso.';
+
+  @override
+  String get sharedLibrary_picker_none =>
+      'Nessuna libreria di siti condivisa qui ti consente di aggiungere siti.';
+
+  @override
+  String get sharedLibrary_list_notConnected =>
+      'Non collegata su questo dispositivo';
+
+  @override
+  String get sharedLibrary_connect_exists =>
+      'Nel frattempo qualcuno ha creato qui una libreria. Controlla di nuovo per unirti.';
+
+  @override
+  String get sharedLibrary_library_lastOwnerLeave =>
+      'Rendi proprietario un altro membro prima di uscire.';
+
+  @override
+  String sharedLibrary_site_badgeTooltip(String name) {
+    return 'In $name';
+  }
+
+  @override
+  String sharedLibrary_site_lastEdited(String name, String when) {
+    return 'Ultima modifica di $name, $when';
+  }
+
+  @override
+  String get sharedLibrary_site_history => 'Cronologia modifiche';
+
+  @override
+  String get sharedLibrary_site_addToLibrary =>
+      'Aggiungi alla libreria di siti condivisa';
+
+  @override
+  String get sharedLibrary_site_chooseLibrary => 'Scegli una libreria';
+
+  @override
+  String sharedLibrary_site_added(String name) {
+    return 'Aggiunto a $name';
+  }
+
+  @override
+  String sharedLibrary_site_notConnectedHere(String name) {
+    return 'Questo sito è in $name, che non è collegata su questo dispositivo.';
+  }
+
+  @override
+  String get sharedLibrary_site_connectHere => 'Collega su questo dispositivo';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_title =>
+      'Eliminare dalla libreria di siti condivisa?';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_body =>
+      'I membri le cui immersioni usano questo sito ne conservano una copia personale.';
+
+  @override
+  String get sharedLibrary_site_readerCannotDelete =>
+      'Solo editor e proprietari eliminano i siti condivisi.';
+
+  @override
+  String get sharedLibrary_suggest_title => 'Suggerisci modifiche';
+
+  @override
+  String get sharedLibrary_suggest_note_label => 'Nota per i referenti';
+
+  @override
+  String get sharedLibrary_suggest_send => 'Invia';
+
+  @override
+  String get sharedLibrary_suggest_sent => 'Suggerimento inviato';
+
+  @override
+  String get sharedLibrary_suggest_nothingChanged => 'Nessuna modifica.';
+
+  @override
+  String sharedLibrary_suggest_pending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count suggerimenti in attesa',
+      one: '1 suggerimento in attesa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_suggest_withdraw => 'Ritira';
+
+  @override
+  String get sharedLibrary_inbox_title => 'Suggerimenti';
+
+  @override
+  String get sharedLibrary_inbox_empty => 'Nessun suggerimento in attesa.';
+
+  @override
+  String sharedLibrary_inbox_from(String name, String when) {
+    return 'Da $name, $when';
+  }
+
+  @override
+  String get sharedLibrary_inbox_accept => 'Accetta';
+
+  @override
+  String get sharedLibrary_inbox_dismiss => 'Ignora';
+
+  @override
+  String get sharedLibrary_inbox_siteDeleted =>
+      'Questo sito è stato eliminato dalla libreria.';
+
+  @override
+  String get sharedLibrary_inbox_before => 'Prima';
+
+  @override
+  String get sharedLibrary_inbox_after => 'Dopo';
+
+  @override
+  String get sharedLibrary_filter_library => 'Libreria';
+
+  @override
+  String get sharedLibrary_filter_personal => 'Siti personali';
+
+  @override
+  String get sharedLibrary_groupBy_library => 'Libreria';
+
+  @override
+  String get sharedLibrary_groupBy_personalGroup => 'Personali';
+
+  @override
+  String get sharedLibrary_bulk_addToLibrary =>
+      'Aggiungi alla libreria di siti condivisa';
+
+  @override
   String get settings_cloudSync_adopt_confirm =>
       'Adotta la libreria ripristinata';
 
@@ -22587,6 +22852,28 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_conflict_field_isShared => 'Condiviso';
+
+  @override
+  String get settings_conflict_field_sharedLibrary =>
+      'Libreria di siti condivisa';
+
+  @override
+  String get settings_conflict_field_sharedLibraryMember => 'Id membro';
+
+  @override
+  String get settings_conflict_field_sharedLibraryDisplayName =>
+      'Nome visualizzato';
+
+  @override
+  String get settings_conflict_field_sharedLibraryName => 'Nome della libreria';
+
+  @override
+  String get settings_conflict_field_sharedLibraryBackend =>
+      'Tipo di archiviazione';
+
+  @override
+  String get settings_conflict_field_sharedLibraryLocation =>
+      'Posizione della libreria';
 
   @override
   String get settings_conflict_field_isTravelGas => 'Gas di trasferimento';
@@ -51371,6 +51658,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get query_sites_coordinates => 'Coordinate';
+
+  @override
+  String get query_sites_library => 'Libreria';
 
   @override
   String get query_sites_country => 'Paese';

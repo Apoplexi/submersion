@@ -20866,6 +20866,270 @@ class AppLocalizationsHu extends AppLocalizations {
       'Szinkronizálás felhőtárhelyen keresztül';
 
   @override
+  String get sharedLibrary_settings_title => 'Megosztott merülőhely-könyvtárak';
+
+  @override
+  String get sharedLibrary_settings_subtitle =>
+      'Más búvárokkal közösen vezetett merülőhelyek';
+
+  @override
+  String get sharedLibrary_list_empty =>
+      'Még nincs csatlakoztatott megosztott merülőhely-könyvtár.';
+
+  @override
+  String get sharedLibrary_connect_action => 'Könyvtár csatlakoztatása';
+
+  @override
+  String get sharedLibrary_connect_addAccount => 'Tárhelyfiók hozzáadása';
+
+  @override
+  String get sharedLibrary_connect_saveAccount => 'Fiók mentése';
+
+  @override
+  String get sharedLibrary_connect_account_label => 'Tárhelyfiók';
+
+  @override
+  String get sharedLibrary_connect_prefix_label => 'Mappa (előtag)';
+
+  @override
+  String get sharedLibrary_connect_prefix_help =>
+      'Egy mappa a submersion-sites mappában, a bucket vagy a szerver legfelső szintjén, például site-sync.';
+
+  @override
+  String get sharedLibrary_connect_probe_action => 'Ellenőrzés';
+
+  @override
+  String sharedLibrary_connect_join_action(String name) {
+    return 'Csatlakozás: $name';
+  }
+
+  @override
+  String get sharedLibrary_connect_create_action => 'Könyvtár létrehozása';
+
+  @override
+  String get sharedLibrary_connect_create_name_label => 'Könyvtár neve';
+
+  @override
+  String get sharedLibrary_connect_displayName_label =>
+      'A neved ebben a könyvtárban';
+
+  @override
+  String get sharedLibrary_connect_notALibrary => 'Itt még nincs könyvtár.';
+
+  @override
+  String get sharedLibrary_connect_needsNewerApp =>
+      'Ehhez a könyvtárhoz a Submersion újabb verziója szükséges.';
+
+  @override
+  String get sharedLibrary_connect_onlyS3Webdav =>
+      'A megosztott merülőhely-könyvtárak S3- és WebDAV-fiókokkal működnek.';
+
+  @override
+  String get sharedLibrary_role_reader => 'Olvasó';
+
+  @override
+  String get sharedLibrary_role_editor => 'Szerkesztő';
+
+  @override
+  String get sharedLibrary_role_owner => 'Tulajdonos';
+
+  @override
+  String get sharedLibrary_library_members => 'Tagok';
+
+  @override
+  String sharedLibrary_library_memberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tag',
+      one: '1 tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_library_syncNow => 'Szinkronizálás most';
+
+  @override
+  String sharedLibrary_library_lastSync(String when) {
+    return 'Utolsó szinkronizálás: $when';
+  }
+
+  @override
+  String get sharedLibrary_library_neverSynced => 'Még nincs szinkronizálva';
+
+  @override
+  String get sharedLibrary_library_readOnlyBanner =>
+      'A hitelesítő adataid csak olvasást engednek. Javasolhatsz módosításokat, egy felelős alkalmazza őket.';
+
+  @override
+  String sharedLibrary_library_errorBanner(String error) {
+    return 'Az utolsó szinkronizálás sikertelen: $error';
+  }
+
+  @override
+  String get sharedLibrary_library_addMySites => 'Merülőhelyeim hozzáadása';
+
+  @override
+  String get sharedLibrary_library_suggestions => 'Javaslatok';
+
+  @override
+  String get sharedLibrary_library_leave => 'Kilépés a könyvtárból';
+
+  @override
+  String sharedLibrary_library_leaveConfirm_title(String name) {
+    return 'Kilépsz innen: $name?';
+  }
+
+  @override
+  String get sharedLibrary_library_leaveConfirm_body =>
+      'A merüléseid által használt megosztott helyek személyes másolatként megmaradnak. A többi megosztott hely törlődik erről az eszközről.';
+
+  @override
+  String get sharedLibrary_library_rename_label => 'Megjelenített név';
+
+  @override
+  String get sharedLibrary_members_setRole => 'Szerep módosítása';
+
+  @override
+  String get sharedLibrary_members_lastOwner =>
+      'Az utolsó tulajdonos nem fokozható le.';
+
+  @override
+  String get sharedLibrary_picker_none =>
+      'Itt egyik megosztott merülőhely-könyvtárba sem adhatsz hozzá merülőhelyeket.';
+
+  @override
+  String get sharedLibrary_list_notConnected =>
+      'Ezen az eszközön nincs csatlakoztatva';
+
+  @override
+  String get sharedLibrary_connect_exists =>
+      'Közben valaki könyvtárat hozott létre itt. Ellenőrizd újra a csatlakozáshoz.';
+
+  @override
+  String get sharedLibrary_library_lastOwnerLeave =>
+      'Kilépés előtt tegyél meg egy másik tagot tulajdonosnak.';
+
+  @override
+  String sharedLibrary_site_badgeTooltip(String name) {
+    return 'Itt: $name';
+  }
+
+  @override
+  String sharedLibrary_site_lastEdited(String name, String when) {
+    return 'Utoljára szerkesztette: $name, $when';
+  }
+
+  @override
+  String get sharedLibrary_site_history => 'Szerkesztési előzmények';
+
+  @override
+  String get sharedLibrary_site_addToLibrary =>
+      'Hozzáadás a megosztott merülőhely-könyvtárhoz';
+
+  @override
+  String get sharedLibrary_site_chooseLibrary => 'Válassz könyvtárat';
+
+  @override
+  String sharedLibrary_site_added(String name) {
+    return 'Hozzáadva ide: $name';
+  }
+
+  @override
+  String sharedLibrary_site_notConnectedHere(String name) {
+    return 'Ez a hely itt található: $name, amely nincs csatlakoztatva ezen az eszközön.';
+  }
+
+  @override
+  String get sharedLibrary_site_connectHere =>
+      'Csatlakoztatás ezen az eszközön';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_title =>
+      'Törlöd a megosztott merülőhely-könyvtárból?';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_body =>
+      'Azok a tagok, akiknek a merülései ezt a helyet használják, megtartanak egy személyes másolatot.';
+
+  @override
+  String get sharedLibrary_site_readerCannotDelete =>
+      'Megosztott helyeket csak szerkesztők és tulajdonosok törölhetnek.';
+
+  @override
+  String get sharedLibrary_suggest_title => 'Módosítások javaslása';
+
+  @override
+  String get sharedLibrary_suggest_note_label => 'Megjegyzés a felelősöknek';
+
+  @override
+  String get sharedLibrary_suggest_send => 'Küldés';
+
+  @override
+  String get sharedLibrary_suggest_sent => 'Javaslat elküldve';
+
+  @override
+  String get sharedLibrary_suggest_nothingChanged => 'Semmi sem változott.';
+
+  @override
+  String sharedLibrary_suggest_pending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count javaslat függőben',
+      one: '1 javaslat függőben',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_suggest_withdraw => 'Visszavonás';
+
+  @override
+  String get sharedLibrary_inbox_title => 'Javaslatok';
+
+  @override
+  String get sharedLibrary_inbox_empty => 'Nincs függőben lévő javaslat.';
+
+  @override
+  String sharedLibrary_inbox_from(String name, String when) {
+    return 'Tőle: $name, $when';
+  }
+
+  @override
+  String get sharedLibrary_inbox_accept => 'Elfogadás';
+
+  @override
+  String get sharedLibrary_inbox_dismiss => 'Elvetés';
+
+  @override
+  String get sharedLibrary_inbox_siteDeleted =>
+      'Ezt a helyet törölték a könyvtárból.';
+
+  @override
+  String get sharedLibrary_inbox_before => 'Előtte';
+
+  @override
+  String get sharedLibrary_inbox_after => 'Utána';
+
+  @override
+  String get sharedLibrary_filter_library => 'Könyvtár';
+
+  @override
+  String get sharedLibrary_filter_personal => 'Személyes helyek';
+
+  @override
+  String get sharedLibrary_groupBy_library => 'Könyvtár';
+
+  @override
+  String get sharedLibrary_groupBy_personalGroup => 'Személyes';
+
+  @override
+  String get sharedLibrary_bulk_addToLibrary =>
+      'Hozzáadás a megosztott merülőhely-könyvtárhoz';
+
+  @override
   String get settings_cloudSync_adopt_confirm =>
       'Visszaállított könyvtár átvétele';
 
@@ -22489,6 +22753,26 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_conflict_field_isShared => 'Megosztva';
+
+  @override
+  String get settings_conflict_field_sharedLibrary =>
+      'Megosztott merülőhely-könyvtár';
+
+  @override
+  String get settings_conflict_field_sharedLibraryMember => 'Tagazonosító';
+
+  @override
+  String get settings_conflict_field_sharedLibraryDisplayName =>
+      'Megjelenített név';
+
+  @override
+  String get settings_conflict_field_sharedLibraryName => 'Könyvtár neve';
+
+  @override
+  String get settings_conflict_field_sharedLibraryBackend => 'Tárhely típusa';
+
+  @override
+  String get settings_conflict_field_sharedLibraryLocation => 'Könyvtár helye';
 
   @override
   String get settings_conflict_field_isTravelGas => 'Utazógáz';
@@ -51105,6 +51389,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get query_sites_coordinates => 'Koordináták';
+
+  @override
+  String get query_sites_library => 'Könyvtár';
 
   @override
   String get query_sites_country => 'Ország';

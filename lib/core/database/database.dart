@@ -25,6 +25,7 @@ import 'package:submersion/core/database/tables/insight_tables.dart';
 import 'package:submersion/core/database/tables/query_tables.dart';
 import 'package:submersion/core/database/tables/safety_tables.dart';
 import 'package:submersion/core/database/tables/service_tables.dart';
+import 'package:submersion/core/database/tables/shared_library_tables.dart';
 import 'package:submersion/core/database/tables/site_tables.dart';
 import 'package:submersion/core/database/tables/sync_tables.dart';
 import 'package:submersion/core/database/tables/tag_tables.dart';
@@ -57,6 +58,7 @@ export 'package:submersion/core/database/tables/insight_tables.dart';
 export 'package:submersion/core/database/tables/query_tables.dart';
 export 'package:submersion/core/database/tables/safety_tables.dart';
 export 'package:submersion/core/database/tables/service_tables.dart';
+export 'package:submersion/core/database/tables/shared_library_tables.dart';
 export 'package:submersion/core/database/tables/site_tables.dart';
 export 'package:submersion/core/database/tables/sync_tables.dart';
 export 'package:submersion/core/database/tables/tag_tables.dart';
@@ -255,6 +257,12 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     // Documents store (v277, issue #2613)
     Documents,
     DocumentPages,
+    // Shared dive-site library (v289, issue #2567)
+    SharedLibraries,
+    SharedLibraryMembers,
+    SharedLibraryMemberships,
+    SharedSiteStates,
+    SharedSiteSuggestions,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -1240,6 +1248,10 @@ class AppDatabase extends _$AppDatabase {
     // floor stays at 280. Renumbered from 286 and 287, which #2628 and #2650
     // shipped first.
     288,
+    // v289: shared dive-site library tables and dive_sites.shared_library_id
+    // (issue #2567). New tables and a nullable column, so the floor stays
+    // at 280. Renumbered from 288 after #2515 shipped 288.
+    289,
     // v290: dive_plan_segments.split_at_configured_rate (issue #3264).
     // Additive defaulted column, so the floor stays at 280. Renumbered from
     // 277, 282 then 286, as #2613's documents store, #3189, #3012, #3047,

@@ -21205,6 +21205,272 @@ class AppLocalizationsAr extends AppLocalizations {
       'المزامنة عبر التخزين السحابي';
 
   @override
+  String get sharedLibrary_settings_title => 'مكتبات المواقع المشتركة';
+
+  @override
+  String get sharedLibrary_settings_subtitle =>
+      'مواقع غوص تُدار مع غواصين آخرين';
+
+  @override
+  String get sharedLibrary_list_empty =>
+      'لم يتم توصيل أي مكتبة مواقع مشتركة بعد.';
+
+  @override
+  String get sharedLibrary_connect_action => 'توصيل مكتبة';
+
+  @override
+  String get sharedLibrary_connect_addAccount => 'إضافة حساب تخزين';
+
+  @override
+  String get sharedLibrary_connect_saveAccount => 'حفظ الحساب';
+
+  @override
+  String get sharedLibrary_connect_account_label => 'حساب التخزين';
+
+  @override
+  String get sharedLibrary_connect_prefix_label => 'المجلد (البادئة)';
+
+  @override
+  String get sharedLibrary_connect_prefix_help =>
+      'مجلد داخل submersion-sites في أعلى الحاوية أو الخادم، مثل site-sync.';
+
+  @override
+  String get sharedLibrary_connect_probe_action => 'تحقق';
+
+  @override
+  String sharedLibrary_connect_join_action(String name) {
+    return 'الانضمام إلى $name';
+  }
+
+  @override
+  String get sharedLibrary_connect_create_action => 'إنشاء مكتبة';
+
+  @override
+  String get sharedLibrary_connect_create_name_label => 'اسم المكتبة';
+
+  @override
+  String get sharedLibrary_connect_displayName_label => 'اسمك في هذه المكتبة';
+
+  @override
+  String get sharedLibrary_connect_notALibrary => 'لا توجد مكتبة هنا بعد.';
+
+  @override
+  String get sharedLibrary_connect_needsNewerApp =>
+      'تتطلب هذه المكتبة إصدارًا أحدث من Submersion.';
+
+  @override
+  String get sharedLibrary_connect_onlyS3Webdav =>
+      'تعمل مكتبات المواقع المشتركة مع حسابات S3 وWebDAV.';
+
+  @override
+  String get sharedLibrary_role_reader => 'قارئ';
+
+  @override
+  String get sharedLibrary_role_editor => 'محرر';
+
+  @override
+  String get sharedLibrary_role_owner => 'مالك';
+
+  @override
+  String get sharedLibrary_library_members => 'الأعضاء';
+
+  @override
+  String sharedLibrary_library_memberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عضو',
+      many: '$count عضوًا',
+      few: '$count أعضاء',
+      two: 'عضوان',
+      one: 'عضو واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_library_syncNow => 'مزامنة الآن';
+
+  @override
+  String sharedLibrary_library_lastSync(String when) {
+    return 'آخر مزامنة $when';
+  }
+
+  @override
+  String get sharedLibrary_library_neverSynced => 'لم تتم المزامنة بعد';
+
+  @override
+  String get sharedLibrary_library_readOnlyBanner =>
+      'تسمح بيانات اعتمادك بالقراءة فقط. يمكنك اقتراح تغييرات ويقوم مرجع بتطبيقها.';
+
+  @override
+  String sharedLibrary_library_errorBanner(String error) {
+    return 'فشلت آخر مزامنة: $error';
+  }
+
+  @override
+  String get sharedLibrary_library_addMySites => 'إضافة مواقعي';
+
+  @override
+  String get sharedLibrary_library_suggestions => 'الاقتراحات';
+
+  @override
+  String get sharedLibrary_library_leave => 'مغادرة المكتبة';
+
+  @override
+  String sharedLibrary_library_leaveConfirm_title(String name) {
+    return 'مغادرة $name؟';
+  }
+
+  @override
+  String get sharedLibrary_library_leaveConfirm_body =>
+      'تبقى المواقع المشتركة التي تستخدمها غوصاتك كنسخ شخصية. تُزال المواقع المشتركة الأخرى من هذا الجهاز.';
+
+  @override
+  String get sharedLibrary_library_rename_label => 'الاسم المعروض';
+
+  @override
+  String get sharedLibrary_members_setRole => 'تغيير الدور';
+
+  @override
+  String get sharedLibrary_members_lastOwner =>
+      'لا يمكن تخفيض رتبة المالك الأخير.';
+
+  @override
+  String get sharedLibrary_picker_none =>
+      'لا توجد مكتبة مواقع مشتركة هنا تتيح لك إضافة مواقع.';
+
+  @override
+  String get sharedLibrary_list_notConnected => 'غير متصل على هذا الجهاز';
+
+  @override
+  String get sharedLibrary_connect_exists =>
+      'أنشأ أحدهم مكتبة هنا في الأثناء. تحقق مرة أخرى للانضمام إليها.';
+
+  @override
+  String get sharedLibrary_library_lastOwnerLeave =>
+      'اجعل عضوًا آخر مالكًا قبل المغادرة.';
+
+  @override
+  String sharedLibrary_site_badgeTooltip(String name) {
+    return 'في $name';
+  }
+
+  @override
+  String sharedLibrary_site_lastEdited(String name, String when) {
+    return 'آخر تعديل بواسطة $name، $when';
+  }
+
+  @override
+  String get sharedLibrary_site_history => 'سجل التعديلات';
+
+  @override
+  String get sharedLibrary_site_addToLibrary =>
+      'إضافة إلى مكتبة المواقع المشتركة';
+
+  @override
+  String get sharedLibrary_site_chooseLibrary => 'اختر مكتبة';
+
+  @override
+  String sharedLibrary_site_added(String name) {
+    return 'تمت الإضافة إلى $name';
+  }
+
+  @override
+  String sharedLibrary_site_notConnectedHere(String name) {
+    return 'هذا الموقع في $name، وهي غير متصلة على هذا الجهاز.';
+  }
+
+  @override
+  String get sharedLibrary_site_connectHere => 'توصيل على هذا الجهاز';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_title =>
+      'حذف من مكتبة المواقع المشتركة؟';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_body =>
+      'يحتفظ الأعضاء الذين تستخدم غوصاتهم هذا الموقع بنسخة شخصية.';
+
+  @override
+  String get sharedLibrary_site_readerCannotDelete =>
+      'يمكن للمحررين والمالكين فقط حذف المواقع المشتركة.';
+
+  @override
+  String get sharedLibrary_suggest_title => 'اقتراح تغييرات';
+
+  @override
+  String get sharedLibrary_suggest_note_label => 'ملاحظة للمراجع';
+
+  @override
+  String get sharedLibrary_suggest_send => 'إرسال';
+
+  @override
+  String get sharedLibrary_suggest_sent => 'تم إرسال الاقتراح';
+
+  @override
+  String get sharedLibrary_suggest_nothingChanged => 'لم يتغير شيء.';
+
+  @override
+  String sharedLibrary_suggest_pending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count اقتراح معلق',
+      many: '$count اقتراحًا معلقًا',
+      few: '$count اقتراحات معلقة',
+      two: 'اقتراحان معلقان',
+      one: 'اقتراح واحد معلق',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_suggest_withdraw => 'سحب';
+
+  @override
+  String get sharedLibrary_inbox_title => 'الاقتراحات';
+
+  @override
+  String get sharedLibrary_inbox_empty => 'لا توجد اقتراحات بانتظار المراجعة.';
+
+  @override
+  String sharedLibrary_inbox_from(String name, String when) {
+    return 'من $name، $when';
+  }
+
+  @override
+  String get sharedLibrary_inbox_accept => 'قبول';
+
+  @override
+  String get sharedLibrary_inbox_dismiss => 'تجاهل';
+
+  @override
+  String get sharedLibrary_inbox_siteDeleted => 'تم حذف هذا الموقع من المكتبة.';
+
+  @override
+  String get sharedLibrary_inbox_before => 'قبل';
+
+  @override
+  String get sharedLibrary_inbox_after => 'بعد';
+
+  @override
+  String get sharedLibrary_filter_library => 'المكتبة';
+
+  @override
+  String get sharedLibrary_filter_personal => 'المواقع الشخصية';
+
+  @override
+  String get sharedLibrary_groupBy_library => 'المكتبة';
+
+  @override
+  String get sharedLibrary_groupBy_personalGroup => 'شخصي';
+
+  @override
+  String get sharedLibrary_bulk_addToLibrary =>
+      'إضافة إلى مكتبة المواقع المشتركة';
+
+  @override
   String get settings_cloudSync_adopt_confirm => 'اعتماد المكتبة المستعادة';
 
   @override
@@ -22800,6 +23066,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_field_isShared => 'مشترك';
+
+  @override
+  String get settings_conflict_field_sharedLibrary => 'مكتبة المواقع المشتركة';
+
+  @override
+  String get settings_conflict_field_sharedLibraryMember => 'معرّف العضو';
+
+  @override
+  String get settings_conflict_field_sharedLibraryDisplayName =>
+      'الاسم المعروض';
+
+  @override
+  String get settings_conflict_field_sharedLibraryName => 'اسم المكتبة';
+
+  @override
+  String get settings_conflict_field_sharedLibraryBackend => 'نوع التخزين';
+
+  @override
+  String get settings_conflict_field_sharedLibraryLocation => 'موقع المكتبة';
 
   @override
   String get settings_conflict_field_isTravelGas => 'غاز العبور';
@@ -52032,6 +52317,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_sites_coordinates => 'الإحداثيات';
+
+  @override
+  String get query_sites_library => 'المكتبة';
 
   @override
   String get query_sites_country => 'البلد';

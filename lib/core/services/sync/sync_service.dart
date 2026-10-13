@@ -1538,6 +1538,12 @@ class SyncService {
             records: data.diveComputerConnections,
             hasUpdatedAt: true,
           ),
+          // v289: a profile's club-library memberships (issue #2567).
+          (
+            type: 'sharedLibraryMemberships',
+            records: data.sharedLibraryMemberships,
+            hasUpdatedAt: true,
+          ),
           (
             type: 'transmitters',
             records: data.transmitters,
@@ -2405,6 +2411,8 @@ class SyncService {
     var applied = 0;
     var conflicts = 0;
     var failed = 0;
+    // A library site ignores a personal tombstone (issue #2567).
+    final librarySites = await _serializer.librarySiteIds();
 
     for (final entry in deletions.entries) {
       final entityType = entry.key;
@@ -2434,6 +2442,20 @@ class SyncService {
           // peer's tombstone for one neither deletes this device's value nor
           // raises a conflict, as the merge treats a live copy.
           if (isDeviceLocalRecord(entityType, recordId)) continue;
+          if (entityType == 'diveSites' && librarySites.contains(recordId)) {
+            continue;
+          }
+          // A child row of a library site (its types, tags, species, hides
+          // or features) is just as much outside the personal sync.
+          if (librarySites.isNotEmpty &&
+              SyncDataSerializer.librarySiteChildEntities.contains(
+                entityType,
+              )) {
+            final local = await _serializer.fetchRecord(entityType, recordId);
+            if (local != null && librarySites.contains(local['siteId'])) {
+              continue;
+            }
+          }
           if (pendingByEntity[entityType]?.contains(recordId) == true) {
             continue;
           }
@@ -2643,6 +2665,7 @@ class SyncService {
     'weightPresetEntries': false,
     'diveComputers': true,
     'diveComputerConnections': true,
+    'sharedLibraryMemberships': true,
     'transmitters': true,
     'cylinderFills': true,
     'connectionMaps': true,
@@ -2782,6 +2805,42 @@ class SyncService {
     },
   };
 
+  /// A device that has not connected a club library holds no copy of its
+  /// sites, so the FK repair clears its rows' links to one, and its next
+  /// edit of such a row sends that null back (issue #2567). Where the club
+  /// site exists, the null is the peer's blindness, not an unlink: keep the
+  /// local link. The rest of the row merges as usual.
+  Future<List<Map<String, dynamic>>> _keepLibrarySiteLinks(
+    String entityType,
+    List<Map<String, dynamic>> records,
+  ) async {
+    final fields = [
+      for (final ref in parentRefs[entityType] ?? const <ParentRef>[])
+        if (ref.parent == 'diveSites' && ref.nullable) ref.field,
+    ];
+    if (fields.isEmpty) return records;
+    final cleared = [
+      for (final r in records)
+        if (r['id'] is String && fields.any((f) => r[f] == null))
+          r['id'] as String,
+    ];
+    if (cleared.isEmpty) return records;
+    final guarded = await _serializer.librarySiteIds();
+    if (guarded.isEmpty) return records;
+    final local = await _serializer.fetchRecords(entityType, cleared);
+    return [
+      for (final r in records)
+        if (local[r['id']] case final mine?)
+          {
+            ...r,
+            for (final f in fields)
+              if (r[f] == null && guarded.contains(mine[f])) f: mine[f],
+          }
+        else
+          r,
+    ];
+  }
+
   @visibleForTesting
   static const Map<String, List<ParentRef>> parentRefs = {
     'dives': [
@@ -2809,6 +2868,10 @@ class SyncService {
     // v279: a connection belongs to its computer (issue #3106).
     'diveComputerConnections': [
       (field: 'computerId', parent: 'diveComputers', nullable: false),
+    ],
+    // v289: a membership belongs to its profile (issue #2567).
+    'sharedLibraryMemberships': [
+      (field: 'diverId', parent: 'divers', nullable: false),
     ],
     // Both gear FKs are nullable: the registry entry outlives a deleted
     // cylinder or computer (set null), so a missing parent must not drop it.
@@ -3144,6 +3207,23 @@ class SyncService {
     if (records.isEmpty) {
       return const _MergeResult(recordsApplied: 0, conflictsFound: 0);
     }
+    // A row of a club-library site never arrives through the personal sync
+    // (issue #2567): a peer's stale personal copy must not overwrite it.
+    if (entityType == 'diveSites' ||
+        SyncDataSerializer.librarySiteChildEntities.contains(entityType)) {
+      final guarded = await _serializer.librarySiteIds();
+      if (guarded.isNotEmpty) {
+        final key = entityType == 'diveSites' ? 'id' : 'siteId';
+        records = [
+          for (final r in records)
+            if (!guarded.contains(r[key])) r,
+        ];
+        if (records.isEmpty) {
+          return const _MergeResult(recordsApplied: 0, conflictsFound: 0);
+        }
+      }
+    }
+    records = await _keepLibrarySiteLinks(entityType, records);
 
     var applied = 0;
     var conflicts = 0;

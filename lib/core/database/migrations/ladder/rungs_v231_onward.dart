@@ -383,6 +383,13 @@ extension RungsFromV231 on AppDatabase {
       await backfillCertificationCourseLinks(this);
     }
     if (from < 288) await reportProgress();
+    // v289: shared dive-site library tables and dive_sites.shared_library_id
+    // (issue #2567). Idempotent; re-asserted in beforeOpen. Renumbered from
+    // 288 after #2515 shipped 288.
+    if (from < 289) {
+      await _assertSharedLibrarySchema();
+    }
+    if (from < 289) await reportProgress();
     // v290: dive_plan_segments.split_at_configured_rate (issue #3264).
     // Column only, defaulting off; re-asserted in beforeOpen. Renumbered
     // from 277, 282 then 286, as earlier rungs shipped or were claimed

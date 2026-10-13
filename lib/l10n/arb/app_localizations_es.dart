@@ -20938,6 +20938,273 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sincronización mediante almacenamiento en la nube';
 
   @override
+  String get sharedLibrary_settings_title =>
+      'Bibliotecas de puntos compartidas';
+
+  @override
+  String get sharedLibrary_settings_subtitle =>
+      'Puntos de buceo mantenidos con otros buceadores';
+
+  @override
+  String get sharedLibrary_list_empty =>
+      'Aún no hay ninguna biblioteca de puntos compartida conectada.';
+
+  @override
+  String get sharedLibrary_connect_action => 'Conectar una biblioteca';
+
+  @override
+  String get sharedLibrary_connect_addAccount =>
+      'Añadir cuenta de almacenamiento';
+
+  @override
+  String get sharedLibrary_connect_saveAccount => 'Guardar cuenta';
+
+  @override
+  String get sharedLibrary_connect_account_label => 'Cuenta de almacenamiento';
+
+  @override
+  String get sharedLibrary_connect_prefix_label => 'Carpeta (prefijo)';
+
+  @override
+  String get sharedLibrary_connect_prefix_help =>
+      'Una carpeta dentro de submersion-sites, en la raíz del bucket o del servidor, por ejemplo site-sync.';
+
+  @override
+  String get sharedLibrary_connect_probe_action => 'Comprobar';
+
+  @override
+  String sharedLibrary_connect_join_action(String name) {
+    return 'Unirse a $name';
+  }
+
+  @override
+  String get sharedLibrary_connect_create_action => 'Crear biblioteca';
+
+  @override
+  String get sharedLibrary_connect_create_name_label =>
+      'Nombre de la biblioteca';
+
+  @override
+  String get sharedLibrary_connect_displayName_label =>
+      'Tu nombre en esta biblioteca';
+
+  @override
+  String get sharedLibrary_connect_notALibrary =>
+      'Aquí todavía no hay ninguna biblioteca.';
+
+  @override
+  String get sharedLibrary_connect_needsNewerApp =>
+      'Esta biblioteca necesita una versión más reciente de Submersion.';
+
+  @override
+  String get sharedLibrary_connect_onlyS3Webdav =>
+      'Las bibliotecas de puntos compartidas funcionan con cuentas S3 y WebDAV.';
+
+  @override
+  String get sharedLibrary_role_reader => 'Lector';
+
+  @override
+  String get sharedLibrary_role_editor => 'Editor';
+
+  @override
+  String get sharedLibrary_role_owner => 'Propietario';
+
+  @override
+  String get sharedLibrary_library_members => 'Miembros';
+
+  @override
+  String sharedLibrary_library_memberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count miembros',
+      one: '1 miembro',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_library_syncNow => 'Sincronizar ahora';
+
+  @override
+  String sharedLibrary_library_lastSync(String when) {
+    return 'Última sincronización $when';
+  }
+
+  @override
+  String get sharedLibrary_library_neverSynced => 'Aún no sincronizada';
+
+  @override
+  String get sharedLibrary_library_readOnlyBanner =>
+      'Tus credenciales solo permiten leer. Puedes sugerir cambios; un responsable los aplicará.';
+
+  @override
+  String sharedLibrary_library_errorBanner(String error) {
+    return 'La última sincronización falló: $error';
+  }
+
+  @override
+  String get sharedLibrary_library_addMySites => 'Añadir mis puntos';
+
+  @override
+  String get sharedLibrary_library_suggestions => 'Sugerencias';
+
+  @override
+  String get sharedLibrary_library_leave => 'Salir de la biblioteca';
+
+  @override
+  String sharedLibrary_library_leaveConfirm_title(String name) {
+    return '¿Salir de $name?';
+  }
+
+  @override
+  String get sharedLibrary_library_leaveConfirm_body =>
+      'Los puntos compartidos que usan tus inmersiones se conservan como copias personales. Los demás puntos compartidos se eliminan de este dispositivo.';
+
+  @override
+  String get sharedLibrary_library_rename_label => 'Nombre visible';
+
+  @override
+  String get sharedLibrary_members_setRole => 'Cambiar rol';
+
+  @override
+  String get sharedLibrary_members_lastOwner =>
+      'No se puede degradar al último propietario.';
+
+  @override
+  String get sharedLibrary_picker_none =>
+      'Ninguna biblioteca de puntos compartida aquí te permite añadir sitios.';
+
+  @override
+  String get sharedLibrary_list_notConnected =>
+      'No conectada en este dispositivo';
+
+  @override
+  String get sharedLibrary_connect_exists =>
+      'Alguien ha creado una biblioteca aquí mientras tanto. Vuelve a comprobarlo para unirte.';
+
+  @override
+  String get sharedLibrary_library_lastOwnerLeave =>
+      'Haz propietario a otro miembro antes de salir.';
+
+  @override
+  String sharedLibrary_site_badgeTooltip(String name) {
+    return 'En $name';
+  }
+
+  @override
+  String sharedLibrary_site_lastEdited(String name, String when) {
+    return 'Última edición de $name, $when';
+  }
+
+  @override
+  String get sharedLibrary_site_history => 'Historial de ediciones';
+
+  @override
+  String get sharedLibrary_site_addToLibrary =>
+      'Añadir a la biblioteca de puntos compartida';
+
+  @override
+  String get sharedLibrary_site_chooseLibrary => 'Elige una biblioteca';
+
+  @override
+  String sharedLibrary_site_added(String name) {
+    return 'Añadido a $name';
+  }
+
+  @override
+  String sharedLibrary_site_notConnectedHere(String name) {
+    return 'Este punto está en $name, que no está conectada en este dispositivo.';
+  }
+
+  @override
+  String get sharedLibrary_site_connectHere => 'Conectar en este dispositivo';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_title =>
+      '¿Eliminar de la biblioteca de puntos compartida?';
+
+  @override
+  String get sharedLibrary_site_deleteFromLibrary_body =>
+      'Los miembros cuyas inmersiones usan este punto conservan una copia personal.';
+
+  @override
+  String get sharedLibrary_site_readerCannotDelete =>
+      'Solo los editores y propietarios eliminan puntos compartidos.';
+
+  @override
+  String get sharedLibrary_suggest_title => 'Sugerir cambios';
+
+  @override
+  String get sharedLibrary_suggest_note_label => 'Nota para los responsables';
+
+  @override
+  String get sharedLibrary_suggest_send => 'Enviar';
+
+  @override
+  String get sharedLibrary_suggest_sent => 'Sugerencia enviada';
+
+  @override
+  String get sharedLibrary_suggest_nothingChanged => 'No ha cambiado nada.';
+
+  @override
+  String sharedLibrary_suggest_pending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sugerencias pendientes',
+      one: '1 sugerencia pendiente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharedLibrary_suggest_withdraw => 'Retirar';
+
+  @override
+  String get sharedLibrary_inbox_title => 'Sugerencias';
+
+  @override
+  String get sharedLibrary_inbox_empty => 'No hay sugerencias pendientes.';
+
+  @override
+  String sharedLibrary_inbox_from(String name, String when) {
+    return 'De $name, $when';
+  }
+
+  @override
+  String get sharedLibrary_inbox_accept => 'Aceptar';
+
+  @override
+  String get sharedLibrary_inbox_dismiss => 'Descartar';
+
+  @override
+  String get sharedLibrary_inbox_siteDeleted =>
+      'Este punto se ha eliminado de la biblioteca.';
+
+  @override
+  String get sharedLibrary_inbox_before => 'Antes';
+
+  @override
+  String get sharedLibrary_inbox_after => 'Después';
+
+  @override
+  String get sharedLibrary_filter_library => 'Biblioteca';
+
+  @override
+  String get sharedLibrary_filter_personal => 'Puntos personales';
+
+  @override
+  String get sharedLibrary_groupBy_library => 'Biblioteca';
+
+  @override
+  String get sharedLibrary_groupBy_personalGroup => 'Personal';
+
+  @override
+  String get sharedLibrary_bulk_addToLibrary =>
+      'Añadir a la biblioteca de puntos compartida';
+
+  @override
   String get settings_cloudSync_adopt_confirm =>
       'Adoptar la biblioteca restaurada';
 
@@ -22584,6 +22851,29 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_conflict_field_isShared => 'Compartido';
+
+  @override
+  String get settings_conflict_field_sharedLibrary =>
+      'Biblioteca de puntos compartida';
+
+  @override
+  String get settings_conflict_field_sharedLibraryMember => 'Id. de miembro';
+
+  @override
+  String get settings_conflict_field_sharedLibraryDisplayName =>
+      'Nombre visible';
+
+  @override
+  String get settings_conflict_field_sharedLibraryName =>
+      'Nombre de la biblioteca';
+
+  @override
+  String get settings_conflict_field_sharedLibraryBackend =>
+      'Tipo de almacenamiento';
+
+  @override
+  String get settings_conflict_field_sharedLibraryLocation =>
+      'Ubicación de la biblioteca';
 
   @override
   String get settings_conflict_field_isTravelGas => 'Gas de viaje';
@@ -51415,6 +51705,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get query_sites_coordinates => 'Coordenadas';
+
+  @override
+  String get query_sites_library => 'Biblioteca';
 
   @override
   String get query_sites_country => 'País';

@@ -9,6 +9,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/library_error_text.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/select_items_menu_entries.dart';
@@ -49,6 +50,8 @@ import 'package:submersion/features/dive_sites/presentation/widgets/site_locatio
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_list_count_provider.dart';
+import 'package:submersion/features/shared_library/presentation/providers/shared_library_providers.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/library_picker_dialog.dart';
 
 /// Content widget for the site list, used in master-detail layout.
 final _log = LoggerService.forClass(SiteListContent);
@@ -383,6 +386,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
         if (!canDestroySharedItem(
           ownerId: s.diverId,
           activeDiverId: sharing.activeDiverId,
+          isLibrarySite: s.isLibrarySite,
         ))
           s.id,
     ];
@@ -467,6 +471,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
       selectedSites,
       ownerOf: (s) => s.diverId,
       isSharedOf: (s) => s.isShared,
+      isLibraryOf: (s) => s.isLibrarySite,
       activeDiverId: sharing.activeDiverId,
     );
     final destroyIds = [for (final s in split.destroy) s.id];
@@ -1266,6 +1271,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
   /// SelectionAppBar, so they are deliberately absent here. Computed once and
   /// shared by both shells so the pane cannot drift from the full-width bar.
   List<BulkAction> _bulkActions(List<SiteWithDiveCount> sites) {
+    final byId = {for (final s in sites) s.site.id: s.site};
     return [
       BulkAction(
         id: 'merge',
@@ -1274,7 +1280,92 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
         minCount: 2,
         onInvoke: _startMerge,
       ),
+      // Personal sites into a club library (issue #2567); a library site
+      // already belongs to one.
+      BulkAction(
+        id: 'addToLibrary',
+        icon: Icons.groups_outlined,
+        label: context.l10n.sharedLibrary_bulk_addToLibrary,
+        minCount: 1,
+        isEnabled: (ids) => ids.every((id) => _mayPushToLibrary(byId[id])),
+        onInvoke: _addToLibrary,
+      ),
     ];
+  }
+
+  /// The library group header shows the library's name; the group key and
+  /// label are its id, which the domain grouper does not resolve.
+  String _outerGroupLabel(
+    SiteGroupBy groupBy,
+    String noGroupLabel,
+    SiteOuterGroup<SiteWithDiveCount> group,
+  ) {
+    final label = siteOuterGroupLabel(noGroupLabel, group);
+    if (groupBy != SiteGroupBy.library || group.isUngroupedKey) return label;
+    final libraries = ref.watch(sharedLibrariesProvider).valueOrNull;
+    for (final l in libraries ?? const []) {
+      if (l.id == group.label) return l.name;
+    }
+    return label;
+  }
+
+  /// A personal site this profile may destroy: pushing takes it from every
+  /// other profile, so another profile's shared site never qualifies.
+  bool _mayPushToLibrary(DiveSite? site) =>
+      site != null &&
+      !site.isLibrarySite &&
+      canDestroySharedItemOnceKnown(
+            ref.read(validatedCurrentDiverIdProvider),
+            ownerId: site.diverId,
+          ) ==
+          true;
+
+  Future<BulkActionOutcome> _addToLibrary() async {
+    final selected = await _readSelectedSites(_selectedIds.toList());
+    if (selected == null) return BulkActionOutcome.failed;
+    final personal = [
+      for (final s in selected)
+        if (_mayPushToLibrary(s)) s.id,
+    ];
+    if (personal.isEmpty || !mounted) return BulkActionOutcome.cancelled;
+    // The picker explains an empty choice itself; null is also a cancel.
+    final libraryId = await showLibraryPickerDialog(context, ref);
+    if (libraryId == null) return BulkActionOutcome.cancelled;
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+    if (diverId == null) return BulkActionOutcome.failed;
+    final publisher = ref.read(sharedSitePublisherProvider);
+    try {
+      for (final id in personal) {
+        await publisher.push(
+          siteId: id,
+          libraryId: libraryId,
+          diverId: diverId,
+        );
+      }
+    } catch (e) {
+      ref.invalidate(sitesProvider);
+      ref.invalidate(sitesWithCountsProvider);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(libraryErrorText(context.l10n, e))),
+        );
+      }
+      return BulkActionOutcome.failed;
+    }
+    ref.invalidate(sitesProvider);
+    ref.invalidate(sitesWithCountsProvider);
+    if (!mounted) return BulkActionOutcome.completed;
+    // From the store: nothing on this page need be listening to the
+    // libraries stream, and a paused stream never yields.
+    final name =
+        (await ref.read(sharedLibraryStoreProvider).getLibrary(libraryId))
+            ?.name ??
+        '';
+    if (!mounted) return BulkActionOutcome.completed;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.sharedLibrary_site_added(name))),
+    );
+    return BulkActionOutcome.completed;
   }
 
   /// Contextual bar for the master pane, which is too narrow for every icon.
@@ -1411,7 +1502,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                 KeyboardListItem(
                   navigationKey: _groupNavKey(group.key),
                   child: SiteGroupHeader(
-                    label: siteOuterGroupLabel(noGroupLabel, group),
+                    label: _outerGroupLabel(groupBy, noGroupLabel, group),
                     siteCount: group.siteCount,
                     isExpanded: isExpanded,
                     onTap: () => _toggleGroup(group.key, expanded),
@@ -1486,6 +1577,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
       ),
       ListViewMode.dense || ListViewMode.table => DenseSiteListTile(
         name: site.name,
+        site: site,
         location: locationString,
         diveCount: siteData.diveCount,
         isSelectionMode: _isSelectionMode,
