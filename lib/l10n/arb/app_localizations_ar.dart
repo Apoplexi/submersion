@@ -17007,13 +17007,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_icd_suggestionsTitle => 'لتحقيق الامتثال';
 
   @override
-  String gasCalculators_icd_suggestionKeepA(String he) {
-    return 'احتفظ بالغاز الحالي، واضبط نسبة الهليوم في الغاز المنتقل إليه على $he%';
+  String gasCalculators_icd_suggestionSetHe(String he) {
+    return 'اضبط نسبة الهليوم على $he%';
   }
 
   @override
-  String gasCalculators_icd_suggestionKeepB(String he) {
-    return 'احتفظ بالغاز المنتقل إليه، واضبط نسبة الهليوم في الغاز الحالي على $he%';
+  String gasCalculators_icd_suggestionSetO2(String o2) {
+    return 'اضبط نسبة الأكسجين على $o2%';
   }
 
   @override

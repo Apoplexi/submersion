@@ -16011,13 +16011,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_icd_suggestionsTitle => '使其符合规则';
 
   @override
-  String gasCalculators_icd_suggestionKeepA(String he) {
-    return '保留当前气体,将切换后气体的He设为$he%';
+  String gasCalculators_icd_suggestionSetHe(String he) {
+    return '将He设为$he%';
   }
 
   @override
-  String gasCalculators_icd_suggestionKeepB(String he) {
-    return '保留切换后气体,将当前气体的He设为$he%';
+  String gasCalculators_icd_suggestionSetO2(String o2) {
+    return '将O2设为$o2%';
   }
 
   @override
