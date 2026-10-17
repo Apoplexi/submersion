@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/documents/data/repositories/document_repository.dart';
 import 'package:submersion/features/documents/domain/document_ids.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
@@ -353,6 +354,41 @@ void main() {
     expect(all.single.pageCount, 2);
   });
 
+  test('a dive owner is labelled by number and site, with its date '
+      '(#3391)', () async {
+    final when = DateTime.utc(2026, 10, 12, 9).millisecondsSinceEpoch;
+    await db.customStatement(
+      'INSERT INTO dive_sites (id, diver_id, name, created_at, updated_at) '
+      "VALUES ('s1', 'd1', 'Blue Hole', 0, 0)",
+    );
+    await db.customStatement(
+      'INSERT INTO dives (id, diver_id, dive_number, dive_date_time, site_id, '
+      "name, created_at, updated_at) VALUES ('v1', 'd1', 142, $when, 's1', "
+      "NULL, 0, 0), ('v2', 'd1', 143, $when, 's1', 'Night dive', 0, 0), "
+      "('v3', 'd1', NULL, $when, NULL, NULL, 0, 0)",
+    );
+    for (final id in ['v1', 'v2', 'v3']) {
+      await repo.save(
+        newDoc(owner: DocumentOwner(DocumentOwnerKind.dive, id)),
+        const [],
+      );
+    }
+    final byDive = {
+      for (final e in await repo.getAllForDiver('d1')) e.document.owner.id: e,
+    };
+    expect(byDive['v1']!.ownerLabel, '#142 · Blue Hole');
+    expect(byDive['v1']!.ownerDate, DateTime.utc(2026, 10, 12, 9));
+    expect(byDive['v2']!.ownerLabel, '#143 · Night dive');
+    // Nothing to name it by but its date.
+    expect(byDive['v3']!.ownerLabel, isNull);
+    expect(byDive['v3']!.ownerDate, DateTime.utc(2026, 10, 12, 9));
+    final trip = await repo.save(
+      newDoc(owner: const DocumentOwner(DocumentOwnerKind.trip, 't1')),
+      const [],
+    );
+    expect((await repo.getEntryById(trip.id))!.ownerDate, isNull);
+  });
+
   test(
     'an entry filed under a certification carries its title fields',
     () async {
@@ -405,6 +441,26 @@ void main() {
     );
     await expectLater(changed.timeout(const Duration(seconds: 2)), completes);
   });
+
+  test(
+    'a burst of owner writes ticks once, after it settles (#3391)',
+    () async {
+      var ticks = 0;
+      final sub = repo.watchOwnerChanges().listen((_) => ticks++);
+      addTearDown(sub.cancel);
+      for (var i = 0; i < 5; i++) {
+        await db.customUpdate(
+          "UPDATE trips SET name = 'Bonaire $i' WHERE id = 't1'",
+          updates: {db.trips},
+          updateKind: UpdateKind.update,
+        );
+      }
+      await pumpEventQueue();
+      expect(ticks, 0);
+      await Future<void>.delayed(DiveRepository.changeTickDebounce * 2);
+      expect(ticks, 1);
+    },
+  );
 
   test('card images: save, read, clear one side, clear both', () async {
     await seedCert(db, 'c1');

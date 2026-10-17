@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/features/documents/data/repositories/document_owner_options_repository.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
 import 'package:submersion/features/documents/presentation/providers/document_owner_providers.dart';
 import 'package:submersion/features/documents/presentation/widgets/document_owner_field.dart';
@@ -18,8 +19,8 @@ void main() {
           ...overrides,
           documentOwnerLabelProvider.overrideWith(
             (ref, owner) async => switch (owner.id) {
-              't1' => 'Bonaire',
-              'c1' => '',
+              't1' => const DocumentOwnerOption('t1', 'Bonaire'),
+              'c1' => const DocumentOwnerOption('c1', ''),
               _ => null,
             },
           ),

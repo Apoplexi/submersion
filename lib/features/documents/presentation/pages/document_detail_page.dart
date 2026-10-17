@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/certification_agencies/presentation/providers/certification_catalog_providers.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
 import 'package:submersion/features/documents/presentation/document_l10n.dart';
 import 'package:submersion/features/documents/presentation/providers/document_providers.dart';
 import 'package:submersion/features/documents/presentation/widgets/document_details_panel.dart';
 import 'package:submersion/features/documents/presentation/widgets/document_page_viewer.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 
@@ -54,6 +56,7 @@ class _DocumentDetailPageState extends ConsumerState<DocumentDetailPage> {
     }
     final entry = ref.watch(documentEntryProvider(widget.documentId));
     final pages = ref.watch(documentPagesProvider(widget.documentId));
+    final units = UnitFormatter(ref.watch(settingsProvider));
     return entry.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -76,6 +79,7 @@ class _DocumentDetailPageState extends ConsumerState<DocumentDetailPage> {
           catalog: ref.watch(certificationCatalogSyncProvider),
         );
         final doc = entry.document;
+        final owner = entry.ownerText(units);
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: !widget.embedded,
@@ -131,7 +135,7 @@ class _DocumentDetailPageState extends ConsumerState<DocumentDetailPage> {
                         constraints: const BoxConstraints(maxWidth: 640),
                         child: DocumentDetailsCard(
                           document: doc,
-                          ownerLabel: entry.ownerLabel,
+                          ownerLabel: owner,
                         ),
                       ),
                     ),
@@ -154,7 +158,7 @@ class _DocumentDetailPageState extends ConsumerState<DocumentDetailPage> {
                         padding: const EdgeInsets.all(16),
                         child: DocumentDetailsCard(
                           document: doc,
-                          ownerLabel: entry.ownerLabel,
+                          ownerLabel: owner,
                         ),
                       ),
                     ),

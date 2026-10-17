@@ -7,6 +7,9 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/documents/data/repositories/document_owner_options_repository.dart';
 import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/features/documents/data/repositories/document_row_mapper.dart';
 import 'package:submersion/features/documents/domain/document_ids.dart';
@@ -18,12 +21,18 @@ import 'package:submersion/core/services/notification_service.dart';
 class DocumentListEntry {
   final Document document;
 
-  /// Name of the record the document is filed under; null when personal.
-  /// For a certification this is the stored name, empty when it has no
-  /// custom title; [withOwnerLabel] puts the title derived from
+  /// Name of the record the document is filed under; null when personal,
+  /// or for an unnumbered dive with no name or site. A dive reads as its
+  /// number and its name or site (`#142 · Blue Hole`), as the picker lists
+  /// it (#3391). For a certification this is the stored name, empty when it
+  /// has no custom title; [withOwnerLabel] puts the title derived from
   /// [certification] in its place (issue #3366).
   final String? ownerLabel;
   final int pageCount;
+
+  /// A dive owner's wall-clock date, shown after [ownerLabel] in the
+  /// diver's date format; null for every other owner.
+  final DateTime? ownerDate;
 
   /// What the owning certification's title is made from; null unless the
   /// document is filed under a certification that still exists.
@@ -33,6 +42,7 @@ class DocumentListEntry {
     this.document,
     this.ownerLabel,
     this.pageCount, {
+    this.ownerDate,
     this.certification,
   });
 
@@ -41,6 +51,7 @@ class DocumentListEntry {
     document,
     label,
     pageCount,
+    ownerDate: ownerDate,
     certification: certification,
   );
 }
@@ -100,6 +111,30 @@ class DocumentRepository {
       TableUpdateQuery.onTable(_db.certifications),
     ]),
   );
+
+  /// Ticks when a record a document can be filed under changes, so the
+  /// owner labels of [getAllForDiver] and [getEntryById] follow a rename
+  /// (a dive's number, name, date or site, #3391). Kept apart from
+  /// [watchChanges] so page content is not reread on every dive write, and
+  /// debounced like the dive list's ticks so a sync's write burst refreshes
+  /// the labels once, on the settled rows.
+  Stream<void> watchOwnerChanges() => _db
+      .tableUpdates(
+        TableUpdateQuery.allOf([
+          for (final table in <ResultSetImplementation>[
+            _db.diveSites,
+            _db.trips,
+            _db.equipment,
+            _db.courses,
+            _db.certifications,
+            _db.buddies,
+            _db.diveCenters,
+            _db.dives,
+          ])
+            TableUpdateQuery.onTable(table),
+        ]),
+      )
+      .debounce(DiveRepository.changeTickDebounce);
 
   Future<Document?> getById(String id) async {
     final row = await (_db.select(
@@ -166,7 +201,10 @@ class DocumentRepository {
           '(SELECT COUNT(*) FROM document_pages p WHERE p.document_id = d.id) '
           'AS page_count, '
           'COALESCE(s.name, t.name, e.name, c.name, cert.name, b.name, '
-          "dc.name, dv.name, '#' || dv.dive_number) AS owner_label, "
+          'dc.name) AS owner_label, '
+          'dv.id AS owner_dive_id, dv.dive_number AS owner_dive_number, '
+          'dv.name AS owner_dive_name, dvs.name AS owner_dive_site, '
+          'dv.dive_date_time AS owner_dive_date_time, '
           'cert.name AS cert_name, cert.agency AS cert_agency, '
           'cert.level AS cert_level '
           'FROM documents d '
@@ -178,18 +216,22 @@ class DocumentRepository {
           'LEFT JOIN buddies b ON b.id = d.buddy_id '
           'LEFT JOIN dive_centers dc ON dc.id = d.dive_center_id '
           'LEFT JOIN dives dv ON dv.id = d.dive_id '
+          'LEFT JOIN dive_sites dvs ON dvs.id = dv.site_id '
           'WHERE $where '
           'ORDER BY d.type, d.title, d.created_at',
           variables: [Variable.withString(arg)],
           readsFrom: {_db.documents, _db.documentPages},
         )
         .get();
-    return [
-      for (final r in rows)
-        DocumentListEntry(
-          documentFromRow(_db.documents.map(r.data)),
+    DocumentListEntry entry(QueryRow r) {
+      final document = documentFromRow(_db.documents.map(r.data));
+      final pageCount = r.read<int>('page_count');
+      final diveId = r.readNullable<String>('owner_dive_id');
+      if (diveId == null) {
+        return DocumentListEntry(
+          document,
           r.readNullable<String>('owner_label'),
-          r.read<int>('page_count'),
+          pageCount,
           certification: switch (r.readNullable<String>('cert_agency')) {
             final agency? => (
               name: r.read<String>('cert_name'),
@@ -198,8 +240,24 @@ class DocumentRepository {
             ),
             null => null,
           },
-        ),
-    ];
+        );
+      }
+      final dive = DocumentOwnerOption.dive(
+        diveId,
+        number: r.readNullable<int>('owner_dive_number'),
+        name: r.readNullable<String>('owner_dive_name'),
+        site: r.readNullable<String>('owner_dive_site'),
+        dateTimeMillis: r.read<int>('owner_dive_date_time'),
+      );
+      return DocumentListEntry(
+        document,
+        dive.name.isEmpty ? null : dive.name,
+        pageCount,
+        ownerDate: dive.date,
+      );
+    }
+
+    return [for (final r in rows) entry(r)];
   }
 
   /// A document's pages in order. [withBytes] false reads every column but
