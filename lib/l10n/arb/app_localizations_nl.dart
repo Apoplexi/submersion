@@ -26020,10 +26020,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_section_data_title => 'Gegevens';
 
   @override
-  String get settings_section_decompression_subtitle =>
-      'GF, gegevensbronnen & narcose';
-
-  @override
   String get settings_section_decompression_title => 'Decompressie';
 
   @override
@@ -36974,6 +36970,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String get safetySettings_noFlyPreset_strict => 'Strikt (18/24/48 u)';
 
   @override
+  String safetyHub_reviewOn(int enabled, int total, String noFly) {
+    return 'Aan, $enabled van $total regels, vliegverbod $noFly';
+  }
+
+  @override
+  String safetyHub_reviewOff(String noFly) {
+    return 'Uit, vliegverbod $noFly';
+  }
+
+  @override
+  String get safetyHub_noFlyStandard => 'Standaard';
+
+  @override
+  String get safetyHub_noFlyStrict => 'Strikt';
+
+  @override
+  String safetyHub_conditionOn(int enabled, int total) {
+    return 'Aan, $enabled van $total regels';
+  }
+
+  @override
+  String get safetyHub_off => 'Uit';
+
+  @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Richttijden na een enkele duik zonder deco, herhalingsduiken en decoduiken';
 
@@ -37528,7 +37548,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_section_safety_subtitle =>
-      'Controleregels & vliegen na het duiken';
+      'Controleregels, decompressie & uitrusting';
 
   @override
   String get settings_section_equipmentCondition_title =>

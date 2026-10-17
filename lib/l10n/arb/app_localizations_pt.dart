@@ -26194,10 +26194,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_section_data_title => 'Dados';
 
   @override
-  String get settings_section_decompression_subtitle =>
-      'GF, fontes de dados e narcose';
-
-  @override
   String get settings_section_decompression_title => 'Descompressão';
 
   @override
@@ -37218,6 +37214,30 @@ class AppLocalizationsPt extends AppLocalizations {
   String get safetySettings_noFlyPreset_strict => 'Rigoroso (18/24/48 h)';
 
   @override
+  String safetyHub_reviewOn(int enabled, int total, String noFly) {
+    return 'Ativado, $enabled de $total regras, sem voo: $noFly';
+  }
+
+  @override
+  String safetyHub_reviewOff(String noFly) {
+    return 'Desativado, sem voo: $noFly';
+  }
+
+  @override
+  String get safetyHub_noFlyStandard => 'Padrão';
+
+  @override
+  String get safetyHub_noFlyStrict => 'Rigoroso';
+
+  @override
+  String safetyHub_conditionOn(int enabled, int total) {
+    return 'Ativado, $enabled de $total regras';
+  }
+
+  @override
+  String get safetyHub_off => 'Desativado';
+
+  @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Intervalos orientativos após um único mergulho sem deco, mergulhos repetitivos e mergulhos com deco';
 
@@ -37773,7 +37793,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_section_safety_subtitle =>
-      'Regras de revisão e voar após mergulhar';
+      'Regras de revisão, descompressão e equipamento';
 
   @override
   String get settings_section_equipmentCondition_title =>

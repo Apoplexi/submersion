@@ -26281,10 +26281,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_section_data_title => 'Données';
 
   @override
-  String get settings_section_decompression_subtitle =>
-      'GF, sources de données et narcose';
-
-  @override
   String get settings_section_decompression_title => 'Décompression';
 
   @override
@@ -37339,6 +37335,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get safetySettings_noFlyPreset_strict => 'Strict (18/24/48 h)';
 
   @override
+  String safetyHub_reviewOn(int enabled, int total, String noFly) {
+    return 'Activé, $enabled sur $total règles, interdiction de vol $noFly';
+  }
+
+  @override
+  String safetyHub_reviewOff(String noFly) {
+    return 'Désactivé, interdiction de vol $noFly';
+  }
+
+  @override
+  String get safetyHub_noFlyStandard => 'Standard';
+
+  @override
+  String get safetyHub_noFlyStrict => 'Strict';
+
+  @override
+  String safetyHub_conditionOn(int enabled, int total) {
+    return 'Activé, $enabled sur $total règles';
+  }
+
+  @override
+  String get safetyHub_off => 'Désactivé';
+
+  @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Intervalles indicatifs après une plongée unique sans déco, des plongées successives et des plongées avec déco';
 
@@ -37896,7 +37916,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_section_safety_subtitle =>
-      'Règles du bilan et vol après la plongée';
+      'Règles du bilan, décompression et matériel';
 
   @override
   String get settings_section_equipmentCondition_title => 'État du matériel';
