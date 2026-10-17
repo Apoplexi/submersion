@@ -19510,6 +19510,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_ceilingViolated(String ceiling) {
+    return 'Il profilo supera il ceiling di decompressione di $ceiling, saltando soste obbligatorie';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'Il piano di decompressione CCR non prevede gas di bailout';
 

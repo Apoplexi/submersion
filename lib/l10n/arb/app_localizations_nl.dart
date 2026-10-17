@@ -19384,6 +19384,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_ceilingViolated(String ceiling) {
+    return 'Het profiel gaat boven het decompressieplafond van $ceiling en slaat verplichte stops over';
+  }
+
+  @override
   String get plannerCanvas_issue_noBailout =>
       'CCR-decompressieplan heeft geen bailoutgas aan boord';
 
