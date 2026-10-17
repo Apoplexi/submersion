@@ -54,6 +54,7 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _shownTabIndex = _tabController.index;
     _tabController.addListener(_onTabChanged);
   }
 
@@ -65,8 +66,15 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
     super.dispose();
   }
 
+  /// The section the page last built for; see [_onTabChanged].
+  late int _shownTabIndex;
+
   void _onTabChanged() {
-    if (_tabController.indexIsChanging) return;
+    // A tapped name notifies twice: as the index changes, with the pill about
+    // to slide, and again when it lands. Act on the first, so the section
+    // shows at once rather than after the slide (issue #3461).
+    if (_tabController.index == _shownTabIndex) return;
+    _shownTabIndex = _tabController.index;
     setState(() {});
     // Skip URL clearing for programmatic tab switches (e.g., auto-switching
     // to Equipment tab when EquipmentDetailPage's desktop redirect fires)
