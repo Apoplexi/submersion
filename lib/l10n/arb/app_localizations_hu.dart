@@ -27285,6 +27285,62 @@ class AppLocalizationsHu extends AppLocalizations {
   String get insights_gas_sacTrend_title => 'Gázfogyasztási trend';
 
   @override
+  String get insights_gas_tankConfig_title => 'Palackkonfiguráció';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'Merülések a palackok elrendezése szerint';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'Konfiguráció';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'Extrák';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'Visszalélegeztető';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'Sidemount';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'Ikerpalack';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'Egy palack';
+
+  @override
+  String get insights_gas_tankConfig_other => 'Egyéb';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'Nincs rögzített palack';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'Stage palack(ok)';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'Dekó gáz';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'Több gáz';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'Az egy palackként rögzített ikerpalackok akkor számítanak, ha a név ezt jelzi (twin, double, D12, 2x12), vagy a palack nagyobb bármely szokásos egyes palacknál. Állítsa be a Sidemount bal és Sidemount jobb szerepet egy merülés palackjain, hogy sidemountként számítson.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'Nincs megjeleníthető merülés';
+
+  @override
+  String get insights_gas_tankConfig_error =>
+      'Nem sikerült a palackkonfiguráció betöltése';
+
+  @override
   String get insights_focus_title => 'Merülésfókusz';
 
   @override

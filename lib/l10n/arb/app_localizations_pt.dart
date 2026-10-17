@@ -27407,6 +27407,62 @@ class AppLocalizationsPt extends AppLocalizations {
   String get insights_gas_sacTrend_title => 'Tendência do consumo de gás';
 
   @override
+  String get insights_gas_tankConfig_title => 'Configuração dos cilindros';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'Mergulhos pela forma como os cilindros foram levados';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'Configuração';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'Extras';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'Rebreather';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'Sidemount';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'Bicilindro';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'Monocilindro';
+
+  @override
+  String get insights_gas_tankConfig_other => 'Outro';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'Nenhum cilindro registrado';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'Stage(s)';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'Gás de deco';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'Vários gases';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'Bicilindros registrados como um único cilindro são contados quando o nome indica (twin, double, D12, 2x12) ou o cilindro é maior que qualquer monocilindro comum. Defina Sidemount Esquerdo e Sidemount Direito nos cilindros de um mergulho para que ele conte como sidemount.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'Nenhum mergulho para mostrar';
+
+  @override
+  String get insights_gas_tankConfig_error =>
+      'Falha ao carregar a configuração dos cilindros';
+
+  @override
   String get insights_focus_title => 'Foco de mergulhos';
 
   @override

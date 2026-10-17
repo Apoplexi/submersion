@@ -27356,6 +27356,62 @@ class AppLocalizationsDe extends AppLocalizations {
   String get insights_gas_sacTrend_title => 'Gasverbrauchstrend';
 
   @override
+  String get insights_gas_tankConfig_title => 'Flaschenkonfiguration';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'Tauchgänge nach Anordnung der Flaschen';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'Konfiguration';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'Extras';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'Rebreather';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'Sidemount';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'Doppelgerät';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'Einzelflasche';
+
+  @override
+  String get insights_gas_tankConfig_other => 'Sonstige';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'Keine Flaschen erfasst';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'Stage(s)';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'Dekogas';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'Mehrere Gase';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'Als eine Flasche erfasste Doppelgeräte werden erkannt, wenn der Name es sagt (Doppel, twin, D12, 2x12) oder die Flasche größer als jede übliche Einzelflasche ist. Setzen Sie Sidemount Links und Sidemount Rechts bei den Flaschen eines Tauchgangs, damit er als Sidemount zählt.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'Keine Tauchgänge vorhanden';
+
+  @override
+  String get insights_gas_tankConfig_error =>
+      'Flaschenkonfiguration konnte nicht geladen werden';
+
+  @override
   String get insights_focus_title => 'Tauchgangsfokus';
 
   @override

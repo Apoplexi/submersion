@@ -27419,6 +27419,62 @@ class AppLocalizationsIt extends AppLocalizations {
   String get insights_gas_sacTrend_title => 'Tendenza del consumo di gas';
 
   @override
+  String get insights_gas_tankConfig_title => 'Configurazione bombole';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'Immersioni secondo come erano portate le bombole';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'Configurazione';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'Extra';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'Rebreather';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'Sidemount';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'Bibombola';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'Monobombola';
+
+  @override
+  String get insights_gas_tankConfig_other => 'Altro';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'Nessuna bombola registrata';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'Stage';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'Gas deco';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'Più gas';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'I bibombola registrati come una sola bombola vengono contati quando il nome lo indica (twin, double, D12, 2x12) o la bombola è più grande di qualsiasi monobombola comune. Imposta Sidemount sinistra e Sidemount destra sulle bombole di un\'immersione perché conti come sidemount.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'Nessuna immersione da mostrare';
+
+  @override
+  String get insights_gas_tankConfig_error =>
+      'Impossibile caricare la configurazione delle bombole';
+
+  @override
   String get insights_focus_title => 'Focus immersioni';
 
   @override

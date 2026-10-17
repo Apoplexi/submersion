@@ -25860,6 +25860,60 @@ class AppLocalizationsZh extends AppLocalizations {
   String get insights_gas_sacTrend_title => '气体消耗趋势';
 
   @override
+  String get insights_gas_tankConfig_title => '气瓶配置';
+
+  @override
+  String get insights_gas_tankConfig_subtitle => '按气瓶携带方式分类的潜水';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => '配置';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => '附加';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => '循环呼吸器';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => '侧挂';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => '背挂双瓶';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => '背挂单瓶';
+
+  @override
+  String get insights_gas_tankConfig_other => '其他';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => '未记录气瓶';
+
+  @override
+  String get insights_gas_tankConfig_stages => '阶段瓶';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => '减压气';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => '多种气体';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      '记录为单个气瓶的双瓶，在名称表明时（twin、double、D12、2x12）或气瓶大于任何常见单瓶时会被计入。为潜水的气瓶设置左侧挂和右侧挂，使其计为侧挂。';
+
+  @override
+  String get insights_gas_tankConfig_empty => '没有可显示的潜水';
+
+  @override
+  String get insights_gas_tankConfig_error => '加载气瓶配置失败';
+
+  @override
   String get insights_focus_title => '潜水聚焦';
 
   @override

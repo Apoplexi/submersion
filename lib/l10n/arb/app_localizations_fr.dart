@@ -27502,6 +27502,62 @@ class AppLocalizationsFr extends AppLocalizations {
       'Tendance de la consommation de gaz';
 
   @override
+  String get insights_gas_tankConfig_title => 'Configuration des blocs';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'Plongées selon la façon dont les blocs étaient portés';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'Configuration';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'Extras';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'Recycleur';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'Sidemount';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'Bi-bouteille';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'Mono-bouteille';
+
+  @override
+  String get insights_gas_tankConfig_other => 'Autre';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'Aucun bloc enregistré';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'Stage(s)';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'Gaz de déco';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'Multigaz';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'Les bi-bouteilles enregistrés comme un seul bloc sont comptés quand le nom l\'indique (twin, double, D12, 2x12) ou que le bloc dépasse tout mono-bouteille courant. Indiquez Sidemount gauche et Sidemount droit sur les blocs d\'une plongée pour qu\'elle compte comme sidemount.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'Aucune plongée à afficher';
+
+  @override
+  String get insights_gas_tankConfig_error =>
+      'Échec du chargement de la configuration des blocs';
+
+  @override
   String get insights_focus_title => 'Focus plongées';
 
   @override

@@ -27217,6 +27217,61 @@ class AppLocalizationsNl extends AppLocalizations {
   String get insights_gas_sacTrend_title => 'Gasverbruikstrend';
 
   @override
+  String get insights_gas_tankConfig_title => 'Flesconfiguratie';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'Duiken naar hoe de flessen gedragen werden';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'Configuratie';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'Extra\'s';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'Rebreather';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'Sidemount';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'Dubbelset';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'Enkele fles';
+
+  @override
+  String get insights_gas_tankConfig_other => 'Overig';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'Geen flessen vastgelegd';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'Stagefles(sen)';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'Decogas';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'Meerdere gassen';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'Dubbelsets die als één fles zijn vastgelegd tellen mee als de naam het zegt (twin, double, D12, 2x12) of de fles groter is dan elke gangbare enkele fles. Stel Sidemount links en Sidemount rechts in op de flessen van een duik om hem als sidemount te laten tellen.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'Geen duiken om te tonen';
+
+  @override
+  String get insights_gas_tankConfig_error => 'Kan flesconfiguratie niet laden';
+
+  @override
   String get insights_focus_title => 'Duikfocus';
 
   @override

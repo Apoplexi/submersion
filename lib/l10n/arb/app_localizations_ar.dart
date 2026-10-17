@@ -27579,6 +27579,62 @@ class AppLocalizationsAr extends AppLocalizations {
   String get insights_gas_sacTrend_title => 'اتجاه استهلاك الغاز';
 
   @override
+  String get insights_gas_tankConfig_title => 'تكوين الأسطوانات';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'الغوصات حسب طريقة حمل الأسطوانات';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'التكوين';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'إضافات';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'جهاز إعادة تنفس';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'تعليق جانبي';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'أسطوانتان على الظهر';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount =>
+      'أسطوانة واحدة على الظهر';
+
+  @override
+  String get insights_gas_tankConfig_other => 'أخرى';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'لا توجد أسطوانات مسجلة';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'أسطوانات مرحلية';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'غاز تخفيف الضغط';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'غازات متعددة';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'تُحتسب الأسطوانات المزدوجة المسجلة كأسطوانة واحدة عندما يدل الاسم على ذلك (twin، double، D12، 2x12) أو عندما تكون الأسطوانة أكبر من أي أسطوانة مفردة شائعة. عيّن تعليق جانبي أيسر وتعليق جانبي أيمن لأسطوانات الغوصة لتُحتسب كتعليق جانبي.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'لا توجد غوصات لعرضها';
+
+  @override
+  String get insights_gas_tankConfig_error => 'فشل تحميل تكوين الأسطوانات';
+
+  @override
   String get insights_focus_title => 'تركيز الغطسات';
 
   @override

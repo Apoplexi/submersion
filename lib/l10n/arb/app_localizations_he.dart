@@ -26699,6 +26699,61 @@ class AppLocalizationsHe extends AppLocalizations {
   String get insights_gas_sacTrend_title => 'מגמת צריכת גז';
 
   @override
+  String get insights_gas_tankConfig_title => 'תצורת בלונים';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'צלילות לפי אופן נשיאת הבלונים';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'תצורה';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'תוספות';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'ריברידר';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'סיידמאונט';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'בלונים תאומים על הגב';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'בלון יחיד על הגב';
+
+  @override
+  String get insights_gas_tankConfig_other => 'אחר';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'לא נרשמו בלונים';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'סטייג\'ים';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'גז דקו';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'ריבוי גזים';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'בלונים תאומים שנרשמו כבלון אחד נספרים כשהשם מציין זאת (twin, double, D12, 2x12) או כשהבלון גדול מכל בלון יחיד נפוץ. הגדר סיידמאונט שמאל וסיידמאונט ימין לבלוני הצלילה כדי שתיספר כסיידמאונט.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'אין צלילות להצגה';
+
+  @override
+  String get insights_gas_tankConfig_error => 'שגיאה בטעינת תצורת הבלונים';
+
+  @override
   String get insights_focus_title => 'מיקוד צלילות';
 
   @override

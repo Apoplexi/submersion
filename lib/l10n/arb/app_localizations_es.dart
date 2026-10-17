@@ -27433,6 +27433,62 @@ class AppLocalizationsEs extends AppLocalizations {
   String get insights_gas_sacTrend_title => 'Tendencia del consumo de gas';
 
   @override
+  String get insights_gas_tankConfig_title => 'Configuración de botellas';
+
+  @override
+  String get insights_gas_tankConfig_subtitle =>
+      'Inmersiones según cómo se llevaron las botellas';
+
+  @override
+  String get insights_gas_tankConfig_configurationHeading => 'Configuración';
+
+  @override
+  String get insights_gas_tankConfig_extrasHeading => 'Extras';
+
+  @override
+  String get insights_gas_tankConfig_rebreather => 'Rebreather';
+
+  @override
+  String get insights_gas_tankConfig_sidemount => 'Sidemount';
+
+  @override
+  String get insights_gas_tankConfig_twinBackmount => 'Bibotella';
+
+  @override
+  String get insights_gas_tankConfig_singleBackmount => 'Monobotella';
+
+  @override
+  String get insights_gas_tankConfig_other => 'Otra';
+
+  @override
+  String get insights_gas_tankConfig_noTanks => 'Sin botellas registradas';
+
+  @override
+  String get insights_gas_tankConfig_stages => 'Stage(s)';
+
+  @override
+  String get insights_gas_tankConfig_decoGas => 'Gas de deco';
+
+  @override
+  String get insights_gas_tankConfig_multiGas => 'Varios gases';
+
+  @override
+  String insights_gas_tankConfig_countAndPercent(int count, String percent) {
+    return '$count · $percent';
+  }
+
+  @override
+  String get insights_gas_tankConfig_note =>
+      'Los bibotellas registrados como una sola botella se cuentan cuando el nombre lo indica (twin, double, D12, 2x12) o la botella es mayor que cualquier monobotella habitual. Indica Sidemount izquierdo y Sidemount derecho en las botellas de una inmersión para que cuente como sidemount.';
+
+  @override
+  String get insights_gas_tankConfig_empty => 'No hay inmersiones que mostrar';
+
+  @override
+  String get insights_gas_tankConfig_error =>
+      'Error al cargar la configuración de botellas';
+
+  @override
   String get insights_focus_title => 'Enfoque de inmersiones';
 
   @override
