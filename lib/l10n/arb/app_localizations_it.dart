@@ -36656,8 +36656,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_photosMedia_title => 'Foto e media';
 
   @override
-  String get settings_photosMedia_subtitle =>
-      'Sorgenti, archiviazione e account';
+  String get settings_photosMedia_subtitle => 'Sorgenti e archiviazione';
 
   @override
   String get settings_photosMedia_sourcesHeader => 'Da dove arrivano le foto';
@@ -36665,9 +36664,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_photosMedia_storageHeader =>
       'Dove sono conservate le copie';
-
-  @override
-  String get settings_photosMedia_accountsHeader => 'Account';
 
   @override
   String get settings_photosMedia_displayHeader => 'Visualizzazione';

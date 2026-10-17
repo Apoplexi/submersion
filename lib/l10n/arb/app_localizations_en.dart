@@ -36029,16 +36029,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_photosMedia_title => 'Photos & Media';
 
   @override
-  String get settings_photosMedia_subtitle => 'Sources, storage & accounts';
+  String get settings_photosMedia_subtitle => 'Sources & storage';
 
   @override
   String get settings_photosMedia_sourcesHeader => 'Where photos come from';
 
   @override
   String get settings_photosMedia_storageHeader => 'Where copies are kept';
-
-  @override
-  String get settings_photosMedia_accountsHeader => 'Accounts';
 
   @override
   String get settings_photosMedia_displayHeader => 'Display';

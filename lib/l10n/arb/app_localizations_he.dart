@@ -35737,16 +35737,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_photosMedia_title => 'תמונות ומדיה';
 
   @override
-  String get settings_photosMedia_subtitle => 'מקורות, אחסון וחשבונות';
+  String get settings_photosMedia_subtitle => 'מקורות ואחסון';
 
   @override
   String get settings_photosMedia_sourcesHeader => 'מאיפה מגיעות התמונות';
 
   @override
   String get settings_photosMedia_storageHeader => 'איפה נשמרים העותקים';
-
-  @override
-  String get settings_photosMedia_accountsHeader => 'חשבונות';
 
   @override
   String get settings_photosMedia_displayHeader => 'תצוגה';
