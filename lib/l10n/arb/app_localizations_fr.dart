@@ -21642,6 +21642,89 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ajouter à la bibliothèque de sites partagée';
 
   @override
+  String get sharedLibrary_about_title => 'À propos';
+
+  @override
+  String get sharedLibrary_about_edit_title =>
+      'Modifier les informations de la bibliothèque';
+
+  @override
+  String get sharedLibrary_about_name_label => 'Nom de la bibliothèque';
+
+  @override
+  String get sharedLibrary_about_description_label => 'Description';
+
+  @override
+  String get sharedLibrary_about_description_help =>
+      'Ce que contient cette bibliothèque et à qui elle s\'adresse. Tous les membres la voient.';
+
+  @override
+  String get sharedLibrary_about_nameRequired => 'Saisissez un nom';
+
+  @override
+  String get sharedLibrary_connection_title => 'Connexion sur cet appareil';
+
+  @override
+  String get sharedLibrary_connection_s3 => 'Compte S3';
+
+  @override
+  String sharedLibrary_connection_s3Bucket(String bucket) {
+    return 'Compte S3, bucket $bucket';
+  }
+
+  @override
+  String get sharedLibrary_connection_webdav => 'Compte WebDAV';
+
+  @override
+  String sharedLibrary_connection_webdavServer(String server) {
+    return 'Compte WebDAV, $server';
+  }
+
+  @override
+  String get sharedLibrary_connection_accountMissing =>
+      'Ce compte n\'est plus sur cet appareil';
+
+  @override
+  String get sharedLibrary_connection_folder => 'Dossier';
+
+  @override
+  String get sharedLibrary_connection_change => 'Modifier la connexion';
+
+  @override
+  String get sharedLibrary_connection_check => 'Vérifier l\'emplacement';
+
+  @override
+  String sharedLibrary_connection_same(String name) {
+    return '$name trouvée ici. C\'est la même bibliothèque.';
+  }
+
+  @override
+  String get sharedLibrary_connection_save => 'Enregistrer la connexion';
+
+  @override
+  String get sharedLibrary_connection_olderCopy =>
+      'Cette copie semble plus ancienne que celle avec laquelle vous synchronisiez.';
+
+  @override
+  String get sharedLibrary_connection_saveAnyway => 'Enregistrer quand même';
+
+  @override
+  String sharedLibrary_connection_different(String name) {
+    return 'Ce dossier contient une autre bibliothèque ($name). Votre connexion reste inchangée.';
+  }
+
+  @override
+  String get sharedLibrary_connection_differentUnnamed =>
+      'Ce dossier contient une autre bibliothèque. Votre connexion reste inchangée.';
+
+  @override
+  String get sharedLibrary_connection_none =>
+      'Aucune bibliothèque trouvée dans ce dossier. Votre connexion reste inchangée.';
+
+  @override
+  String get sharedLibrary_connection_saved => 'Connexion mise à jour';
+
+  @override
   String get settings_cloudSync_adopt_confirm =>
       'Adopter la bibliothèque restaurée';
 

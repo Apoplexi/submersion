@@ -96,6 +96,53 @@ void main() {
     );
   });
 
+  test('probe reads the description from info.json', () async {
+    final lib = await service.create(
+      account: account,
+      prefix: 'site-sync',
+      name: 'Reef Survey',
+      diverId: 'd1',
+      displayName: 'Ann',
+    );
+    expect(
+      (await service.probe(account: account, prefix: 'site-sync')).description,
+      isNull,
+    );
+    await SharedLibraryTransport(
+      cloud,
+      prefix: 'site-sync',
+    ).writeInfo({'name': 'Reef Survey', 'description': 'Group sites'});
+    final probe = await service.probe(account: account, prefix: 'site-sync');
+    expect(probe.id, lib.id);
+    expect(probe.description, 'Group sites');
+  });
+
+  test('join keeps the description the folder holds', () async {
+    await service.create(
+      account: account,
+      prefix: 'site-sync',
+      name: 'Reef Survey',
+      diverId: 'd1',
+      displayName: 'Ann',
+    );
+    await SharedLibraryTransport(
+      cloud,
+      prefix: 'site-sync',
+    ).writeInfo({'name': 'Reef Survey', 'description': 'Group sites'});
+    await _diver('d2');
+    final joined = await service.join(
+      account: account,
+      prefix: 'site-sync',
+      diverId: 'd2',
+      displayName: 'Bob',
+    );
+    expect(joined.description, 'Group sites');
+    expect(
+      (await SharedLibraryStore().getLibrary(joined.id))!.description,
+      'Group sites',
+    );
+  });
+
   test('join refuses a prefix with no library or a newer format', () async {
     expect(
       () => service.join(

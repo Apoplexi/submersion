@@ -21851,6 +21851,88 @@ class AppLocalizationsAr extends AppLocalizations {
       'إضافة إلى مكتبة المواقع المشتركة';
 
   @override
+  String get sharedLibrary_about_title => 'حول';
+
+  @override
+  String get sharedLibrary_about_edit_title => 'تعديل تفاصيل المكتبة';
+
+  @override
+  String get sharedLibrary_about_name_label => 'اسم المكتبة';
+
+  @override
+  String get sharedLibrary_about_description_label => 'الوصف';
+
+  @override
+  String get sharedLibrary_about_description_help =>
+      'ما تحتويه هذه المكتبة ولمن هي. يراه جميع الأعضاء.';
+
+  @override
+  String get sharedLibrary_about_nameRequired => 'أدخل اسمًا';
+
+  @override
+  String get sharedLibrary_connection_title => 'الاتصال على هذا الجهاز';
+
+  @override
+  String get sharedLibrary_connection_s3 => 'حساب S3';
+
+  @override
+  String sharedLibrary_connection_s3Bucket(String bucket) {
+    return 'حساب S3، الحاوية $bucket';
+  }
+
+  @override
+  String get sharedLibrary_connection_webdav => 'حساب WebDAV';
+
+  @override
+  String sharedLibrary_connection_webdavServer(String server) {
+    return 'حساب WebDAV، $server';
+  }
+
+  @override
+  String get sharedLibrary_connection_accountMissing =>
+      'لم يعد هذا الحساب على هذا الجهاز';
+
+  @override
+  String get sharedLibrary_connection_folder => 'المجلد';
+
+  @override
+  String get sharedLibrary_connection_change => 'تغيير الاتصال';
+
+  @override
+  String get sharedLibrary_connection_check => 'التحقق من الموقع';
+
+  @override
+  String sharedLibrary_connection_same(String name) {
+    return 'تم العثور على $name هنا. إنها المكتبة نفسها.';
+  }
+
+  @override
+  String get sharedLibrary_connection_save => 'حفظ الاتصال';
+
+  @override
+  String get sharedLibrary_connection_olderCopy =>
+      'تبدو هذه النسخة أقدم من النسخة التي كنت تزامن معها.';
+
+  @override
+  String get sharedLibrary_connection_saveAnyway => 'حفظ على أي حال';
+
+  @override
+  String sharedLibrary_connection_different(String name) {
+    return 'يحتوي هذا المجلد على مكتبة أخرى ($name). لم يتغير اتصالك.';
+  }
+
+  @override
+  String get sharedLibrary_connection_differentUnnamed =>
+      'يحتوي هذا المجلد على مكتبة أخرى. لم يتغير اتصالك.';
+
+  @override
+  String get sharedLibrary_connection_none =>
+      'لم يتم العثور على مكتبة في هذا المجلد. لم يتغير اتصالك.';
+
+  @override
+  String get sharedLibrary_connection_saved => 'تم تحديث الاتصال';
+
+  @override
   String get settings_cloudSync_adopt_confirm => 'اعتماد المكتبة المستعادة';
 
   @override

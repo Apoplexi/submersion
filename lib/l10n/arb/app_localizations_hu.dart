@@ -21505,6 +21505,89 @@ class AppLocalizationsHu extends AppLocalizations {
       'Hozzáadás a megosztott merülőhely-könyvtárhoz';
 
   @override
+  String get sharedLibrary_about_title => 'Névjegy';
+
+  @override
+  String get sharedLibrary_about_edit_title =>
+      'Könyvtár adatainak szerkesztése';
+
+  @override
+  String get sharedLibrary_about_name_label => 'A könyvtár neve';
+
+  @override
+  String get sharedLibrary_about_description_label => 'Leírás';
+
+  @override
+  String get sharedLibrary_about_description_help =>
+      'Mit tartalmaz ez a könyvtár, és kinek szól. Minden tag látja.';
+
+  @override
+  String get sharedLibrary_about_nameRequired => 'Adj meg egy nevet';
+
+  @override
+  String get sharedLibrary_connection_title => 'Kapcsolat ezen az eszközön';
+
+  @override
+  String get sharedLibrary_connection_s3 => 'S3-fiók';
+
+  @override
+  String sharedLibrary_connection_s3Bucket(String bucket) {
+    return 'S3-fiók, $bucket tároló';
+  }
+
+  @override
+  String get sharedLibrary_connection_webdav => 'WebDAV-fiók';
+
+  @override
+  String sharedLibrary_connection_webdavServer(String server) {
+    return 'WebDAV-fiók, $server';
+  }
+
+  @override
+  String get sharedLibrary_connection_accountMissing =>
+      'Ez a fiók már nincs ezen az eszközön';
+
+  @override
+  String get sharedLibrary_connection_folder => 'Mappa';
+
+  @override
+  String get sharedLibrary_connection_change => 'Kapcsolat módosítása';
+
+  @override
+  String get sharedLibrary_connection_check => 'Hely ellenőrzése';
+
+  @override
+  String sharedLibrary_connection_same(String name) {
+    return '$name itt található. Ez ugyanaz a könyvtár.';
+  }
+
+  @override
+  String get sharedLibrary_connection_save => 'Kapcsolat mentése';
+
+  @override
+  String get sharedLibrary_connection_olderCopy =>
+      'Ez a másolat régebbinek tűnik annál, amellyel eddig szinkronizáltál.';
+
+  @override
+  String get sharedLibrary_connection_saveAnyway => 'Mentés mégis';
+
+  @override
+  String sharedLibrary_connection_different(String name) {
+    return 'Ebben a mappában egy másik könyvtár van ($name). A kapcsolatod nem változik.';
+  }
+
+  @override
+  String get sharedLibrary_connection_differentUnnamed =>
+      'Ebben a mappában egy másik könyvtár van. A kapcsolatod nem változik.';
+
+  @override
+  String get sharedLibrary_connection_none =>
+      'Ebben a mappában nincs könyvtár. A kapcsolatod nem változik.';
+
+  @override
+  String get sharedLibrary_connection_saved => 'Kapcsolat frissítve';
+
+  @override
   String get settings_cloudSync_adopt_confirm =>
       'Visszaállított könyvtár átvétele';
 

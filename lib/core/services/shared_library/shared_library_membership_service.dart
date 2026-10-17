@@ -143,16 +143,18 @@ class SharedLibraryMembershipService with _MembershipOwnership {
     required String secret,
   }) async {
     final t = await _transportFor(account: account, prefix: prefix);
-    final found = await _probeWith(t);
+    final found = await probeWith(t);
     if (!found.encrypted) return found;
     await _unlock(t, secret);
+    final details = await t.readDetails();
     return LibraryProbe(
       exists: true,
       id: found.id,
-      name: await t.readName(),
+      name: details?.name,
       formatVersion: found.formatVersion,
       encrypted: true,
       keyId: found.keyId,
+      description: details?.description,
     );
   }
 
@@ -184,9 +186,11 @@ class SharedLibraryMembershipService with _MembershipOwnership {
   Future<LibraryProbe> probe({
     required domain.ConnectedAccount account,
     required String prefix,
-  }) async => _probeWith(await _transportFor(account: account, prefix: prefix));
+  }) async => probeWith(await _transportFor(account: account, prefix: prefix));
 
-  static Future<LibraryProbe> _probeWith(SharedLibraryTransport t) async {
+  /// What the folder [t] reaches holds, read from its manifest (and its
+  /// `info.json` when readable).
+  static Future<LibraryProbe> probeWith(SharedLibraryTransport t) async {
     final manifest = await t.readManifest();
     if (manifest == null) return const LibraryProbe(exists: false);
     final version = (manifest['formatVersion'] as num?)?.toInt() ?? 1;
@@ -196,8 +200,11 @@ class SharedLibraryMembershipService with _MembershipOwnership {
       final String n => n,
       _ => null,
     };
+    String? description;
     if (version >= SharedLibraryLayout.minFormatVersion && !encrypted) {
-      name = await t.readName() ?? name;
+      final details = await t.readDetails();
+      name = details?.name ?? name;
+      description = details?.description;
     }
     return LibraryProbe(
       exists: true,
@@ -206,6 +213,7 @@ class SharedLibraryMembershipService with _MembershipOwnership {
       formatVersion: version,
       encrypted: encrypted,
       keyId: keyId is String ? keyId : null,
+      description: description,
     );
   }
 
@@ -316,7 +324,7 @@ class SharedLibraryMembershipService with _MembershipOwnership {
   }) async {
     // One transport for the whole join: each resolves its folders afresh.
     final t = await _transportFor(account: account, prefix: prefix);
-    final found = await _probeWith(t);
+    final found = await probeWith(t);
     final cipher = found.encrypted ? await _unlock(t, secret) : null;
     if (!found.exists ||
         found.id == null ||
@@ -387,6 +395,8 @@ class SharedLibraryMembershipService with _MembershipOwnership {
       lastAutoBackupAt: held?.lastAutoBackupAt,
       encrypted: found.encrypted,
       keyId: cipher?.keyId,
+      // As the probe read it; a sealed one comes with the first sync.
+      description: found.description ?? held?.description,
     );
     // Connecting on another device finds the profile's membership already
     // synced in: keep its id, or the profile ends up with two and leaving

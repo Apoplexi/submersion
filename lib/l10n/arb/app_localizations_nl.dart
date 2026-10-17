@@ -21442,6 +21442,88 @@ class AppLocalizationsNl extends AppLocalizations {
       'Toevoegen aan gedeelde duikstekbibliotheek';
 
   @override
+  String get sharedLibrary_about_title => 'Over';
+
+  @override
+  String get sharedLibrary_about_edit_title => 'Bibliotheekgegevens bewerken';
+
+  @override
+  String get sharedLibrary_about_name_label => 'Naam van de bibliotheek';
+
+  @override
+  String get sharedLibrary_about_description_label => 'Beschrijving';
+
+  @override
+  String get sharedLibrary_about_description_help =>
+      'Wat deze bibliotheek bevat en voor wie ze is. Alle leden zien deze.';
+
+  @override
+  String get sharedLibrary_about_nameRequired => 'Voer een naam in';
+
+  @override
+  String get sharedLibrary_connection_title => 'Verbinding op dit apparaat';
+
+  @override
+  String get sharedLibrary_connection_s3 => 'S3-account';
+
+  @override
+  String sharedLibrary_connection_s3Bucket(String bucket) {
+    return 'S3-account, bucket $bucket';
+  }
+
+  @override
+  String get sharedLibrary_connection_webdav => 'WebDAV-account';
+
+  @override
+  String sharedLibrary_connection_webdavServer(String server) {
+    return 'WebDAV-account, $server';
+  }
+
+  @override
+  String get sharedLibrary_connection_accountMissing =>
+      'Dit account staat niet meer op dit apparaat';
+
+  @override
+  String get sharedLibrary_connection_folder => 'Map';
+
+  @override
+  String get sharedLibrary_connection_change => 'Verbinding wijzigen';
+
+  @override
+  String get sharedLibrary_connection_check => 'Locatie controleren';
+
+  @override
+  String sharedLibrary_connection_same(String name) {
+    return '$name hier gevonden. Dit is dezelfde bibliotheek.';
+  }
+
+  @override
+  String get sharedLibrary_connection_save => 'Verbinding opslaan';
+
+  @override
+  String get sharedLibrary_connection_olderCopy =>
+      'Deze kopie lijkt ouder dan de bibliotheek waarmee je tot nu toe synchroniseerde.';
+
+  @override
+  String get sharedLibrary_connection_saveAnyway => 'Toch opslaan';
+
+  @override
+  String sharedLibrary_connection_different(String name) {
+    return 'Deze map bevat een andere bibliotheek ($name). Je verbinding blijft ongewijzigd.';
+  }
+
+  @override
+  String get sharedLibrary_connection_differentUnnamed =>
+      'Deze map bevat een andere bibliotheek. Je verbinding blijft ongewijzigd.';
+
+  @override
+  String get sharedLibrary_connection_none =>
+      'Geen bibliotheek gevonden in deze map. Je verbinding blijft ongewijzigd.';
+
+  @override
+  String get sharedLibrary_connection_saved => 'Verbinding bijgewerkt';
+
+  @override
   String get settings_cloudSync_adopt_confirm =>
       'Herstelde bibliotheek overnemen';
 
