@@ -39884,6 +39884,18 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get dataQuality_detector_transmitter_role => 'دور جهاز الإرسال';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'الأسطوانة $tankNumber معلَّمة على أنها $role بناءً على اسم جهاز الإرسال، لكنها فقدت $ocDrop بعد التحويل إلى الدائرة المفتوحة ولم تفقد شيئًا تقريبًا على الدائرة المغلقة، لذا يبدو أنها أسطوانة غاز الطوارئ. لا يمكن بهذه الطريقة اكتشاف غاز طوارئ لم يُتنفَّس منه، أو استُخدم دون تبديل الغاز على الكمبيوتر.';
+  }
+
+  @override
   String get dataQuality_msg_twinTanks =>
       'تحمل أسطوانتان سلسلة ضغط شبه متطابقة';
 
@@ -51887,6 +51899,42 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'جهاز الإرسال $serial غير معيّن لأسطوانة';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'استخدام كغاز طوارئ';
+
+  @override
+  String get dataQuality_useAsBailout_title => 'جعل هذه الأسطوانة غاز الطوارئ؟';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'يزيل أسطوانة غاز الطوارئ المكررة (تنتقل تبديلات الغاز إلى الأسطوانة $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'تسجيل جهاز الإرسال هذا أيضًا بدور $role';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'احتفظت $count غطسة أخرى بمزيج الغاز الخاص بها. يُرجى التحقق منها.',
+      many: 'احتفظت $count غطسة أخرى بمزيج الغاز الخاص بها. يُرجى التحقق منها.',
+      few: 'احتفظت $count غطسات أخرى بمزيج الغاز الخاص بها. يُرجى التحقق منها.',
+      two: 'احتفظت غطستان أخريان بمزيج الغاز الخاص بهما. يُرجى التحقق منهما.',
+      one: 'احتفظت غطسة أخرى واحدة بمزيج الغاز الخاص بها. يُرجى التحقق منها.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'تم تسجيل جهاز الإرسال بدور $role. التراجع يغيّر هذه الغطسة فقط.';
   }
 
   @override

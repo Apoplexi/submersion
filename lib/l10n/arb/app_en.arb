@@ -24039,6 +24039,21 @@
       }
     }
   },
+  "dataQuality_detector_transmitter_role": "Transmitter role",
+  "dataQuality_msg_transmitterRoleBailout": "Tank {tankNumber} is marked {role} from its transmitter's name, but it lost {ocDrop} after the switch to open circuit and almost none on the loop, so it looks like the bailout. A bailout that was never breathed, or one breathed without a gas switch on the computer, cannot be detected this way.",
+  "@dataQuality_msg_transmitterRoleBailout": {
+    "placeholders": {
+      "tankNumber": {
+        "type": "int"
+      },
+      "role": {
+        "type": "String"
+      },
+      "ocDrop": {
+        "type": "String"
+      }
+    }
+  },
   "dataQuality_msg_twinTanks": "Two tanks carry a near-identical pressure series",
   "dataQuality_msg_sourceDepth": "Sources disagree on max depth: {primary} vs {source}",
   "@dataQuality_msg_sourceDepth": {
@@ -30438,6 +30453,40 @@
   "@dataQuality_msg_unknownTransmitter": {
     "placeholders": {
       "serial": { "type": "String" }
+    }
+  },
+  "dataQuality_repairLabel_useAsBailout": "Use as bailout",
+  "dataQuality_useAsBailout_title": "Make this tank the bailout?",
+  "dataQuality_useAsBailout_merge": "Removes the duplicate Bailout cylinder (switches move to Tank {tankNumber})",
+  "@dataQuality_useAsBailout_merge": {
+    "placeholders": {
+      "tankNumber": {
+        "type": "int"
+      }
+    }
+  },
+  "dataQuality_useAsBailout_register": "Also register this transmitter as {role}",
+  "@dataQuality_useAsBailout_register": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "dataQuality_useAsBailout_mixesKept": "{count, plural, =1{{count} other dive kept its gas mix. Check it.} other{{count} other dives kept their gas mix. Check them.}}",
+  "@dataQuality_useAsBailout_mixesKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataQuality_useAsBailout_registered": "Transmitter registered as {role}. Undo changes this dive only.",
+  "@dataQuality_useAsBailout_registered": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
     }
   },
   "dataQuality_repairLabel_assignTransmitter": "Assign transmitter",

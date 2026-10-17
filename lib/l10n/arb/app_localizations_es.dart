@@ -39400,6 +39400,18 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get dataQuality_detector_transmitter_role => 'Función del transmisor';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'El tanque $tankNumber figura como $role según el nombre de su transmisor, pero perdió $ocDrop tras el cambio a circuito abierto y casi nada en el circuito cerrado, así que parece ser el bailout. Un bailout que no se respiró, o que se respiró sin cambio de gas en el ordenador, no se puede detectar así.';
+  }
+
+  @override
   String get dataQuality_msg_twinTanks =>
       'Dos tanques tienen una serie de presión casi idéntica';
 
@@ -51279,6 +51291,41 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'El transmisor $serial no está asignado a ninguna botella';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'Usar como bailout';
+
+  @override
+  String get dataQuality_useAsBailout_title =>
+      '¿Convertir este tanque en el bailout?';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'Elimina el tanque de bailout duplicado (los cambios de gas pasan al tanque $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'Registrar también este transmisor como $role';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count inmersiones más conservaron su mezcla de gas. Conviene revisarlas.',
+      one:
+          '$count inmersión más conservó su mezcla de gas. Conviene revisarla.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'Transmisor registrado como $role. Deshacer solo cambia esta inmersión.';
   }
 
   @override

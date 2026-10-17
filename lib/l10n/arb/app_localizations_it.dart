@@ -39373,6 +39373,18 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get dataQuality_detector_transmitter_role => 'Ruolo del trasmettitore';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'La bombola $tankNumber è indicata come $role in base al nome del trasmettitore, ma ha perso $ocDrop dopo il passaggio al circuito aperto e quasi nulla nel loop, quindi sembra essere il bailout. Un bailout mai respirato, o respirato senza un cambio gas sul computer, non può essere rilevato in questo modo.';
+  }
+
+  @override
   String get dataQuality_msg_twinTanks =>
       'Due bombole presentano una serie di pressione quasi identica';
 
@@ -51226,6 +51238,41 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'Il trasmettitore $serial non è assegnato a nessuna bombola';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'Usa come bailout';
+
+  @override
+  String get dataQuality_useAsBailout_title =>
+      'Rendere questa bombola il bailout?';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'Rimuove la bombola bailout duplicata (i cambi gas passano alla bombola $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'Registra anche questo trasmettitore come $role';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count altre immersioni hanno mantenuto la loro miscela. Da controllare.',
+      one:
+          '$count altra immersione ha mantenuto la sua miscela. Da controllare.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'Trasmettitore registrato come $role. Annulla modifica solo questa immersione.';
   }
 
   @override

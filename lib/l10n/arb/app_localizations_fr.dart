@@ -39478,6 +39478,18 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get dataQuality_detector_transmitter_role => 'Rôle de l\'émetteur';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'Le bloc $tankNumber est marqué $role d\'après le nom de son émetteur, mais il a perdu $ocDrop après le passage en circuit ouvert et presque rien sur la boucle : c\'est donc probablement le bailout. Un bailout jamais respiré, ou respiré sans changement de gaz sur l\'ordinateur, ne peut pas être détecté ainsi.';
+  }
+
+  @override
   String get dataQuality_msg_twinTanks =>
       'Deux blocs présentent une série de pression quasi identique';
 
@@ -51341,6 +51353,38 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'L\'émetteur $serial n\'est associé à aucune bouteille';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'Utiliser comme bailout';
+
+  @override
+  String get dataQuality_useAsBailout_title => 'Faire de ce bloc le bailout ?';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'Supprime le bloc bailout en double (les changements de gaz passent au bloc $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'Enregistrer aussi cet émetteur comme $role';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count autres plongées ont conservé leur mélange. À vérifier.',
+      one: '$count autre plongée a conservé son mélange. À vérifier.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'Émetteur enregistré comme $role. Annuler ne modifie que cette plongée.';
   }
 
   @override

@@ -38400,6 +38400,18 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get dataQuality_detector_transmitter_role => 'תפקיד המשדר';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'בלון $tankNumber מסומן כ$role לפי שם המשדר, אבל הוא איבד $ocDrop אחרי המעבר למעגל פתוח וכמעט כלום בלולאה, כך שנראה שזה בלון החירום. בלון חירום שלא נשמו ממנו, או שנשמו ממנו בלי החלפת גז במחשב, אי אפשר לזהות כך.';
+  }
+
+  @override
   String get dataQuality_msg_twinTanks => 'שני בלונים נושאים סדרת לחץ כמעט זהה';
 
   @override
@@ -50138,6 +50150,39 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'משדר $serial אינו משויך למיכל';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'שימוש כבלון חירום';
+
+  @override
+  String get dataQuality_useAsBailout_title =>
+      'להפוך את הבלון הזה לבלון החירום?';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'מסיר את בלון החירום הכפול (החלפות הגז עוברות לבלון $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'לרשום גם את המשדר הזה בתפקיד $role';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות נוספות שמרו על תערובת הגז שלהן. כדאי לבדוק אותן.',
+      one: 'צלילה נוספת אחת שמרה על תערובת הגז שלה. כדאי לבדוק אותה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'המשדר נרשם בתפקיד $role. ביטול משנה רק את הצלילה הזו.';
   }
 
   @override

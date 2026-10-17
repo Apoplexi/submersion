@@ -39354,6 +39354,18 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get dataQuality_detector_transmitter_role => 'Função do transmissor';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'O cilindro $tankNumber está marcado como $role pelo nome do transmissor, mas perdeu $ocDrop após a troca para circuito aberto e quase nada no circuito fechado, por isso parece ser o bailout. Um bailout que nunca foi respirado, ou respirado sem troca de gás no computador, não pode ser detectado assim.';
+  }
+
+  @override
   String get dataQuality_msg_twinTanks =>
       'Dois cilindros apresentam uma série de pressão quase idêntica';
 
@@ -51226,6 +51238,40 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'O transmissor $serial não está atribuído a nenhum cilindro';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'Usar como bailout';
+
+  @override
+  String get dataQuality_useAsBailout_title =>
+      'Tornar este cilindro o bailout?';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'Remove o cilindro de bailout duplicado (as trocas de gás passam para o cilindro $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'Registrar também este transmissor como $role';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count outros mergulhos mantiveram sua mistura. Convém verificá-los.',
+      one: '$count outro mergulho manteve sua mistura. Convém verificá-lo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'Transmissor registrado como $role. Desfazer altera apenas este mergulho.';
   }
 
   @override

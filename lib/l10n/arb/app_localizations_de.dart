@@ -39292,6 +39292,18 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get dataQuality_detector_transmitter_role => 'Senderrolle';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'Flasche $tankNumber ist nach dem Sendernamen als $role markiert, verlor aber $ocDrop nach dem Wechsel auf offenen Kreislauf und im Kreislauf fast nichts. Sie ist also wohl das Bailout. Ein nie geatmetes Bailout oder eines ohne Gaswechsel am Computer lässt sich so nicht erkennen.';
+  }
+
+  @override
   String get dataQuality_msg_twinTanks =>
       'Zwei Flaschen weisen eine nahezu identische Druckreihe auf';
 
@@ -51119,6 +51131,41 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'Sender $serial ist keiner Flasche zugewiesen';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'Als Bailout verwenden';
+
+  @override
+  String get dataQuality_useAsBailout_title =>
+      'Diese Flasche zum Bailout machen?';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'Entfernt die doppelte Bailout-Flasche (Gaswechsel gehen auf Flasche $tankNumber über)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'Diesen Sender auch als $role registrieren';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count weitere Tauchgänge haben ihr Gasgemisch behalten. Bitte prüfen.',
+      one:
+          '$count weiterer Tauchgang hat sein Gasgemisch behalten. Bitte prüfen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'Sender als $role registriert. Rückgängig ändert nur diesen Tauchgang.';
   }
 
   @override

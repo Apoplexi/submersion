@@ -39098,6 +39098,18 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get dataQuality_detector_transmitter_role => 'Rol van de zender';
+
+  @override
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  ) {
+    return 'Fles $tankNumber staat op basis van de zendernaam als $role gemarkeerd, maar verloor $ocDrop na de overstap naar open circuit en vrijwel niets op de loop, dus het lijkt de bailout te zijn. Een bailout die nooit is geademd, of zonder gaswissel op de computer, is zo niet te herkennen.';
+  }
+
+  @override
   String get dataQuality_msg_twinTanks =>
       'Twee flessen hebben een vrijwel identieke drukreeks';
 
@@ -50898,6 +50910,39 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'Zender $serial is niet aan een fles toegewezen';
+  }
+
+  @override
+  String get dataQuality_repairLabel_useAsBailout => 'Als bailout gebruiken';
+
+  @override
+  String get dataQuality_useAsBailout_title => 'Deze fles de bailout maken?';
+
+  @override
+  String dataQuality_useAsBailout_merge(int tankNumber) {
+    return 'Verwijdert de dubbele bailoutfles (gaswissels gaan naar fles $tankNumber)';
+  }
+
+  @override
+  String dataQuality_useAsBailout_register(String role) {
+    return 'Deze zender ook als $role registreren';
+  }
+
+  @override
+  String dataQuality_useAsBailout_mixesKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count andere duiken hebben hun gasmengsel behouden. Controleer die.',
+      one: '$count andere duik heeft zijn gasmengsel behouden. Controleer die.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataQuality_useAsBailout_registered(String role) {
+    return 'Zender als $role geregistreerd. Ongedaan maken wijzigt alleen deze duik.';
   }
 
   @override
