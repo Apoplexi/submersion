@@ -15,6 +15,7 @@ import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.
 import 'package:submersion/features/dive_computer/data/services/parsed_dive_start_time.dart';
 import 'package:submersion/features/dive_computer/data/services/reparse_empty_parse.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_source_links.dart';
 import 'package:submersion/features/dive_log/data/repositories/stored_tank_matching.dart';
@@ -325,6 +326,19 @@ class ReparseService {
         await stage('gasSwitches', await _idsOf(db.gasSwitches, diveId));
       }
       if (sourceRow.isPrimary) await stage('dives', [diveId]);
+
+      // ------------------------------------------------------------------
+      // 8. Drop the stored safety review when this re-parse rewrote what it
+      //    graded, so it recomputes on next view (#1641): the dive row's
+      //    gradient factors and mode (primary only), or the profile strand
+      //    and, under it, the events, tanks and gas switches (ownsStrand).
+      //    A re-parse that rewrote neither leaves a valid review alone,
+      //    rather than tombstoning it on every peer. Both reparseDive and
+      //    reparseAllForComputer land here.
+      // ------------------------------------------------------------------
+      if (sourceRow.isPrimary || ownsStrand) {
+        await SafetyFindingsRepository.clearReviewForDive(db, _sync, diveId);
+      }
 
       return (profilePreserved: !ownsStrand);
     });
