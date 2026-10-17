@@ -25142,6 +25142,179 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get dataHealth_feature_backup => 'Mentés';
+
+  @override
+  String get dataHealth_feature_sync => 'Szinkronizálás';
+
+  @override
+  String get dataHealth_feature_libraries => 'Könyvtárak';
+
+  @override
+  String get dataHealth_feature_media => 'Média';
+
+  @override
+  String get dataHealth_level_healthy => 'Rendben';
+
+  @override
+  String get dataHealth_level_attention => 'Figyelmet igényel';
+
+  @override
+  String get dataHealth_level_failing => 'Hibás';
+
+  @override
+  String get dataHealth_level_notSetUp => 'Nincs beállítva';
+
+  @override
+  String dataHealth_semantics(String feature, String status) {
+    return '$feature: $status';
+  }
+
+  @override
+  String get dataHealth_backup_autoOff =>
+      'Ajánlott: kapcsold be az automatikus mentést';
+
+  @override
+  String dataHealth_backup_failed(String when) {
+    return 'Az utolsó mentés sikertelen: $when';
+  }
+
+  @override
+  String dataHealth_backup_overdue(String when) {
+    return 'Esedékes mentés (utolsó: $when)';
+  }
+
+  @override
+  String get dataHealth_backup_never => 'Még nincs mentés';
+
+  @override
+  String get dataHealth_backup_cloudCopyMissing =>
+      'Az utolsó mentés nem került fel a felhőbe';
+
+  @override
+  String get dataHealth_backup_noOffDeviceCopy =>
+      'Nincs másolat ezen az eszközön kívül';
+
+  @override
+  String get dataHealth_sync_off =>
+      'Ajánlott: kapcsold be a felhő szinkronizálást';
+
+  @override
+  String get dataHealth_sync_needsPassphrase =>
+      'Szinkronizálás szüneteltetve: add meg a jelmondatot';
+
+  @override
+  String get dataHealth_sync_awaitingAdoption =>
+      'Szinkronizálás szüneteltetve: a felhőkönyvtárat lecserélték';
+
+  @override
+  String get dataHealth_sync_signedOut =>
+      'Szinkronizálás szüneteltetve: jelentkezz be újra';
+
+  @override
+  String dataHealth_sync_failed(String when) {
+    return 'Az utolsó szinkronizálás sikertelen: $when';
+  }
+
+  @override
+  String dataHealth_sync_offline(String when) {
+    return 'Offline (utolsó szinkronizálás: $when)';
+  }
+
+  @override
+  String dataHealth_sync_conflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megoldandó szinkronizálási ütközés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataHealth_sync_peersHeld =>
+      'Egy másik eszköz figyelmet igényel, mielőtt szinkronizálhatna';
+
+  @override
+  String get dataHealth_sync_autoOff =>
+      'Ajánlott: kapcsold be az automatikus szinkronizálást';
+
+  @override
+  String get dataHealth_sync_neverSynced => 'Még nincs szinkronizálva';
+
+  @override
+  String dataHealth_sync_rowSubtitle(String when) {
+    return 'Szinkronizálva: $when';
+  }
+
+  @override
+  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Szinkronizálva: $when · $count eszköz',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_failed(String name) {
+    return '$name: a szinkronizálás sikertelen';
+  }
+
+  @override
+  String dataHealth_libraries_failedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count könyvtár szinkronizálása sikertelen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_editsHeld(String name) {
+    return '$name: a módosításaid várakoznak';
+  }
+
+  @override
+  String get dataHealth_media_finishSetup =>
+      'Fotók: fejezd be az eszköz beállítását';
+
+  @override
+  String get dataHealth_media_transfersPaused => 'A fotóátvitel szünetel';
+
+  @override
+  String dataHealth_facts_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülőhely',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_media(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó és videó',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_decompression_aboutContent =>
       'A Gradiens Faktorok (GF) szabályozzák, mennyire konzervatív a dekompressziós számítás. A GF Low a mély megállókra, míg a GF High a sekély megállókra hat.\n\nAlacsonyabb értékek = konzervatívabb = hosszabb dekó megállók\nMagasabb értékek = kevésbé konzervatív = rövidebb dekó megállók';
 

@@ -24622,6 +24622,179 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get dataHealth_feature_backup => 'גיבוי';
+
+  @override
+  String get dataHealth_feature_sync => 'סנכרון';
+
+  @override
+  String get dataHealth_feature_libraries => 'ספריות';
+
+  @override
+  String get dataHealth_feature_media => 'מדיה';
+
+  @override
+  String get dataHealth_level_healthy => 'תקין';
+
+  @override
+  String get dataHealth_level_attention => 'דורש תשומת לב';
+
+  @override
+  String get dataHealth_level_failing => 'נכשל';
+
+  @override
+  String get dataHealth_level_notSetUp => 'לא הוגדר';
+
+  @override
+  String dataHealth_semantics(String feature, String status) {
+    return '$feature: $status';
+  }
+
+  @override
+  String get dataHealth_backup_autoOff => 'מומלץ: הפעל גיבויים אוטומטיים';
+
+  @override
+  String dataHealth_backup_failed(String when) {
+    return 'הגיבוי האחרון נכשל: $when';
+  }
+
+  @override
+  String dataHealth_backup_overdue(String when) {
+    return 'הגיבוי באיחור (האחרון: $when)';
+  }
+
+  @override
+  String get dataHealth_backup_never => 'עדיין אין גיבוי';
+
+  @override
+  String get dataHealth_backup_cloudCopyMissing => 'הגיבוי האחרון לא הגיע לענן';
+
+  @override
+  String get dataHealth_backup_noOffDeviceCopy => 'אין עותק מחוץ למכשיר הזה';
+
+  @override
+  String get dataHealth_sync_off => 'מומלץ: הפעל סנכרון ענן';
+
+  @override
+  String get dataHealth_sync_needsPassphrase =>
+      'הסנכרון מושהה: הזן את משפט הסיסמה';
+
+  @override
+  String get dataHealth_sync_awaitingAdoption =>
+      'הסנכרון מושהה: ספריית הענן הוחלפה';
+
+  @override
+  String get dataHealth_sync_signedOut => 'הסנכרון מושהה: התחבר מחדש';
+
+  @override
+  String dataHealth_sync_failed(String when) {
+    return 'הסנכרון האחרון נכשל: $when';
+  }
+
+  @override
+  String dataHealth_sync_offline(String when) {
+    return 'לא מקוון (סנכרון אחרון: $when)';
+  }
+
+  @override
+  String dataHealth_sync_conflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count התנגשויות סנכרון לפתרון',
+      one: '$count התנגשות סנכרון לפתרון',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataHealth_sync_peersHeld =>
+      'מכשיר אחר דורש תשומת לב לפני שיוכל לסנכרן';
+
+  @override
+  String get dataHealth_sync_autoOff => 'מומלץ: הפעל סנכרון אוטומטי';
+
+  @override
+  String get dataHealth_sync_neverSynced => 'עדיין לא סונכרן';
+
+  @override
+  String dataHealth_sync_rowSubtitle(String when) {
+    return 'סונכרן: $when';
+  }
+
+  @override
+  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'סונכרן: $when · $count מכשירים',
+      one: 'סונכרן: $when · $count מכשיר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_failed(String name) {
+    return '$name: הסנכרון נכשל';
+  }
+
+  @override
+  String dataHealth_libraries_failedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ספריות לא סונכרנו',
+      one: '$count ספרייה לא סונכרנה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_editsHeld(String name) {
+    return '$name: השינויים שלך מוחזקים';
+  }
+
+  @override
+  String get dataHealth_media_finishSetup =>
+      'תמונות: סיים להגדיר את המכשיר הזה';
+
+  @override
+  String get dataHealth_media_transfersPaused => 'העברות התמונות מושהות';
+
+  @override
+  String dataHealth_facts_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות',
+      one: '$count צלילה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count אתרים',
+      one: '$count אתר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_media(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות וסרטונים',
+      one: '$count תמונה או סרטון',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_decompression_aboutContent =>
       'גורמי שיפוע (GF) קובעים עד כמה שמרניים חישובי הדקומפרסיה שלך. GF Low משפיע על עצירות עמוקות, בעוד GF High משפיע על עצירות רדודות.\n\nערכים נמוכים יותר = שמרני יותר = עצירות דקו ארוכות יותר\nערכים גבוהים יותר = פחות שמרני = עצירות דקו קצרות יותר';
 

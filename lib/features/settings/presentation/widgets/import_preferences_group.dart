@@ -6,7 +6,8 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/label_with_control.dart';
 
-/// The card under the Import header on Settings > Data (issue #2779).
+/// The group under the Import header on Settings > Data (issue #2779). Flat,
+/// like the rest of that page (issue #3390).
 ///
 /// It holds the preferences for how incoming dive data is interpreted:
 /// how closely a dive must sit to a site before site matching proposes it
@@ -20,8 +21,8 @@ import 'package:submersion/shared/widgets/label_with_control.dart';
 /// The auto-tag switch is only the starting point for a new session: the
 /// import wizard's Import Options sheet overrides it for a single import
 /// without touching this default.
-class ImportPreferencesCard extends ConsumerWidget {
-  const ImportPreferencesCard({super.key});
+class ImportPreferencesGroup extends ConsumerWidget {
+  const ImportPreferencesGroup({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,7 +36,9 @@ class ImportPreferencesCard extends ConsumerWidget {
       settingsProvider.select((s) => s.autoTagImports),
     );
 
-    return Card(
+    // Flush with the page's other rows, which drop the default inset.
+    return ListTileTheme(
+      data: const ListTileThemeData(contentPadding: EdgeInsets.zero),
       child: Column(
         children: [
           ListTile(
@@ -70,7 +73,6 @@ class ImportPreferencesCard extends ConsumerWidget {
             ),
             subtitle: Text(context.l10n.settings_siteMatch_subtitle),
           ),
-          const Divider(height: 1),
           SwitchListTile(
             secondary: const Icon(Icons.compress),
             title: Text(context.l10n.settings_tankPressureAtSurfacing_title),
@@ -82,7 +84,6 @@ class ImportPreferencesCard extends ConsumerWidget {
                 .read(settingsProvider.notifier)
                 .setTrimTankPressureAtSurfacing(value),
           ),
-          const Divider(height: 1),
           SwitchListTile(
             secondary: const Icon(Icons.label_outline),
             title: Text(context.l10n.settings_autoTagImports_title),

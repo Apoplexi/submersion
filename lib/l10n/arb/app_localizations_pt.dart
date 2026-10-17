@@ -25251,6 +25251,186 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get dataHealth_feature_backup => 'Backup';
+
+  @override
+  String get dataHealth_feature_sync => 'Sincronização';
+
+  @override
+  String get dataHealth_feature_libraries => 'Bibliotecas';
+
+  @override
+  String get dataHealth_feature_media => 'Mídia';
+
+  @override
+  String get dataHealth_level_healthy => 'Em ordem';
+
+  @override
+  String get dataHealth_level_attention => 'Requer atenção';
+
+  @override
+  String get dataHealth_level_failing => 'Com falha';
+
+  @override
+  String get dataHealth_level_notSetUp => 'Não configurado';
+
+  @override
+  String dataHealth_semantics(String feature, String status) {
+    return '$feature: $status';
+  }
+
+  @override
+  String get dataHealth_backup_autoOff =>
+      'Recomendado: ative os backups automáticos';
+
+  @override
+  String dataHealth_backup_failed(String when) {
+    return 'O último backup falhou: $when';
+  }
+
+  @override
+  String dataHealth_backup_overdue(String when) {
+    return 'Backup atrasado (último: $when)';
+  }
+
+  @override
+  String get dataHealth_backup_never => 'Ainda não há backup';
+
+  @override
+  String get dataHealth_backup_cloudCopyMissing =>
+      'O último backup não chegou à nuvem';
+
+  @override
+  String get dataHealth_backup_noOffDeviceCopy =>
+      'Nenhuma cópia fora deste dispositivo';
+
+  @override
+  String get dataHealth_sync_off =>
+      'Recomendado: ative a sincronização na nuvem';
+
+  @override
+  String get dataHealth_sync_needsPassphrase =>
+      'Sincronização pausada: insira sua frase-senha';
+
+  @override
+  String get dataHealth_sync_awaitingAdoption =>
+      'Sincronização pausada: a biblioteca na nuvem foi substituída';
+
+  @override
+  String get dataHealth_sync_signedOut =>
+      'Sincronização pausada: entre novamente';
+
+  @override
+  String dataHealth_sync_failed(String when) {
+    return 'A última sincronização falhou: $when';
+  }
+
+  @override
+  String dataHealth_sync_offline(String when) {
+    return 'Offline (última sincronização: $when)';
+  }
+
+  @override
+  String dataHealth_sync_conflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count conflitos de sincronização para resolver',
+      one: '$count conflito de sincronização para resolver',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataHealth_sync_peersHeld =>
+      'Outro dispositivo requer atenção antes de poder sincronizar';
+
+  @override
+  String get dataHealth_sync_autoOff =>
+      'Recomendado: ative a sincronização automática';
+
+  @override
+  String get dataHealth_sync_neverSynced => 'Ainda não sincronizado';
+
+  @override
+  String dataHealth_sync_rowSubtitle(String when) {
+    return 'Sincronizado: $when';
+  }
+
+  @override
+  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sincronizado: $when · $count dispositivos',
+      one: 'Sincronizado: $when · $count dispositivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_failed(String name) {
+    return '$name: falha na sincronização';
+  }
+
+  @override
+  String dataHealth_libraries_failedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bibliotecas não sincronizaram',
+      one: '$count biblioteca não sincronizou',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_editsHeld(String name) {
+    return '$name: suas alterações estão em espera';
+  }
+
+  @override
+  String get dataHealth_media_finishSetup =>
+      'Fotos: conclua a configuração deste dispositivo';
+
+  @override
+  String get dataHealth_media_transfersPaused =>
+      'As transferências de fotos estão pausadas';
+
+  @override
+  String dataHealth_facts_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos',
+      one: '$count mergulho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pontos',
+      one: '$count ponto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_media(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos e vídeos',
+      one: '$count foto ou vídeo',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_decompression_aboutContent =>
       'Fatores de Gradiente (GF) controlam o quão conservadores são seus cálculos de descompressão. GF Low afeta paradas profundas, enquanto GF High afeta paradas rasas.\n\nValores mais baixos = mais conservador = paradas deco mais longas\nValores mais altos = menos conservador = paradas deco mais curtas';
 

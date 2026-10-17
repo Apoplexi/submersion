@@ -25211,6 +25211,186 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get dataHealth_feature_backup => 'Sicherung';
+
+  @override
+  String get dataHealth_feature_sync => 'Sync';
+
+  @override
+  String get dataHealth_feature_libraries => 'Bibliotheken';
+
+  @override
+  String get dataHealth_feature_media => 'Medien';
+
+  @override
+  String get dataHealth_level_healthy => 'In Ordnung';
+
+  @override
+  String get dataHealth_level_attention => 'Erfordert Aufmerksamkeit';
+
+  @override
+  String get dataHealth_level_failing => 'Fehlerhaft';
+
+  @override
+  String get dataHealth_level_notSetUp => 'Nicht eingerichtet';
+
+  @override
+  String dataHealth_semantics(String feature, String status) {
+    return '$feature: $status';
+  }
+
+  @override
+  String get dataHealth_backup_autoOff =>
+      'Empfohlen: automatische Sicherungen einschalten';
+
+  @override
+  String dataHealth_backup_failed(String when) {
+    return 'Letzte Sicherung fehlgeschlagen: $when';
+  }
+
+  @override
+  String dataHealth_backup_overdue(String when) {
+    return 'Sicherung überfällig (letzte: $when)';
+  }
+
+  @override
+  String get dataHealth_backup_never => 'Noch keine Sicherung';
+
+  @override
+  String get dataHealth_backup_cloudCopyMissing =>
+      'Letzte Sicherung hat die Cloud nicht erreicht';
+
+  @override
+  String get dataHealth_backup_noOffDeviceCopy =>
+      'Keine Kopie außerhalb dieses Geräts';
+
+  @override
+  String get dataHealth_sync_off =>
+      'Empfohlen: Cloud-Synchronisierung einschalten';
+
+  @override
+  String get dataHealth_sync_needsPassphrase =>
+      'Synchronisierung pausiert: Passphrase eingeben';
+
+  @override
+  String get dataHealth_sync_awaitingAdoption =>
+      'Synchronisierung pausiert: Die Cloud-Bibliothek wurde ersetzt';
+
+  @override
+  String get dataHealth_sync_signedOut =>
+      'Synchronisierung pausiert: erneut anmelden';
+
+  @override
+  String dataHealth_sync_failed(String when) {
+    return 'Letzte Synchronisierung fehlgeschlagen: $when';
+  }
+
+  @override
+  String dataHealth_sync_offline(String when) {
+    return 'Offline (zuletzt synchronisiert: $when)';
+  }
+
+  @override
+  String dataHealth_sync_conflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Synchronisierungskonflikte zu lösen',
+      one: '$count Synchronisierungskonflikt zu lösen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataHealth_sync_peersHeld =>
+      'Ein anderes Gerät erfordert Aufmerksamkeit, bevor es synchronisieren kann';
+
+  @override
+  String get dataHealth_sync_autoOff =>
+      'Empfohlen: automatische Synchronisierung einschalten';
+
+  @override
+  String get dataHealth_sync_neverSynced => 'Noch nicht synchronisiert';
+
+  @override
+  String dataHealth_sync_rowSubtitle(String when) {
+    return 'Synchronisiert: $when';
+  }
+
+  @override
+  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Synchronisiert: $when · $count Geräte',
+      one: 'Synchronisiert: $when · $count Gerät',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_failed(String name) {
+    return '$name: Synchronisierung fehlgeschlagen';
+  }
+
+  @override
+  String dataHealth_libraries_failedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Bibliotheken konnten nicht synchronisiert werden',
+      one: '$count Bibliothek konnte nicht synchronisiert werden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_editsHeld(String name) {
+    return '$name: Ihre Änderungen werden zurückgehalten';
+  }
+
+  @override
+  String get dataHealth_media_finishSetup =>
+      'Fotos: Einrichtung auf diesem Gerät abschließen';
+
+  @override
+  String get dataHealth_media_transfersPaused =>
+      'Fotoübertragungen sind pausiert';
+
+  @override
+  String dataHealth_facts_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge',
+      one: '$count Tauchgang',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchplätze',
+      one: '$count Tauchplatz',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_media(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos und Videos',
+      one: '$count Foto oder Video',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_decompression_aboutContent =>
       'Gradientenfaktoren (GF) steuern, wie konservativ Ihre Dekompressionsberechnungen sind. GF Low beeinflusst tiefe Stopps, während GF High flache Stopps beeinflusst.\n\nNiedrigere Werte = konservativer = längere Dekostopps\nHöhere Werte = weniger konservativ = kürzere Dekostopps';
 

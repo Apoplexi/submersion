@@ -46,19 +46,24 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Element cardOf(WidgetTester tester, String text) => tester.element(
-    find.ancestor(of: find.text(text), matching: find.byType(Card)).first,
-  );
+  double topOf(WidgetTester tester, String text) =>
+      tester.getTopLeft(find.text(text)).dy;
 
   testWidgets('Connected Accounts sits in the Backup & Sync group', (
     tester,
   ) async {
     await pumpDataSection(tester);
 
+    // The Data page is flat (issue #3390): the group is the rows between
+    // the Backup & Sync and Storage headers.
     expect(find.text('Connected Accounts'), findsOneWidget);
     expect(
-      cardOf(tester, 'Connected Accounts'),
-      same(cardOf(tester, 'Database Cloud Sync')),
+      topOf(tester, 'Connected Accounts'),
+      greaterThan(topOf(tester, 'Photos & Media')),
+    );
+    expect(
+      topOf(tester, 'Connected Accounts'),
+      lessThan(topOf(tester, 'Storage')),
     );
   });
 

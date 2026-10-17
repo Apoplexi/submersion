@@ -25093,6 +25093,185 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get dataHealth_feature_backup => 'Back-up';
+
+  @override
+  String get dataHealth_feature_sync => 'Synchronisatie';
+
+  @override
+  String get dataHealth_feature_libraries => 'Bibliotheken';
+
+  @override
+  String get dataHealth_feature_media => 'Media';
+
+  @override
+  String get dataHealth_level_healthy => 'In orde';
+
+  @override
+  String get dataHealth_level_attention => 'Vraagt aandacht';
+
+  @override
+  String get dataHealth_level_failing => 'Mislukt';
+
+  @override
+  String get dataHealth_level_notSetUp => 'Niet ingesteld';
+
+  @override
+  String dataHealth_semantics(String feature, String status) {
+    return '$feature: $status';
+  }
+
+  @override
+  String get dataHealth_backup_autoOff =>
+      'Aanbevolen: zet automatische back-ups aan';
+
+  @override
+  String dataHealth_backup_failed(String when) {
+    return 'Laatste back-up mislukt: $when';
+  }
+
+  @override
+  String dataHealth_backup_overdue(String when) {
+    return 'Back-up achterstallig (laatste: $when)';
+  }
+
+  @override
+  String get dataHealth_backup_never => 'Nog geen back-up';
+
+  @override
+  String get dataHealth_backup_cloudCopyMissing =>
+      'Laatste back-up heeft de cloud niet bereikt';
+
+  @override
+  String get dataHealth_backup_noOffDeviceCopy =>
+      'Geen kopie buiten dit apparaat';
+
+  @override
+  String get dataHealth_sync_off => 'Aanbevolen: zet cloudsynchronisatie aan';
+
+  @override
+  String get dataHealth_sync_needsPassphrase =>
+      'Synchronisatie gepauzeerd: voer je wachtzin in';
+
+  @override
+  String get dataHealth_sync_awaitingAdoption =>
+      'Synchronisatie gepauzeerd: de cloudbibliotheek is vervangen';
+
+  @override
+  String get dataHealth_sync_signedOut =>
+      'Synchronisatie gepauzeerd: meld je opnieuw aan';
+
+  @override
+  String dataHealth_sync_failed(String when) {
+    return 'Laatste synchronisatie mislukt: $when';
+  }
+
+  @override
+  String dataHealth_sync_offline(String when) {
+    return 'Offline (laatst gesynchroniseerd: $when)';
+  }
+
+  @override
+  String dataHealth_sync_conflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count synchronisatieconflicten op te lossen',
+      one: '$count synchronisatieconflict op te lossen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataHealth_sync_peersHeld =>
+      'Een ander apparaat vraagt aandacht voordat het kan synchroniseren';
+
+  @override
+  String get dataHealth_sync_autoOff =>
+      'Aanbevolen: zet automatische synchronisatie aan';
+
+  @override
+  String get dataHealth_sync_neverSynced => 'Nog niet gesynchroniseerd';
+
+  @override
+  String dataHealth_sync_rowSubtitle(String when) {
+    return 'Gesynchroniseerd: $when';
+  }
+
+  @override
+  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Gesynchroniseerd: $when · $count apparaten',
+      one: 'Gesynchroniseerd: $when · $count apparaat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_failed(String name) {
+    return '$name: synchronisatie mislukt';
+  }
+
+  @override
+  String dataHealth_libraries_failedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bibliotheken konden niet synchroniseren',
+      one: '$count bibliotheek kon niet synchroniseren',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_editsHeld(String name) {
+    return '$name: je wijzigingen staan in de wacht';
+  }
+
+  @override
+  String get dataHealth_media_finishSetup =>
+      'Foto\'s: rond de instelling van dit apparaat af';
+
+  @override
+  String get dataHealth_media_transfersPaused =>
+      'Fotooverdrachten zijn gepauzeerd';
+
+  @override
+  String dataHealth_facts_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken',
+      one: '$count duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duikstekken',
+      one: '$count duikstek',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_media(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s en video\'s',
+      one: '$count foto of video',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_decompression_aboutContent =>
       'Gradiëntfactoren (GF) bepalen hoe conservatief je decompressieberekeningen zijn. GF Low beïnvloedt diepe stops, terwijl GF High ondiepe stops beïnvloedt.\n\nLagere waarden = conservatiever = langere decostops\nHogere waarden = minder conservatief = kortere decostops';
 

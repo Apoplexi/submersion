@@ -25455,6 +25455,201 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get dataHealth_feature_backup => 'النسخ الاحتياطي';
+
+  @override
+  String get dataHealth_feature_sync => 'المزامنة';
+
+  @override
+  String get dataHealth_feature_libraries => 'المكتبات';
+
+  @override
+  String get dataHealth_feature_media => 'الوسائط';
+
+  @override
+  String get dataHealth_level_healthy => 'سليم';
+
+  @override
+  String get dataHealth_level_attention => 'يحتاج إلى انتباه';
+
+  @override
+  String get dataHealth_level_failing => 'متعطل';
+
+  @override
+  String get dataHealth_level_notSetUp => 'غير مُعد';
+
+  @override
+  String dataHealth_semantics(String feature, String status) {
+    return '$feature: $status';
+  }
+
+  @override
+  String get dataHealth_backup_autoOff =>
+      'موصى به: فعّل النسخ الاحتياطي التلقائي';
+
+  @override
+  String dataHealth_backup_failed(String when) {
+    return 'فشل آخر نسخ احتياطي: $when';
+  }
+
+  @override
+  String dataHealth_backup_overdue(String when) {
+    return 'النسخ الاحتياطي متأخر (آخر نسخة: $when)';
+  }
+
+  @override
+  String get dataHealth_backup_never => 'لا توجد نسخة احتياطية بعد';
+
+  @override
+  String get dataHealth_backup_cloudCopyMissing =>
+      'لم يصل آخر نسخ احتياطي إلى السحابة';
+
+  @override
+  String get dataHealth_backup_noOffDeviceCopy =>
+      'لا توجد نسخة خارج هذا الجهاز';
+
+  @override
+  String get dataHealth_sync_off => 'موصى به: فعّل المزامنة السحابية';
+
+  @override
+  String get dataHealth_sync_needsPassphrase =>
+      'المزامنة متوقفة مؤقتًا: أدخل عبارة المرور';
+
+  @override
+  String get dataHealth_sync_awaitingAdoption =>
+      'المزامنة متوقفة مؤقتًا: تم استبدال المكتبة السحابية';
+
+  @override
+  String get dataHealth_sync_signedOut =>
+      'المزامنة متوقفة مؤقتًا: سجّل الدخول مجددًا';
+
+  @override
+  String dataHealth_sync_failed(String when) {
+    return 'فشلت آخر مزامنة: $when';
+  }
+
+  @override
+  String dataHealth_sync_offline(String when) {
+    return 'غير متصل (آخر مزامنة: $when)';
+  }
+
+  @override
+  String dataHealth_sync_conflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count تعارض مزامنة بحاجة إلى حل',
+      many: '$count تعارضًا في المزامنة بحاجة إلى حل',
+      few: '$count تعارضات مزامنة بحاجة إلى حل',
+      two: 'تعارضا مزامنة بحاجة إلى حل',
+      one: '$count تعارض مزامنة بحاجة إلى حل',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dataHealth_sync_peersHeld =>
+      'جهاز آخر يحتاج إلى انتباه قبل أن يتمكن من المزامنة';
+
+  @override
+  String get dataHealth_sync_autoOff => 'موصى به: فعّل المزامنة التلقائية';
+
+  @override
+  String get dataHealth_sync_neverSynced => 'لم تتم المزامنة بعد';
+
+  @override
+  String dataHealth_sync_rowSubtitle(String when) {
+    return 'تمت المزامنة: $when';
+  }
+
+  @override
+  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت المزامنة: $when · $count جهاز',
+      many: 'تمت المزامنة: $when · $count جهازًا',
+      few: 'تمت المزامنة: $when · $count أجهزة',
+      two: 'تمت المزامنة: $when · جهازان',
+      one: 'تمت المزامنة: $when · $count جهاز',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_failed(String name) {
+    return '$name: فشلت المزامنة';
+  }
+
+  @override
+  String dataHealth_libraries_failedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذرت مزامنة $count مكتبة',
+      many: 'تعذرت مزامنة $count مكتبة',
+      few: 'تعذرت مزامنة $count مكتبات',
+      two: 'تعذرت مزامنة مكتبتين',
+      one: 'تعذرت مزامنة $count مكتبة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_libraries_editsHeld(String name) {
+    return '$name: تعديلاتك معلّقة';
+  }
+
+  @override
+  String get dataHealth_media_finishSetup => 'الصور: أكمل إعداد هذا الجهاز';
+
+  @override
+  String get dataHealth_media_transfersPaused =>
+      'عمليات نقل الصور متوقفة مؤقتًا';
+
+  @override
+  String dataHealth_facts_dives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
+      one: '$count غوصة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_sites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count موقع',
+      many: '$count موقعًا',
+      few: '$count مواقع',
+      two: 'موقعان',
+      one: '$count موقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dataHealth_facts_media(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صورة ومقطع فيديو',
+      many: '$count صورة ومقطع فيديو',
+      few: '$count صور ومقاطع فيديو',
+      two: 'صورتان أو مقطعا فيديو',
+      one: '$count صورة أو فيديو',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_decompression_aboutContent =>
       'تتحكم عوامل التدرج (GF) في مدى تحفظ حسابات تخفيف الضغط. يؤثر GF المنخفض على محطات التوقف العميقة، بينما يؤثر GF المرتفع على محطات التوقف الضحلة.\n\nقيم أقل = أكثر تحفظًا = محطات تخفيف ضغط أطول\nقيم أعلى = أقل تحفظًا = محطات تخفيف ضغط أقصر';
 
