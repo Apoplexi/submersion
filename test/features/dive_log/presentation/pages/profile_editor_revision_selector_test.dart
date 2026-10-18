@@ -81,12 +81,12 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
 
-      // Verify revision selector is in AppBar with edit icon and compact date label
-      expect(find.byIcon(Icons.edit), findsOneWidget);
-      expect(find.textContaining('1970'), findsOneWidget);
+      // Verify revision selector is in AppBar with history icon
+      expect(find.byIcon(Icons.history), findsOneWidget);
+      expect(find.textContaining('Edit: Profile editor'), findsOneWidget);
 
       // Tap revision selector to open revision menu
-      await tester.tap(find.byIcon(Icons.edit));
+      await tester.tap(find.byIcon(Icons.history));
       await tester.pumpAndSettle();
 
       // Verify alternative revision is shown in menu
@@ -260,7 +260,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    // Verify selector is not shown when no revision history
-    expect(find.byTooltip('Revision history'), findsNothing);
+    // Verify history icon and selector are not shown when no revision history
+    expect(find.byIcon(Icons.history), findsNothing);
   });
 }

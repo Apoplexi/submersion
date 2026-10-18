@@ -1615,7 +1615,7 @@ class DiveRepository {
   /// Throws [ArgumentError] if the series does not exist or if it's the only revision.
   ///
   /// Also deletes associated gas switches and profile events for this series.
-  /// After deletion, if the deleted series was the active primary, the oldest
+  /// After deletion, if the deleted series was the active primary, the newest
   /// remaining revision becomes primary.
   Future<void> deleteProfileSeriesWithHistoryForDive(
     String diveId,
@@ -1642,18 +1642,18 @@ class DiveRepository {
     }
 
     await _db.transaction(() async {
-      // Check if this series is the active primary - if so, activate the oldest remaining
+      // Check if this series is the active primary - if so, activate the newest remaining
       final primarySeries = await _profileSeries.primarySeriesIdForDive(diveId);
       if (primarySeries == seriesId) {
-        // Find the oldest remaining revision (newest in history is first)
+        // Find the newest remaining revision (history order is newest first)
         final remainingRevisions = revisions
             .where((r) => r.seriesId != seriesId)
             .toList();
         if (remainingRevisions.isNotEmpty) {
-          final oldestRevision = remainingRevisions.last;
+          final newestRevision = remainingRevisions.first;
           await _profileSeries.activateSeriesForDive(
             diveId: diveId,
-            seriesId: oldestRevision.seriesId,
+            seriesId: newestRevision.seriesId,
             now: now,
           );
         }
