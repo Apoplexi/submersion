@@ -2505,9 +2505,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get backup_appBar_title => 'النسخ الاحتياطي والاستعادة';
-
-  @override
   String get backup_backingUp => 'جاري النسخ الاحتياطي...';
 
   @override
@@ -5172,7 +5169,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get connections_empty_buddies =>
-      'لا يوجد رفقاء مرتبطون بالغوصات بعد. أضف رفقاء إلى غوصاتك أو حوّل أسماء الرفقاء القديمة من الإعدادات، أدوات البيانات.';
+      'لا يوجد رفقاء مرتبطون بالغوصات بعد. أضف رفقاء إلى غوصاتك أو حوّل أسماء الرفقاء القديمة من الإعدادات > البيانات > أدوات البيانات.';
 
   @override
   String get connections_empty_sites => 'لا توجد غوصة لها موقع بعد.';
@@ -21204,10 +21201,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_backToSettings_tooltip => 'العودة إلى الإعدادات';
 
   @override
-  String get settings_cloudSync_appBar_title =>
-      'المزامنة السحابية لقاعدة البيانات';
-
-  @override
   String get settings_cloudSync_autoSync => 'المزامنة التلقائية';
 
   @override
@@ -21237,15 +21230,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'المزامنة السحابية معطلة';
 
   @override
-  String get settings_cloudSync_entry_subtitle =>
-      'المزامنة عبر التخزين السحابي';
-
-  @override
   String get sharedLibrary_settings_title => 'مكتبات المواقع المشتركة';
-
-  @override
-  String get sharedLibrary_settings_subtitle =>
-      'مواقع غوص تُدار مع غواصين آخرين';
 
   @override
   String get sharedLibrary_list_empty =>
@@ -22089,7 +22074,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_cloudSync_firstSync_replaceHint =>
-      'إذا كنت تريد بدلاً من ذلك أن تحل مكتبة هذا الجهاز محل ما في السحابة، فألغِ العملية واستخدم الإعدادات > مزامنة السحابة > استبدال مكتبة السحابة.';
+      'إذا كنت تريد بدلاً من ذلك أن تحل مكتبة هذا الجهاز محل ما في السحابة، فألغِ العملية واستخدم الإعدادات > البيانات > المزامنة بين الأجهزة > استبدال مكتبة السحابة.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -25460,12 +25445,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_data_appDefaultLocation => 'موقع التطبيق الافتراضي';
 
   @override
-  String get settings_data_backup => 'نسخ احتياطي واستعادة';
-
-  @override
-  String get settings_data_backup_subtitle => 'إنشاء نسخة احتياطية من بياناتك';
-
-  @override
   String get settings_data_customFolder => 'مجلد مخصص';
 
   @override
@@ -25475,15 +25454,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String settings_data_export_failed(Object error) {
     return 'فشل التصدير: $error';
   }
-
-  @override
-  String get settings_data_header_backupSync => 'النسخ الاحتياطي والمزامنة';
-
-  @override
-  String get settings_data_header_import => 'الاستيراد';
-
-  @override
-  String get settings_data_header_storage => 'التخزين';
 
   @override
   String get settings_data_offlineMaps => 'الخرائط غير المتصلة';
@@ -25511,16 +25481,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get dataHealth_feature_backup => 'النسخ الاحتياطي';
+  String get dataHealth_feature_backup => 'النسخ الاحتياطية';
 
   @override
   String get dataHealth_feature_sync => 'المزامنة';
 
   @override
   String get dataHealth_feature_libraries => 'المكتبات';
-
-  @override
-  String get dataHealth_feature_media => 'الوسائط';
 
   @override
   String get dataHealth_level_healthy => 'سليم';
@@ -25614,20 +25581,161 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dataHealth_sync_neverSynced => 'لم تتم المزامنة بعد';
 
   @override
-  String dataHealth_sync_rowSubtitle(String when) {
-    return 'تمت المزامنة: $when';
+  String get settings_data_header_yourData => 'بياناتك';
+
+  @override
+  String get settings_data_header_advanced => 'متقدم';
+
+  @override
+  String get settings_data_setUp => 'إعداد';
+
+  @override
+  String get settings_data_importOptions => 'خيارات الاستيراد';
+
+  @override
+  String get settings_data_importOptions_subtitle =>
+      'مطابقة المواقع، الضغط عند الصعود، الوسوم التلقائية';
+
+  @override
+  String get settings_data_dataTools => 'أدوات البيانات';
+
+  @override
+  String get settings_data_dataTools_subtitle =>
+      'تصحيح أوقات الغوص، ربط الرفقاء، إعادة تصنيف المعدات، جودة البيانات';
+
+  @override
+  String get settings_sync_title => 'المزامنة بين الأجهزة';
+
+  @override
+  String get settings_backups_title => 'النسخ الاحتياطية';
+
+  @override
+  String get settings_photosVideos_title => 'الصور والفيديوهات';
+
+  @override
+  String get settings_section_data_tagline =>
+      'النسخ الاحتياطية والمزامنة والصور';
+
+  @override
+  String get dataHealth_feature_photos => 'الصور';
+
+  @override
+  String get settings_data_backups_status_never => 'لم يتم النسخ الاحتياطي بعد';
+
+  @override
+  String settings_data_backups_status_local(String when) {
+    return 'تم النسخ الاحتياطي $when، على هذا الجهاز فقط';
   }
 
   @override
-  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+  String settings_data_backups_status_cloud(String when, String account) {
+    return 'تم النسخ الاحتياطي $when، نسخة في $account';
+  }
+
+  @override
+  String settings_data_backups_status_cloudUnknown(String when) {
+    return 'تم النسخ الاحتياطي $when، نسخة في السحابة';
+  }
+
+  @override
+  String get settings_data_time_justNow => 'الآن';
+
+  @override
+  String get settings_data_status_checking => 'جارٍ التحقق…';
+
+  @override
+  String settings_data_accounts_status_list(String accounts) {
+    return '$accounts';
+  }
+
+  @override
+  String settings_data_backups_status_folder(String when) {
+    return 'تم النسخ الاحتياطي $when، نسخة في مجلد النسخ الاحتياطي';
+  }
+
+  @override
+  String get settings_data_sync_status_off => 'على هذا الجهاز فقط';
+
+  @override
+  String settings_data_sync_status_alone(String when) {
+    return 'تمت المزامنة $when، هذا الجهاز فقط حتى الآن';
+  }
+
+  @override
+  String settings_data_sync_status_one(String device, String when) {
+    return 'متزامن مع $device، $when';
+  }
+
+  @override
+  String settings_data_sync_status_many(int count, String when) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'تمت المزامنة: $when · $count جهاز',
-      many: 'تمت المزامنة: $when · $count جهازًا',
-      few: 'تمت المزامنة: $when · $count أجهزة',
-      two: 'تمت المزامنة: $when · جهازان',
-      one: 'تمت المزامنة: $when · $count جهاز',
+      other: 'متزامن مع $count جهاز، $when',
+      many: 'متزامن مع $count جهازًا، $when',
+      few: 'متزامن مع $count أجهزة، $when',
+      two: 'متزامن مع جهازين، $when',
+      one: 'متزامن مع جهاز واحد، $when',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_data_photos_status_off =>
+      'لا يتم الاحتفاظ بنسخ في السحابة';
+
+  @override
+  String settings_data_photos_status_on(String store) {
+    return 'نسخ محفوظة في $store';
+  }
+
+  @override
+  String get settings_data_photos_status_onUnknown => 'نسخ محفوظة في السحابة';
+
+  @override
+  String get settings_data_libraries_status_none => 'لم تنضم إلى أي مكتبة';
+
+  @override
+  String settings_data_libraries_status_some(int count, String when) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مكتبة، آخر مزامنة $when',
+      many: '$count مكتبة، آخر مزامنة $when',
+      few: '$count مكتبات، آخر مزامنة $when',
+      two: 'مكتبتان، آخر مزامنة $when',
+      one: 'مكتبة واحدة، آخر مزامنة $when',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_data_libraries_status_someNever(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مكتبة، لم تتم مزامنتها بعد',
+      many: '$count مكتبة، لم تتم مزامنتها بعد',
+      few: '$count مكتبات، لم تتم مزامنتها بعد',
+      two: 'مكتبتان، لم تتم مزامنتهما بعد',
+      one: 'مكتبة واحدة، لم تتم مزامنتها بعد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_data_accounts_status_none => 'لا يوجد بعد';
+
+  @override
+  String settings_data_accounts_status_needSignIn(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count حساب يحتاج إلى تسجيل الدخول',
+      many: '$count حسابًا يحتاج إلى تسجيل الدخول',
+      few: '$count حسابات تحتاج إلى تسجيل الدخول',
+      two: 'حسابان يحتاجان إلى تسجيل الدخول',
+      one: 'حساب واحد يحتاج إلى تسجيل الدخول',
     );
     return '$_temp0';
   }
@@ -26844,10 +26952,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_section_appearance_title => 'المظهر';
 
   @override
-  String get settings_section_data_subtitle =>
-      'النسخ الاحتياطي والاستعادة والتخزين';
-
-  @override
   String get settings_section_data_title => 'البيانات';
 
   @override
@@ -27093,7 +27197,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_customFolder_deviceOnly_noCloudSync =>
-      'المزامنة السحابية التي يديرها التطبيق معطَّلة ما دامت قاعدة البيانات موجودة على وحدة تخزين في الجهاز. لا يمكن لأي خدمة مزامنة الوصول إلى هذا المجلد على Android، لذا استخدم النسخ الاحتياطي والاستعادة للاحتفاظ بنسخ في مكان آخر.';
+      'المزامنة السحابية التي يديرها التطبيق معطَّلة ما دامت قاعدة البيانات موجودة على وحدة تخزين في الجهاز. لا يمكن لأي خدمة مزامنة الوصول إلى هذا المجلد على Android، لذا استخدم النسخ الاحتياطية للاحتفاظ بنسخ في مكان آخر.';
 
   @override
   String get settings_storage_dismissError_tooltip => 'تجاهل الخطأ';
@@ -27158,7 +27262,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDialog_body =>
-      'سيؤدي هذا إلى حذف جميع البيانات الموجودة على هذا الجهاز نهائياً، بما في ذلك الغوصات والمواقع والمعدات والإعدادات. سيتم إنشاء نسخة احتياطية تلقائياً قبل إعادة التعيين.\n\nلن تُحذف مكتبتك السحابية، وتحتفظ الأجهزة الأخرى ببياناتها. سيتم فصل مزامنة السحابة حتى لا يُلغى أثر إعادة التعيين؛ يمكنك إعادة توصيلها من الإعدادات > مزامنة السحابة.';
+      'سيؤدي هذا إلى حذف جميع البيانات الموجودة على هذا الجهاز نهائياً، بما في ذلك الغوصات والمواقع والمعدات والإعدادات. سيتم إنشاء نسخة احتياطية تلقائياً قبل إعادة التعيين.\n\nلن تُحذف مكتبتك السحابية، وتحتفظ الأجهزة الأخرى ببياناتها. سيتم فصل مزامنة السحابة حتى لا يُلغى أثر إعادة التعيين؛ يمكنك إعادة توصيلها من الإعدادات > البيانات > المزامنة بين الأجهزة.';
 
   @override
   String get settings_storage_resetDialog_confirmWord => 'حذف';
@@ -27180,7 +27284,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'تم مسح بيانات هذا الجهاز وحفظ نسخة احتياطية. أصبحت مزامنة السحابة الآن غير متصلة حتى لا يُلغى أثر إعادة التعيين؛ يمكنك إعادة توصيلها من الإعدادات > مزامنة السحابة. اضغط على متابعة لإعادة تحميل التطبيق.';
+      'تم مسح بيانات هذا الجهاز وحفظ نسخة احتياطية. أصبحت مزامنة السحابة الآن غير متصلة حتى لا يُلغى أثر إعادة التعيين؛ يمكنك إعادة توصيلها من الإعدادات > البيانات > المزامنة بين الأجهزة. اضغط على متابعة لإعادة تحميل التطبيق.';
 
   @override
   String get settings_summary_activeDiver => 'الغواص النشط';
@@ -30918,11 +31022,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transfer_export_aboutContent =>
-      'قم بتصدير بيانات الغوص بصيغ متعددة. ينشئ PDF سجل غوص قابل للطباعة. UDDF هو تنسيق عالمي متوافق مع معظم برامج تسجيل الغوص. يمكن فتح ملفات CSV وExcel في تطبيقات جداول البيانات. يمكنك أيضًا نسخ قاعدة بياناتك بالكامل احتياطيًا من الإعدادات > نسخ احتياطي واستعادة.';
+      'قم بتصدير بيانات الغوص بصيغ متعددة. ينشئ PDF سجل غوص قابل للطباعة. UDDF هو تنسيق عالمي متوافق مع معظم برامج تسجيل الغوص. يمكن فتح ملفات CSV وExcel في تطبيقات جداول البيانات. يمكنك أيضًا نسخ قاعدة بياناتك بالكامل احتياطيًا من الإعدادات > البيانات > النسخ الاحتياطية.';
 
   @override
-  String get transfer_export_backupLink =>
-      'انتقال إلى النسخ الاحتياطي والاستعادة';
+  String get transfer_export_backupLink => 'انتقال إلى النسخ الاحتياطية';
 
   @override
   String get transfer_export_aboutTitle => 'حول التصدير';
@@ -36385,7 +36488,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get db_location_backup_note =>
-      'لا يمكن لنظام Android تشغيل قاعدة البيانات من مجلد مُزامَن مع السحابة. للاحتفاظ بنسخة في Dropbox أو Nextcloud أو Google Drive، حدِّد موقع النسخة الاحتياطية ضمن النسخ الاحتياطي والاستعادة.';
+      'لا يمكن لنظام Android تشغيل قاعدة البيانات من مجلد مُزامَن مع السحابة. للاحتفاظ بنسخة في Dropbox أو Nextcloud أو Google Drive، حدِّد مجلدًا للنسخ الاحتياطي ضمن النسخ الاحتياطية.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {
@@ -36611,7 +36714,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_connect_dropbox_hint =>
-      'يستخدم اتصال Dropbox من مزامنة السحابة. تُخزن الوسائط في مجلد التطبيق في Dropbox.';
+      'يستخدم اتصال Dropbox من المزامنة بين الأجهزة. تُخزن الوسائط في مجلد التطبيق في Dropbox.';
 
   @override
   String get settings_mediaStorage_connect_gdrive_hint =>
@@ -37204,12 +37307,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_setup_dismiss => 'تجاهل';
 
   @override
-  String get settings_photosMedia_title => 'الصور والوسائط';
-
-  @override
-  String get settings_photosMedia_subtitle => 'المصادر والتخزين';
-
-  @override
   String get settings_photosMedia_sourcesHeader => 'من أين تأتي الصور';
 
   @override
@@ -37237,10 +37334,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_connectedAccounts_title => 'الحسابات المتصلة';
-
-  @override
-  String get settings_connectedAccounts_subtitle =>
-      'تسجيلات الدخول المستخدمة للمزامنة وتخزين الوسائط والمكتبات المشتركة';
 
   @override
   String get settings_connectedAccounts_empty => 'لا توجد حسابات متصلة بعد';
@@ -47659,9 +47752,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'أصلح مزامنة متوقفة أو حرّر مساحة سحابية';
 
   @override
-  String get settings_data_header_dataTools => 'أدوات البيانات';
-
-  @override
   String get settings_decompression_ascentGasLabel => 'خطّط الصعود باستخدام';
 
   @override
@@ -49397,7 +49487,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get startup_recovery_encryptedBackup_body =>
-      'هذه النسخة الاحتياطية مشفَّرة. لا يستطيع Submersion فتح نسخة مشفَّرة إلا بعد تشغيل التطبيق، لذا استخدم إحدى الطرق الأخرى هنا أولًا ثم استعِدها من الإعدادات ضمن النسخ الاحتياطي والاستعادة.';
+      'هذه النسخة الاحتياطية مشفَّرة. لا يستطيع Submersion فتح نسخة مشفَّرة إلا بعد تشغيل التطبيق، لذا استخدم إحدى الطرق الأخرى هنا أولًا ثم استعِدها من الإعدادات > البيانات > النسخ الاحتياطية.';
 
   @override
   String get startup_recovery_useDefault_title =>
@@ -51695,7 +51785,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get startup_interruptedRestore_recoverNote =>
-      'يُحتفظ بالملف الموجود مكانه الآن، ولا يُحذف. يمكنك استعادته أو حذفه لاحقًا من نسخ احتياطي واستعادة في الإعدادات.';
+      'يُحتفظ بالملف الموجود مكانه الآن، ولا يُحذف. يمكنك استعادته أو حذفه لاحقًا من الإعدادات > البيانات > النسخ الاحتياطية.';
 
   @override
   String get startup_interruptedRestore_keepAction =>
@@ -51703,7 +51793,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get startup_interruptedRestore_keepNote =>
-      'يُحتفظ بسجل الغوص السابق، ولا يُحذف. يمكنك استعادته أو حذفه لاحقًا من نسخ احتياطي واستعادة في الإعدادات.';
+      'يُحتفظ بسجل الغوص السابق، ولا يُحذف. يمكنك استعادته أو حذفه لاحقًا من الإعدادات > البيانات > النسخ الاحتياطية.';
 
   @override
   String get startup_interruptedRestore_failed =>

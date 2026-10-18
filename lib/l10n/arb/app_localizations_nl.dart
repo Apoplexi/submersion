@@ -2438,9 +2438,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get backup_appBar_title => 'Back-up en Herstel';
-
-  @override
   String get backup_backingUp => 'Back-up maken...';
 
   @override
@@ -5058,7 +5055,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get connections_empty_buddies =>
-      'Nog geen buddy\'s gekoppeld aan duiken. Voeg buddy\'s toe aan je duiken of zet oude buddynamen om via Instellingen, Gegevenshulpmiddelen.';
+      'Nog geen buddy\'s gekoppeld aan duiken. Voeg buddy\'s toe aan je duiken of zet oude buddynamen om via Instellingen > Gegevens > Gegevenshulpmiddelen.';
 
   @override
   String get connections_empty_sites => 'Nog geen duik heeft een duikplek.';
@@ -20804,9 +20801,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_backToSettings_tooltip => 'Terug naar instellingen';
 
   @override
-  String get settings_cloudSync_appBar_title => 'Database-cloudsynchronisatie';
-
-  @override
   String get settings_cloudSync_autoSync => 'Automatische synchronisatie';
 
   @override
@@ -20833,15 +20827,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Cloudsynchronisatie uitgeschakeld';
 
   @override
-  String get settings_cloudSync_entry_subtitle =>
-      'Synchroniseren via cloudopslag';
-
-  @override
   String get sharedLibrary_settings_title => 'Gedeelde duikstekbibliotheken';
-
-  @override
-  String get sharedLibrary_settings_subtitle =>
-      'Duikstekken die je met andere duikers bijhoudt';
 
   @override
   String get sharedLibrary_list_empty =>
@@ -21673,7 +21659,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_cloudSync_firstSync_replaceHint =>
-      'Als de bibliotheek van dit apparaat juist moet vervangen wat in de cloud staat, annuleer dan en gebruik Instellingen > Cloudsynchronisatie > Cloudbibliotheek vervangen.';
+      'Als de bibliotheek van dit apparaat juist moet vervangen wat in de cloud staat, annuleer dan en gebruik Instellingen > Gegevens > Synchronisatie tussen apparaten > Cloudbibliotheek vervangen.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -25097,13 +25083,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_data_appDefaultLocation => 'Standaard app-locatie';
 
   @override
-  String get settings_data_backup => 'Back-up en herstel';
-
-  @override
-  String get settings_data_backup_subtitle =>
-      'Maak een back-up van je gegevens';
-
-  @override
   String get settings_data_customFolder => 'Aangepaste map';
 
   @override
@@ -25113,15 +25092,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String settings_data_export_failed(Object error) {
     return 'Export mislukt: $error';
   }
-
-  @override
-  String get settings_data_header_backupSync => 'Back-up & synchronisatie';
-
-  @override
-  String get settings_data_header_import => 'Importeren';
-
-  @override
-  String get settings_data_header_storage => 'Opslag';
 
   @override
   String get settings_data_offlineMaps => 'Offline kaarten';
@@ -25149,16 +25119,13 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get dataHealth_feature_backup => 'Back-up';
+  String get dataHealth_feature_backup => 'Back-ups';
 
   @override
   String get dataHealth_feature_sync => 'Synchronisatie';
 
   @override
   String get dataHealth_feature_libraries => 'Bibliotheken';
-
-  @override
-  String get dataHealth_feature_media => 'Media';
 
   @override
   String get dataHealth_level_healthy => 'In orde';
@@ -25250,17 +25217,150 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dataHealth_sync_neverSynced => 'Nog niet gesynchroniseerd';
 
   @override
-  String dataHealth_sync_rowSubtitle(String when) {
-    return 'Gesynchroniseerd: $when';
+  String get settings_data_header_yourData => 'Je gegevens';
+
+  @override
+  String get settings_data_header_advanced => 'Geavanceerd';
+
+  @override
+  String get settings_data_setUp => 'Instellen';
+
+  @override
+  String get settings_data_importOptions => 'Importopties';
+
+  @override
+  String get settings_data_importOptions_subtitle =>
+      'Stekkoppeling, druk bij opduiken, automatische tags';
+
+  @override
+  String get settings_data_dataTools => 'Gegevenshulpmiddelen';
+
+  @override
+  String get settings_data_dataTools_subtitle =>
+      'Duiktijden corrigeren, buddy\'s koppelen, uitrusting hertyperen, gegevenskwaliteit';
+
+  @override
+  String get settings_sync_title => 'Synchronisatie tussen apparaten';
+
+  @override
+  String get settings_backups_title => 'Back-ups';
+
+  @override
+  String get settings_photosVideos_title => 'Foto\'s en video\'s';
+
+  @override
+  String get settings_section_data_tagline =>
+      'Back-ups, synchronisatie en foto\'s';
+
+  @override
+  String get dataHealth_feature_photos => 'Foto\'s';
+
+  @override
+  String get settings_data_backups_status_never => 'Nog geen back-up';
+
+  @override
+  String settings_data_backups_status_local(String when) {
+    return 'Back-up $when, alleen op dit apparaat';
   }
 
   @override
-  String dataHealth_sync_rowSubtitleDevices(String when, int count) {
+  String settings_data_backups_status_cloud(String when, String account) {
+    return 'Back-up $when, kopie in $account';
+  }
+
+  @override
+  String settings_data_backups_status_cloudUnknown(String when) {
+    return 'Back-up $when, kopie in de cloud';
+  }
+
+  @override
+  String get settings_data_time_justNow => 'zojuist';
+
+  @override
+  String get settings_data_status_checking => 'Bezig met controleren…';
+
+  @override
+  String settings_data_accounts_status_list(String accounts) {
+    return '$accounts';
+  }
+
+  @override
+  String settings_data_backups_status_folder(String when) {
+    return 'Back-up $when, kopie in je back-upmap';
+  }
+
+  @override
+  String get settings_data_sync_status_off => 'Alleen op dit apparaat';
+
+  @override
+  String settings_data_sync_status_alone(String when) {
+    return 'Gesynchroniseerd $when, tot nu toe alleen dit apparaat';
+  }
+
+  @override
+  String settings_data_sync_status_one(String device, String when) {
+    return 'Gelijk met $device, $when';
+  }
+
+  @override
+  String settings_data_sync_status_many(int count, String when) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Gesynchroniseerd: $when · $count apparaten',
-      one: 'Gesynchroniseerd: $when · $count apparaat',
+      other: 'Gelijk met $count apparaten, $when',
+      one: 'Gelijk met $count apparaat, $when',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_data_photos_status_off =>
+      'Er worden geen kopieën in de cloud bewaard';
+
+  @override
+  String settings_data_photos_status_on(String store) {
+    return 'Kopieën bewaard in $store';
+  }
+
+  @override
+  String get settings_data_photos_status_onUnknown =>
+      'Kopieën bewaard in de cloud';
+
+  @override
+  String get settings_data_libraries_status_none => 'Geen';
+
+  @override
+  String settings_data_libraries_status_some(int count, String when) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bibliotheken, laatste synchronisatie $when',
+      one: '$count bibliotheek, laatste synchronisatie $when',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_data_libraries_status_someNever(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bibliotheken, nog niet gesynchroniseerd',
+      one: '$count bibliotheek, nog niet gesynchroniseerd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_data_accounts_status_none => 'Nog geen';
+
+  @override
+  String settings_data_accounts_status_needSignIn(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count accounts moeten aanmelden',
+      one: '$count account moet aanmelden',
     );
     return '$_temp0';
   }
@@ -26457,9 +26557,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_section_appearance_title => 'Uiterlijk';
 
   @override
-  String get settings_section_data_subtitle => 'Back-up, herstel & opslag';
-
-  @override
   String get settings_section_data_title => 'Gegevens';
 
   @override
@@ -26710,7 +26807,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_storage_customFolder_deviceOnly_noCloudSync =>
-      'Door de app beheerde cloudsynchronisatie is uitgeschakeld zolang de database op een opslagvolume van het apparaat staat. Geen enkele synchronisatiedienst kan die map op Android bereiken; gebruik Back-up en Herstel om elders kopieën te bewaren.';
+      'Door de app beheerde cloudsynchronisatie is uitgeschakeld zolang de database op een opslagvolume van het apparaat staat. Geen enkele synchronisatiedienst kan die map op Android bereiken; gebruik Back-ups om elders kopieën te bewaren.';
 
   @override
   String get settings_storage_dismissError_tooltip => 'Foutmelding sluiten';
@@ -26774,7 +26871,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Dit verwijdert permanent alle gegevens op DIT apparaat, inclusief duiken, stekken, uitrusting en instellingen. Er wordt automatisch een back-up gemaakt voor het resetten.\n\nJe cloudbibliotheek wordt niet verwijderd en andere apparaten behouden hun gegevens. Cloudsynchronisatie wordt losgekoppeld zodat de reset niet ongedaan wordt gemaakt; je kunt deze opnieuw verbinden via Instellingen > Cloudsynchronisatie.';
+      'Dit verwijdert permanent alle gegevens op DIT apparaat, inclusief duiken, stekken, uitrusting en instellingen. Er wordt automatisch een back-up gemaakt voor het resetten.\n\nJe cloudbibliotheek wordt niet verwijderd en andere apparaten behouden hun gegevens. Cloudsynchronisatie wordt losgekoppeld zodat de reset niet ongedaan wordt gemaakt; je kunt deze opnieuw verbinden via Instellingen > Gegevens > Synchronisatie tussen apparaten.';
 
   @override
   String get settings_storage_resetDialog_confirmWord => 'Delete';
@@ -26796,7 +26893,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'De gegevens van dit apparaat zijn gewist en er is een back-up opgeslagen. Cloudsynchronisatie is nu losgekoppeld zodat de reset niet ongedaan wordt gemaakt; je kunt deze opnieuw verbinden via Instellingen > Cloudsynchronisatie. Tik op doorgaan om de app opnieuw te laden.';
+      'De gegevens van dit apparaat zijn gewist en er is een back-up opgeslagen. Cloudsynchronisatie is nu losgekoppeld zodat de reset niet ongedaan wordt gemaakt; je kunt deze opnieuw verbinden via Instellingen > Gegevens > Synchronisatie tussen apparaten. Tik op doorgaan om de app opnieuw te laden.';
 
   @override
   String get settings_summary_activeDiver => 'Actieve duiker';
@@ -30370,10 +30467,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get transfer_export_aboutContent =>
-      'Exporteer je duikgegevens in verschillende formaten. PDF maakt een afdrukbaar logboek. UDDF is een universeel formaat dat compatibel is met de meeste duiklogsoftware. CSV- en Excel-bestanden kunnen worden geopend in spreadsheetapplicaties. Je kunt ook je hele database back-uppen via Instellingen > Back-up en herstel.';
+      'Exporteer je duikgegevens in verschillende formaten. PDF maakt een afdrukbaar logboek. UDDF is een universeel formaat dat compatibel is met de meeste duiklogsoftware. CSV- en Excel-bestanden kunnen worden geopend in spreadsheetapplicaties. Je kunt ook je hele database back-uppen via Instellingen > Gegevens > Back-ups.';
 
   @override
-  String get transfer_export_backupLink => 'Ga naar Back-up en herstel';
+  String get transfer_export_backupLink => 'Ga naar Back-ups';
 
   @override
   String get transfer_export_aboutTitle => 'Over exporteren';
@@ -35643,7 +35740,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get db_location_backup_note =>
-      'Android kan de database niet vanuit een cloudgesynchroniseerde map draaien. Stel een Back-uplocatie in onder Back-up en Herstel om een kopie in Dropbox, Nextcloud of Google Drive te bewaren.';
+      'Android kan de database niet vanuit een cloudgesynchroniseerde map draaien. Stel een back-upmap in onder Back-ups om een kopie in Dropbox, Nextcloud of Google Drive te bewaren.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {
@@ -35863,7 +35960,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_connect_dropbox_hint =>
-      'Gebruikt je Dropbox-koppeling uit Cloud Sync. Media wordt opgeslagen in je Dropbox-appmap.';
+      'Gebruikt je Dropbox-koppeling uit Synchronisatie tussen apparaten. Media wordt opgeslagen in je Dropbox-appmap.';
 
   @override
   String get settings_mediaStorage_connect_gdrive_hint =>
@@ -36462,12 +36559,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_setup_dismiss => 'Negeren';
 
   @override
-  String get settings_photosMedia_title => 'Foto\'s en media';
-
-  @override
-  String get settings_photosMedia_subtitle => 'Bronnen en opslag';
-
-  @override
   String get settings_photosMedia_sourcesHeader => 'Waar foto\'s vandaan komen';
 
   @override
@@ -36497,10 +36588,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_connectedAccounts_title => 'Gekoppelde accounts';
-
-  @override
-  String get settings_connectedAccounts_subtitle =>
-      'Aanmeldingen voor synchronisatie, mediaopslag en gedeelde bibliotheken';
 
   @override
   String get settings_connectedAccounts_empty => 'Nog geen accounts gekoppeld';
@@ -46787,9 +46874,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Een vastgelopen synchronisatie herstellen of cloudruimte vrijmaken';
 
   @override
-  String get settings_data_header_dataTools => 'Gegevenshulpmiddelen';
-
-  @override
   String get settings_decompression_ascentGasLabel => 'Opstijging plannen met';
 
   @override
@@ -48429,7 +48513,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get startup_recovery_encryptedBackup_body =>
-      'Die back-up is versleuteld. Submersion kan een versleutelde back-up pas ontgrendelen als de app open is, dus gebruik hier eerst een van de andere routes en herstel hem daarna via Instellingen, bij Back-up en herstel.';
+      'Die back-up is versleuteld. Submersion kan een versleutelde back-up pas ontgrendelen als de app open is, dus gebruik hier eerst een van de andere routes en herstel hem daarna via Instellingen > Gegevens > Back-ups.';
 
   @override
   String get startup_recovery_useDefault_title =>
@@ -50722,14 +50806,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get startup_interruptedRestore_recoverNote =>
-      'Het bestand dat nu op zijn plaats staat, wordt bewaard en niet verwijderd. Je kunt het later herstellen of verwijderen via Back-up en herstel in Instellingen.';
+      'Het bestand dat nu op zijn plaats staat, wordt bewaard en niet verwijderd. Je kunt het later herstellen of verwijderen via Instellingen > Gegevens > Back-ups.';
 
   @override
   String get startup_interruptedRestore_keepAction => 'Houden wat er nu staat';
 
   @override
   String get startup_interruptedRestore_keepNote =>
-      'Je vorige duiklogboek wordt bewaard en niet verwijderd. Je kunt het later herstellen of verwijderen via Back-up en herstel in Instellingen.';
+      'Je vorige duiklogboek wordt bewaard en niet verwijderd. Je kunt het later herstellen of verwijderen via Instellingen > Gegevens > Back-ups.';
 
   @override
   String get startup_interruptedRestore_failed =>

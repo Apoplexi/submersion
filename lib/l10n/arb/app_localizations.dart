@@ -3823,12 +3823,6 @@ abstract class AppLocalizations {
   /// **'Sort by {displayName}'**
   String accessibility_sort_unselectedLabel(Object displayName);
 
-  /// No description provided for @backup_appBar_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Backup & Restore'**
-  String get backup_appBar_title;
-
   /// No description provided for @backup_backingUp.
   ///
   /// In en, this message translates to:
@@ -8007,7 +8001,7 @@ abstract class AppLocalizations {
   /// No description provided for @connections_empty_buddies.
   ///
   /// In en, this message translates to:
-  /// **'No buddies are linked to dives yet. Add buddies to your dives, or convert legacy buddy names in Settings, Data Tools.'**
+  /// **'No buddies are linked to dives yet. Add buddies to your dives, or convert legacy buddy names under Settings > Data > Data tools.'**
   String get connections_empty_buddies;
 
   /// No description provided for @connections_empty_sites.
@@ -33545,12 +33539,6 @@ abstract class AppLocalizations {
   /// **'Back to settings'**
   String get settings_backToSettings_tooltip;
 
-  /// No description provided for @settings_cloudSync_appBar_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Database Cloud Sync'**
-  String get settings_cloudSync_appBar_title;
-
   /// No description provided for @settings_cloudSync_autoSync.
   ///
   /// In en, this message translates to:
@@ -33581,23 +33569,11 @@ abstract class AppLocalizations {
   /// **'Cloud Sync Disabled'**
   String get settings_cloudSync_disabledBanner_title;
 
-  /// No description provided for @settings_cloudSync_entry_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync via cloud storage'**
-  String get settings_cloudSync_entry_subtitle;
-
   /// No description provided for @sharedLibrary_settings_title.
   ///
   /// In en, this message translates to:
-  /// **'Shared Site Libraries'**
+  /// **'Shared site libraries'**
   String get sharedLibrary_settings_title;
-
-  /// No description provided for @sharedLibrary_settings_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Dive sites kept together with other divers'**
-  String get sharedLibrary_settings_subtitle;
 
   /// No description provided for @sharedLibrary_list_empty.
   ///
@@ -34878,7 +34854,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_cloudSync_firstSync_replaceHint.
   ///
   /// In en, this message translates to:
-  /// **'If instead this device\'s library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.'**
+  /// **'If instead this device\'s library should replace what is in the cloud, cancel and use Settings > Data > Sync between devices > Replace cloud library.'**
   String get settings_cloudSync_firstSync_replaceHint;
 
   /// No description provided for @settings_cloudSync_firstSync_dialogContent.
@@ -40690,18 +40666,6 @@ abstract class AppLocalizations {
   /// **'App default location'**
   String get settings_data_appDefaultLocation;
 
-  /// No description provided for @settings_data_backup.
-  ///
-  /// In en, this message translates to:
-  /// **'Backup & Restore'**
-  String get settings_data_backup;
-
-  /// No description provided for @settings_data_backup_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Create a backup of your data'**
-  String get settings_data_backup_subtitle;
-
   /// No description provided for @settings_data_customFolder.
   ///
   /// In en, this message translates to:
@@ -40711,7 +40675,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_data_databaseStorage.
   ///
   /// In en, this message translates to:
-  /// **'Database Storage'**
+  /// **'Database storage'**
   String get settings_data_databaseStorage;
 
   /// No description provided for @settings_data_export_failed.
@@ -40720,28 +40684,10 @@ abstract class AppLocalizations {
   /// **'Export failed: {error}'**
   String settings_data_export_failed(Object error);
 
-  /// No description provided for @settings_data_header_backupSync.
-  ///
-  /// In en, this message translates to:
-  /// **'Backup & Sync'**
-  String get settings_data_header_backupSync;
-
-  /// No description provided for @settings_data_header_import.
-  ///
-  /// In en, this message translates to:
-  /// **'Import'**
-  String get settings_data_header_import;
-
-  /// No description provided for @settings_data_header_storage.
-  ///
-  /// In en, this message translates to:
-  /// **'Storage'**
-  String get settings_data_header_storage;
-
   /// No description provided for @settings_data_offlineMaps.
   ///
   /// In en, this message translates to:
-  /// **'Offline Maps'**
+  /// **'Offline maps'**
   String get settings_data_offlineMaps;
 
   /// No description provided for @settings_data_offlineMaps_subtitle.
@@ -40777,7 +40723,7 @@ abstract class AppLocalizations {
   /// No description provided for @dataHealth_feature_backup.
   ///
   /// In en, this message translates to:
-  /// **'Backup'**
+  /// **'Backups'**
   String get dataHealth_feature_backup;
 
   /// No description provided for @dataHealth_feature_sync.
@@ -40791,12 +40737,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Libraries'**
   String get dataHealth_feature_libraries;
-
-  /// No description provided for @dataHealth_feature_media.
-  ///
-  /// In en, this message translates to:
-  /// **'Media'**
-  String get dataHealth_feature_media;
 
   /// No description provided for @dataHealth_level_healthy.
   ///
@@ -40924,17 +40864,197 @@ abstract class AppLocalizations {
   /// **'Not synced yet'**
   String get dataHealth_sync_neverSynced;
 
-  /// No description provided for @dataHealth_sync_rowSubtitle.
+  /// No description provided for @settings_data_header_yourData.
   ///
   /// In en, this message translates to:
-  /// **'Synced: {when}'**
-  String dataHealth_sync_rowSubtitle(String when);
+  /// **'Your data'**
+  String get settings_data_header_yourData;
 
-  /// No description provided for @dataHealth_sync_rowSubtitleDevices.
+  /// No description provided for @settings_data_header_advanced.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, one{Synced: {when} · {count} device} other{Synced: {when} · {count} devices}}'**
-  String dataHealth_sync_rowSubtitleDevices(String when, int count);
+  /// **'Advanced'**
+  String get settings_data_header_advanced;
+
+  /// No description provided for @settings_data_setUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get settings_data_setUp;
+
+  /// No description provided for @settings_data_importOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Import options'**
+  String get settings_data_importOptions;
+
+  /// No description provided for @settings_data_importOptions_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Site matching, surfacing pressure, auto tags'**
+  String get settings_data_importOptions_subtitle;
+
+  /// No description provided for @settings_data_dataTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Data tools'**
+  String get settings_data_dataTools;
+
+  /// No description provided for @settings_data_dataTools_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix dive times, link buddies, retype gear, data quality'**
+  String get settings_data_dataTools_subtitle;
+
+  /// No description provided for @settings_sync_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync between devices'**
+  String get settings_sync_title;
+
+  /// No description provided for @settings_backups_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups'**
+  String get settings_backups_title;
+
+  /// No description provided for @settings_photosVideos_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos & videos'**
+  String get settings_photosVideos_title;
+
+  /// No description provided for @settings_section_data_tagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups, sync and photos'**
+  String get settings_section_data_tagline;
+
+  /// No description provided for @dataHealth_feature_photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get dataHealth_feature_photos;
+
+  /// No description provided for @settings_data_backups_status_never.
+  ///
+  /// In en, this message translates to:
+  /// **'Not backed up yet'**
+  String get settings_data_backups_status_never;
+
+  /// No description provided for @settings_data_backups_status_local.
+  ///
+  /// In en, this message translates to:
+  /// **'Backed up {when}, on this device only'**
+  String settings_data_backups_status_local(String when);
+
+  /// No description provided for @settings_data_backups_status_cloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Backed up {when}, copy in {account}'**
+  String settings_data_backups_status_cloud(String when, String account);
+
+  /// No description provided for @settings_data_backups_status_cloudUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Backed up {when}, copy in the cloud'**
+  String settings_data_backups_status_cloudUnknown(String when);
+
+  /// No description provided for @settings_data_time_justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get settings_data_time_justNow;
+
+  /// No description provided for @settings_data_status_checking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get settings_data_status_checking;
+
+  /// No description provided for @settings_data_accounts_status_list.
+  ///
+  /// In en, this message translates to:
+  /// **'{accounts}'**
+  String settings_data_accounts_status_list(String accounts);
+
+  /// No description provided for @settings_data_backups_status_folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Backed up {when}, copy in your backup folder'**
+  String settings_data_backups_status_folder(String when);
+
+  /// No description provided for @settings_data_sync_status_off.
+  ///
+  /// In en, this message translates to:
+  /// **'Only on this device'**
+  String get settings_data_sync_status_off;
+
+  /// No description provided for @settings_data_sync_status_alone.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced {when}, only this device so far'**
+  String settings_data_sync_status_alone(String when);
+
+  /// No description provided for @settings_data_sync_status_one.
+  ///
+  /// In en, this message translates to:
+  /// **'In step with {device}, {when}'**
+  String settings_data_sync_status_one(String device, String when);
+
+  /// No description provided for @settings_data_sync_status_many.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{In step with {count} device, {when}} other{In step with {count} devices, {when}}}'**
+  String settings_data_sync_status_many(int count, String when);
+
+  /// No description provided for @settings_data_photos_status_off.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies are not kept in the cloud'**
+  String get settings_data_photos_status_off;
+
+  /// No description provided for @settings_data_photos_status_on.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies kept in {store}'**
+  String settings_data_photos_status_on(String store);
+
+  /// No description provided for @settings_data_photos_status_onUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies kept in the cloud'**
+  String get settings_data_photos_status_onUnknown;
+
+  /// No description provided for @settings_data_libraries_status_none.
+  ///
+  /// In en, this message translates to:
+  /// **'None joined'**
+  String get settings_data_libraries_status_none;
+
+  /// No description provided for @settings_data_libraries_status_some.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} library, last sync {when}} other{{count} libraries, last sync {when}}}'**
+  String settings_data_libraries_status_some(int count, String when);
+
+  /// No description provided for @settings_data_libraries_status_someNever.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} library, not synced yet} other{{count} libraries, not synced yet}}'**
+  String settings_data_libraries_status_someNever(int count);
+
+  /// No description provided for @settings_data_accounts_status_none.
+  ///
+  /// In en, this message translates to:
+  /// **'None yet'**
+  String get settings_data_accounts_status_none;
+
+  /// No description provided for @settings_data_accounts_status_needSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} account needs sign-in} other{{count} accounts need sign-in}}'**
+  String settings_data_accounts_status_needSignIn(int count);
 
   /// No description provided for @dataHealth_libraries_failed.
   ///
@@ -42876,12 +42996,6 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get settings_section_appearance_title;
 
-  /// No description provided for @settings_section_data_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Backup, restore & storage'**
-  String get settings_section_data_subtitle;
-
   /// No description provided for @settings_section_data_title.
   ///
   /// In en, this message translates to:
@@ -43297,7 +43411,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_customFolder_deviceOnly_noCloudSync.
   ///
   /// In en, this message translates to:
-  /// **'App-managed cloud sync is disabled while the database sits on a device storage volume. No sync service can reach that folder on Android, so use Backup & Restore to keep copies elsewhere.'**
+  /// **'App-managed cloud sync is disabled while the database sits on a device storage volume. No sync service can reach that folder on Android, so use Backups to keep copies elsewhere.'**
   String get settings_storage_customFolder_deviceOnly_noCloudSync;
 
   /// No description provided for @settings_storage_dismissError_tooltip.
@@ -43405,7 +43519,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_resetDialog_body.
   ///
   /// In en, this message translates to:
-  /// **'This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync.'**
+  /// **'This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it under Settings > Data > Sync between devices.'**
   String get settings_storage_resetDialog_body;
 
   /// The word the user must type to arm the reset. Compared literally against their input, so it MUST match the word quoted in settings_storage_resetDialog_confirmHint in the same locale.
@@ -43441,7 +43555,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_resetComplete_description.
   ///
   /// In en, this message translates to:
-  /// **'This device\'s data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync. Tap continue to reload the app.'**
+  /// **'This device\'s data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it under Settings > Data > Sync between devices. Tap continue to reload the app.'**
   String get settings_storage_resetComplete_description;
 
   /// No description provided for @settings_summary_activeDiver.
@@ -48664,13 +48778,13 @@ abstract class AppLocalizations {
   /// No description provided for @transfer_export_aboutContent.
   ///
   /// In en, this message translates to:
-  /// **'Export your dive data in various formats. PDF creates a printable logbook. UDDF is a universal format compatible with most dive logging software. CSV and Excel files can be opened in spreadsheet applications. You can also back up your entire database from Settings > Backup & Restore.'**
+  /// **'Export your dive data in various formats. PDF creates a printable logbook. UDDF is a universal format compatible with most dive logging software. CSV and Excel files can be opened in spreadsheet applications. You can also back up your entire database from Settings > Data > Backups.'**
   String get transfer_export_aboutContent;
 
   /// No description provided for @transfer_export_backupLink.
   ///
   /// In en, this message translates to:
-  /// **'Go to Backup & Restore'**
+  /// **'Go to Backups'**
   String get transfer_export_backupLink;
 
   /// No description provided for @transfer_export_aboutTitle.
@@ -56457,7 +56571,7 @@ abstract class AppLocalizations {
   /// No description provided for @db_location_backup_note.
   ///
   /// In en, this message translates to:
-  /// **'Android cannot run the database from a cloud-synced folder. To keep a copy in Dropbox, Nextcloud, or Google Drive, set a Backup Location under Backup & Restore.'**
+  /// **'Android cannot run the database from a cloud-synced folder. To keep a copy in Dropbox, Nextcloud, or Google Drive, set a backup folder under Backups.'**
   String get db_location_backup_note;
 
   /// No description provided for @diveLog_bulkEdit_membership_onAll.
@@ -56771,7 +56885,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_mediaStorage_connect_dropbox_hint.
   ///
   /// In en, this message translates to:
-  /// **'Uses your Dropbox connection from Cloud Sync. Media is stored in your Dropbox app folder.'**
+  /// **'Uses your Dropbox connection from Sync between devices. Media is stored in your Dropbox app folder.'**
   String get settings_mediaStorage_connect_dropbox_hint;
 
   /// No description provided for @settings_mediaStorage_connect_gdrive_hint.
@@ -57842,18 +57956,6 @@ abstract class AppLocalizations {
   /// **'Dismiss'**
   String get settings_setup_dismiss;
 
-  /// No description provided for @settings_photosMedia_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Photos & Media'**
-  String get settings_photosMedia_title;
-
-  /// No description provided for @settings_photosMedia_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sources & storage'**
-  String get settings_photosMedia_subtitle;
-
   /// No description provided for @settings_photosMedia_sourcesHeader.
   ///
   /// In en, this message translates to:
@@ -57905,14 +58007,8 @@ abstract class AppLocalizations {
   /// No description provided for @settings_connectedAccounts_title.
   ///
   /// In en, this message translates to:
-  /// **'Connected Accounts'**
+  /// **'Connected accounts'**
   String get settings_connectedAccounts_title;
-
-  /// No description provided for @settings_connectedAccounts_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign-ins used by sync, media storage and shared libraries'**
-  String get settings_connectedAccounts_subtitle;
 
   /// No description provided for @settings_connectedAccounts_empty.
   ///
@@ -75082,12 +75178,6 @@ abstract class AppLocalizations {
   /// **'Fix a stuck sync or free cloud space'**
   String get settings_cloudSync_troubleshoot_tileSubtitle;
 
-  /// No description provided for @settings_data_header_dataTools.
-  ///
-  /// In en, this message translates to:
-  /// **'Data Tools'**
-  String get settings_data_header_dataTools;
-
   /// No description provided for @settings_decompression_ascentGasLabel.
   ///
   /// In en, this message translates to:
@@ -75368,7 +75458,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_fixDiveTimes_title.
   ///
   /// In en, this message translates to:
-  /// **'Fix Dive Times'**
+  /// **'Fix dive times'**
   String get settings_fixDiveTimes_title;
 
   /// No description provided for @settings_fixDiveTimes_to.
@@ -77318,7 +77408,7 @@ abstract class AppLocalizations {
   /// Shown when the diver picks an encrypted backup on the startup failure screen, where the passphrase prompt that unlocks one is not reachable.
   ///
   /// In en, this message translates to:
-  /// **'That backup is encrypted. Submersion can only unlock an encrypted backup once the app is open, so use one of the other routes here first, then restore it from Settings, under Backup and Restore.'**
+  /// **'That backup is encrypted. Submersion can only unlock an encrypted backup once the app is open, so use one of the other routes here first, then restore it from Settings > Data > Backups.'**
   String get startup_recovery_encryptedBackup_body;
 
   /// Title of the dialog confirming the return to the app default location.
@@ -80888,7 +80978,7 @@ abstract class AppLocalizations {
   /// No description provided for @startup_interruptedRestore_recoverNote.
   ///
   /// In en, this message translates to:
-  /// **'The file in its place now is kept, not deleted. You can restore or delete it later in Backup & Restore in Settings.'**
+  /// **'The file in its place now is kept, not deleted. You can restore or delete it later under Settings > Data > Backups.'**
   String get startup_interruptedRestore_recoverNote;
 
   /// No description provided for @startup_interruptedRestore_keepAction.
@@ -80900,7 +80990,7 @@ abstract class AppLocalizations {
   /// No description provided for @startup_interruptedRestore_keepNote.
   ///
   /// In en, this message translates to:
-  /// **'Your previous dive log is kept, not deleted. You can restore or delete it later in Backup & Restore in Settings.'**
+  /// **'Your previous dive log is kept, not deleted. You can restore or delete it later under Settings > Data > Backups.'**
   String get startup_interruptedRestore_keepNote;
 
   /// No description provided for @startup_interruptedRestore_failed.

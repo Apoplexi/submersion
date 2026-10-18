@@ -1,4 +1,4 @@
-# Shared Site Libraries
+# Shared site libraries
 
 A **shared site library** is a set of dive sites kept together by a group of
 divers: a dive shop's house reefs, a survey team's transects, or the sites a
@@ -11,7 +11,7 @@ S3-compatible bucket or a WebDAV server. There is no Submersion server and no
 Submersion account. You can belong to more than one library, each in its own
 folder.
 
-Open **Settings > Data > Shared Site Libraries** to see your libraries and
+Open **Settings > Data > Shared site libraries** to see your libraries and
 connect new ones.
 
 ## Roles
@@ -301,4 +301,4 @@ access to the whole folder.
 - [Dive Sites](dive-sites.md)
 - [Multi-Device Sync](multi-device-sync.md)
 - [Encrypted Sync](encrypted-sync.md)
-- [Backup & Restore](backup-and-restore.md)
+- [Backups](backup-and-restore.md)
