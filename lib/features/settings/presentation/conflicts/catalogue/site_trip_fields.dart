@@ -357,6 +357,10 @@ final Map<String, ConflictField> siteTripFields = {
     (l) => l.settings_conflict_field_source,
     FieldKind.shortText,
   ),
+  'sourceMetadata': ConflictField(
+    (l) => l.settings_conflict_field_sourceMetadata,
+    FieldKind.opaque,
+  ),
   'sourceRef': ConflictField(
     (l) => l.settings_conflict_field_sourceRef,
     FieldKind.shortText,
@@ -440,6 +444,52 @@ final Map<String, ConflictField> siteTripFields = {
 
 /// Columns whose meaning depends on the entity, keyed `entity.column`.
 final Map<String, ConflictField> siteTripOverrides = {
+  // Shared site libraries (issue #2567).
+  'diveSites.sharedLibraryId': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibrary,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.libraryId': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibrary,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.memberId': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryMember,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.displayName': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryDisplayName,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.libraryName': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryName,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.backendKind': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryBackend,
+    FieldKind.shortText,
+  ),
+  'sharedLibraryMemberships.locationHint': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryLocation,
+    FieldKind.shortText,
+  ),
+  // Keys: opaque, so a conflict never shows them.
+  'sharedLibraryMemberships.signingPublicKey': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibrarySigningKey,
+    FieldKind.opaque,
+  ),
+  'sharedLibraryMemberships.signingPrivateKey': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibrarySigningKey,
+    FieldKind.opaque,
+  ),
+  'sharedLibraryMemberships.libraryKeyId': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryKey,
+    FieldKind.opaque,
+  ),
+  'sharedLibraryMemberships.libraryKey': ConflictField(
+    (l) => l.settings_conflict_field_sharedLibraryKey,
+    FieldKind.opaque,
+  ),
   'checklistTemplateItems.category': ConflictField(
     (l) => l.settings_conflict_field_checklistTemplateItems_category,
     FieldKind.shortText,

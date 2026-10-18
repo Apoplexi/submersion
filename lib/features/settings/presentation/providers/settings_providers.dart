@@ -25,6 +25,9 @@ import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart
 import 'package:submersion/features/equipment/domain/entities/equipment_finding.dart';
 import 'package:submersion/features/insights/domain/observations/observation_rule_id.dart';
 import 'package:submersion/features/insights/domain/trend_gap_threshold.dart';
+import 'package:submersion/features/equipment/domain/models/equipment_default_view.dart';
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric.dart';
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric_color_overrides.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_model.dart';
@@ -300,6 +303,13 @@ class AppSettings {
   /// Stretches with no dives longer than this collapse into a break on the
   /// trend charts (issue #3251).
   final TrendGapThreshold trendGapThreshold;
+
+  /// The statuses the Equipment list shows with no filter set (issue
+  /// #2628). Never empty.
+  final Set<EquipmentStatus> equipmentDefaultStatuses;
+
+  /// The profile-chart metric colours this diver chose (issue #3012).
+  final ProfileMetricColorOverrides profileMetricColors;
 
   /// Bundled chamber ids hidden from the emergency card
   final Set<String> hiddenChamberIds;
@@ -663,6 +673,8 @@ class AppSettings {
     this.conditionDisabledRules = const {},
     this.insightsMutedObservationRules = const {},
     this.trendGapThreshold = TrendGapThreshold.year1,
+    this.equipmentDefaultStatuses = factoryDefaultEquipmentStatuses,
+    this.profileMetricColors = ProfileMetricColorOverrides.none,
     this.hiddenChamberIds = const {},
     this.emergencyRegion,
     this.showAscentRateColors = false,
@@ -856,6 +868,8 @@ class AppSettings {
     Set<String>? conditionDisabledRules,
     Set<String>? insightsMutedObservationRules,
     TrendGapThreshold? trendGapThreshold,
+    Set<EquipmentStatus>? equipmentDefaultStatuses,
+    ProfileMetricColorOverrides? profileMetricColors,
     Set<String>? hiddenChamberIds,
     String? emergencyRegion,
     bool clearEmergencyRegion = false,
@@ -1026,6 +1040,9 @@ class AppSettings {
       insightsMutedObservationRules:
           insightsMutedObservationRules ?? this.insightsMutedObservationRules,
       trendGapThreshold: trendGapThreshold ?? this.trendGapThreshold,
+      equipmentDefaultStatuses:
+          equipmentDefaultStatuses ?? this.equipmentDefaultStatuses,
+      profileMetricColors: profileMetricColors ?? this.profileMetricColors,
       hiddenChamberIds: hiddenChamberIds ?? this.hiddenChamberIds,
       emergencyRegion: clearEmergencyRegion
           ? null
@@ -2295,6 +2312,72 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  /// The default equipment view (issue #2628). Waits for the load like
+  /// [setTrendGapThreshold], so a pick made first is not overwritten. An
+  /// empty set is ignored: the default view always shows something.
+  Future<void> setEquipmentDefaultStatuses(Set<EquipmentStatus> value) async {
+    if (value.isEmpty) return;
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    state = state.copyWith(equipmentDefaultStatuses: Set.unmodifiable(value));
+    await _saveSettings();
+  }
+
+  /// Adds [status] to, or removes it from, the default equipment view
+  /// (issue #2628). Applied to the settings as they stand after the load, so
+  /// several checklist taps in flight together each land. Removing the last
+  /// status is ignored: the default view always shows something.
+  Future<void> setEquipmentDefaultStatusIncluded(
+    EquipmentStatus status,
+    bool included,
+  ) async {
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    final current = state.equipmentDefaultStatuses;
+    final next = included ? {...current, status} : current.difference({status});
+    if (next.isEmpty) return;
+    state = state.copyWith(equipmentDefaultStatuses: Set.unmodifiable(next));
+    await _saveSettings();
+  }
+
+  /// [metric] takes [color] (null: its default, or Auto), swapping with any
+  /// metric already showing it (issue #3012). Waits for the load first, as
+  /// [setTrendGapThreshold] does, so an early pick is not overwritten.
+  Future<void> setProfileMetricColor(ProfileMetric metric, Color? color) async {
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    state = state.copyWith(
+      profileMetricColors: state.profileMetricColors.withColor(metric, color),
+    );
+    await _saveSettings();
+  }
+
+  /// Every profile metric back to its default colour.
+  Future<void> resetProfileMetricColors() async {
+    try {
+      await settingsLoaded;
+    } catch (_) {
+      // Already logged by the load; defaults are the fallback.
+    }
+    if (!mounted) return;
+    state = state.copyWith(
+      profileMetricColors: ProfileMetricColorOverrides.none,
+    );
+    await _saveSettings();
+  }
+
   Future<void> setIcdWarningsEnabled(bool value) async {
     state = state.copyWith(icdWarningsEnabled: value);
     await _saveSettings();
@@ -3167,6 +3250,11 @@ final defaultShowGasSwitchMarkersProvider = Provider<bool>((ref) {
 /// The active diver's gap threshold for every `DiveTrendChart`.
 final trendGapThresholdProvider = Provider<TrendGapThreshold>((ref) {
   return ref.watch(settingsProvider.select((s) => s.trendGapThreshold));
+});
+
+/// The diver's default equipment view (issue #2628).
+final equipmentDefaultStatusesProvider = Provider<Set<EquipmentStatus>>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.equipmentDefaultStatuses));
 });
 
 final defaultShowLateGasSwitchesProvider = Provider<bool>((ref) {

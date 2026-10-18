@@ -4,13 +4,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:submersion/core/router/section_navigation.dart';
+import 'package:submersion/core/router/pushed_route.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/search/dive_search_action.dart';
 import 'package:submersion/core/services/export/csv/codec/csv_export_units.dart';
 import 'package:submersion/core/services/export/uddf/uddf_dives_extras.dart';
 import 'package:submersion/core/services/export/uddf/uddf_source_fetch.dart';
 
 import 'package:submersion/core/constants/card_color.dart';
-import 'package:submersion/core/providers/async_value_extensions.dart';
 import 'package:submersion/core/constants/dive_field.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
@@ -126,6 +127,11 @@ class DiveListContent extends ConsumerStatefulWidget {
   /// Whether to show the app bar. Set to false when used inside MasterDetailScaffold.
   final bool showAppBar;
 
+  /// Whether the compact header (shown when [showAppBar] is false) leads with
+  /// a back arrow. Set by a dive list pushed over the page that opened it
+  /// (#3292); a page that merely embeds the list owns its own way back.
+  final bool showBackButton;
+
   /// Optional floating action button to display when showAppBar is true.
   final Widget? floatingActionButton;
 
@@ -158,6 +164,7 @@ class DiveListContent extends ConsumerStatefulWidget {
     this.onItemSelected,
     this.selectedId,
     this.showAppBar = true,
+    this.showBackButton = false,
     this.floatingActionButton,
     this.onItemTapForMap,
     this.isMapMode = false,
@@ -1026,7 +1033,15 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
   Future<BulkActionOutcome> _openBulkEdit() async {
     final ids = _selectedIds.toList();
     if (ids.isEmpty) return BulkActionOutcome.cancelled;
-    await context.pushNamed('bulkEditDives', extra: ids);
+    // A list pushed over another page (a site's dives, say) has the form
+    // come back to it on save; a go('/dives') would erase that page (#3292).
+    await context.pushNamed(
+      'bulkEditDives',
+      queryParameters: isPushedRoute(context)
+          ? const {'return': 'pop'}
+          : const {},
+      extra: ids,
+    );
     return BulkActionOutcome.completed;
   }
 
@@ -1140,10 +1155,15 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     // Drop checked dives that fell out of the filtered, searched or sorted
     // list, so the count always matches what is on screen and a bulk action
-    // can never reach a dive the user cannot see. pruneTo is a no-op when
-    // nothing changed, which is what keeps this off a rebuild loop.
+    // can never reach a dive the user cannot see. pruneToSettled is a no-op
+    // when nothing changed, which is what keeps this off a rebuild loop.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && paginatedAsync.hasSettled) _selection.pruneTo(visibleIds);
+      if (mounted) {
+        _selection.pruneToSettled(
+          paginatedAsync,
+          (page) => page.dives.map((d) => d.id),
+        );
+      }
     });
 
     return SelectableListScope(
@@ -1411,7 +1431,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
           ),
           child: Row(
             children: [
-              const SizedBox(width: 8),
+              // A list pushed over the page that opened it (a site's dives,
+              // say) leads with the way back to that page (#3292).
+              if (widget.showBackButton)
+                const BackButton()
+              else
+                const SizedBox(width: 8),
               // Expanded, and no Spacer: the title must be the row's only
               // flexible child (see trip_list_content for the detail). This
               // bar was already right-aligned with a bare title plus Spacer,
@@ -1694,7 +1719,9 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     // Same pruning the list path does: drop checked dives that fell out of
     // the visible list, so the count always matches what is on screen.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && tableAsync.hasSettled) _selection.pruneTo(visibleIds);
+      if (mounted) {
+        _selection.pruneToSettled(tableAsync, (rows) => rows.map((d) => d.id));
+      }
     });
 
     // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
@@ -2246,7 +2273,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                 onLogManually: () {
                   if (ResponsiveBreakpoints.isMasterDetail(context)) {
                     final routerState = GoRouterState.of(context);
-                    context.go('${routerState.uri.path}?mode=new');
+                    context.goInPlace('${routerState.uri.path}?mode=new');
                   } else {
                     context.push('/dives/new');
                   }

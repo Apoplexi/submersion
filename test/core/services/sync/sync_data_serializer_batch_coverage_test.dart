@@ -146,6 +146,7 @@ void main() {
           (type: 'tags', table: db.tags.actualTableName),
           (type: 'diveTags', table: db.diveTags.actualTableName),
           (type: 'diveDiveTypes', table: db.diveDiveTypes.actualTableName),
+          (type: 'diveCourses', table: db.diveCourses.actualTableName),
           (type: 'diveTypes', table: db.diveTypes.actualTableName),
           (type: 'siteTypes', table: db.siteTypes.actualTableName),
           (type: 'siteSiteTypes', table: db.siteSiteTypes.actualTableName),
@@ -172,6 +173,14 @@ void main() {
           (
             type: 'diveComputerConnections',
             table: db.diveComputerConnections.actualTableName,
+          ),
+          (
+            type: 'sharedLibraryMemberships',
+            table: db.sharedLibraryMemberships.actualTableName,
+          ),
+          (
+            type: 'librarySiteNotes',
+            table: db.librarySiteNotes.actualTableName,
           ),
           (type: 'cylinderFills', table: db.cylinderFills.actualTableName),
           (type: 'savedQueries', table: db.savedQueries.actualTableName),

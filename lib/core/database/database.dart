@@ -25,6 +25,7 @@ import 'package:submersion/core/database/tables/insight_tables.dart';
 import 'package:submersion/core/database/tables/query_tables.dart';
 import 'package:submersion/core/database/tables/safety_tables.dart';
 import 'package:submersion/core/database/tables/service_tables.dart';
+import 'package:submersion/core/database/tables/shared_library_tables.dart';
 import 'package:submersion/core/database/tables/site_tables.dart';
 import 'package:submersion/core/database/tables/sync_tables.dart';
 import 'package:submersion/core/database/tables/tag_tables.dart';
@@ -57,6 +58,7 @@ export 'package:submersion/core/database/tables/insight_tables.dart';
 export 'package:submersion/core/database/tables/query_tables.dart';
 export 'package:submersion/core/database/tables/safety_tables.dart';
 export 'package:submersion/core/database/tables/service_tables.dart';
+export 'package:submersion/core/database/tables/shared_library_tables.dart';
 export 'package:submersion/core/database/tables/site_tables.dart';
 export 'package:submersion/core/database/tables/sync_tables.dart';
 export 'package:submersion/core/database/tables/tag_tables.dart';
@@ -175,6 +177,8 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     // Course requirement tracker (v121)
     CourseRequirements,
     CourseRequirementDives,
+    // A dive's courses (v288, issue #2515)
+    DiveCourses,
     // Sync tables
     SyncMetadata,
     SyncRecords,
@@ -253,6 +257,14 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     // Documents store (v277, issue #2613)
     Documents,
     DocumentPages,
+    // Shared dive-site library (v289, issue #2567)
+    SharedLibraries,
+    SharedLibraryMembers,
+    SharedLibraryMemberships,
+    SharedSiteStates,
+    SharedSiteSuggestions,
+    SharedLibraryBackups,
+    LibrarySiteNotes,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -262,7 +274,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 281;
+  static const int currentSchemaVersion = 291;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -1214,6 +1226,42 @@ class AppDatabase extends _$AppDatabase {
     // defaulted column, so the floor stays at 280. Renumbered from 278, 279
     // and 280, which #3226, #3106 and #2361 shipped first.
     281,
+    // v283: dive_profile_series.activated_at (issue #3189), backfilled from
+    // the primary flags and the local revision history. Additive nullable
+    // column, so the floor stays at 280. 282 is held by PR #3133.
+    283,
+    // v284: diver_settings.profile_color_* (issue #3012). Additive nullable
+    // columns, so the floor stays at 280. Renumbered from 282, which PR #3133
+    // holds, after #3296 shipped 283.
+    284,
+    // v285: nav_tracks.source_metadata (issue #3047). Additive nullable
+    // column, so the floor stays at 280. Renumbered from 282, which PR
+    // #3133 holds; 283 and 284 shipped first.
+    285,
+    // v286: diver_settings.equipment_default_statuses (issue #2628).
+    // Additive nullable column, so the floor stays at 280.
+    286,
+    // v287: dive_tanks.passport_id (issue #2650). Additive nullable column,
+    // so the floor stays at 280. Renumbered from 285 and 286, which #3306
+    // and #3319 shipped first.
+    287,
+    // v288: the dive_courses junction and the certification-side course link
+    // (issue #2515). A new table plus meaning-preserving backfills, so the
+    // floor stays at 280. Renumbered from 286 and 287, which #2628 and #2650
+    // shipped first.
+    288,
+    // v289: shared dive-site library tables and dive_sites.shared_library_id
+    // (issue #2567). New tables and a nullable column, so the floor stays
+    // at 280. Renumbered from 288 after #2515 shipped 288.
+    289,
+    // v290: dive_plan_segments.split_at_configured_rate (issue #3264).
+    // Additive defaulted column, so the floor stays at 280. Renumbered from
+    // 277, 282 then 286, as #2613's documents store, #3189, #3012, #3047,
+    // #2628, #2650, #2515 and #3324 shipped or claimed earlier rungs.
+    290,
+    // v291: shared_libraries.description (issue #3389). Additive nullable
+    // column, so the floor stays at 280.
+    291,
   ];
 
   /// Returns the number of migration steps that will execute when upgrading

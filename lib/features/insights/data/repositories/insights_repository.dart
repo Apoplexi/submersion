@@ -18,6 +18,9 @@ import 'package:submersion/features/dive_log/data/repositories/dive_repository_i
 import 'package:submersion/features/dive_log/data/repositories/dive_times_sql.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/sql/multi_cylinder_sac_sql.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    as domain;
+import 'package:submersion/features/dive_log/domain/entities/tank_shared_computers.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_sites/domain/entities/site_dive_statistics.dart';
@@ -30,6 +33,7 @@ import 'package:submersion/features/insights/domain/conditions/conditions_row.da
 import 'package:submersion/features/insights/domain/entities/species_insights.dart';
 import 'package:submersion/features/insights/domain/focus/focus_factor_row.dart';
 import 'package:submersion/features/insights/domain/suit_thickness_stats.dart';
+import 'package:submersion/features/insights/domain/tank_configuration/tank_configuration.dart';
 import 'package:submersion/features/insights/domain/trend_aggregation.dart';
 import 'package:submersion/features/insights/domain/water_temp_bands.dart';
 
@@ -39,6 +43,7 @@ export 'package:submersion/features/insights/domain/trend_aggregation.dart'
 part 'insights_repository_conditions.dart';
 part 'insights_repository_focus.dart';
 part 'insights_repository_focus_series.dart';
+part 'insights_repository_tank_configuration.dart';
 
 /// Per-dive outcome of the recorded (non-computed) deco classification.
 ///
@@ -209,6 +214,11 @@ class InsightsRepository {
           TableUpdateQuery.onTable(_db.dives),
           TableUpdateQuery.onTable(_db.diveProfileSeries),
           TableUpdateQuery.onTable(_db.diveTanks),
+          // The tank configuration card reads which cylinders were switched
+          // to and which recording is primary (#3421); a sync pull or a
+          // primary-source change writes only these.
+          TableUpdateQuery.onTable(_db.gasSwitches),
+          TableUpdateQuery.onTable(_db.diveDataSources),
           TableUpdateQuery.onTable(_db.tankPressureSeries),
           TableUpdateQuery.onTable(_db.diveEquipment),
           TableUpdateQuery.onTable(_db.equipment),
@@ -2012,7 +2022,7 @@ class InsightsRepository {
         FROM dive_sites ds
         JOIN dives d ON d.site_id = ds.id
         WHERE TRIM(ds.country, $dartWhitespaceSqlChars) != '' $diverFilter ${df.clause}
-        GROUP BY LOWER(TRIM(ds.country, $dartWhitespaceSqlChars))
+        GROUP BY unicode_lower(TRIM(ds.country, $dartWhitespaceSqlChars))
         ORDER BY dive_count DESC
         LIMIT ?
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -2058,8 +2068,8 @@ class InsightsRepository {
         FROM dive_sites ds
         JOIN dives d ON d.site_id = ds.id
         WHERE TRIM(ds.region, $dartWhitespaceSqlChars) != '' $diverFilter ${df.clause}
-        GROUP BY LOWER(TRIM(ds.region, $dartWhitespaceSqlChars)),
-          LOWER(NULLIF(TRIM(ds.country, $dartWhitespaceSqlChars), ''))
+        GROUP BY unicode_lower(TRIM(ds.region, $dartWhitespaceSqlChars)),
+          unicode_lower(NULLIF(TRIM(ds.country, $dartWhitespaceSqlChars), ''))
         ORDER BY dive_count DESC
         LIMIT ?
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -2993,7 +3003,7 @@ class InsightsRepository {
              AVG(d.max_depth) AS avg_max_depth
       FROM dives d
       JOIN dive_sites ds ON d.site_id = ds.id
-      WHERE LOWER(ds.name) = LOWER(?) AND d.diver_id = ?
+      WHERE unicode_lower(ds.name) = unicode_lower(?) AND d.diver_id = ?
             ${DiveStatsScope.and(alias: 'd')}
     ''',
           variables: [

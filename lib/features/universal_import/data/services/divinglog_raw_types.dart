@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:submersion/features/universal_import/data/services/divemate_raw_types.dart';
 
 /// Quotes [name] as a SQL identifier, doubling any embedded quote.
@@ -127,6 +129,9 @@ class DivingLogRawSample {
 class DivingLogRawTank {
   final int tankId;
   final double? sizeLiters;
+
+  /// Dive Log's Tanktype: 1 aluminum, 2 steel, 3 carbon fiber.
+  final int? materialCode;
   final double? startPressureBar;
   final double? endPressureBar;
   final double? workingPressureBar;
@@ -143,6 +148,7 @@ class DivingLogRawTank {
   const DivingLogRawTank({
     required this.tankId,
     this.sizeLiters,
+    this.materialCode,
     this.startPressureBar,
     this.endPressureBar,
     this.workingPressureBar,
@@ -171,7 +177,7 @@ class DivingLogRawDive {
   final String? comments;
   final double? depthMeters;
 
-  /// `DepthAvg`, written by DiveMate.
+  /// `DepthAvg`, when the source recorded an average depth.
   final double? avgDepthMeters;
   final double? diveTimeMinutes;
   final double? airTempCelsius;
@@ -184,6 +190,17 @@ class DivingLogRawDive {
   /// unset.
   final int? visibilityCode;
   final String? supplyType;
+  final int? waterCode;
+  final int? rating;
+  final int? entryCode;
+  final String? weather;
+  final String? current;
+  final String? surface;
+  final String? surfaceInterval;
+  final String? horizontalVisibility;
+  final String? boat;
+  final String? gasDescription;
+  final String? altitude;
 
   /// Ids from `Logbook`'s reference columns. Empty when the column is
   /// absent or blank.
@@ -223,6 +240,17 @@ class DivingLogRawDive {
     this.computer,
     this.visibilityCode,
     this.supplyType,
+    this.waterCode,
+    this.rating,
+    this.entryCode,
+    this.weather,
+    this.current,
+    this.surface,
+    this.surfaceInterval,
+    this.horizontalVisibility,
+    this.boat,
+    this.gasDescription,
+    this.altitude,
     this.buddyIds = const [],
     this.equipmentIds = const [],
     this.diveTypeIds = const [],
@@ -245,6 +273,10 @@ class DivingLogLogbook {
   /// Human-readable notes about tables and columns this file lacked,
   /// recorded once per import as diagnostics rather than shown per dive.
   final List<String> schemaNotes;
+
+  /// Pictures the file stores on records Submersion keeps no picture for
+  /// (gear, marine life, site maps, trips, dive centers), by kind.
+  final Map<String, int> unsupportedImageCounts;
 
   final Map<int, DivingLogRawBuddy> buddiesById;
   final Map<int, DivingLogRawPlace> placesById;
@@ -273,6 +305,7 @@ class DivingLogLogbook {
     required this.dives,
     required this.capabilities,
     this.schemaNotes = const [],
+    this.unsupportedImageCounts = const {},
     this.buddiesById = const {},
     this.placesById = const {},
     this.cityNamesById = const {},
@@ -300,6 +333,7 @@ class DivingLogRawBuddy {
   final String? mobile;
   final String? comments;
   final String? url;
+  final Uint8List? photo;
 
   const DivingLogRawBuddy({
     required this.id,
@@ -310,6 +344,7 @@ class DivingLogRawBuddy {
     this.mobile,
     this.comments,
     this.url,
+    this.photo,
   });
 
   /// The display name, or null when the row has neither name part.
@@ -394,6 +429,9 @@ class DivingLogRawEquipment {
   final String? manufacturer;
   final String? serial;
   final DateTime? purchaseDate;
+  final String? purchaseShop;
+  final DateTime? lastServiceDate;
+  final DateTime? nextServiceDate;
   final double? price;
   final double? weightKg;
   final bool inactive;
@@ -412,6 +450,9 @@ class DivingLogRawEquipment {
     this.manufacturer,
     this.serial,
     this.purchaseDate,
+    this.purchaseShop,
+    this.lastServiceDate,
+    this.nextServiceDate,
     this.price,
     this.weightKg,
     this.inactive = false,
@@ -487,6 +528,9 @@ class DivingLogRawCertification {
   final DateTime? certDate;
   final String? number;
   final String? instructor;
+  final String? instructorNumber;
+  final Uint8List? photoFront;
+  final Uint8List? photoBack;
 
   const DivingLogRawCertification({
     required this.id,
@@ -495,6 +539,9 @@ class DivingLogRawCertification {
     this.certDate,
     this.number,
     this.instructor,
+    this.instructorNumber,
+    this.photoFront,
+    this.photoBack,
   });
 }
 

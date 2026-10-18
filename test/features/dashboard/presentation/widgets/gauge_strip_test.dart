@@ -119,7 +119,17 @@ Future<NavSpy> pumpStrip(
         path: '/certifications',
         builder: (_, _) => stub('/certifications'),
       ),
-      GoRoute(path: '/trips', builder: (_, _) => stub('/trips')),
+      GoRoute(
+        path: '/trips',
+        builder: (_, _) => stub('/trips'),
+        routes: [
+          GoRoute(
+            path: ':tripId',
+            builder: (_, state) =>
+                stub('/trips/${state.pathParameters['tripId']}'),
+          ),
+        ],
+      ),
       GoRoute(path: '/courses', builder: (_, _) => stub('/courses')),
       GoRoute(
         path: '/courses/:courseId',
@@ -906,7 +916,17 @@ void main() {
 
     testWidgets('past the alert threshold', (tester) async {
       await pumpDays(tester, kCurrencyAlertDays + 1);
-      expect(find.text('Last dive 366d ago'), findsOneWidget);
+      expect(find.text('Last dive 1y 1d ago'), findsOneWidget);
+    });
+
+    testWidgets('just under a year still counts days', (tester) async {
+      await pumpDays(tester, 364);
+      expect(find.text('Last dive 364d ago'), findsOneWidget);
+    });
+
+    testWidgets('a long break reads in years and days', (tester) async {
+      await pumpDays(tester, 800);
+      expect(find.text('Last dive 2y 70d ago'), findsOneWidget);
     });
 
     testWidgets('opens the dive log', (tester) async {
@@ -977,7 +997,7 @@ void main() {
       expect(chipTone(tester, '1 certification needs attention'), 'alert');
     });
 
-    testWidgets('trip chip navigates', (tester) async {
+    testWidgets('trip chip opens the trip it names, over Home', (tester) async {
       final spy = await pumpStrip(
         tester,
         DashboardGauges(
@@ -997,7 +1017,10 @@ void main() {
             .map((e) => (e.widget as Text).data!)
             .first,
       );
-      expect(spy.location, '/trips');
+      // The chip names one trip, so it opens that trip, pushed so Back
+      // returns Home at every width (#3350).
+      expect(spy.location, '/trips/Bonaire');
+      expect(spy.router.canPop(), isTrue);
     });
 
     testWidgets('checklist chip opens the active session', (tester) async {

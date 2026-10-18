@@ -1,3 +1,5 @@
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric.dart';
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric_color_overrides.dart';
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -40,6 +42,10 @@ import 'package:submersion/features/nav_track/presentation/providers/nav_track_p
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
+import 'package:submersion/features/settings/data/data_facts_repository.dart';
+import 'package:submersion/features/settings/domain/data_health/feature_health.dart';
+import 'package:submersion/features/settings/presentation/providers/data_health_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
@@ -49,6 +55,8 @@ import 'package:submersion/features/weather/presentation/providers/weather_provi
 import 'package:submersion/core/constants/o2_cell_unit.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
 import 'package:submersion/features/documents/presentation/providers/document_providers.dart';
+import 'package:submersion/features/safety/domain/entities/incident.dart';
+import 'package:submersion/features/safety/presentation/providers/incident_providers.dart';
 
 typedef Override = riverpod.Override;
 
@@ -386,6 +394,35 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setTrendGapThreshold(TrendGapThreshold value) async =>
       state = state.copyWith(trendGapThreshold: value);
+  @override
+  Future<void> setEquipmentDefaultStatuses(Set<EquipmentStatus> value) async {
+    if (value.isEmpty) return;
+    state = state.copyWith(equipmentDefaultStatuses: value);
+  }
+
+  @override
+  Future<void> setEquipmentDefaultStatusIncluded(
+    EquipmentStatus status,
+    bool included,
+  ) async {
+    final current = state.equipmentDefaultStatuses;
+    final next = included ? {...current, status} : current.difference({status});
+    if (next.isNotEmpty) {
+      state = state.copyWith(equipmentDefaultStatuses: next);
+    }
+  }
+
+  @override
+  Future<void> setProfileMetricColor(
+    ProfileMetric metric,
+    Color? color,
+  ) async => state = state.copyWith(
+    profileMetricColors: state.profileMetricColors.withColor(metric, color),
+  );
+  @override
+  Future<void> resetProfileMetricColors() async => state = state.copyWith(
+    profileMetricColors: ProfileMetricColorOverrides.none,
+  );
   @override
   Future<void> setIcdWarningsEnabled(bool value) async =>
       state = state.copyWith(icdWarningsEnabled: value);
@@ -763,6 +800,11 @@ Future<List<Override>> getBaseOverrides({
   IncomingLinkSource? incomingLinks,
   NfcTagService? nfcTagService,
   List<Document> ownerDocuments = const [],
+  List<Incident> incidents = const [],
+  List<FeatureHealth>? dataHealth,
+  DataFacts dataFacts = DataFacts.empty,
+  DateTime? lastSync,
+  int syncedDevices = 1,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -790,6 +832,23 @@ Future<List<Override>> getBaseOverrides({
       nfcTagService ?? const UnsupportedNfcTagService(),
     ),
     currentDiverIdProvider.overrideWith((ref) => MockCurrentDiverIdNotifier()),
+    // Settings > Data health (#3390, #3394) reads live sync, backup, library
+    // and media state plus the database file; pages under test get a quiet,
+    // not-set-up dashboard instead. A test of the dashboard overrides these.
+    dataHealthProvider.overrideWithValue(
+      dataHealth ??
+          [
+            for (final feature in DataFeature.values)
+              FeatureHealth(
+                feature: feature,
+                level: HealthLevel.notSetUp,
+                reason: HealthReason.notSetUp,
+              ),
+          ],
+    ),
+    dataFactsProvider.overrideWith((ref) async => dataFacts),
+    lastSyncTimeProvider.overrideWithValue(lastSync),
+    syncedDeviceCountProvider.overrideWithValue(syncedDevices),
     // The Dives app-bar data-quality badge watches a live Drift stream; stub
     // it with a static count so widget tests don't leave a pending timer.
     openQualityFindingsCountProvider.overrideWith((ref) => Stream.value(0)),
@@ -818,6 +877,10 @@ Future<List<Override>> getBaseOverrides({
     documentsForOwnerProvider.overrideWith(
       (ref, owner) async => ownerDocuments,
     ),
+    // The Diver Profile hub counts the active diver's near-miss log entries
+    // (issue #3061); without this it reaches the real repository and a
+    // database that widget tests do not have.
+    incidentsProvider.overrideWith((ref) async => incidents),
     // Weather/elevation lookups must never hit the network in widget tests;
     // the default stub fails fast so altitude auto-fill resolves to null.
     weatherHttpClientProvider.overrideWithValue(

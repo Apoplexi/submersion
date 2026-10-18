@@ -15,7 +15,7 @@ import 'package:submersion/shared/widgets/map_list_layout/map_info_card.dart';
 import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_camera_animator.dart';
-import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_corner_controls.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_interaction_options.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/maps/presentation/widgets/world_copies.dart';
@@ -63,7 +63,11 @@ class _DiveCenterMapPageState extends ConsumerState<DiveCenterMapPage>
     return MapListScaffold(
       sectionKey: 'dive-centers',
       title: context.l10n.diveCenters_title,
-      onBackPressed: () => context.go('/dive-centers'),
+      // Opened as a nav shortcut (#2936) the map is the only page and is a
+      // top-level destination, so it has no arrow back into /dive-centers.
+      onBackPressed: Navigator.of(context).canPop()
+          ? () => context.go('/dive-centers')
+          : null,
       listPane: DiveCenterListContent(
         showAppBar: false,
         isMapMode: true,
@@ -248,11 +252,12 @@ class _DiveCenterMapPageState extends ConsumerState<DiveCenterMapPage>
           ),
         ),
 
-        // Reset-to-north compass (hidden until the map is rotated)
+        // Map style switcher, with the reset-to-north compass (hidden until the
+        // map is rotated) below it.
         Positioned(
           top: 16,
           right: 16,
-          child: MapCompassButton(controller: _mapController),
+          child: MapCornerControls(controller: _mapController),
         ),
 
         // Empty state overlay

@@ -24,6 +24,7 @@ import 'package:submersion/features/planner/presentation/panes/plan_setup_accord
 import 'package:submersion/features/planner/presentation/providers/plan_canvas_providers.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_repository_providers.dart';
 import 'package:submersion/features/planner/presentation/providers/planner_layout_providers.dart';
+import 'package:submersion/features/planner/presentation/widgets/chart_mode_toggle.dart';
 import 'package:submersion/features/planner/presentation/widgets/contingency_chips.dart';
 import 'package:submersion/features/planner/presentation/widgets/follow_dive_sheet.dart';
 import 'package:submersion/features/planner/presentation/widgets/plan_chart_readouts.dart';
@@ -124,7 +125,9 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
+        // Opened as a nav shortcut (#2936) the planner is the only page, and
+        // an inert back arrow reads as broken; AppBar makes the same test.
+        leading: Navigator.of(context).canPop() ? const BackButton() : null,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -429,7 +432,12 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
         ),
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 6, 16, 8),
-          child: ContingencyChips(),
+          child: Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [ContingencyChips(), ChartModeToggle()],
+          ),
         ),
       ],
     );
@@ -478,7 +486,23 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
                   bottom: 8,
                   child: Align(
                     alignment: Alignment.bottomLeft,
-                    child: ContingencyChips(overlay: true),
+                    // Both chip groups scroll together, not just
+                    // ContingencyChips' own inner scroll view: nested inside
+                    // a plain Row here, that inner view took its full
+                    // natural width instead of yielding to the Bailout/CCR
+                    // chips, overflowing this bar on a narrow phone (the
+                    // combined width of every chip no longer fits #3130).
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ContingencyChips(overlay: true),
+                          SizedBox(width: 6),
+                          ChartModeToggle(),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 Positioned(

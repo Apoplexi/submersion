@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label_resolver.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/planned_dive_chip.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge_row.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -289,10 +290,11 @@ class CompactDiveListTile extends ConsumerWidget {
           (diveTypeShortLabelResolver ?? Dive.diveTypeDisplayName)(id),
     ];
 
-    // The highlight is the fill above, not an edge stripe -- the key marks the
-    // row for tests without decorating it.
+    // The highlight is the fill above, not an edge stripe; the key only marks
+    // the row for tests. It sits below the InkWell, never on the root: a tap
+    // highlights the dive in the same frame its ink splash starts, and a
+    // changed key rebuilds its whole subtree, splash and all (issue #3474).
     return Container(
-      key: isHighlighted ? const ValueKey('dive_row_highlight') : null,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Card(
         margin: EdgeInsets.zero,
@@ -306,7 +308,8 @@ class CompactDiveListTile extends ConsumerWidget {
             onTap: onTap,
             onDoubleTap: onDoubleTap,
             borderRadius: BorderRadius.circular(12),
-            child: Padding(
+            child: Container(
+              key: isHighlighted ? const ValueKey('dive_row_highlight') : null,
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,15 +362,9 @@ class CompactDiveListTile extends ConsumerWidget {
                       if ((summary?.safetyFindingCount ?? 0) > 0 &&
                           ref.watch(safetyReviewEnabledProvider)) ...[
                         const SizedBox(width: 6),
-                        Tooltip(
-                          message: context.l10n.safetyReview_findingCount(
-                            summary!.safetyFindingCount,
-                          ),
-                          child: Icon(
-                            Icons.circle,
-                            size: 8,
-                            color: secondaryTextColor,
-                          ),
+                        SafetyFindingBadge(
+                          count: summary!.safetyFindingCount,
+                          color: secondaryTextColor,
                         ),
                       ],
                       const SizedBox(width: 8),

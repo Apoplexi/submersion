@@ -8,9 +8,11 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Wraps every route under /planning (installed by a ShellRoute in
-/// app_router.dart, so a deep link straight to a leaf tool is covered too)
-/// so that each diver confirms the planning safety disclaimer once before
-/// using any tool there (issue #3120). Non-dismissible: there is no way to
+/// app_router.dart, so a deep link straight to a leaf tool is covered too),
+/// and every planning tool opened as a nav shortcut (installed by
+/// `navShortcutRoute` in nav_shortcut_pages.dart, #2936), so that each diver
+/// confirms the planning safety disclaimer once before using any tool there
+/// (issue #3120). Non-dismissible: there is no way to
 /// reach the tools without confirming.
 ///
 /// The confirmation is stored per diver in
@@ -88,6 +90,10 @@ class _PlanningDisclaimerGateState
         // confirming, same as tapping the barrier is not.
         canPop: false,
         child: AlertDialog(
+          // Without a cap the dialog sizes to its text, so on a wide window
+          // the body ran into very long lines (#3392). Phones are already
+          // narrower than this; 280 keeps the stock minimum.
+          constraints: const BoxConstraints(minWidth: 280, maxWidth: 480),
           title: Text(context.l10n.planning_disclaimer_dialog_title),
           content: Text(context.l10n.planning_disclaimer_dialog_body),
           actions: [

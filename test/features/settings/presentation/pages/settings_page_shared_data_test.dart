@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric.dart';
+import 'package:submersion/features/dive_log/presentation/profile_colors/profile_metric_color_overrides.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/insights/domain/trend_gap_threshold.dart';
@@ -523,6 +525,35 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setTrendGapThreshold(TrendGapThreshold value) async =>
       state = state.copyWith(trendGapThreshold: value);
+  @override
+  Future<void> setEquipmentDefaultStatuses(Set<EquipmentStatus> value) async {
+    if (value.isEmpty) return;
+    state = state.copyWith(equipmentDefaultStatuses: value);
+  }
+
+  @override
+  Future<void> setEquipmentDefaultStatusIncluded(
+    EquipmentStatus status,
+    bool included,
+  ) async {
+    final current = state.equipmentDefaultStatuses;
+    final next = included ? {...current, status} : current.difference({status});
+    if (next.isNotEmpty) {
+      state = state.copyWith(equipmentDefaultStatuses: next);
+    }
+  }
+
+  @override
+  Future<void> setProfileMetricColor(
+    ProfileMetric metric,
+    Color? color,
+  ) async => state = state.copyWith(
+    profileMetricColors: state.profileMetricColors.withColor(metric, color),
+  );
+  @override
+  Future<void> resetProfileMetricColors() async => state = state.copyWith(
+    profileMetricColors: ProfileMetricColorOverrides.none,
+  );
   @override
   Future<void> setIcdWarningsEnabled(bool value) async =>
       state = state.copyWith(icdWarningsEnabled: value);

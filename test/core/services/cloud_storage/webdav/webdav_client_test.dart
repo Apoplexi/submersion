@@ -11,13 +11,11 @@ import 'package:path/path.dart' as p;
 import 'package:submersion/core/services/cloud_storage/webdav/webdav_client.dart';
 import 'package:submersion/core/services/cloud_storage/webdav/webdav_config.dart';
 import 'package:submersion/core/services/cloud_storage/webdav/webdav_errors.dart';
-import 'package:submersion/core/services/cloud_storage/webdav/webdav_preset.dart';
 import 'package:submersion/core/services/cloud_storage/webdav/webdav_tls.dart';
 
 import '../../../../helpers/fake_webdav_server.dart';
 
 WebDavConfig _config({String password = 'secret'}) => WebDavConfig(
-  preset: WebDavPreset.other,
   serverUrl: 'https://dav.test/dav',
   username: 'alice',
   password: password,
@@ -146,11 +144,7 @@ void main() {
       throwsA(
         isA<WebDavException>()
             .having((e) => e.code, 'code', WebDavErrorCode.notFound)
-            .having(
-              (e) => e.message,
-              'message',
-              contains('server type and URL'),
-            ),
+            .having((e) => e.message, 'message', contains('Check the address')),
       ),
     );
   });
@@ -346,25 +340,6 @@ void main() {
     },
   );
 
-  test('resolves the Nextcloud user id from current-user-principal', () async {
-    final nc = FakeWebDavServer(
-      username: 'alice@example.com',
-      seedCollections: const ['/remote.php/dav/files/alice'],
-    )..principalUserId = 'alice';
-    final ncClient = WebDavClient(
-      WebDavConfig(
-        preset: WebDavPreset.nextcloud,
-        serverUrl: 'https://dav.test',
-        username: 'alice@example.com',
-        password: 'secret',
-      ),
-      httpClient: nc.client,
-      backoff: (_) => Duration.zero,
-    );
-    addTearDown(ncClient.close);
-    expect(await ncClient.resolveNextcloudUserId(), 'alice');
-  });
-
   test(
     'putFile reads the file only as fast as the transport takes it',
     () async {
@@ -430,4 +405,45 @@ void main() {
     );
     expect(pulled, lessThan(10), reason: 'the whole 8 MB page was read');
   });
+
+  test(
+    'ensureCollection accepts an existing collection it may not create',
+    () async {
+      // Read-only credentials: the server refuses MKCOL with 403 even for a
+      // collection that is there.
+      server.seedCollection('/dav/site-sync');
+      final readOnly = WebDavClient(
+        _config(),
+        httpClient: _RefuseMkcol(server.client),
+        backoff: (_) => Duration.zero,
+      );
+      addTearDown(readOnly.close);
+      await readOnly.ensureCollection('site-sync');
+      await expectLater(
+        readOnly.ensureCollection('missing'),
+        throwsA(
+          isA<WebDavException>().having(
+            (e) => e.code,
+            'code',
+            WebDavErrorCode.forbidden,
+          ),
+        ),
+      );
+    },
+  );
+}
+
+/// A server that refuses every MKCOL, as read-only credentials make it.
+class _RefuseMkcol extends http.BaseClient {
+  _RefuseMkcol(this.inner);
+
+  final http.Client inner;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    if (request.method == 'MKCOL') {
+      return http.StreamedResponse(const Stream.empty(), 403);
+    }
+    return inner.send(request);
+  }
 }

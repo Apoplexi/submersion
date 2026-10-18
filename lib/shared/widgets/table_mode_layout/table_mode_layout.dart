@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -37,6 +38,20 @@ class TableModeLayout extends ConsumerWidget {
 
   /// Optional muted line under [appBarTitle], such as the entry count.
   final SubtitleText? appBarSubtitle;
+
+  /// Replaces the title and its subtitle line when set, such as a section
+  /// switch that carries its own count line (#3437). [appBarTitle] still
+  /// names the page.
+  final Widget? appBarTitleWidget;
+
+  /// The header's toolbar height, for an [appBarTitleWidget] taller than a
+  /// standard toolbar at large text; the standard height when null.
+  final double? appBarToolbarHeight;
+
+  /// Wraps the phone layout's app bar, selection bar included, so a host
+  /// that slides the page sideways can hold the bar still (#3465). Not used
+  /// on desktop, where nothing slides.
+  final PreferredSizeWidget Function(PreferredSizeWidget bar)? phoneAppBarPin;
 
   /// The table content widget (EntityTableView or similar).
   final Widget tableContent;
@@ -122,6 +137,9 @@ class TableModeLayout extends ConsumerWidget {
     required this.sectionKey,
     required this.appBarTitle,
     this.appBarSubtitle,
+    this.appBarTitleWidget,
+    this.appBarToolbarHeight,
+    this.phoneAppBarPin,
     required this.tableContent,
     required this.detailBuilder,
     required this.summaryBuilder,
@@ -191,6 +209,8 @@ class TableModeLayout extends ConsumerWidget {
         return _TableModeMaster(
           appBarTitle: appBarTitle,
           appBarSubtitle: appBarSubtitle,
+          appBarTitleWidget: appBarTitleWidget,
+          appBarToolbarHeight: appBarToolbarHeight,
           tableContent: tableContent,
           mapContent: showMap ? mapContent : null,
           profilePanelContent: showProfile ? profilePanelContent : null,
@@ -218,17 +238,24 @@ class TableModeLayout extends ConsumerWidget {
     bool showProfile,
   ) {
     final body = _buildBody(context, showMap, showProfile);
+    final pin = ResponsiveBreakpoints.isMasterDetail(context)
+        ? null
+        : phoneAppBarPin;
+    final PreferredSizeWidget bar = isSelectionMode && selectionAppBar != null
+        ? selectionAppBar!
+        : AppBar(
+            toolbarHeight: appBarToolbarHeight,
+            title:
+                appBarTitleWidget ??
+                TitleWithSubtitle(
+                  title: Text(appBarTitle),
+                  subtitle: appBarSubtitle,
+                ),
+            actions: toggleActions,
+          );
 
     return Scaffold(
-      appBar: isSelectionMode && selectionAppBar != null
-          ? selectionAppBar
-          : AppBar(
-              title: TitleWithSubtitle(
-                title: Text(appBarTitle),
-                subtitle: appBarSubtitle,
-              ),
-              actions: toggleActions,
-            ),
+      appBar: pin?.call(bar) ?? bar,
       body: body,
       floatingActionButton: floatingActionButton,
     );
@@ -289,7 +316,7 @@ class TableModeLayout extends ConsumerWidget {
     final uri = router.state.uri;
     if (uri.queryParameters.containsKey('mode')) return;
     if (uri.queryParameters['selected'] == id) return;
-    router.go(
+    context.goInPlace(
       uri
           .replace(queryParameters: {...uri.queryParameters, 'selected': id})
           .toString(),
@@ -422,6 +449,8 @@ class TableModeLayout extends ConsumerWidget {
 class _TableModeMaster extends StatefulWidget {
   final String appBarTitle;
   final SubtitleText? appBarSubtitle;
+  final Widget? appBarTitleWidget;
+  final double? appBarToolbarHeight;
   final Widget tableContent;
   final Widget? mapContent;
   final Widget? profilePanelContent;
@@ -437,6 +466,8 @@ class _TableModeMaster extends StatefulWidget {
   const _TableModeMaster({
     required this.appBarTitle,
     this.appBarSubtitle,
+    this.appBarTitleWidget,
+    this.appBarToolbarHeight,
     required this.tableContent,
     required this.toggleActions,
     this.mapContent,
@@ -511,10 +542,13 @@ class _TableModeMasterState extends State<_TableModeMaster> {
           widget.selectionAppBar!
         else
           AppBar(
-            title: TitleWithSubtitle(
-              title: Text(widget.appBarTitle),
-              subtitle: widget.appBarSubtitle,
-            ),
+            toolbarHeight: widget.appBarToolbarHeight,
+            title:
+                widget.appBarTitleWidget ??
+                TitleWithSubtitle(
+                  title: Text(widget.appBarTitle),
+                  subtitle: widget.appBarSubtitle,
+                ),
             actions: widget.toggleActions,
           ),
         if (widget.profilePanelContent != null) widget.profilePanelContent!,

@@ -19,6 +19,9 @@ extension BeforeOpenBackstops on AppDatabase {
     // existing revisions untouched and only fills missing pointer rows.
     await _assertProfileSeriesHistorySchema();
     await _backfillProfileSeriesHistoryRows();
+    // v283 backstop: dive_profile_series.activated_at, after the history it
+    // backfills from.
+    await _assertProfileSeriesActivatedAt();
 
     // v252 backstop: nav_tracks.diver_id. Column only; the backfill stays
     // in the rung.
@@ -65,6 +68,12 @@ extension BeforeOpenBackstops on AppDatabase {
     await _assertVisibilityRangeColumns();
     // v281 backstop: diver_settings.trend_gap_collapse_months.
     await _assertTrendGapCollapseColumn();
+    // v284 backstop: diver_settings.profile_color_*.
+    await _assertProfileMetricColorColumns();
+    // v286 backstop: diver_settings.equipment_default_statuses.
+    await _assertEquipmentDefaultStatusesColumn();
+    // v290 backstop: dive_plan_segments.split_at_configured_rate.
+    await _assertSegmentSplitAtRateColumn();
 
     // v210 backstop: the dive_tanks equipment link sets null on delete.
     // First, while foreign keys are still off: the rebuild it may do
@@ -569,7 +578,7 @@ extension BeforeOpenBackstops on AppDatabase {
     // only, so it cannot touch diver data.
     await _assertCcrPpO2LimitColumns();
 
-    // v194, v254, v259 and v270 backstops: dive_tanks and weight columns
+    // v194, v254, v259, v270 and v287 backstops: dive_tanks and weight columns
     // every row read selects (before_open_child_columns.dart).
     await _assertChildRowColumns();
 
@@ -718,6 +727,7 @@ extension BeforeOpenBackstops on AppDatabase {
     // restore or sync-adopt never runs onUpgrade, and that is exactly the
     // second device the duplicate types came from.
     await assertDiveTypeUniqueness(this);
+    await _assertCourseLinks(); // v288 (#2515)
 
     // Data self-heal: backfill a primary dive_data_sources row for dives
     // that have profile samples but no source row (legacy file imports).
@@ -752,5 +762,9 @@ extension BeforeOpenBackstops on AppDatabase {
     // #1288 pass, so a computer it just registered gets its file
     // connections too. Local-only, deterministic ids, no HLC bump.
     await _seedDiveComputerConnections();
+
+    // Issue #3343: the v62 view_configs unique index, which a fresh install
+    // never got (before_open_view_configs.dart).
+    await _assertViewConfigsUniqueIndex();
   }
 }

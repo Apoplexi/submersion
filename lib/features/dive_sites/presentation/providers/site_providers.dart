@@ -67,6 +67,13 @@ class SiteFilterState {
   /// axis above by `SiteFilterQuery.toQuery`.
   final QueryNode? query;
 
+  /// A shared site library id, or [personalLibrary] for sites in no library;
+  /// null means every site (issue #2567).
+  final String? libraryId;
+
+  /// The [libraryId] value that selects personal sites only.
+  static const String personalLibrary = 'personal';
+
   const SiteFilterState({
     this.country,
     this.region,
@@ -79,6 +86,7 @@ class SiteFilterState {
     this.siteTypeIds = const {},
     this.tagIds = const {},
     this.query,
+    this.libraryId,
   });
 
   /// Whether any filter is currently active.
@@ -93,6 +101,7 @@ class SiteFilterState {
       hasDives != null ||
       siteTypeIds.isNotEmpty ||
       tagIds.isNotEmpty ||
+      libraryId != null ||
       query != null;
 
   SiteFilterState copyWith({
@@ -118,6 +127,8 @@ class SiteFilterState {
     bool clearHasCoordinates = false,
     bool clearHasDives = false,
     bool clearQuery = false,
+    String? libraryId,
+    bool clearLibraryId = false,
   }) {
     return SiteFilterState(
       country: clearCountry ? null : (country ?? this.country),
@@ -133,6 +144,7 @@ class SiteFilterState {
       siteTypeIds: siteTypeIds ?? this.siteTypeIds,
       tagIds: tagIds ?? this.tagIds,
       query: clearQuery ? null : (query ?? this.query),
+      libraryId: clearLibraryId ? null : (libraryId ?? this.libraryId),
     );
   }
 
@@ -152,7 +164,8 @@ class SiteFilterState {
           other.hasDives == hasDives &&
           setEquals(other.siteTypeIds, siteTypeIds) &&
           setEquals(other.tagIds, tagIds) &&
-          other.query == query;
+          other.query == query &&
+          other.libraryId == libraryId;
 
   @override
   int get hashCode => Object.hash(
@@ -167,6 +180,7 @@ class SiteFilterState {
     Object.hashAllUnordered(siteTypeIds),
     Object.hashAllUnordered(tagIds),
     query,
+    libraryId,
   );
 
   @override
@@ -175,7 +189,7 @@ class SiteFilterState {
       'difficulty: $difficulty, depth: $minDepth..$maxDepth, '
       'minRating: $minRating, hasCoordinates: $hasCoordinates, '
       'hasDives: $hasDives, types: $siteTypeIds, tags: $tagIds, '
-      'query: $query)';
+      'query: $query, libraryId: $libraryId)';
 }
 
 /// Site filter provider
@@ -406,6 +420,24 @@ final siteSearchProvider = FutureProvider.family<List<domain.DiveSite>, String>(
     return repository.searchSites(query, diverId: validatedDiverId);
   },
 );
+
+/// Site search results carrying the same dive figures as the site list.
+///
+/// [siteSearchProvider] returns bare sites, and the search page used to wrap
+/// each one with a dive count of 0, so every hit claimed the site had never
+/// been dived (#3377). The hits keep the search's order; their figures come
+/// from [sitesWithCountsProvider], which already refreshes on dive changes.
+final siteSearchWithDiveCountProvider =
+    FutureProvider.family<List<SiteWithDiveCount>, String>((ref, query) async {
+      final withCounts = await ref.watch(sitesWithCountsProvider.future);
+      if (query.isEmpty) return withCounts;
+      final sites = await ref.watch(siteSearchProvider(query).future);
+      final byId = {for (final entry in withCounts) entry.site.id: entry};
+      return [
+        for (final site in sites)
+          byId[site.id] ?? SiteWithDiveCount(site: site, diveCount: 0),
+      ];
+    });
 
 /// Dive count for a specific site
 final siteDiveCountProvider = FutureProvider.family<int, String>((

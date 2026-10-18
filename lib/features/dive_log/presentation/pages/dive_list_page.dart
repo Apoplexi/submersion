@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:submersion/core/router/list_return_scope.dart';
+import 'package:submersion/core/router/pushed_route.dart';
+import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/search/dive_search_action.dart';
 import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_field.dart';
@@ -15,9 +18,11 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_prefill.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/planned_dive_chip.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_badge.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label_resolver.dart';
 import 'package:submersion/features/data_quality/presentation/providers/data_quality_providers.dart';
+import 'package:submersion/features/dive_log/presentation/navigation/open_dive_list.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_detail_page.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_edit_page.dart';
 import 'package:submersion/features/dive_sites/presentation/pages/site_edit_page.dart';
@@ -63,7 +68,11 @@ String _tileUrl(double lat, double lng, int zoom, MapStyle style) {
 /// On desktop (>=800px): Shows a split view with list on left, detail/summary on right.
 /// On narrower screens (<800px): Shows the list with navigation to detail pages.
 class DiveListPage extends ConsumerStatefulWidget {
-  const DiveListPage({super.key});
+  const DiveListPage({super.key, this.returnTo});
+
+  /// Set when this list was pushed by `openDiveList`: what to put back when
+  /// it goes away. Null for the Dives tab itself.
+  final DiveListReturn? returnTo;
 
   @override
   ConsumerState<DiveListPage> createState() => _DiveListPageState();
@@ -100,7 +109,7 @@ class _DiveListPageState extends ConsumerState<DiveListPage>
         if (isDesktop && viewMode != ListViewMode.table) {
           final state = GoRouterState.of(context);
           final currentPath = state.uri.path;
-          context.go('$currentPath?mode=new');
+          context.goInPlace('$currentPath?mode=new');
         } else {
           context.push('/dives/new');
         }
@@ -123,7 +132,6 @@ class _DiveListPageState extends ConsumerState<DiveListPage>
   }
 
   void _toggleMapView() {
-    final router = GoRouter.of(context);
     final state = GoRouterState.of(context);
     final currentPath = state.uri.path;
     final selectedId = state.uri.queryParameters['selected'];
@@ -131,22 +139,25 @@ class _DiveListPageState extends ConsumerState<DiveListPage>
     if (_isMapView) {
       // Switch back to detail view
       if (selectedId != null) {
-        router.go('$currentPath?selected=$selectedId');
+        context.goInPlace('$currentPath?selected=$selectedId');
       } else {
-        router.go(currentPath);
+        context.goInPlace(currentPath);
       }
     } else {
       // Switch to map view
       if (selectedId != null) {
-        router.go('$currentPath?selected=$selectedId&view=map');
+        context.goInPlace('$currentPath?selected=$selectedId&view=map');
       } else {
-        router.go('$currentPath?view=map');
+        context.goInPlace('$currentPath?view=map');
       }
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ListReturnScope(returnTo: widget.returnTo, child: _buildPage(context));
+
+  Widget _buildPage(BuildContext context) {
     // Clear mobile map selection when filters change to avoid stale state
     ref.listen<DiveFilterState>(diveFilterProvider, (previous, next) {
       if (_mobileMapSelectedDiveId != null) {
@@ -194,19 +205,18 @@ class _DiveListPageState extends ConsumerState<DiveListPage>
             embedded: true,
             embeddedSiteId: siteId,
             onCloseEmbeddedSite: () {
-              final router = GoRouter.of(context);
               final state = GoRouterState.of(context);
               final params = Map<String, String>.from(
                 state.uri.queryParameters,
               );
               params.remove('site');
-              router.go(
+              context.goInPlace(
                 Uri(path: state.uri.path, queryParameters: params).toString(),
               );
             },
             onDeleted: () {
               final state = GoRouterState.of(context);
-              context.go(state.uri.path);
+              context.goInPlace(state.uri.path);
             },
           );
         },
@@ -364,6 +374,7 @@ class _DiveListPageState extends ConsumerState<DiveListPage>
           onItemSelected: onItemSelected,
           selectedId: selectedId,
           showAppBar: false,
+          showBackButton: isPushedRoute(context),
           isMapViewActive: _isMapView,
           onMapViewToggle: _toggleMapView,
         ),
@@ -378,21 +389,19 @@ class _DiveListPageState extends ConsumerState<DiveListPage>
             embedded: true,
             embeddedSiteId: siteId,
             onCloseEmbeddedSite: () {
-              final router = GoRouter.of(context);
               final state = GoRouterState.of(context);
               final params = Map<String, String>.from(
                 state.uri.queryParameters,
               );
               params.remove('site');
-              router.go(
+              context.goInPlace(
                 Uri(path: state.uri.path, queryParameters: params).toString(),
               );
             },
             onDeleted: () {
               // Clear selection when dive is deleted
-              final router = GoRouter.of(context);
               final state = GoRouterState.of(context);
-              router.go(state.uri.path);
+              context.goInPlace(state.uri.path);
             },
           );
         },
@@ -404,7 +413,7 @@ class _DiveListPageState extends ConsumerState<DiveListPage>
             // Exit map view and show detail pane for the selected dive
             final state = GoRouterState.of(context);
             final currentPath = state.uri.path;
-            context.go('$currentPath?selected=$diveId');
+            context.goInPlace('$currentPath?selected=$diveId');
           },
         ),
         editBuilder: (context, id, onSaved, onCancel) {
@@ -468,13 +477,18 @@ class _DiveListPageState extends ConsumerState<DiveListPage>
 
     // Mobile: Check if map view is requested
     if (_isMapView) {
+      // A pushed map (a trip's "View on map") returns where it came from,
+      // labelled as a plain Back; the Dives tab's own map returns to its list.
+      final pushed = isPushedRoute(context);
       return Scaffold(
         appBar: AppBar(
           title: Text(context.l10n.diveLog_listPage_appBar_diveMap),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            tooltip: context.l10n.diveLog_listPage_tooltip_backToDiveList,
-            onPressed: () => context.go('/dives'),
+            tooltip: pushed
+                ? MaterialLocalizations.of(context).backButtonTooltip
+                : context.l10n.diveLog_listPage_tooltip_backToDiveList,
+            onPressed: () => pushed ? context.pop() : context.go('/dives'),
           ),
           actions: [
             IconButton(
@@ -869,18 +883,9 @@ class DiveListTile extends ConsumerWidget {
                               if ((summary?.safetyFindingCount ?? 0) > 0 &&
                                   ref.watch(safetyReviewEnabledProvider)) ...[
                                 const SizedBox(width: 6),
-                                Tooltip(
-                                  message: context.l10n
-                                      .safetyReview_findingCount(
-                                        summary!.safetyFindingCount,
-                                      ),
-                                  child: Icon(
-                                    Icons.circle,
-                                    size: 8,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
+                                SafetyFindingBadge(
+                                  count: summary!.safetyFindingCount,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ],
                               if (rating != null) ...[
@@ -1052,83 +1057,69 @@ class DiveListTile extends ConsumerWidget {
       );
     }
 
-    // Build the card with or without map background
-    if (shouldShowMap) {
+    // The map layer, when the card shows one: a cached static tile under a
+    // gradient that keeps the text readable.
+    Widget withMapBackground(Widget content) {
       final tileUrl = _tileUrl(
         siteLatitude!,
         siteLongitude!,
         13,
         ref.watch(settingsProvider.select((s) => s.mapStyle)),
       );
-      return Card(
-        margin:
-            margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        clipBehavior: Clip.antiAlias,
-        child: Semantics(
-          button: true,
-          label: isPlannedDive
-              ? context.l10n.diveLog_listPage_semanticsPlannedDiveAtSite(
-                  siteName ?? context.l10n.diveLog_listPage_unknownSite,
-                )
-              : context.l10n.diveLog_listPage_semanticsDiveAtSite(
-                  diveNumber,
-                  siteName ?? context.l10n.diveLog_listPage_unknownSite,
-                ),
-          child: InkWell(
-            onTap: onTap,
-            onDoubleTap: onDoubleTap,
-            child: Stack(
-              children: [
-                // Static map tile background (cached)
-                Positioned.fill(
-                  child: CachedNetworkImage(
-                    imageUrl: tileUrl,
-                    httpHeaders: const {
-                      'User-Agent': 'Submersion Dive Log App (app.submersion)',
-                    },
-                    fit: BoxFit.cover,
-                    fadeInDuration: Duration.zero,
-                    placeholder: (_, _) =>
-                        Container(color: const Color(0xFF1A1A2E)),
-                    errorWidget: (_, _, _) =>
-                        Container(color: const Color(0xFF1A1A2E)),
-                  ),
-                ),
-                // Gradient overlay for text readability
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        stops: const [0.0, 0.3, 0.7, 1.0],
-                        colors: [
-                          Colors.black.withValues(alpha: 0.4),
-                          Colors.black.withValues(alpha: 0.5),
-                          Colors.black.withValues(alpha: 0.7),
-                          Colors.black.withValues(alpha: 0.85),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Content layer
-                buildContent(),
-              ],
+      return Stack(
+        children: [
+          // Static map tile background (cached)
+          Positioned.fill(
+            child: CachedNetworkImage(
+              imageUrl: tileUrl,
+              httpHeaders: const {
+                'User-Agent': 'Submersion Dive Log App (app.submersion)',
+              },
+              fit: BoxFit.cover,
+              fadeInDuration: Duration.zero,
+              placeholder: (_, _) => Container(color: const Color(0xFF1A1A2E)),
+              errorWidget: (_, _, _) =>
+                  Container(color: const Color(0xFF1A1A2E)),
             ),
           ),
-        ),
+          // Gradient overlay for text readability
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0.0, 0.3, 0.7, 1.0],
+                  colors: [
+                    Colors.black.withValues(alpha: 0.4),
+                    Colors.black.withValues(alpha: 0.5),
+                    Colors.black.withValues(alpha: 0.7),
+                    Colors.black.withValues(alpha: 0.85),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Content layer
+          content,
+        ],
       );
     }
 
-    // Standard card without map. The highlight is the fill above, not an edge
-    // stripe -- the key marks the row for tests without decorating it.
+    // One widget spine for every look the card takes (issue #3474). A tap
+    // highlights the dive in the same frame its ink splash starts, and the
+    // highlight drops the map for the selection fill. The splash lives in the
+    // InkWell's state, so everything from the root down to the InkWell keeps
+    // its type and key across that change; anything that differs between the
+    // looks sits below it. The highlight is the fill above, not an edge
+    // stripe; the key only marks the row for tests. It stays below the
+    // InkWell because a changed key rebuilds its whole subtree.
     return Container(
-      key: isHighlighted ? const ValueKey('dive_row_highlight') : null,
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Card(
         margin: EdgeInsets.zero,
         color: cardColor,
+        clipBehavior: shouldShowMap ? Clip.antiAlias : null,
         child: Semantics(
           button: true,
           label: isPlannedDive
@@ -1142,8 +1133,20 @@ class DiveListTile extends ConsumerWidget {
           child: InkWell(
             onTap: onTap,
             onDoubleTap: onDoubleTap,
-            borderRadius: BorderRadius.circular(12),
-            child: buildContent(),
+            // The card's own shape, in both layouts: a splash keeps the shape
+            // it started with, and a tap on a map card switches it to the
+            // plain layout, whose Card no longer clips, before the splash has
+            // finished. Card corners vary by theme, so the shape is the
+            // theme's, falling back to Material's default card corners.
+            customBorder:
+                Theme.of(context).cardTheme.shape ??
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Container(
+              key: isHighlighted ? const ValueKey('dive_row_highlight') : null,
+              child: shouldShowMap
+                  ? withMapBackground(buildContent())
+                  : buildContent(),
+            ),
           ),
         ),
       ),

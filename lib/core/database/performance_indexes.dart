@@ -134,6 +134,14 @@ const List<PerformanceIndex> kPerformanceIndexes = [
         'CREATE INDEX IF NOT EXISTS idx_dive_tanks_equipment '
         'ON dive_tanks(equipment_id)',
   ),
+  // v287: a passport's usage card finds the dives whose tanks came from one
+  // tagged cylinder (issue #2650).
+  (
+    name: 'idx_dive_tanks_passport_id',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dive_tanks_passport_id '
+        'ON dive_tanks(passport_id)',
+  ),
   (
     name: 'idx_dive_equipment_dive_id',
     ddl:
@@ -288,6 +296,13 @@ const List<PerformanceIndex> kPerformanceIndexes = [
   (
     name: 'idx_courses_diver',
     ddl: 'CREATE INDEX IF NOT EXISTS idx_courses_diver ON courses(diver_id)',
+  ),
+  // A course's dives through the junction (v288, issue #2515).
+  (
+    name: 'idx_dive_courses_course_id',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dive_courses_course_id '
+        'ON dive_courses(course_id)',
   ),
   (
     name: 'idx_media_platform_asset_id',
@@ -510,6 +525,15 @@ const List<PerformanceIndex> kPerformanceIndexes = [
     ddl:
         'CREATE INDEX IF NOT EXISTS idx_trip_cylinders_equipment '
         'ON trip_cylinders(equipment_id)',
+  ),
+  // -- library_site_notes --------------------------------------------
+  // Each library sync that pulled anything copies every library site's
+  // newest private note onto its row: one lookup per site.
+  (
+    name: 'idx_library_site_notes_site',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_library_site_notes_site '
+        'ON library_site_notes(site_id, updated_at)',
   ),
 ];
 

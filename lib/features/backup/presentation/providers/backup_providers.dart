@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:submersion/core/services/storage/gc/storage_gc_store.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -11,6 +12,7 @@ import 'package:submersion/features/backup/data/repositories/backup_preferences.
 import 'package:submersion/features/backup/data/services/backup_encryption_key_store.dart';
 import 'package:submersion/features/backup/data/services/backup_encryption_service.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
+import 'package:submersion/features/backup/data/services/cloud_backup_history.dart';
 import 'package:submersion/features/backup/domain/entities/backup_record.dart';
 import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dart'
     show WrongPassphraseException;
@@ -39,6 +41,10 @@ final backupPreferencesProvider = Provider<BackupPreferences>((ref) {
 
 /// Backup service with all dependencies injected
 final backupServiceProvider = Provider<BackupService>((ref) {
+  // Captured now, not read through ref inside the hook: a restore can run
+  // for minutes, and a rebuild of this provider meanwhile would leave the
+  // hook holding an unmounted Ref that throws, failing the restore.
+  final prefs = ref.watch(sharedPreferencesProvider);
   return BackupService(
     dbAdapter: DefaultBackupDatabaseAdapter(DatabaseService.instance),
     preferences: ref.watch(backupPreferencesProvider),
@@ -47,6 +53,7 @@ final backupServiceProvider = Provider<BackupService>((ref) {
     postRestoreSyncStore: PostRestoreSyncStore(
       ref.watch(sharedPreferencesProvider),
     ),
+    onRestoring: (at) => StorageGcStore.markRestored(prefs, at),
     encryptionKeyStore: ref.watch(encryptionKeyStoreProvider),
     syncPreferences: ref.watch(syncPreferencesProvider),
     backupEncryptionKeyStore: ref.watch(backupEncryptionKeyStoreProvider),
@@ -163,6 +170,25 @@ class BackupSettingsNotifier extends StateNotifier<BackupSettings> {
   /// Refresh state from SharedPreferences (e.g. after a backup updates lastBackupTime)
   void refresh() {
     state = _prefs.getSettings();
+  }
+
+  /// Like [refresh], but first re-reads what the WorkManager isolate may
+  /// have written since this isolate cached its preferences.
+  Future<void> reloadFromDisk() async {
+    await _prefs.reload();
+    if (!mounted) return;
+    refresh();
+  }
+
+  /// Records a failed scheduled backup for Settings > Data health.
+  Future<void> recordScheduledFailure(String message) async {
+    final at = DateTime.now();
+    await _prefs.setLastScheduledFailure(at, message);
+    if (!mounted) return;
+    state = state.copyWith(
+      lastScheduledFailureAt: at,
+      lastScheduledFailureMessage: message,
+    );
   }
 }
 
@@ -702,8 +728,12 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
       await _service.performBackup(isAutomatic: true);
       _ref.read(backupSettingsProvider.notifier).refresh();
       _ref.invalidate(backupHistoryProvider);
-    } catch (_) {
-      // Desktop automatic backup failure is silent — no notification system
+    } catch (e) {
+      // Desktop automatic backup failure has no notification system; it is
+      // recorded for Settings > Data health instead (#3394).
+      await _ref
+          .read(backupSettingsProvider.notifier)
+          .recordScheduledFailure(e.toString());
     }
   }
 
@@ -723,10 +753,26 @@ final backupOperationProvider =
 // History
 // =============================================================================
 
-/// Backup history sorted newest-first
-final backupHistoryProvider = FutureProvider<List<BackupRecord>>((ref) async {
+/// Backup history sorted newest-first, plus the backups in the connected
+/// cloud folder that the local history has no record of (issue #3214: after a
+/// fresh install the local history is empty, the cloud copies are not).
+///
+/// Auto-disposed so every visit to the backup page lists the cloud folder
+/// afresh. Signing in changes no provider state this could watch (Cloud Sync
+/// selects the provider before authenticating, and a re-sign-in to the same
+/// provider selects nothing), so a cached signed-out listing would otherwise
+/// hide the cloud backups until something else invalidated it.
+final backupHistoryProvider = FutureProvider.autoDispose<List<BackupRecord>>((
+  ref,
+) async {
   final service = ref.watch(backupServiceProvider);
-  return service.getValidatedBackupHistory();
+  // Started first so the listing overlaps the local read. Not joined with a
+  // record `.wait`, which would wrap a history failure in ParallelWaitError
+  // and hide the real message; getCloudBackups never throws, so leaving it
+  // unawaited on that path cannot surface an unhandled error.
+  final cloudFiles = service.getCloudBackups();
+  final history = await service.getValidatedBackupHistory();
+  return mergeCloudBackups(history, await cloudFiles);
 });
 
 // =============================================================================

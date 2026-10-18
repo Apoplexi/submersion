@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/data/visibility/visibility_filter.dart';
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/performance/perf_timer.dart';
@@ -31,6 +32,7 @@ import 'package:submersion/features/media_store/data/media_transfer_queue_reposi
 import 'package:submersion/features/planner/data/repositories/dive_plan_dive_links.dart';
 import 'package:submersion/features/documents/data/repositories/document_repository.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
+import 'package:submersion/core/services/shared_library/library_edit_stamper.dart';
 
 export 'package:submersion/features/dive_sites/data/repositories/site_links.dart'
     show SiteLinks, SiteUsage;
@@ -64,6 +66,7 @@ class SiteRepository {
   final MediaDeletionCoordinator _mediaDeletionCoordinator;
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
+  final LibraryEditStamper _libraryStamper = LibraryEditStamper();
   final SiteClassificationRepository _classification =
       SiteClassificationRepository();
   final _uuid = const Uuid();
@@ -175,6 +178,7 @@ class SiteRepository {
                 entryMethod: Value(site.entryMethod?.name),
                 exitMethod: Value(site.exitMethod?.name),
                 isShared: Value(site.isShared),
+                sharedLibraryId: Value(site.sharedLibraryId),
                 createdAt: Value(now),
                 updatedAt: Value(now),
               ),
@@ -241,6 +245,36 @@ class SiteRepository {
     try {
       _log.info('Updating site: ${site.id}');
       final now = DateTime.now().millisecondsSinceEpoch;
+      // A library site records which fields this save changes (issue
+      // #2567); the comparison needs the row as it was.
+      final before = await getSiteById(site.id);
+      final libraryEdit = before?.isLibrarySite ?? false;
+      // A library site this profile may not edit (a reader's, say through
+      // an import) keeps the library's values: only the profile's private
+      // notes and rating are saved, which never leave it.
+      if (libraryEdit &&
+          !await _libraryStamper.mayEdit(
+            site.id,
+            actingDiverId: actingDiverId,
+          )) {
+        site = before!.copyWith(
+          notes: site.notes,
+          rating: site.rating,
+          clearRating: site.rating == null,
+        );
+        metadataPatch = null;
+        classification = null;
+      }
+      final typesBefore = libraryEdit && classification != null
+          ? (await _classification.getTypesForSite(
+              site.id,
+            )).map((t) => t.id).toSet()
+          : const <String>{};
+      final tagsBefore = libraryEdit && classification != null
+          ? (await _classification.getTagsForSite(
+              site.id,
+            )).map((t) => t.id).toSet()
+          : const <String>{};
 
       var companion = DiveSitesCompanion(
         name: Value(site.name),
@@ -304,6 +338,30 @@ class SiteRepository {
         }
         await _writeClassification(site.id, classification);
       });
+      if (libraryEdit && before != null) {
+        final changed = LibraryEditStamper.changedFields(before, site);
+        if (classification != null) {
+          if (classification.typeIds.toSet() != typesBefore) {
+            changed.add('siteTypes');
+          }
+          if (classification.tagIds.toSet() != tagsBefore) changed.add('tags');
+        }
+        await _libraryStamper.stamp(
+          site.id,
+          changed,
+          actingDiverId: actingDiverId,
+        );
+        // The profile's private notes and rating: never in the library,
+        // kept for personal sync to carry to its other devices.
+        if (before.notes != site.notes || before.rating != site.rating) {
+          await _libraryStamper.keepPrivate(
+            site.id,
+            notes: site.notes,
+            rating: site.rating,
+            actingDiverId: actingDiverId,
+          );
+        }
+      }
       SyncEventBus.notifyLocalChange();
       _log.info('Updated site: ${site.id}');
     } catch (e, stackTrace) {
@@ -374,6 +432,13 @@ class SiteRepository {
   }) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
+      final before = await getSiteById(siteId);
+      // A library site this profile may not edit (a reader's) keeps the
+      // library's values: the change could never be uploaded.
+      if ((before?.isLibrarySite ?? false) &&
+          !await _libraryStamper.mayEdit(siteId)) {
+        return false;
+      }
       final changed = await _db.transaction(() async {
         final row = await (_db.select(
           _db.diveSites,
@@ -409,6 +474,15 @@ class SiteRepository {
         recordId: siteId,
         localUpdatedAt: now,
       );
+      if (before?.isLibrarySite ?? false) {
+        final after = await getSiteById(siteId);
+        if (after != null) {
+          await _libraryStamper.stamp(
+            siteId,
+            LibraryEditStamper.changedFields(before!, after),
+          );
+        }
+      }
       SyncEventBus.notifyLocalChange();
       return true;
     } catch (e, stackTrace) {
@@ -429,6 +503,17 @@ class SiteRepository {
   ) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
+      // A shared site library clock goes only on a column whose value changes
+      // (issue #2567): rewriting the same altitude must not beat a newer
+      // edit by another member.
+      final before = await getSiteById(siteId);
+      // As for location details: a library site this profile may not edit
+      // keeps the library's values.
+      if (before != null &&
+          before.isLibrarySite &&
+          !await _libraryStamper.mayEdit(siteId)) {
+        return;
+      }
       await (_db.update(_db.diveSites)..where((t) => t.id.equals(siteId)))
           .write(patch.copyWith(updatedAt: Value(now)));
       await _syncRepository.markRecordPending(
@@ -436,6 +521,15 @@ class SiteRepository {
         recordId: siteId,
         localUpdatedAt: now,
       );
+      if (before != null && before.isLibrarySite) {
+        final after = await getSiteById(siteId);
+        if (after != null) {
+          await _libraryStamper.stamp(
+            siteId,
+            LibraryEditStamper.changedFields(before, after),
+          );
+        }
+      }
       SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {
       _log.error(
@@ -580,6 +674,7 @@ class SiteRepository {
     List<String> ids, {
     required bool cascadeMedia,
     bool undoable = false,
+    Set<String> skipTombstones = const {},
   }) async {
     final split = cascadeMedia
         ? await _mediaRepository.partitionMediaForSiteDeletion(ids)
@@ -612,11 +707,18 @@ class SiteRepository {
           : const <DocumentSnapshotEntry>[];
       await DocumentRepository().deleteForOwners(DocumentOwnerKind.site, ids);
       await (_db.delete(_db.diveSites)..where((t) => t.id.isIn(ids))).go();
-      // One batch for every tombstone, not a transaction per site.
-      await _syncRepository.logDeletions(
-        entityType: 'diveSites',
-        recordIds: ids,
-      );
+      // One batch for every tombstone, not a transaction per site. A library
+      // library site has no personal tombstone (issue #2567).
+      final tombstoned = [
+        for (final id in ids)
+          if (!skipTombstones.contains(id)) id,
+      ];
+      if (tombstoned.isNotEmpty) {
+        await _syncRepository.logDeletions(
+          entityType: 'diveSites',
+          recordIds: tombstoned,
+        );
+      }
       return cleared.copyWith(
         documents: documents,
         hides: hides,
@@ -664,6 +766,7 @@ class SiteRepository {
     String id, {
     bool cascadeMedia = true,
     String? actingDiverId,
+    bool? logTombstones,
   }) async {
     try {
       final ownership = await _siteOwnership([id], actingDiverId);
@@ -675,7 +778,15 @@ class SiteRepository {
       // tombstone for the peers, as deleteTrip does.
       if (ownership.allowed.isEmpty) return true;
       _log.info('Deleting site: $id');
-      await _deleteSiteRows([id], cascadeMedia: cascadeMedia);
+      // A shared site library site leaves no personal tombstone (issue #2567)
+      // unless the caller says otherwise.
+      final tombstone =
+          logTombstones ?? !((await getSiteById(id))?.isLibrarySite ?? false);
+      await _deleteSiteRows(
+        [id],
+        cascadeMedia: cascadeMedia,
+        skipTombstones: tombstone ? const {} : {id},
+      );
       SyncEventBus.notifyLocalChange();
       _log.info('Deleted site: $id');
       return true;
@@ -768,11 +879,18 @@ class SiteRepository {
       }
       if (allowed.isEmpty) return const SiteLinks();
       _log.info('Bulk deleting ${allowed.length} sites');
+      // Shared site library sites among them leave no personal tombstone (issue
+      // #2567).
+      final libraryIds = {
+        for (final site in await getSitesByIds(allowed))
+          if (site.isLibrarySite) site.id,
+      };
       // The site list offers Undo (issue #2718).
       final links = await _deleteSiteRows(
         allowed,
         cascadeMedia: cascadeMedia,
         undoable: true,
+        skipTombstones: libraryIds,
       );
       SyncEventBus.notifyLocalChange();
       _log.info('Bulk deleted ${allowed.length} sites');
@@ -1200,22 +1318,27 @@ class SiteRepository {
     }
   }
 
-  /// Search sites by name or location
+  /// Search sites by name or location, ignoring case.
+  ///
+  /// Each column is folded by `unicode_lower` to meet the Dart-lowered
+  /// needle: LIKE folds ASCII only, so "österreich" missed "Österreich"
+  /// (#3377).
   Future<List<domain.DiveSite>> searchSites(
     String query, {
     String? diverId,
   }) async {
     try {
       return await PerfTimer.measure('searchSites', () async {
+        final needle = query.toLowerCase();
         final searchQuery = _db.select(_db.diveSites)
           ..where(
             (t) =>
-                t.name.contains(query) |
-                t.country.contains(query) |
-                t.region.contains(query) |
-                t.city.contains(query) |
-                t.island.contains(query) |
-                t.bodyOfWater.contains(query),
+                t.name.unicodeLower().contains(needle) |
+                t.country.unicodeLower().contains(needle) |
+                t.region.unicodeLower().contains(needle) |
+                t.city.unicodeLower().contains(needle) |
+                t.island.unicodeLower().contains(needle) |
+                t.bodyOfWater.unicodeLower().contains(needle),
           )
           ..orderBy([(t) => OrderingTerm.asc(t.name.collate(Collate.noCase))]);
 
@@ -1411,9 +1534,40 @@ class SiteRepository {
         entryMethod: Value(site.entryMethod?.name),
         exitMethod: Value(site.exitMethod?.name),
         isShared: Value(site.isShared),
+        sharedLibraryId: Value(site.sharedLibraryId),
         updatedAt: Value(now),
       ),
     );
+  }
+
+  /// Points every row that references [from] at [to] (issue #2567): dives,
+  /// plans, media, documents, features, species, types and tags. The merge
+  /// helpers do the work; [from] is left as an empty site for the caller to
+  /// delete, whose delete would otherwise take the documents with it.
+  Future<void> relinkSiteReferences({
+    required String from,
+    required String to,
+  }) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _relinkDives([from], to, now);
+    await _relinkPlans([from], to, now);
+    await _relinkMedia([from], to, now);
+    await _relinkSiteFeatures([from], to, now);
+    await DocumentRepository().reassignOwner(DocumentOwnerKind.site, [
+      from,
+    ], to);
+    await _classification.relinkForMerge([from], to);
+    await _mergeExpectedSpecies(
+      orderedSiteIds: [to, from],
+      survivorId: to,
+      now: now,
+    );
+  }
+
+  /// Whether any dive or plan on this device links to [siteId].
+  Future<bool> hasLinks(String siteId) async {
+    final usage = await countLinksToSites(_db, [siteId]);
+    return usage.dives > 0 || usage.plans > 0;
   }
 
   Future<void> _relinkDives(

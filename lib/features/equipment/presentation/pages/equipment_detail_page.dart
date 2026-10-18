@@ -15,7 +15,6 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/status_colors.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/cylinder_passports/presentation/widgets/passport_entry_card.dart';
@@ -24,14 +23,16 @@ import 'package:submersion/features/equipment/presentation/widgets/observations_
 import 'package:submersion/features/equipment/presentation/widgets/service_status_indicator.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
-import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/router/pushed_route.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_enum_display.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/dive_log/presentation/navigation/open_dive_list.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
+import 'package:submersion/features/trips/presentation/navigation/open_trip_list.dart';
 import 'package:collection/collection.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_colors.dart';
@@ -86,20 +87,22 @@ class _EquipmentDetailPageState extends ConsumerState<EquipmentDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Desktop redirect: if viewing detail page directly on desktop, redirect to master-detail.
-    // Skip in table mode -- table view has no master-detail split to redirect into.
-    if (!widget.embedded &&
-        !_hasRedirected &&
-        ResponsiveBreakpoints.isMasterDetail(context)) {
-      final viewMode = ref.read(equipmentListViewModeProvider);
-      if (viewMode != ListViewMode.table) {
-        _hasRedirected = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            context.go('/equipment?selected=${widget.equipmentId}');
-          }
-        });
-      }
+    // Desktop redirect: a root visit (deep link, sidebar) moves into the
+    // master-detail split. A pushed page, opened from a dive's details
+    // say, stays put: the redirect's go() would erase the page under it
+    // and its back arrow (#3292).
+    if (!_hasRedirected &&
+        shouldRedirectToMasterDetail(
+          context,
+          embedded: widget.embedded,
+          viewMode: ref.read(equipmentListViewModeProvider),
+        )) {
+      _hasRedirected = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.go('/equipment?selected=${widget.equipmentId}');
+        }
+      });
     }
 
     final equipmentAsync = ref.watch(equipmentItemProvider(widget.equipmentId));
@@ -270,14 +273,10 @@ class _EquipmentDetailContent extends ConsumerWidget {
             const SizedBox(height: 24),
             UnitConfigurationsCard(equipmentId: equipmentId),
           ],
-          const SizedBox(height: 24),
+          // Brings its own top gap: it hides itself once every linked file
+          // has moved into Documents.
           EquipmentDocumentsSection(
             equipmentId: equipmentId,
-            onAttachPressed: () => DocumentOpenHelper.pickAndAttach(
-              context: context,
-              ref: ref,
-              equipmentId: equipmentId,
-            ),
             onOpenDocument: (item) =>
                 DocumentOpenHelper.open(context, ref, item),
           ),
@@ -580,9 +579,11 @@ class _EquipmentDetailContent extends ConsumerWidget {
                 child: InkWell(
                   onTap: count > 0
                       ? () {
-                          ref.read(diveFilterProvider.notifier).state =
-                              DiveFilterState(equipmentIds: [equipmentId]);
-                          context.go('/dives');
+                          openDiveList(
+                            context,
+                            ref,
+                            DiveFilterState(equipmentIds: [equipmentId]),
+                          );
                         }
                       : null,
                   borderRadius: BorderRadius.circular(8),
@@ -649,9 +650,11 @@ class _EquipmentDetailContent extends ConsumerWidget {
                 child: InkWell(
                   onTap: count > 0
                       ? () {
-                          ref.read(tripFilterProvider.notifier).state =
-                              TripFilterState(equipmentId: equipmentId);
-                          context.go('/trips');
+                          openTripList(
+                            context,
+                            ref,
+                            TripFilterState(equipmentId: equipmentId),
+                          );
                         }
                       : null,
                   borderRadius: BorderRadius.circular(8),

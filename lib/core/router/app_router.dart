@@ -5,6 +5,7 @@ import 'package:submersion/core/accessibility/app_shortcuts.dart';
 import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:submersion/core/router/nav_shortcut_pages.dart';
 
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
@@ -27,7 +28,6 @@ import 'package:submersion/features/setup_wizard/presentation/pages/setup_wizard
 import 'package:submersion/features/buddies/presentation/pages/buddy_detail_page.dart';
 import 'package:submersion/features/buddies/presentation/pages/buddy_edit_page.dart';
 import 'package:submersion/features/buddies/presentation/pages/buddy_merge_page.dart';
-import 'package:submersion/features/certifications/presentation/pages/certification_list_page.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
 import 'package:submersion/features/documents/presentation/pages/document_detail_page.dart';
 import 'package:submersion/features/documents/presentation/pages/document_edit_page.dart';
@@ -41,7 +41,6 @@ import 'package:submersion/features/pre_dive/presentation/pages/pre_dive_session
 import 'package:submersion/features/pre_dive/presentation/pages/pre_dive_sessions_page.dart';
 import 'package:submersion/features/pre_dive/presentation/pages/pre_dive_template_edit_page.dart';
 import 'package:submersion/features/pre_dive/presentation/pages/pre_dive_templates_page.dart';
-import 'package:submersion/features/courses/presentation/pages/course_list_page.dart';
 import 'package:submersion/features/courses/presentation/pages/course_detail_page.dart';
 import 'package:submersion/features/courses/presentation/pages/course_edit_page.dart';
 import 'package:submersion/features/dive_centers/presentation/pages/dive_center_detail_page.dart';
@@ -49,6 +48,8 @@ import 'package:submersion/features/dive_centers/presentation/pages/dive_center_
 import 'package:submersion/features/dive_centers/presentation/pages/dive_center_import_page.dart';
 import 'package:submersion/features/dive_centers/presentation/pages/dive_center_list_page.dart';
 import 'package:submersion/features/dive_centers/presentation/pages/dive_center_map_page.dart';
+import 'package:submersion/features/dive_log/presentation/navigation/open_dive_list.dart';
+import 'package:submersion/features/trips/presentation/navigation/open_trip_list.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_list_page.dart';
 import 'package:submersion/features/data_quality/presentation/pages/data_quality_inbox_page.dart';
 import 'package:submersion/features/data_quality/presentation/pages/data_quality_settings_page.dart';
@@ -108,6 +109,13 @@ import 'package:submersion/features/backup/presentation/pages/backup_settings_pa
 import 'package:submersion/features/settings/presentation/pages/manage_currency_rules_page.dart';
 import 'package:submersion/features/settings/presentation/pages/hidden_items_page.dart';
 import 'package:submersion/features/settings/presentation/pages/cloud_sync_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/change_library_connection_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/connect_shared_library_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/library_backups_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/shared_libraries_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/shared_library_members_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/shared_library_page.dart';
+import 'package:submersion/features/shared_library/presentation/pages/suggestion_inbox_page.dart';
 import 'package:submersion/features/media_store/presentation/pages/media_storage_page.dart';
 import 'package:submersion/features/media_store/presentation/pages/transfers_page.dart';
 import 'package:submersion/features/settings/presentation/pages/connected_accounts_page.dart';
@@ -120,10 +128,14 @@ import 'package:submersion/features/settings/presentation/pages/fix_dive_times_p
 import 'package:submersion/features/settings/presentation/pages/link_buddy_names_page.dart';
 import 'package:submersion/features/settings/presentation/pages/retype_other_gear_page.dart';
 import 'package:submersion/features/settings/presentation/pages/settings_page.dart';
+import 'package:submersion/features/settings/presentation/settings_legacy_links.dart';
+import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 import 'package:submersion/features/settings/presentation/pages/appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/default_visible_metrics_page.dart';
+import 'package:submersion/features/settings/presentation/pages/equipment_default_view_page.dart';
+import 'package:submersion/features/settings/presentation/pages/profile_metric_colors_page.dart';
 import 'package:submersion/features/settings/presentation/pages/dive_detail_sections_page.dart';
 import 'package:submersion/features/settings/presentation/pages/site_detail_sections_page.dart';
 import 'package:submersion/features/safety/presentation/pages/add_chamber_page.dart';
@@ -134,7 +146,9 @@ import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
 import 'package:submersion/features/safety/presentation/pages/emergency_card_page.dart';
 import 'package:submersion/features/settings/presentation/pages/equipment_condition_settings_page.dart';
-import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
+import 'package:submersion/features/settings/presentation/pages/decompression_settings_page.dart';
+import 'package:submersion/features/settings/presentation/pages/safety_hub_page.dart';
+import 'package:submersion/features/settings/presentation/pages/safety_review_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/language_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/nav_customization_page.dart';
 import 'package:submersion/features/settings/presentation/pages/theme_gallery_page.dart';
@@ -176,6 +190,8 @@ import 'package:submersion/features/nav_track/presentation/pages/nav_track_detai
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_seascape_page.dart';
 import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_page.dart';
 import 'package:submersion/core/router/track_locations.dart';
+import 'package:submersion/core/router/training_locations.dart';
+import 'package:submersion/features/training/presentation/pages/training_page.dart';
 import 'package:submersion/features/tracks/domain/track_kind.dart';
 import 'package:submersion/features/tracks/presentation/pages/tracks_map_page.dart';
 import 'package:submersion/features/tracks/presentation/pages/tracks_page.dart';
@@ -207,7 +223,7 @@ import 'package:submersion/features/dashboard/presentation/pages/dashboard_page.
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_compare_page.dart';
 import 'package:submersion/features/surface_interval_tool/presentation/pages/surface_interval_tool_page.dart';
-import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
+import 'package:submersion/features/import_wizard/presentation/pages/universal_import_wizard_route.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/main_scaffold.dart';
 import 'package:submersion/features/certification_agencies/presentation/pages/certification_agencies_page.dart';
@@ -273,6 +289,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               child: const DashboardPage(),
             ),
           ),
+
+          // Nav shortcuts: deep pages promoted to the main nav (#2936).
+          navShortcutRoute(),
 
           // Planning hub and tools, gated behind the safety disclaimer
           // (issue #3120). A plain GoRoute only wraps its own exact-match
@@ -423,7 +442,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'dives',
             pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
-              child: const DiveListPage(),
+              // Set when openDiveList pushed this list: what to put back
+              // when it goes away (#3292).
+              child: DiveListPage(
+                returnTo: switch (state.extra) {
+                  final DiveListReturn r => r,
+                  _ => null,
+                },
+              ),
             ),
             routes: [
               GoRoute(
@@ -471,7 +497,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   final ids =
                       (state.extra as List<dynamic>?)?.cast<String>() ??
                       const <String>[];
-                  return BulkDiveEditPage(diveIds: ids);
+                  return BulkDiveEditPage(
+                    diveIds: ids,
+                    popOnSave: state.uri.queryParameters['return'] == 'pop',
+                  );
                 },
               ),
               GoRoute(
@@ -587,8 +616,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'edit',
                     name: 'editSite',
-                    builder: (context, state) =>
-                        SiteEditPage(siteId: state.pathParameters['siteId']),
+                    builder: (context, state) => SiteEditPage(
+                      siteId: state.pathParameters['siteId'],
+                      suggest: state.uri.queryParameters['suggest'] == '1',
+                    ),
                   ),
                 ],
               ),
@@ -799,13 +830,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
+          // Training is the nav entry for the Certifications and Courses
+          // tabs (#3437); its own address opens Certifications.
+          GoRoute(
+            path: kTrainingLocation,
+            redirect: (_, _) => TrainingTab.certifications.path,
+          ),
+
           // Certifications
           GoRoute(
             path: '/certifications',
             name: 'certifications',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const CertificationListPage(),
+            // Both Training tabs build one host under one page key, so it
+            // stays mounted across a switch (#3437).
+            pageBuilder: (context, state) => trainingHostPage(
+              const TrainingPage(tab: TrainingTab.certifications),
             ),
             routes: [
               GoRoute(
@@ -887,14 +926,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // Training Courses
+          // Training Courses, the second Training tab
           GoRoute(
             path: '/courses',
             name: 'courses',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const CourseListPage(),
-            ),
+            pageBuilder: (context, state) =>
+                trainingHostPage(const TrainingPage(tab: TrainingTab.courses)),
             routes: [
               GoRoute(
                 path: 'new',
@@ -969,7 +1006,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'trips',
             pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
-              child: const TripListPage(),
+              // Set when openTripList pushed this list: what to put back
+              // when it goes away (#3350).
+              child: TripListPage(
+                returnTo: switch (state.extra) {
+                  final TripListReturn r => r,
+                  _ => null,
+                },
+              ),
             ),
             routes: [
               GoRoute(
@@ -1134,8 +1178,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'import-wizard',
                 name: 'universalImport',
-                builder: (context, state) =>
-                    const _UniversalImportWizardRoute(),
+                builder: (context, state) => const UniversalImportWizardRoute(),
               ),
               GoRoute(
                 path: 'import-cloud/suunto',
@@ -1251,7 +1294,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 underwaterTrackSeascapeLocation(state.pathParameters['id']!),
           ),
 
-          // Near-miss incident log (entry point: Settings > Manage)
+          // Near-miss incident log (entry point: Settings > Diver Profile)
           GoRoute(
             path: '/incidents',
             name: 'incidents',
@@ -1297,10 +1340,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 // Sections that render a full page of their own would get a
                 // second app bar from the wrapper, so send deep links to the
                 // dedicated route. Returns null for genuine section content,
-                // which belongs in the wrapper.
-                redirect: (context, state) =>
-                    settingsSectionDedicatedRoutes[state
-                        .pathParameters['sectionId']],
+                // which belongs in the wrapper. The old Decompression section
+                // follows the window: the Safety pane on a master-detail
+                // window, its own page on a phone.
+                redirect: (context, state) => resolveSettingsSectionRedirect(
+                  state.pathParameters['sectionId'],
+                  masterDetail: ResponsiveBreakpoints.isMasterDetail(context),
+                ),
                 builder: (context, state) => SettingsSectionDetailPage(
                   sectionId: state.pathParameters['sectionId']!,
                 ),
@@ -1414,8 +1460,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'safety',
                 name: 'safetySettings',
-                builder: (context, state) => const SafetySettingsPage(),
+                builder: (context, state) => const SafetyHubPage(),
                 routes: [
+                  GoRoute(
+                    path: 'review',
+                    name: 'safetyReviewSettings',
+                    builder: (context, state) =>
+                        const SafetyReviewSettingsPage(),
+                  ),
+                  GoRoute(
+                    path: 'decompression',
+                    name: 'decompressionSettings',
+                    builder: (context, state) =>
+                        const DecompressionSettingsPage(),
+                  ),
                   GoRoute(
                     path: 'equipment-condition',
                     name: 'equipmentConditionSettings',
@@ -1425,9 +1483,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 ],
               ),
               GoRoute(
+                path: 'equipment-default-view',
+                name: 'equipmentDefaultView',
+                builder: (context, state) => const EquipmentDefaultViewPage(),
+              ),
+              GoRoute(
                 path: 'default-metrics',
                 name: 'defaultMetrics',
                 builder: (context, state) => const DefaultVisibleMetricsPage(),
+              ),
+              GoRoute(
+                path: 'metric-colors',
+                name: 'metricColors',
+                builder: (context, state) => const ProfileMetricColorsPage(),
               ),
               GoRoute(
                 path: 'themes',
@@ -1481,6 +1549,59 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     path: 'webdav-config',
                     name: 'webdavConfig',
                     builder: (context, state) => const WebDavConfigPage(),
+                  ),
+                ],
+              ),
+              // Shared site libraries (issue #2567).
+              GoRoute(
+                path: 'shared-libraries',
+                name: 'sharedLibraries',
+                builder: (context, state) => const SharedLibrariesPage(),
+                routes: [
+                  GoRoute(
+                    path: 'connect',
+                    name: 'sharedLibraryConnect',
+                    builder: (context, state) => ConnectSharedLibraryPage(
+                      initialPrefix: state.uri.queryParameters['prefix'],
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':libraryId',
+                    name: 'sharedLibrary',
+                    builder: (context, state) => SharedLibraryPage(
+                      libraryId: state.pathParameters['libraryId']!,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'members',
+                        name: 'sharedLibraryMembers',
+                        builder: (context, state) => SharedLibraryMembersPage(
+                          libraryId: state.pathParameters['libraryId']!,
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'suggestions',
+                        name: 'sharedLibrarySuggestions',
+                        builder: (context, state) => SuggestionInboxPage(
+                          libraryId: state.pathParameters['libraryId']!,
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'backups',
+                        name: 'sharedLibraryBackups',
+                        builder: (context, state) => LibraryBackupsPage(
+                          libraryId: state.pathParameters['libraryId']!,
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'connection',
+                        name: 'sharedLibraryConnection',
+                        builder: (context, state) =>
+                            ChangeLibraryConnectionPage(
+                              libraryId: state.pathParameters['libraryId']!,
+                            ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -2114,16 +2235,6 @@ class _DiveComputerDownloadWizardRouteState
         ),
       ),
     );
-  }
-}
-
-/// Wrapper that creates a [UniversalAdapter] with Ref from Riverpod.
-class _UniversalImportWizardRoute extends ConsumerWidget {
-  const _UniversalImportWizardRoute();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return UnifiedImportWizard(adapter: UniversalAdapter(ref: ref));
   }
 }
 

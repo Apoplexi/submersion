@@ -9,7 +9,9 @@ import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_course_links_schema.dart';
 import 'package:submersion/core/database/legacy_sample_staging.dart';
 import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/core/database/site_type_seed.dart';
@@ -19,6 +21,7 @@ import 'package:submersion/core/services/sync/device_local_fields.dart';
 import 'package:submersion/core/services/sync/legacy_wire_keys.dart';
 import 'package:submersion/core/services/sync/sync_fact_groups.dart';
 import 'package:submersion/core/services/sync/sync_record_overlay.dart';
+import 'package:submersion/core/services/sync/view_config_merge.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -320,6 +323,7 @@ class SyncData {
   final List<Map<String, dynamic>> tags;
   final List<Map<String, dynamic>> diveTags;
   final List<Map<String, dynamic>> diveDiveTypes;
+  final List<Map<String, dynamic>> diveCourses;
   final List<Map<String, dynamic>> diveTypes;
   final List<Map<String, dynamic>> diveRoles;
   final List<Map<String, dynamic>> customCertificationAgencies;
@@ -369,6 +373,13 @@ class SyncData {
   final List<Map<String, dynamic>> equipmentLocations;
   final List<Map<String, dynamic>> equipmentLocationMoves;
   final List<Map<String, dynamic>> diveComputerConnections;
+
+  /// Shared site library memberships per profile (v289, issue #2567).
+  final List<Map<String, dynamic>> sharedLibraryMemberships;
+
+  /// A profile's private notes on shared site library sites (v289, issue
+  /// #2567).
+  final List<Map<String, dynamic>> librarySiteNotes;
   final List<Map<String, dynamic>> mediaSpecies;
   final List<Map<String, dynamic>> siteFeatures;
   final List<Map<String, dynamic>> csvPresets;
@@ -443,6 +454,7 @@ class SyncData {
     this.tags = const [],
     this.diveTags = const [],
     this.diveDiveTypes = const [],
+    this.diveCourses = const [],
     this.diveTypes = const [],
     this.diveRoles = const [],
     this.customCertificationAgencies = const [],
@@ -487,6 +499,8 @@ class SyncData {
     this.equipmentLocations = const [],
     this.equipmentLocationMoves = const [],
     this.diveComputerConnections = const [],
+    this.sharedLibraryMemberships = const [],
+    this.librarySiteNotes = const [],
     this.mediaSpecies = const [],
     this.siteFeatures = const [],
     this.csvPresets = const [],
@@ -561,6 +575,7 @@ class SyncData {
     'tags': tags,
     'diveTags': diveTags,
     'diveDiveTypes': diveDiveTypes,
+    'diveCourses': diveCourses,
     'diveTypes': diveTypes,
     'diveRoles': diveRoles,
     'customCertificationAgencies': customCertificationAgencies,
@@ -604,6 +619,8 @@ class SyncData {
     'equipmentLocations': equipmentLocations,
     'equipmentLocationMoves': equipmentLocationMoves,
     'diveComputerConnections': diveComputerConnections,
+    'sharedLibraryMemberships': sharedLibraryMemberships,
+    'librarySiteNotes': librarySiteNotes,
     'mediaSpecies': mediaSpecies,
     'siteFeatures': siteFeatures,
     'csvPresets': csvPresets,
@@ -688,6 +705,7 @@ class SyncData {
       tags: _parseList(json['tags']),
       diveTags: _parseList(json['diveTags']),
       diveDiveTypes: _parseList(json['diveDiveTypes']),
+      diveCourses: _parseList(json['diveCourses']),
       diveTypes: _parseList(json['diveTypes']),
       diveRoles: _parseList(json['diveRoles']),
       customCertificationAgencies: _parseList(
@@ -736,6 +754,8 @@ class SyncData {
       equipmentLocations: _parseList(json['equipmentLocations']),
       equipmentLocationMoves: _parseList(json['equipmentLocationMoves']),
       diveComputerConnections: _parseList(json['diveComputerConnections']),
+      sharedLibraryMemberships: _parseList(json['sharedLibraryMemberships']),
+      librarySiteNotes: _parseList(json['librarySiteNotes']),
       mediaSpecies: _parseList(json['mediaSpecies']),
       siteFeatures: _parseList(json['siteFeatures']),
       csvPresets: _parseList(json['csvPresets']),
@@ -1167,6 +1187,7 @@ class SyncDataSerializer {
     (key: 'tags', table: _db.tags, blob: false, full: null),
     (key: 'diveTags', table: _db.diveTags, blob: false, full: null),
     (key: 'diveDiveTypes', table: _db.diveDiveTypes, blob: false, full: null),
+    (key: 'diveCourses', table: _db.diveCourses, blob: false, full: null),
     // diveTypes/species/fieldPresets exclude built-in reference data
     // (isBuiltIn=false), so reuse their exporters rather than paging all rows.
     (
@@ -1325,6 +1346,18 @@ class SyncDataSerializer {
     (
       key: 'diveComputerConnections',
       table: _db.diveComputerConnections,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'sharedLibraryMemberships',
+      table: _db.sharedLibraryMemberships,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'librarySiteNotes',
+      table: _db.librarySiteNotes,
       blob: false,
       full: null,
     ),
@@ -1537,6 +1570,8 @@ class SyncDataSerializer {
       // ---- data object (hashed) ----
       await writeData('{');
       final tables = _baseTables;
+      // Library sites and their children stay out of the base (issue #2567).
+      final librarySites = await librarySiteIds();
       for (var t = 0; t < tables.length; t++) {
         final spec = tables[t];
         if (t > 0) await writeData(',');
@@ -1553,6 +1588,15 @@ class SyncDataSerializer {
         ];
 
         Future<void> emit(Map<String, dynamic> row) async {
+          if (librarySites.isNotEmpty) {
+            if (spec.key == 'diveSites' && row['sharedLibraryId'] != null) {
+              return;
+            }
+            if (librarySiteChildEntities.contains(spec.key) &&
+                librarySites.contains(row['siteId'])) {
+              return;
+            }
+          }
           if (!firstRow) await writeData(',');
           firstRow = false;
           rowCount++;
@@ -1726,6 +1770,7 @@ class SyncDataSerializer {
     'courseRequirementDives',
     'diveTags',
     'diveDiveTypes',
+    'diveCourses',
     'diveDiverRoles',
     'diveBuddyRoles',
     'siteSiteTypes',
@@ -1968,6 +2013,7 @@ class SyncDataSerializer {
     'equipmentOwnershipEvents': 'equipment_ownership_events',
     'equipmentLocationMoves': 'equipment_location_moves',
     'diveDiveTypes': 'dive_dive_types',
+    'diveCourses': 'dive_courses',
     'weightPresetEntries': 'weight_preset_entries',
     'diveCenterGearNotes': 'dive_center_gear_notes',
     'tideRecords': 'tide_records',
@@ -2084,12 +2130,18 @@ class SyncDataSerializer {
         if (!present.contains(id)) id,
     ];
     if (missing.isEmpty) return rows;
-    final extra = (await fetchRecords(entityType, missing)).values;
+    var extra = (await fetchRecords(entityType, missing)).values.toList();
+    if (librarySiteChildEntities.contains(entityType)) {
+      extra = await _withoutLibrarySiteRows(entityType, extra);
+    }
     return extra.isEmpty ? rows : [...rows, ...extra];
   }
 
   /// Build the full SyncData, filtering by [hlcSince] (null = full export).
-  Future<SyncData> _buildSyncData(String? hlcSince) async {
+  Future<SyncData> _buildSyncData(String? hlcSince) =>
+      _withLibrarySiteIdsMemo(() => _buildSyncDataUnmemoised(hlcSince));
+
+  Future<SyncData> _buildSyncDataUnmemoised(String? hlcSince) async {
     // A base (null hlcSince) already carries every row.
     final pendingChildren = hlcSince == null
         ? const <String, Set<String>>{}
@@ -2370,6 +2422,14 @@ class SyncDataSerializer {
           pendingChildren,
         ),
       ),
+      diveCourses: await _safeExport(
+        'diveCourses',
+        () async => _withPendingChildren(
+          'diveCourses',
+          await _exportDiveCourses(hlcSince),
+          pendingChildren,
+        ),
+      ),
       diveDiverRoles: await _safeExport(
         'diveDiverRoles',
         () async => _withPendingChildren(
@@ -2624,6 +2684,14 @@ class SyncDataSerializer {
         'diveComputerConnections',
         () => _exportDiveComputerConnections(hlcSince),
       ),
+      sharedLibraryMemberships: await _safeExport(
+        'sharedLibraryMemberships',
+        () => _exportSharedLibraryMemberships(hlcSince),
+      ),
+      librarySiteNotes: await _safeExport(
+        'librarySiteNotes',
+        () => _exportLibrarySiteNotes(hlcSince),
+      ),
       siteTypes: await _safeExport(
         'siteTypes',
         () => _exportSiteTypes(hlcSince),
@@ -2732,6 +2800,20 @@ class SyncDataSerializer {
   Future<void> repairDanglingForeignKeys() async {
     await _repairDanglingReferences();
     await alignLinkedRouteOwners();
+    await seedRepresentativeCourseLinks();
+  }
+
+  /// An older app version writes only the representative `dives.course_id`
+  /// (#2515). Adds that course to the dive's `dive_courses` set when the pair
+  /// is missing; never removes one. Runs after the FK repair so a just-cleared
+  /// link is not re-added. Marks nothing pending: every device derives the
+  /// same deterministic rows from the same synced dives.
+  Future<void> seedRepresentativeCourseLinks() async {
+    if (await seedDiveCourseLinks(_db) > 0) {
+      _db.notifyUpdates({
+        TableUpdate.onTable(_db.diveCourses, kind: UpdateKind.insert),
+      });
+    }
   }
 
   /// A linked route belongs to its dive's diver (v252). A peer below v252,
@@ -3165,6 +3247,11 @@ class SyncDataSerializer {
           _db.diveDiveTypes,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'diveCourses':
+        final row = await (_db.select(
+          _db.diveCourses,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'diveTypes':
         final row = await (_db.select(
           _db.diveTypes,
@@ -3282,6 +3369,16 @@ class SyncDataSerializer {
                 'diveComputerConnections',
                 row.toJson(),
               );
+      case 'sharedLibraryMemberships':
+        final row = await (_db.select(
+          _db.sharedLibraryMemberships,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'librarySiteNotes':
+        final row = await (_db.select(
+          _db.librarySiteNotes,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'transmitters':
         final row = await (_db.select(
           _db.transmitters,
@@ -3748,6 +3845,16 @@ class SyncDataSerializer {
               r.toJson(),
             ),
         };
+      case 'sharedLibraryMemberships':
+        final rows = await (_db.select(
+          _db.sharedLibraryMemberships,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'librarySiteNotes':
+        final rows = await (_db.select(
+          _db.librarySiteNotes,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
       case 'transmitters':
         final rows = await (_db.select(
           _db.transmitters,
@@ -3963,8 +4070,11 @@ class SyncDataSerializer {
   /// migration's rule, so a device that healed by migration and a device that
   /// healed by merge land on the same tag.
   ///
-  /// Both sides normalize to `lower(trim(name))`, exactly as
-  /// `idx_tags_diver_name_unique` keys. Trimming only the INCOMING name made
+  /// Both sides normalize to `unicode_lower(trim(name))`: the trim and case
+  /// fold `idx_tags_diver_name_unique` keys on, with non-ASCII capitals folded
+  /// too (#3032). The index's lower() folds ASCII only, so a stored "Épave"
+  /// never met an incoming "épave"; folding more than the index can only find
+  /// more rivals, never fewer. Trimming only the INCOMING name made
   /// the comparison asymmetric -- a local " Wreck" would not match a remote
   /// "Wreck" while the reverse did -- so whether two devices converged
   /// depended on which of them happened to hold the padded spelling
@@ -3973,7 +4083,7 @@ class SyncDataSerializer {
     final rivals =
         await (_db.select(_db.tags)..where(
               (t) =>
-                  t.name.trim().lower().equals(
+                  t.name.trim().unicodeLower().equals(
                     remote.name.trim().toLowerCase(),
                   ) &
                   coalesce([
@@ -4974,6 +5084,19 @@ class SyncDataSerializer {
       case 'diveDiveTypes':
         await _applyDiveDiveTypeRecord(DiveDiveType.fromJson(data));
         return;
+      case 'diveCourses':
+        // Deterministic ids plus a unique (dive, course) index: DoNothing with
+        // an empty target absorbs a conflict on either constraint, and the
+        // pair is the row's whole meaning (#2515).
+        await _db
+            .into(_db.diveCourses)
+            .insert(
+              DiveCourseRow.fromJson(data),
+              onConflict: DoNothing<$DiveCoursesTable, DiveCourseRow>(
+                target: const [],
+              ),
+            );
+        return;
       case 'diveTypes':
         await _db
             .into(_db.diveTypes)
@@ -5084,6 +5207,24 @@ class SyncDataSerializer {
             .into(_db.diveComputerConnections)
             .insertOnConflictUpdate(
               DiveComputerConnectionRow.fromJson(
+                _withTimestampDefaults(data),
+              ).toCompanion(false),
+            );
+        return;
+      case 'sharedLibraryMemberships':
+        await _db
+            .into(_db.sharedLibraryMemberships)
+            .insertOnConflictUpdate(
+              SharedLibraryMembershipRow.fromJson(
+                _withTimestampDefaults(data),
+              ).toCompanion(false),
+            );
+        return;
+      case 'librarySiteNotes':
+        await _db
+            .into(_db.librarySiteNotes)
+            .insertOnConflictUpdate(
+              LibrarySiteNoteRow.fromJson(
                 _withTimestampDefaults(data),
               ).toCompanion(false),
             );
@@ -5268,13 +5409,11 @@ class SyncDataSerializer {
             );
         return;
       case 'viewConfigs':
-        await _db
-            .into(_db.viewConfigs)
-            .insertOnConflictUpdate(
-              ViewConfig.fromJson(
-                _withTimestampDefaults(data),
-              ).toCompanion(false),
-            );
+        await applyViewConfigRecord(
+          _db,
+          ViewConfig.fromJson(_withTimestampDefaults(data)),
+          syncRepository: _syncRepository,
+        );
         return;
       case 'fieldPresets':
         await _db
@@ -6175,6 +6314,18 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'diveCourses':
+        // See the single-row apply in [upsertRecord].
+        await _db.batch(
+          (b) => b.insertAll(
+            _db.diveCourses,
+            records.map(DiveCourseRow.fromJson).toList(),
+            onConflict: DoNothing<$DiveCoursesTable, DiveCourseRow>(
+              target: const [],
+            ),
+          ),
+        );
+        return;
       case 'diveTypes':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -6526,6 +6677,34 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'sharedLibraryMemberships':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.sharedLibraryMemberships,
+            records
+                .map(
+                  (r) => SharedLibraryMembershipRow.fromJson(
+                    _withTimestampDefaults(r),
+                  ).toCompanion(false),
+                )
+                .toList(),
+          ),
+        );
+        return;
+      case 'librarySiteNotes':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.librarySiteNotes,
+            records
+                .map(
+                  (r) => LibrarySiteNoteRow.fromJson(
+                    _withTimestampDefaults(r),
+                  ).toCompanion(false),
+                )
+                .toList(),
+          ),
+        );
+        return;
       case 'transmitters':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -6786,18 +6965,16 @@ class SyncDataSerializer {
         );
         return;
       case 'viewConfigs':
-        await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
-            _db.viewConfigs,
-            records
-                .map(
-                  (r) => ViewConfig.fromJson(
-                    _withTimestampDefaults(r),
-                  ).toCompanion(false),
-                )
-                .toList(),
-          ),
-        );
+        // One at a time rather than one batch: a peer's row may need merging
+        // with a rival this device holds for the same view (issue #3343).
+        // A diver has a handful of these rows, so the batch saved nothing.
+        for (final r in records) {
+          await applyViewConfigRecord(
+            _db,
+            ViewConfig.fromJson(_withTimestampDefaults(r)),
+            syncRepository: _syncRepository,
+          );
+        }
         return;
       case 'fieldPresets':
         await _db.batch(
@@ -7061,6 +7238,13 @@ class SyncDataSerializer {
           _db.diveComputerConnections,
           _db.diveComputerConnections.id,
         );
+      case 'sharedLibraryMemberships':
+        return plain(
+          _db.sharedLibraryMemberships,
+          _db.sharedLibraryMemberships.id,
+        );
+      case 'librarySiteNotes':
+        return plain(_db.librarySiteNotes, _db.librarySiteNotes.id);
       case 'transmitters':
         return plain(_db.transmitters, _db.transmitters.id);
       case 'cylinderFills':
@@ -7096,6 +7280,8 @@ class SyncDataSerializer {
         return plain(_db.diveTags, _db.diveTags.id);
       case 'diveDiveTypes':
         return plain(_db.diveDiveTypes, _db.diveDiveTypes.id);
+      case 'diveCourses':
+        return plain(_db.diveCourses, _db.diveCourses.id);
       case 'diveBuddies':
         return plain(_db.diveBuddies, _db.diveBuddies.id);
       case 'diveProfileEvents':
@@ -7519,6 +7705,10 @@ class SyncDataSerializer {
         return _db.diveComputers;
       case 'diveComputerConnections':
         return _db.diveComputerConnections;
+      case 'sharedLibraryMemberships':
+        return _db.sharedLibraryMemberships;
+      case 'librarySiteNotes':
+        return _db.librarySiteNotes;
       case 'transmitters':
         return _db.transmitters;
       case 'cylinderFills':
@@ -7551,6 +7741,8 @@ class SyncDataSerializer {
         return _db.diveTags;
       case 'diveDiveTypes':
         return _db.diveDiveTypes;
+      case 'diveCourses':
+        return _db.diveCourses;
       case 'diveBuddies':
         return _db.diveBuddies;
       case 'diveProfileEvents':
@@ -7979,6 +8171,11 @@ class SyncDataSerializer {
           _db.diveDiveTypes,
         )..where((t) => t.id.equals(recordId))).go();
         return;
+      case 'diveCourses':
+        await (_db.delete(
+          _db.diveCourses,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
       case 'diveTypes':
         await (_db.delete(
           _db.diveTypes,
@@ -8098,6 +8295,16 @@ class SyncDataSerializer {
       case 'diveComputerConnections':
         await (_db.delete(
           _db.diveComputerConnections,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'sharedLibraryMemberships':
+        await (_db.delete(
+          _db.sharedLibraryMemberships,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'librarySiteNotes':
+        await (_db.delete(
+          _db.librarySiteNotes,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'transmitters':
@@ -8387,8 +8594,63 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
+  /// Child entities of `dive_sites` whose rows follow the site out of the
+  /// personal sync when the site belongs to a shared site library (issue #2567).
+  /// `siteHides` is not one: a hide is the profile's own preference and
+  /// syncs to its other devices; the parent gate drops it on a device that
+  /// holds no copy of the site.
+  static const Set<String> librarySiteChildEntities = {
+    'siteSiteTypes',
+    'siteTags',
+    'siteSpecies',
+    'siteFeatures',
+  };
+
+  /// Ids of sites that belong to a shared site library (issue #2567): outside the
+  /// personal sync in both directions.
+  Future<Set<String>> librarySiteIds() async {
+    final memo = _librarySiteIdsMemo;
+    if (memo != null) return memo;
+    final rows =
+        await (_db.selectOnly(_db.diveSites)
+              ..addColumns([_db.diveSites.id])
+              ..where(_db.diveSites.sharedLibraryId.isNotNull()))
+            .get();
+    return rows.map((r) => r.read(_db.diveSites.id)!).toSet();
+  }
+
+  /// One read of the library site ids per export: set at the start of
+  /// [_buildSyncData] and the base export, cleared when they return.
+  Set<String>? _librarySiteIdsMemo;
+
+  Future<T> _withLibrarySiteIdsMemo<T>(Future<T> Function() body) async {
+    _librarySiteIdsMemo = await librarySiteIds();
+    try {
+      return await body();
+    } finally {
+      _librarySiteIdsMemo = null;
+    }
+  }
+
+  /// Drops the rows of [entityType] that belong to a library site.
+  Future<List<Map<String, dynamic>>> _withoutLibrarySiteRows(
+    String entityType,
+    List<Map<String, dynamic>> rows,
+  ) async {
+    if (rows.isEmpty) return rows;
+    final guarded = await librarySiteIds();
+    if (guarded.isEmpty) return rows;
+    final key = entityType == 'diveSites' ? 'id' : 'siteId';
+    return [
+      for (final row in rows)
+        if (!guarded.contains(row[key])) row,
+    ];
+  }
+
   Future<List<Map<String, dynamic>>> _exportDiveSites(String? hlcSince) async {
-    final query = _db.select(_db.diveSites);
+    final query = _db.select(_db.diveSites)
+      // Library sites never enter the personal sync (issue #2567).
+      ..where((t) => t.sharedLibraryId.isNull());
     if (hlcSince != null) {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
@@ -8693,7 +8955,10 @@ class SyncDataSerializer {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
     final rows = await query.get();
-    return rows.map((r) => r.toJson()).toList();
+    return _withoutLibrarySiteRows(
+      'siteFeatures',
+      rows.map((r) => r.toJson()).toList(),
+    );
   }
 
   Future<List<Map<String, dynamic>>> _exportServiceRecords(
@@ -9176,6 +9441,21 @@ class SyncDataSerializer {
     return _childRowsOf(diveIds, select);
   }
 
+  Future<List<Map<String, dynamic>>> _exportDiveCourses(
+    String? hlcSince,
+  ) async {
+    if (hlcSince != null) {
+      final diveIds = await _diveIdsModifiedSince(hlcSince);
+      if (diveIds.isEmpty) return [];
+      final rows = await (_db.select(
+        _db.diveCourses,
+      )..where((t) => t.diveId.isIn(diveIds))).get();
+      return rows.map((r) => r.toJson()).toList();
+    }
+    final rows = await _db.select(_db.diveCourses).get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
   Future<Set<String>> _diveIdsModifiedSince(String hlcSince) async {
     final rows =
         await (_db.selectOnly(_db.dives)
@@ -9307,6 +9587,31 @@ class SyncDataSerializer {
               withoutDeviceLocalColumns('diveComputerConnections', r.toJson()),
         )
         .toList();
+  }
+
+  /// Shared site library memberships (v289, issue #2567), incremental by hlc.
+  Future<List<Map<String, dynamic>>> _exportSharedLibraryMemberships(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.sharedLibraryMemberships);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Private notes on shared site library sites (v289, issue #2567),
+  /// incremental by hlc.
+  Future<List<Map<String, dynamic>>> _exportLibrarySiteNotes(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.librarySiteNotes);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportTransmitters(
@@ -9526,9 +9831,13 @@ class SyncDataSerializer {
     String? hlcSince,
   ) async {
     if (hlcSince != null) {
-      final modifiedSites = await (_db.select(
-        _db.diveSites,
-      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
+      final modifiedSites =
+          await (_db.select(_db.diveSites)..where(
+                (t) =>
+                    t.hlc.isBiggerThanValue(hlcSince) &
+                    t.sharedLibraryId.isNull(),
+              ))
+              .get();
       final siteIds = modifiedSites.map((s) => s.id).toSet();
       if (siteIds.isEmpty) return [];
 
@@ -9540,15 +9849,22 @@ class SyncDataSerializer {
       );
     }
     final rows = await _db.select(_db.siteSiteTypes).get();
-    return rows.map((r) => r.toJson()).toList();
+    return _withoutLibrarySiteRows(
+      'siteSiteTypes',
+      rows.map((r) => r.toJson()).toList(),
+    );
   }
 
   /// Site tag links, gated like [_exportSiteSiteTypes].
   Future<List<Map<String, dynamic>>> _exportSiteTags(String? hlcSince) async {
     if (hlcSince != null) {
-      final modifiedSites = await (_db.select(
-        _db.diveSites,
-      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
+      final modifiedSites =
+          await (_db.select(_db.diveSites)..where(
+                (t) =>
+                    t.hlc.isBiggerThanValue(hlcSince) &
+                    t.sharedLibraryId.isNull(),
+              ))
+              .get();
       final siteIds = modifiedSites.map((s) => s.id).toSet();
       if (siteIds.isEmpty) return [];
 
@@ -9560,7 +9876,10 @@ class SyncDataSerializer {
       );
     }
     final rows = await _db.select(_db.siteTags).get();
-    return rows.map((r) => r.toJson()).toList();
+    return _withoutLibrarySiteRows(
+      'siteTags',
+      rows.map((r) => r.toJson()).toList(),
+    );
   }
 
   /// Equipment tag links (v219, issue #1942), gated on the parent item's
@@ -9731,9 +10050,13 @@ class SyncDataSerializer {
     String? hlcSince,
   ) async {
     if (hlcSince != null) {
-      final modifiedSites = await (_db.select(
-        _db.diveSites,
-      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
+      final modifiedSites =
+          await (_db.select(_db.diveSites)..where(
+                (t) =>
+                    t.hlc.isBiggerThanValue(hlcSince) &
+                    t.sharedLibraryId.isNull(),
+              ))
+              .get();
       final siteIds = modifiedSites.map((s) => s.id).toSet();
       if (siteIds.isEmpty) return [];
 
@@ -9745,7 +10068,10 @@ class SyncDataSerializer {
       );
     }
     final rows = await _db.select(_db.siteSpecies).get();
-    return rows.map((r) => r.toJson()).toList();
+    return _withoutLibrarySiteRows(
+      'siteSpecies',
+      rows.map((r) => r.toJson()).toList(),
+    );
   }
 
   /// Rows of a clockless child table for [parentIds], fetched in chunks so

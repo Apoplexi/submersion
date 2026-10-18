@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:submersion/features/insights/domain/trend_gap_threshold.dart';
+import 'package:submersion/features/equipment/domain/models/equipment_default_view.dart';
+import 'package:submersion/features/settings/data/repositories/profile_metric_color_columns.dart';
 import 'package:submersion/core/built_ins/hidden_built_ins_codec.dart';
 import 'package:submersion/core/constants/place_name_language.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
@@ -47,13 +49,68 @@ class DiverSettingsRepository {
     return db.tableUpdates(TableUpdateQuery.onTable(db.diverSettings));
   }
 
+  /// The diver's rows, the one every read uses first.
+  ///
+  /// `diver_settings` has no unique index on `diver_id`, and sync merges its
+  /// rows by id, so two devices that each created a row for the diver before
+  /// syncing leave both behind (issue #3343). A read that expected one row
+  /// then threw "Too many elements". The newest row wins: one with an HLC
+  /// over one without, then the later clock (its packed form sorts as it
+  /// compares), then updatedAt, with the id breaking a tie so that every
+  /// device picks the same one.
+  SimpleSelectStatement<$DiverSettingsTable, DiverSetting> _rowsNewestFirst(
+    String diverId,
+  ) => _db.select(_db.diverSettings)
+    ..where((t) => t.diverId.equals(diverId))
+    ..orderBy([
+      (t) => OrderingTerm.asc(t.hlc.isNull()),
+      (t) => OrderingTerm.desc(t.hlc),
+      (t) => OrderingTerm.desc(t.updatedAt),
+      (t) => OrderingTerm.asc(t.id),
+    ]);
+
+  /// The diver's settings row, or null when there is none. See
+  /// [_rowsNewestFirst] for which row wins when sync has left two.
+  Future<DiverSetting?> _rowFor(String diverId) =>
+      (_rowsNewestFirst(diverId)..limit(1)).getSingleOrNull();
+
+  /// Deletes every settings row of [diverId] but the one [_rowFor] reads,
+  /// with a tombstone for each so that peers drop it too (issue #3343).
+  ///
+  /// A failure is logged, not thrown: the reads already pick the right row,
+  /// so a duplicate left in place costs nothing but this retry next load.
+  Future<void> _dropDuplicateRows(String diverId) async {
+    try {
+      final rows = await _rowsNewestFirst(diverId).get();
+      if (rows.length < 2) return;
+      final duplicateIds = [for (final row in rows.skip(1)) row.id];
+      await _db.transaction(() async {
+        await (_db.delete(
+          _db.diverSettings,
+        )..where((t) => t.id.isIn(duplicateIds))).go();
+        await _syncRepository.logDeletions(
+          entityType: 'diverSettings',
+          recordIds: duplicateIds,
+        );
+      });
+      SyncEventBus.notifyLocalChange();
+      _log.warning(
+        'Dropped ${duplicateIds.length} duplicate settings row(s) for diver '
+        '$diverId, keeping ${rows.first.id}',
+      );
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to drop duplicate settings rows for diver: $diverId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   /// Get settings for a specific diver
   Future<AppSettings?> getSettingsForDiver(String diverId) async {
     try {
-      final query = _db.select(_db.diverSettings)
-        ..where((t) => t.diverId.equals(diverId));
-
-      final row = await query.getSingleOrNull();
+      final row = await _rowFor(diverId);
       return row != null ? _mapRowToAppSettings(row) : null;
     } catch (e, stackTrace) {
       _log.error(
@@ -70,9 +127,7 @@ class DiverSettingsRepository {
   /// device-local pref: a null column marks a pre-v151 row (or a diver
   /// with no row yet), the only cases where the pref may seed the value.
   Future<bool> hasSeascapeAppearance(String diverId) async {
-    final query = _db.select(_db.diverSettings)
-      ..where((t) => t.diverId.equals(diverId));
-    final row = await query.getSingleOrNull();
+    final row = await _rowFor(diverId);
     return row?.seascapeAppearance != null;
   }
 
@@ -81,9 +136,7 @@ class DiverSettingsRepository {
   /// unset for both: the load creates it with both columns null.
   Future<({bool pscrRatio, bool profileMetricsFollowViewport})>
   unsetAdoptableColumns(String diverId) async {
-    final row = await (_db.select(
-      _db.diverSettings,
-    )..where((t) => t.diverId.equals(diverId))).getSingleOrNull();
+    final row = await _rowFor(diverId);
     return (
       pscrRatio: row?.pscrRatio == null,
       profileMetricsFollowViewport: row?.profileMetricsFollowViewport == null,
@@ -106,6 +159,9 @@ class DiverSettingsRepository {
       return false;
     }
     try {
+      // Keyed on the diver like updateSettingsForDiver, so twins collapse
+      // first for the same reason (issue #3343).
+      await _dropDuplicateRows(diverId);
       // One transaction: both columns and the sync mark land together, and
       // the table-updates stream fires once.
       final adopted = await _db.transaction(() async {
@@ -172,184 +228,200 @@ class DiverSettingsRepository {
       await _db
           .into(_db.diverSettings)
           .insert(
-            DiverSettingsCompanion(
-              id: Value(id),
-              diverId: Value(diverId),
-              depthUnit: Value(s.depthUnit.name),
-              temperatureUnit: Value(s.temperatureUnit.name),
-              pressureUnit: Value(s.pressureUnit.name),
-              volumeUnit: Value(s.volumeUnit.name),
-              weightUnit: Value(s.weightUnit.name),
-              altitudeUnit: Value(s.altitudeUnit.name),
-              distanceUnit: Value(s.distanceUnit.name),
-              gasConsumptionDisplay: Value(s.gasConsumptionDisplay.name),
-              gasModel: Value(s.gasModel.name),
-              defaultPlannerWaterType: Value(s.defaultPlannerWaterType.name),
-              defaultCurrency: Value(s.defaultCurrency),
-              visibilityScalePreset: Value(s.visibilityScalePreset.name),
-              visibilityScaleExcellentM: Value(s.visibilityScaleExcellentM),
-              visibilityScaleGoodM: Value(s.visibilityScaleGoodM),
-              visibilityScaleModerateM: Value(s.visibilityScaleModerateM),
-              coordinateFormat: Value(s.coordinateFormat.name),
-              seascapeAppearance: Value(s.seascapeAppearance.encode()),
-              seascapeVerticalExaggerationOverrides: Value(
-                _encodeExaggerationOverrides(
-                  s.seascapeVerticalExaggerationOverrides,
+            withProfileMetricColors(
+              DiverSettingsCompanion(
+                id: Value(id),
+                diverId: Value(diverId),
+                depthUnit: Value(s.depthUnit.name),
+                temperatureUnit: Value(s.temperatureUnit.name),
+                pressureUnit: Value(s.pressureUnit.name),
+                volumeUnit: Value(s.volumeUnit.name),
+                weightUnit: Value(s.weightUnit.name),
+                altitudeUnit: Value(s.altitudeUnit.name),
+                distanceUnit: Value(s.distanceUnit.name),
+                gasConsumptionDisplay: Value(s.gasConsumptionDisplay.name),
+                gasModel: Value(s.gasModel.name),
+                defaultPlannerWaterType: Value(s.defaultPlannerWaterType.name),
+                defaultCurrency: Value(s.defaultCurrency),
+                visibilityScalePreset: Value(s.visibilityScalePreset.name),
+                visibilityScaleExcellentM: Value(s.visibilityScaleExcellentM),
+                visibilityScaleGoodM: Value(s.visibilityScaleGoodM),
+                visibilityScaleModerateM: Value(s.visibilityScaleModerateM),
+                coordinateFormat: Value(s.coordinateFormat.name),
+                seascapeAppearance: Value(s.seascapeAppearance.encode()),
+                seascapeVerticalExaggerationOverrides: Value(
+                  _encodeExaggerationOverrides(
+                    s.seascapeVerticalExaggerationOverrides,
+                  ),
                 ),
+                timeFormat: Value(s.timeFormat.name),
+                dateFormat: Value(s.dateFormat.name),
+                themeMode: Value(_themeModeToString(s.themeMode)),
+                themePreset: Value(s.themePresetId),
+                accentNavIcons: Value(s.accentNavIcons),
+                accentSectionHeaders: Value(s.accentSectionHeaders),
+                accentListIcons: Value(s.accentListIcons),
+                locale: Value(s.locale),
+                placeNameLanguage: Value(s.placeNameLanguage),
+                defaultDiveType: Value(s.defaultDiveType),
+                defaultTankVolume: Value(s.defaultTankVolume),
+                defaultStartPressure: Value(s.defaultStartPressure),
+                defaultTankPreset: Value(s.defaultTankPreset),
+                applyDefaultTankToImports: Value(s.applyDefaultTankToImports),
+                gfLow: Value(s.gfLow),
+                gfHigh: Value(s.gfHigh),
+                ppO2MaxWorking: Value(s.ppO2MaxWorking),
+                ppO2MaxDeco: Value(s.ppO2MaxDeco),
+                ccrSetpointLow: Value(s.ccrSetpointLow),
+                ccrSetpointHigh: Value(s.ccrSetpointHigh),
+                ccrDiluentModPpO2: Value(s.ccrDiluentModPpO2),
+                cnsWarningThreshold: Value(s.cnsWarningThreshold),
+                ascentRateWarning: Value(s.ascentRateWarning),
+                ascentRateCritical: Value(s.ascentRateCritical),
+                showCeilingOnProfile: Value(s.showCeilingOnProfile),
+                showDecoStopsOnProfile: Value(s.showDecoStopsOnProfile),
+                safetyReviewEnabled: Value(s.safetyReviewEnabled),
+                safetyReviewDisabledRules: Value(
+                  _encodeDisabledRules(s.safetyReviewDisabledRules),
+                ),
+                noFlyPreset: Value(s.noFlyPreset.dbValue),
+                coldWaterThresholdC: Value(s.coldWaterThresholdC),
+                deepDiveThresholdM: Value(s.deepDiveThresholdM),
+                highO2ThresholdPercent: Value(s.highO2ThresholdPercent),
+                conditionEngineEnabled: Value(s.conditionEngineEnabled),
+                conditionDisabledRules: Value(
+                  _encodeDisabledRules(s.conditionDisabledRules),
+                ),
+                insightsMutedObservationRules: Value(
+                  _encodeDisabledRules(s.insightsMutedObservationRules),
+                ),
+                equipmentDefaultStatuses: Value(
+                  encodeEquipmentDefaultStatuses(s.equipmentDefaultStatuses),
+                ),
+                hiddenChamberIds: Value(
+                  _encodeDisabledRules(s.hiddenChamberIds),
+                ),
+                emergencyRegion: Value(s.emergencyRegion),
+                hiddenTankPresetIds: Value(
+                  _encodeDisabledRules(s.hiddenTankPresetIds),
+                ),
+                hiddenBuiltInIds: Value(
+                  encodeHiddenBuiltIns(s.hiddenBuiltInIds),
+                ),
+                showAscentRateColors: Value(s.showAscentRateColors),
+                showNdlOnProfile: Value(s.showNdlOnProfile),
+                lastStopDepth: Value(s.lastStopDepth),
+                decoStopIncrement: Value(s.decoStopIncrement),
+                ascentGasSet: Value(s.ascentGasSet.index),
+                o2Narcotic: Value(s.o2Narcotic),
+                endLimit: Value(s.endLimit),
+                icdWarningsEnabled: Value(s.icdWarningsEnabled),
+                defaultNdlSource: Value(s.defaultNdlSource.toInt()),
+                defaultDecoStopSource: Value(s.defaultDecoStopSource.toInt()),
+                defaultTtsSource: Value(s.defaultTtsSource.toInt()),
+                defaultCnsSource: Value(s.defaultCnsSource.toInt()),
+                defaultGtrSource: Value(s.defaultGtrSource.toInt()),
+                gtrReservePressure: Value(s.gtrReservePressure),
+                cnsCalculationMethod: Value(s.cnsCalculationMethod.dbValue),
+                showDepthColoredDiveCards: Value(s.showDepthColoredDiveCards),
+                cardColorAttribute: Value(s.cardColorAttribute.name),
+                diveListViewMode: Value(s.diveListViewMode.name),
+                groupTripsInDiveList: Value(s.groupTripsInDiveList),
+                autoTagImports: Value(s.autoTagImports),
+                siteListViewMode: Value(s.siteListViewMode.name),
+                tripListViewMode: Value(s.tripListViewMode.name),
+                equipmentListViewMode: Value(s.equipmentListViewMode.name),
+                buddyListViewMode: Value(s.buddyListViewMode.name),
+                diveCenterListViewMode: Value(s.diveCenterListViewMode.name),
+                certificationListViewMode: Value(
+                  s.certificationListViewMode.name,
+                ),
+                courseListViewMode: Value(s.courseListViewMode.name),
+                mapStyle: Value(s.mapStyle.name),
+                siteMatchSensitivity: Value(s.siteMatchSensitivity.name),
+                trimTankPressureAtSurfacing: Value(
+                  s.trimTankPressureAtSurfacing,
+                ),
+                cardColorGradientPreset: Value(s.cardColorGradientPreset),
+                cardColorGradientStart: Value(s.cardColorGradientStart),
+                cardColorGradientEnd: Value(s.cardColorGradientEnd),
+                tissueColorScheme: Value(s.tissueColorScheme.name),
+                tissueVizMode: Value(s.tissueVizMode.name),
+                showMapBackgroundOnDiveCards: Value(
+                  s.showMapBackgroundOnDiveCards,
+                ),
+                showMapBackgroundOnSiteCards: Value(
+                  s.showMapBackgroundOnSiteCards,
+                ),
+                showMaxDepthMarker: Value(s.showMaxDepthMarker),
+                showPressureThresholdMarkers: Value(
+                  s.showPressureThresholdMarkers,
+                ),
+                defaultRightAxisMetric: Value(s.defaultRightAxisMetric.name),
+                defaultShowTemperature: Value(s.defaultShowTemperature),
+                defaultShowPressure: Value(s.defaultShowPressure),
+                defaultShowHeartRate: Value(s.defaultShowHeartRate),
+                defaultShowSac: Value(s.defaultShowSac),
+                defaultShowEvents: Value(s.defaultShowEvents),
+                defaultShowPpO2: Value(s.defaultShowPpO2),
+                defaultShowPpN2: Value(s.defaultShowPpN2),
+                defaultShowPpHe: Value(s.defaultShowPpHe),
+                defaultShowGasDensity: Value(s.defaultShowGasDensity),
+                defaultShowGf: Value(s.defaultShowGf),
+                defaultShowSurfaceGf: Value(s.defaultShowSurfaceGf),
+                defaultShowMeanDepth: Value(s.defaultShowMeanDepth),
+                defaultShowTts: Value(s.defaultShowTts),
+                defaultShowGtr: Value(s.defaultShowGtr),
+                defaultShowCns: Value(s.defaultShowCns),
+                defaultShowOtu: Value(s.defaultShowOtu),
+                defaultShowGasSwitchMarkers: Value(
+                  s.defaultShowGasSwitchMarkers,
+                ),
+                defaultShowLateGasSwitches: Value(s.defaultShowLateGasSwitches),
+                defaultShowPhotoMarkers: Value(s.defaultShowPhotoMarkers),
+                defaultShowGasTimeline: Value(s.defaultShowGasTimeline),
+                defaultShowO2CellMv: Value(s.defaultShowO2CellMv),
+                defaultShowEstimatedTankPressure: Value(
+                  s.defaultShowEstimatedTankPressure,
+                ),
+                defaultShowAscentRateLine: Value(s.defaultShowAscentRateLine),
+                notificationsEnabled: Value(s.notificationsEnabled),
+                serviceReminderDays: Value(
+                  _formatReminderDays(s.serviceReminderDays),
+                ),
+                tripServiceLeadDays: Value(s.tripServiceLeadDays),
+                trendGapCollapseMonths: Value(s.trendGapThreshold.months),
+                reminderTime: Value(_formatReminderTime(s.reminderTime)),
+                showDataSourceBadges: Value(s.showDataSourceBadges),
+                showDiveFigure: Value(s.showDiveFigure),
+                showProfilePanelInTableView: Value(
+                  s.showProfilePanelInTableView,
+                ),
+                showDetailsPaneDives: Value(s.showDetailsPaneDives),
+                showDetailsPaneSites: Value(s.showDetailsPaneSites),
+                showDetailsPaneBuddies: Value(s.showDetailsPaneBuddies),
+                showDetailsPaneTrips: Value(s.showDetailsPaneTrips),
+                showDetailsPaneEquipment: Value(s.showDetailsPaneEquipment),
+                showDetailsPaneDiveCenters: Value(s.showDetailsPaneDiveCenters),
+                showDetailsPaneCertifications: Value(
+                  s.showDetailsPaneCertifications,
+                ),
+                showDetailsPaneCourses: Value(s.showDetailsPaneCourses),
+                diveDetailSections: Value(
+                  DiveDetailSectionConfig.sectionsToJson(s.diveDetailSections),
+                ),
+                diveDetailLayout: Value(s.diveDetailLayout.name),
+                siteDetailSections: Value(
+                  SiteDetailSectionConfig.sectionsToJson(s.siteDetailSections),
+                ),
+                siteDetailLayout: Value(s.siteDetailLayout.name),
+                hasAcceptedPlanningDisclaimer: Value(
+                  s.hasAcceptedPlanningDisclaimer,
+                ),
+                createdAt: Value(now),
+                updatedAt: Value(now),
               ),
-              timeFormat: Value(s.timeFormat.name),
-              dateFormat: Value(s.dateFormat.name),
-              themeMode: Value(_themeModeToString(s.themeMode)),
-              themePreset: Value(s.themePresetId),
-              accentNavIcons: Value(s.accentNavIcons),
-              accentSectionHeaders: Value(s.accentSectionHeaders),
-              accentListIcons: Value(s.accentListIcons),
-              locale: Value(s.locale),
-              placeNameLanguage: Value(s.placeNameLanguage),
-              defaultDiveType: Value(s.defaultDiveType),
-              defaultTankVolume: Value(s.defaultTankVolume),
-              defaultStartPressure: Value(s.defaultStartPressure),
-              defaultTankPreset: Value(s.defaultTankPreset),
-              applyDefaultTankToImports: Value(s.applyDefaultTankToImports),
-              gfLow: Value(s.gfLow),
-              gfHigh: Value(s.gfHigh),
-              ppO2MaxWorking: Value(s.ppO2MaxWorking),
-              ppO2MaxDeco: Value(s.ppO2MaxDeco),
-              ccrSetpointLow: Value(s.ccrSetpointLow),
-              ccrSetpointHigh: Value(s.ccrSetpointHigh),
-              ccrDiluentModPpO2: Value(s.ccrDiluentModPpO2),
-              cnsWarningThreshold: Value(s.cnsWarningThreshold),
-              ascentRateWarning: Value(s.ascentRateWarning),
-              ascentRateCritical: Value(s.ascentRateCritical),
-              showCeilingOnProfile: Value(s.showCeilingOnProfile),
-              showDecoStopsOnProfile: Value(s.showDecoStopsOnProfile),
-              safetyReviewEnabled: Value(s.safetyReviewEnabled),
-              safetyReviewDisabledRules: Value(
-                _encodeDisabledRules(s.safetyReviewDisabledRules),
-              ),
-              noFlyPreset: Value(s.noFlyPreset.dbValue),
-              coldWaterThresholdC: Value(s.coldWaterThresholdC),
-              deepDiveThresholdM: Value(s.deepDiveThresholdM),
-              highO2ThresholdPercent: Value(s.highO2ThresholdPercent),
-              conditionEngineEnabled: Value(s.conditionEngineEnabled),
-              conditionDisabledRules: Value(
-                _encodeDisabledRules(s.conditionDisabledRules),
-              ),
-              insightsMutedObservationRules: Value(
-                _encodeDisabledRules(s.insightsMutedObservationRules),
-              ),
-              hiddenChamberIds: Value(_encodeDisabledRules(s.hiddenChamberIds)),
-              emergencyRegion: Value(s.emergencyRegion),
-              hiddenTankPresetIds: Value(
-                _encodeDisabledRules(s.hiddenTankPresetIds),
-              ),
-              hiddenBuiltInIds: Value(encodeHiddenBuiltIns(s.hiddenBuiltInIds)),
-              showAscentRateColors: Value(s.showAscentRateColors),
-              showNdlOnProfile: Value(s.showNdlOnProfile),
-              lastStopDepth: Value(s.lastStopDepth),
-              decoStopIncrement: Value(s.decoStopIncrement),
-              ascentGasSet: Value(s.ascentGasSet.index),
-              o2Narcotic: Value(s.o2Narcotic),
-              endLimit: Value(s.endLimit),
-              icdWarningsEnabled: Value(s.icdWarningsEnabled),
-              defaultNdlSource: Value(s.defaultNdlSource.toInt()),
-              defaultDecoStopSource: Value(s.defaultDecoStopSource.toInt()),
-              defaultTtsSource: Value(s.defaultTtsSource.toInt()),
-              defaultCnsSource: Value(s.defaultCnsSource.toInt()),
-              defaultGtrSource: Value(s.defaultGtrSource.toInt()),
-              gtrReservePressure: Value(s.gtrReservePressure),
-              cnsCalculationMethod: Value(s.cnsCalculationMethod.dbValue),
-              showDepthColoredDiveCards: Value(s.showDepthColoredDiveCards),
-              cardColorAttribute: Value(s.cardColorAttribute.name),
-              diveListViewMode: Value(s.diveListViewMode.name),
-              groupTripsInDiveList: Value(s.groupTripsInDiveList),
-              autoTagImports: Value(s.autoTagImports),
-              siteListViewMode: Value(s.siteListViewMode.name),
-              tripListViewMode: Value(s.tripListViewMode.name),
-              equipmentListViewMode: Value(s.equipmentListViewMode.name),
-              buddyListViewMode: Value(s.buddyListViewMode.name),
-              diveCenterListViewMode: Value(s.diveCenterListViewMode.name),
-              certificationListViewMode: Value(
-                s.certificationListViewMode.name,
-              ),
-              courseListViewMode: Value(s.courseListViewMode.name),
-              mapStyle: Value(s.mapStyle.name),
-              siteMatchSensitivity: Value(s.siteMatchSensitivity.name),
-              trimTankPressureAtSurfacing: Value(s.trimTankPressureAtSurfacing),
-              cardColorGradientPreset: Value(s.cardColorGradientPreset),
-              cardColorGradientStart: Value(s.cardColorGradientStart),
-              cardColorGradientEnd: Value(s.cardColorGradientEnd),
-              tissueColorScheme: Value(s.tissueColorScheme.name),
-              tissueVizMode: Value(s.tissueVizMode.name),
-              showMapBackgroundOnDiveCards: Value(
-                s.showMapBackgroundOnDiveCards,
-              ),
-              showMapBackgroundOnSiteCards: Value(
-                s.showMapBackgroundOnSiteCards,
-              ),
-              showMaxDepthMarker: Value(s.showMaxDepthMarker),
-              showPressureThresholdMarkers: Value(
-                s.showPressureThresholdMarkers,
-              ),
-              defaultRightAxisMetric: Value(s.defaultRightAxisMetric.name),
-              defaultShowTemperature: Value(s.defaultShowTemperature),
-              defaultShowPressure: Value(s.defaultShowPressure),
-              defaultShowHeartRate: Value(s.defaultShowHeartRate),
-              defaultShowSac: Value(s.defaultShowSac),
-              defaultShowEvents: Value(s.defaultShowEvents),
-              defaultShowPpO2: Value(s.defaultShowPpO2),
-              defaultShowPpN2: Value(s.defaultShowPpN2),
-              defaultShowPpHe: Value(s.defaultShowPpHe),
-              defaultShowGasDensity: Value(s.defaultShowGasDensity),
-              defaultShowGf: Value(s.defaultShowGf),
-              defaultShowSurfaceGf: Value(s.defaultShowSurfaceGf),
-              defaultShowMeanDepth: Value(s.defaultShowMeanDepth),
-              defaultShowTts: Value(s.defaultShowTts),
-              defaultShowGtr: Value(s.defaultShowGtr),
-              defaultShowCns: Value(s.defaultShowCns),
-              defaultShowOtu: Value(s.defaultShowOtu),
-              defaultShowGasSwitchMarkers: Value(s.defaultShowGasSwitchMarkers),
-              defaultShowLateGasSwitches: Value(s.defaultShowLateGasSwitches),
-              defaultShowPhotoMarkers: Value(s.defaultShowPhotoMarkers),
-              defaultShowGasTimeline: Value(s.defaultShowGasTimeline),
-              defaultShowO2CellMv: Value(s.defaultShowO2CellMv),
-              defaultShowEstimatedTankPressure: Value(
-                s.defaultShowEstimatedTankPressure,
-              ),
-              defaultShowAscentRateLine: Value(s.defaultShowAscentRateLine),
-              notificationsEnabled: Value(s.notificationsEnabled),
-              serviceReminderDays: Value(
-                _formatReminderDays(s.serviceReminderDays),
-              ),
-              tripServiceLeadDays: Value(s.tripServiceLeadDays),
-              trendGapCollapseMonths: Value(s.trendGapThreshold.months),
-              reminderTime: Value(_formatReminderTime(s.reminderTime)),
-              showDataSourceBadges: Value(s.showDataSourceBadges),
-              showDiveFigure: Value(s.showDiveFigure),
-              showProfilePanelInTableView: Value(s.showProfilePanelInTableView),
-              showDetailsPaneDives: Value(s.showDetailsPaneDives),
-              showDetailsPaneSites: Value(s.showDetailsPaneSites),
-              showDetailsPaneBuddies: Value(s.showDetailsPaneBuddies),
-              showDetailsPaneTrips: Value(s.showDetailsPaneTrips),
-              showDetailsPaneEquipment: Value(s.showDetailsPaneEquipment),
-              showDetailsPaneDiveCenters: Value(s.showDetailsPaneDiveCenters),
-              showDetailsPaneCertifications: Value(
-                s.showDetailsPaneCertifications,
-              ),
-              showDetailsPaneCourses: Value(s.showDetailsPaneCourses),
-              diveDetailSections: Value(
-                DiveDetailSectionConfig.sectionsToJson(s.diveDetailSections),
-              ),
-              diveDetailLayout: Value(s.diveDetailLayout.name),
-              siteDetailSections: Value(
-                SiteDetailSectionConfig.sectionsToJson(s.siteDetailSections),
-              ),
-              siteDetailLayout: Value(s.siteDetailLayout.name),
-              hasAcceptedPlanningDisclaimer: Value(
-                s.hasAcceptedPlanningDisclaimer,
-              ),
-              createdAt: Value(now),
-              updatedAt: Value(now),
+              s.profileMetricColors,
             ),
           );
 
@@ -388,6 +460,10 @@ class DiverSettingsRepository {
     AppSettings? previous,
   }) async {
     try {
+      // The writes below key on the diver, so a twin row a sync delivered
+      // since the load would take the write too and tie with the row the
+      // reads use (issue #3343).
+      await _dropDuplicateRows(diverId);
       final columns = _storedColumns(settings).toColumns(false);
       final changed = previous == null
           ? columns
@@ -436,9 +512,7 @@ class DiverSettingsRepository {
     int now, {
     bool notify = true,
   }) async {
-    final row = await (_db.select(
-      _db.diverSettings,
-    )..where((t) => t.diverId.equals(diverId))).getSingleOrNull();
+    final row = await _rowFor(diverId);
     if (row == null) return;
     await _syncRepository.markRecordPending(
       entityType: 'diverSettings',
@@ -469,174 +543,188 @@ class DiverSettingsRepository {
   /// row's identity and clocks.
   static DiverSettingsCompanion _storedColumns(
     AppSettings settings,
-  ) => DiverSettingsCompanion(
-    depthUnit: Value(settings.depthUnit.name),
-    temperatureUnit: Value(settings.temperatureUnit.name),
-    pressureUnit: Value(settings.pressureUnit.name),
-    volumeUnit: Value(settings.volumeUnit.name),
-    weightUnit: Value(settings.weightUnit.name),
-    altitudeUnit: Value(settings.altitudeUnit.name),
-    distanceUnit: Value(settings.distanceUnit.name),
-    gasConsumptionDisplay: Value(settings.gasConsumptionDisplay.name),
-    gasModel: Value(settings.gasModel.name),
-    defaultPlannerWaterType: Value(settings.defaultPlannerWaterType.name),
-    defaultCurrency: Value(settings.defaultCurrency),
-    visibilityScalePreset: Value(settings.visibilityScalePreset.name),
-    visibilityScaleExcellentM: Value(settings.visibilityScaleExcellentM),
-    visibilityScaleGoodM: Value(settings.visibilityScaleGoodM),
-    visibilityScaleModerateM: Value(settings.visibilityScaleModerateM),
-    coordinateFormat: Value(settings.coordinateFormat.name),
-    seascapeAppearance: Value(settings.seascapeAppearance.encode()),
-    seascapeVerticalExaggerationOverrides: Value(
-      _encodeExaggerationOverrides(
-        settings.seascapeVerticalExaggerationOverrides,
+  ) => withProfileMetricColors(
+    DiverSettingsCompanion(
+      depthUnit: Value(settings.depthUnit.name),
+      temperatureUnit: Value(settings.temperatureUnit.name),
+      pressureUnit: Value(settings.pressureUnit.name),
+      volumeUnit: Value(settings.volumeUnit.name),
+      weightUnit: Value(settings.weightUnit.name),
+      altitudeUnit: Value(settings.altitudeUnit.name),
+      distanceUnit: Value(settings.distanceUnit.name),
+      gasConsumptionDisplay: Value(settings.gasConsumptionDisplay.name),
+      gasModel: Value(settings.gasModel.name),
+      defaultPlannerWaterType: Value(settings.defaultPlannerWaterType.name),
+      defaultCurrency: Value(settings.defaultCurrency),
+      visibilityScalePreset: Value(settings.visibilityScalePreset.name),
+      visibilityScaleExcellentM: Value(settings.visibilityScaleExcellentM),
+      visibilityScaleGoodM: Value(settings.visibilityScaleGoodM),
+      visibilityScaleModerateM: Value(settings.visibilityScaleModerateM),
+      coordinateFormat: Value(settings.coordinateFormat.name),
+      seascapeAppearance: Value(settings.seascapeAppearance.encode()),
+      seascapeVerticalExaggerationOverrides: Value(
+        _encodeExaggerationOverrides(
+          settings.seascapeVerticalExaggerationOverrides,
+        ),
+      ),
+      timeFormat: Value(settings.timeFormat.name),
+      dateFormat: Value(settings.dateFormat.name),
+      themeMode: Value(_themeModeToString(settings.themeMode)),
+      themePreset: Value(settings.themePresetId),
+      accentNavIcons: Value(settings.accentNavIcons),
+      accentSectionHeaders: Value(settings.accentSectionHeaders),
+      accentListIcons: Value(settings.accentListIcons),
+      locale: Value(settings.locale),
+      placeNameLanguage: Value(settings.placeNameLanguage),
+      defaultDiveType: Value(settings.defaultDiveType),
+      defaultTankVolume: Value(settings.defaultTankVolume),
+      defaultStartPressure: Value(settings.defaultStartPressure),
+      defaultTankPreset: Value(settings.defaultTankPreset),
+      applyDefaultTankToImports: Value(settings.applyDefaultTankToImports),
+      gfLow: Value(settings.gfLow),
+      gfHigh: Value(settings.gfHigh),
+      ppO2MaxWorking: Value(settings.ppO2MaxWorking),
+      ppO2MaxDeco: Value(settings.ppO2MaxDeco),
+      ccrSetpointLow: Value(settings.ccrSetpointLow),
+      ccrSetpointHigh: Value(settings.ccrSetpointHigh),
+      ccrDiluentModPpO2: Value(settings.ccrDiluentModPpO2),
+      cnsWarningThreshold: Value(settings.cnsWarningThreshold),
+      ascentRateWarning: Value(settings.ascentRateWarning),
+      ascentRateCritical: Value(settings.ascentRateCritical),
+      showCeilingOnProfile: Value(settings.showCeilingOnProfile),
+      showDecoStopsOnProfile: Value(settings.showDecoStopsOnProfile),
+      safetyReviewEnabled: Value(settings.safetyReviewEnabled),
+      safetyReviewDisabledRules: Value(
+        _encodeDisabledRules(settings.safetyReviewDisabledRules),
+      ),
+      noFlyPreset: Value(settings.noFlyPreset.dbValue),
+      coldWaterThresholdC: Value(settings.coldWaterThresholdC),
+      deepDiveThresholdM: Value(settings.deepDiveThresholdM),
+      highO2ThresholdPercent: Value(settings.highO2ThresholdPercent),
+      conditionEngineEnabled: Value(settings.conditionEngineEnabled),
+      conditionDisabledRules: Value(
+        _encodeDisabledRules(settings.conditionDisabledRules),
+      ),
+      insightsMutedObservationRules: Value(
+        _encodeDisabledRules(settings.insightsMutedObservationRules),
+      ),
+      equipmentDefaultStatuses: Value(
+        encodeEquipmentDefaultStatuses(settings.equipmentDefaultStatuses),
+      ),
+      hiddenChamberIds: Value(_encodeDisabledRules(settings.hiddenChamberIds)),
+      emergencyRegion: Value(settings.emergencyRegion),
+      hiddenTankPresetIds: Value(
+        _encodeDisabledRules(settings.hiddenTankPresetIds),
+      ),
+      hiddenBuiltInIds: Value(encodeHiddenBuiltIns(settings.hiddenBuiltInIds)),
+      showAscentRateColors: Value(settings.showAscentRateColors),
+      showNdlOnProfile: Value(settings.showNdlOnProfile),
+      lastStopDepth: Value(settings.lastStopDepth),
+      decoStopIncrement: Value(settings.decoStopIncrement),
+      ascentGasSet: Value(settings.ascentGasSet.index),
+      o2Narcotic: Value(settings.o2Narcotic),
+      endLimit: Value(settings.endLimit),
+      icdWarningsEnabled: Value(settings.icdWarningsEnabled),
+      defaultNdlSource: Value(settings.defaultNdlSource.toInt()),
+      defaultDecoStopSource: Value(settings.defaultDecoStopSource.toInt()),
+      defaultTtsSource: Value(settings.defaultTtsSource.toInt()),
+      defaultCnsSource: Value(settings.defaultCnsSource.toInt()),
+      defaultGtrSource: Value(settings.defaultGtrSource.toInt()),
+      gtrReservePressure: Value(settings.gtrReservePressure),
+      cnsCalculationMethod: Value(settings.cnsCalculationMethod.dbValue),
+      showDepthColoredDiveCards: Value(settings.showDepthColoredDiveCards),
+      cardColorAttribute: Value(settings.cardColorAttribute.name),
+      diveListViewMode: Value(settings.diveListViewMode.name),
+      groupTripsInDiveList: Value(settings.groupTripsInDiveList),
+      autoTagImports: Value(settings.autoTagImports),
+      siteListViewMode: Value(settings.siteListViewMode.name),
+      tripListViewMode: Value(settings.tripListViewMode.name),
+      equipmentListViewMode: Value(settings.equipmentListViewMode.name),
+      buddyListViewMode: Value(settings.buddyListViewMode.name),
+      diveCenterListViewMode: Value(settings.diveCenterListViewMode.name),
+      certificationListViewMode: Value(settings.certificationListViewMode.name),
+      courseListViewMode: Value(settings.courseListViewMode.name),
+      pscrRatio: Value(settings.pscrRatio),
+      profileMetricsFollowViewport: Value(
+        settings.profileMetricsFollowViewport,
+      ),
+      mapStyle: Value(settings.mapStyle.name),
+      siteMatchSensitivity: Value(settings.siteMatchSensitivity.name),
+      trimTankPressureAtSurfacing: Value(settings.trimTankPressureAtSurfacing),
+      cardColorGradientPreset: Value(settings.cardColorGradientPreset),
+      cardColorGradientStart: Value(settings.cardColorGradientStart),
+      cardColorGradientEnd: Value(settings.cardColorGradientEnd),
+      tissueColorScheme: Value(settings.tissueColorScheme.name),
+      tissueVizMode: Value(settings.tissueVizMode.name),
+      showMapBackgroundOnDiveCards: Value(
+        settings.showMapBackgroundOnDiveCards,
+      ),
+      showMapBackgroundOnSiteCards: Value(
+        settings.showMapBackgroundOnSiteCards,
+      ),
+      showMaxDepthMarker: Value(settings.showMaxDepthMarker),
+      showPressureThresholdMarkers: Value(
+        settings.showPressureThresholdMarkers,
+      ),
+      defaultRightAxisMetric: Value(settings.defaultRightAxisMetric.name),
+      defaultShowTemperature: Value(settings.defaultShowTemperature),
+      defaultShowPressure: Value(settings.defaultShowPressure),
+      defaultShowHeartRate: Value(settings.defaultShowHeartRate),
+      defaultShowSac: Value(settings.defaultShowSac),
+      defaultShowEvents: Value(settings.defaultShowEvents),
+      defaultShowPpO2: Value(settings.defaultShowPpO2),
+      defaultShowPpN2: Value(settings.defaultShowPpN2),
+      defaultShowPpHe: Value(settings.defaultShowPpHe),
+      defaultShowGasDensity: Value(settings.defaultShowGasDensity),
+      defaultShowGf: Value(settings.defaultShowGf),
+      defaultShowSurfaceGf: Value(settings.defaultShowSurfaceGf),
+      defaultShowMeanDepth: Value(settings.defaultShowMeanDepth),
+      defaultShowTts: Value(settings.defaultShowTts),
+      defaultShowGtr: Value(settings.defaultShowGtr),
+      defaultShowCns: Value(settings.defaultShowCns),
+      defaultShowOtu: Value(settings.defaultShowOtu),
+      defaultShowGasSwitchMarkers: Value(settings.defaultShowGasSwitchMarkers),
+      defaultShowLateGasSwitches: Value(settings.defaultShowLateGasSwitches),
+      defaultShowPhotoMarkers: Value(settings.defaultShowPhotoMarkers),
+      defaultShowGasTimeline: Value(settings.defaultShowGasTimeline),
+      defaultShowO2CellMv: Value(settings.defaultShowO2CellMv),
+      defaultShowEstimatedTankPressure: Value(
+        settings.defaultShowEstimatedTankPressure,
+      ),
+      defaultShowAscentRateLine: Value(settings.defaultShowAscentRateLine),
+      notificationsEnabled: Value(settings.notificationsEnabled),
+      serviceReminderDays: Value(
+        _formatReminderDays(settings.serviceReminderDays),
+      ),
+      tripServiceLeadDays: Value(settings.tripServiceLeadDays),
+      trendGapCollapseMonths: Value(settings.trendGapThreshold.months),
+      reminderTime: Value(_formatReminderTime(settings.reminderTime)),
+      showDataSourceBadges: Value(settings.showDataSourceBadges),
+      showDiveFigure: Value(settings.showDiveFigure),
+      showProfilePanelInTableView: Value(settings.showProfilePanelInTableView),
+      showDetailsPaneDives: Value(settings.showDetailsPaneDives),
+      showDetailsPaneSites: Value(settings.showDetailsPaneSites),
+      showDetailsPaneBuddies: Value(settings.showDetailsPaneBuddies),
+      showDetailsPaneTrips: Value(settings.showDetailsPaneTrips),
+      showDetailsPaneEquipment: Value(settings.showDetailsPaneEquipment),
+      showDetailsPaneDiveCenters: Value(settings.showDetailsPaneDiveCenters),
+      showDetailsPaneCertifications: Value(
+        settings.showDetailsPaneCertifications,
+      ),
+      showDetailsPaneCourses: Value(settings.showDetailsPaneCourses),
+      diveDetailSections: Value(
+        DiveDetailSectionConfig.sectionsToJson(settings.diveDetailSections),
+      ),
+      diveDetailLayout: Value(settings.diveDetailLayout.name),
+      siteDetailSections: Value(
+        SiteDetailSectionConfig.sectionsToJson(settings.siteDetailSections),
+      ),
+      siteDetailLayout: Value(settings.siteDetailLayout.name),
+      hasAcceptedPlanningDisclaimer: Value(
+        settings.hasAcceptedPlanningDisclaimer,
       ),
     ),
-    timeFormat: Value(settings.timeFormat.name),
-    dateFormat: Value(settings.dateFormat.name),
-    themeMode: Value(_themeModeToString(settings.themeMode)),
-    themePreset: Value(settings.themePresetId),
-    accentNavIcons: Value(settings.accentNavIcons),
-    accentSectionHeaders: Value(settings.accentSectionHeaders),
-    accentListIcons: Value(settings.accentListIcons),
-    locale: Value(settings.locale),
-    placeNameLanguage: Value(settings.placeNameLanguage),
-    defaultDiveType: Value(settings.defaultDiveType),
-    defaultTankVolume: Value(settings.defaultTankVolume),
-    defaultStartPressure: Value(settings.defaultStartPressure),
-    defaultTankPreset: Value(settings.defaultTankPreset),
-    applyDefaultTankToImports: Value(settings.applyDefaultTankToImports),
-    gfLow: Value(settings.gfLow),
-    gfHigh: Value(settings.gfHigh),
-    ppO2MaxWorking: Value(settings.ppO2MaxWorking),
-    ppO2MaxDeco: Value(settings.ppO2MaxDeco),
-    ccrSetpointLow: Value(settings.ccrSetpointLow),
-    ccrSetpointHigh: Value(settings.ccrSetpointHigh),
-    ccrDiluentModPpO2: Value(settings.ccrDiluentModPpO2),
-    cnsWarningThreshold: Value(settings.cnsWarningThreshold),
-    ascentRateWarning: Value(settings.ascentRateWarning),
-    ascentRateCritical: Value(settings.ascentRateCritical),
-    showCeilingOnProfile: Value(settings.showCeilingOnProfile),
-    showDecoStopsOnProfile: Value(settings.showDecoStopsOnProfile),
-    safetyReviewEnabled: Value(settings.safetyReviewEnabled),
-    safetyReviewDisabledRules: Value(
-      _encodeDisabledRules(settings.safetyReviewDisabledRules),
-    ),
-    noFlyPreset: Value(settings.noFlyPreset.dbValue),
-    coldWaterThresholdC: Value(settings.coldWaterThresholdC),
-    deepDiveThresholdM: Value(settings.deepDiveThresholdM),
-    highO2ThresholdPercent: Value(settings.highO2ThresholdPercent),
-    conditionEngineEnabled: Value(settings.conditionEngineEnabled),
-    conditionDisabledRules: Value(
-      _encodeDisabledRules(settings.conditionDisabledRules),
-    ),
-    insightsMutedObservationRules: Value(
-      _encodeDisabledRules(settings.insightsMutedObservationRules),
-    ),
-    hiddenChamberIds: Value(_encodeDisabledRules(settings.hiddenChamberIds)),
-    emergencyRegion: Value(settings.emergencyRegion),
-    hiddenTankPresetIds: Value(
-      _encodeDisabledRules(settings.hiddenTankPresetIds),
-    ),
-    hiddenBuiltInIds: Value(encodeHiddenBuiltIns(settings.hiddenBuiltInIds)),
-    showAscentRateColors: Value(settings.showAscentRateColors),
-    showNdlOnProfile: Value(settings.showNdlOnProfile),
-    lastStopDepth: Value(settings.lastStopDepth),
-    decoStopIncrement: Value(settings.decoStopIncrement),
-    ascentGasSet: Value(settings.ascentGasSet.index),
-    o2Narcotic: Value(settings.o2Narcotic),
-    endLimit: Value(settings.endLimit),
-    icdWarningsEnabled: Value(settings.icdWarningsEnabled),
-    defaultNdlSource: Value(settings.defaultNdlSource.toInt()),
-    defaultDecoStopSource: Value(settings.defaultDecoStopSource.toInt()),
-    defaultTtsSource: Value(settings.defaultTtsSource.toInt()),
-    defaultCnsSource: Value(settings.defaultCnsSource.toInt()),
-    defaultGtrSource: Value(settings.defaultGtrSource.toInt()),
-    gtrReservePressure: Value(settings.gtrReservePressure),
-    cnsCalculationMethod: Value(settings.cnsCalculationMethod.dbValue),
-    showDepthColoredDiveCards: Value(settings.showDepthColoredDiveCards),
-    cardColorAttribute: Value(settings.cardColorAttribute.name),
-    diveListViewMode: Value(settings.diveListViewMode.name),
-    groupTripsInDiveList: Value(settings.groupTripsInDiveList),
-    autoTagImports: Value(settings.autoTagImports),
-    siteListViewMode: Value(settings.siteListViewMode.name),
-    tripListViewMode: Value(settings.tripListViewMode.name),
-    equipmentListViewMode: Value(settings.equipmentListViewMode.name),
-    buddyListViewMode: Value(settings.buddyListViewMode.name),
-    diveCenterListViewMode: Value(settings.diveCenterListViewMode.name),
-    certificationListViewMode: Value(settings.certificationListViewMode.name),
-    courseListViewMode: Value(settings.courseListViewMode.name),
-    pscrRatio: Value(settings.pscrRatio),
-    profileMetricsFollowViewport: Value(settings.profileMetricsFollowViewport),
-    mapStyle: Value(settings.mapStyle.name),
-    siteMatchSensitivity: Value(settings.siteMatchSensitivity.name),
-    trimTankPressureAtSurfacing: Value(settings.trimTankPressureAtSurfacing),
-    cardColorGradientPreset: Value(settings.cardColorGradientPreset),
-    cardColorGradientStart: Value(settings.cardColorGradientStart),
-    cardColorGradientEnd: Value(settings.cardColorGradientEnd),
-    tissueColorScheme: Value(settings.tissueColorScheme.name),
-    tissueVizMode: Value(settings.tissueVizMode.name),
-    showMapBackgroundOnDiveCards: Value(settings.showMapBackgroundOnDiveCards),
-    showMapBackgroundOnSiteCards: Value(settings.showMapBackgroundOnSiteCards),
-    showMaxDepthMarker: Value(settings.showMaxDepthMarker),
-    showPressureThresholdMarkers: Value(settings.showPressureThresholdMarkers),
-    defaultRightAxisMetric: Value(settings.defaultRightAxisMetric.name),
-    defaultShowTemperature: Value(settings.defaultShowTemperature),
-    defaultShowPressure: Value(settings.defaultShowPressure),
-    defaultShowHeartRate: Value(settings.defaultShowHeartRate),
-    defaultShowSac: Value(settings.defaultShowSac),
-    defaultShowEvents: Value(settings.defaultShowEvents),
-    defaultShowPpO2: Value(settings.defaultShowPpO2),
-    defaultShowPpN2: Value(settings.defaultShowPpN2),
-    defaultShowPpHe: Value(settings.defaultShowPpHe),
-    defaultShowGasDensity: Value(settings.defaultShowGasDensity),
-    defaultShowGf: Value(settings.defaultShowGf),
-    defaultShowSurfaceGf: Value(settings.defaultShowSurfaceGf),
-    defaultShowMeanDepth: Value(settings.defaultShowMeanDepth),
-    defaultShowTts: Value(settings.defaultShowTts),
-    defaultShowGtr: Value(settings.defaultShowGtr),
-    defaultShowCns: Value(settings.defaultShowCns),
-    defaultShowOtu: Value(settings.defaultShowOtu),
-    defaultShowGasSwitchMarkers: Value(settings.defaultShowGasSwitchMarkers),
-    defaultShowLateGasSwitches: Value(settings.defaultShowLateGasSwitches),
-    defaultShowPhotoMarkers: Value(settings.defaultShowPhotoMarkers),
-    defaultShowGasTimeline: Value(settings.defaultShowGasTimeline),
-    defaultShowO2CellMv: Value(settings.defaultShowO2CellMv),
-    defaultShowEstimatedTankPressure: Value(
-      settings.defaultShowEstimatedTankPressure,
-    ),
-    defaultShowAscentRateLine: Value(settings.defaultShowAscentRateLine),
-    notificationsEnabled: Value(settings.notificationsEnabled),
-    serviceReminderDays: Value(
-      _formatReminderDays(settings.serviceReminderDays),
-    ),
-    tripServiceLeadDays: Value(settings.tripServiceLeadDays),
-    trendGapCollapseMonths: Value(settings.trendGapThreshold.months),
-    reminderTime: Value(_formatReminderTime(settings.reminderTime)),
-    showDataSourceBadges: Value(settings.showDataSourceBadges),
-    showDiveFigure: Value(settings.showDiveFigure),
-    showProfilePanelInTableView: Value(settings.showProfilePanelInTableView),
-    showDetailsPaneDives: Value(settings.showDetailsPaneDives),
-    showDetailsPaneSites: Value(settings.showDetailsPaneSites),
-    showDetailsPaneBuddies: Value(settings.showDetailsPaneBuddies),
-    showDetailsPaneTrips: Value(settings.showDetailsPaneTrips),
-    showDetailsPaneEquipment: Value(settings.showDetailsPaneEquipment),
-    showDetailsPaneDiveCenters: Value(settings.showDetailsPaneDiveCenters),
-    showDetailsPaneCertifications: Value(
-      settings.showDetailsPaneCertifications,
-    ),
-    showDetailsPaneCourses: Value(settings.showDetailsPaneCourses),
-    diveDetailSections: Value(
-      DiveDetailSectionConfig.sectionsToJson(settings.diveDetailSections),
-    ),
-    diveDetailLayout: Value(settings.diveDetailLayout.name),
-    siteDetailSections: Value(
-      SiteDetailSectionConfig.sectionsToJson(settings.siteDetailSections),
-    ),
-    siteDetailLayout: Value(settings.siteDetailLayout.name),
-    hasAcceptedPlanningDisclaimer: Value(
-      settings.hasAcceptedPlanningDisclaimer,
-    ),
+    settings.profileMetricColors,
   );
 
   /// Get or create settings for a diver (ensures settings always exist)
@@ -644,6 +732,7 @@ class DiverSettingsRepository {
     String diverId, {
     AppSettings? defaultSettings,
   }) async {
+    await _dropDuplicateRows(diverId);
     final existing = await getSettingsForDiver(diverId);
     if (existing != null) {
       return existing;
@@ -751,6 +840,9 @@ class DiverSettingsRepository {
       insightsMutedObservationRules: _decodeDisabledRules(
         row.insightsMutedObservationRules,
       ),
+      equipmentDefaultStatuses: decodeEquipmentDefaultStatuses(
+        row.equipmentDefaultStatuses,
+      ),
       hiddenChamberIds: _decodeDisabledRules(row.hiddenChamberIds),
       emergencyRegion: row.emergencyRegion,
       hiddenTankPresetIds: _decodeDisabledRules(row.hiddenTankPresetIds),
@@ -839,6 +931,7 @@ class DiverSettingsRepository {
       trendGapThreshold: TrendGapThreshold.fromMonths(
         row.trendGapCollapseMonths,
       ),
+      profileMetricColors: profileMetricColorsFromRow(row),
       reminderTime: _parseReminderTime(row.reminderTime),
       showDataSourceBadges: row.showDataSourceBadges,
       showDiveFigure: row.showDiveFigure,

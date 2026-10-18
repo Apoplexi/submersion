@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/app_directories.dart';
 import 'package:submersion/core/domain/entities/storage_config.dart';
 import 'package:submersion/core/services/security_scoped_bookmark_service.dart';
+import 'package:submersion/core/services/storage/gc/storage_gc_store.dart';
 
 /// Service for managing database file location
 ///
@@ -141,7 +142,24 @@ class DatabaseLocationService {
   }
 
   /// Get the database file path based on current configuration
+  ///
+  /// A `SUBMERSION_DB_PATH` environment variable, when set, short-circuits
+  /// this entirely and skips SharedPreferences. SharedPreferences on
+  /// desktop is one file per Windows user account, shared by every running
+  /// instance of the app regardless of which build or working copy launched
+  /// it -- running two development builds side by side (one worktree per
+  /// branch) means the one that happens to start second silently inherits
+  /// whatever custom folder the first one configured, and if its schema is
+  /// newer it auto-migrates the first one's database out from under it. No
+  /// real install ever sets this variable, so production behaviour is
+  /// unchanged; it exists purely so each worktree's dev run can point at a
+  /// folder nothing else touches.
   Future<String> getDatabasePath() async {
+    final override = Platform.environment['SUBMERSION_DB_PATH'];
+    if (override != null && override.isNotEmpty) {
+      return override;
+    }
+
     final config = await getStorageConfig();
 
     if (config.mode == StorageLocationMode.customFolder &&
@@ -471,6 +489,15 @@ class DatabaseLocationService {
 
   /// Clears the storage configuration, so the app goes back to its default
   /// location. Nothing at the custom location is moved or deleted.
+  /// Records that another dive log file is about to replace the open one
+  /// (adopting a folder, switching to an existing database, going back to
+  /// the default location). The storage cleanup treats it as a restore:
+  /// what the last sync told it described the previous file, so no cloud
+  /// media is deleted until a sync after the switch. Throws when the mark
+  /// cannot be saved, so the switch does not go ahead without it.
+  Future<void> markDatabaseSwitched() =>
+      StorageGcStore.markRestored(_prefs, DateTime.now());
+
   Future<void> resetToDefault() async {
     // Stop accessing any security-scoped resource first
     await SecurityScopedBookmarkService.stopAccessingSecurityScopedResource();

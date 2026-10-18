@@ -204,7 +204,6 @@ The reusable lists and rules Submersion offers throughout the app:
 | **Setup assistant** | Revisit the first-run choices for units, appearance and backup |
 | **Trip Checklist Templates** | Reusable to-do lists for trip planning |
 | **Pre-Dive Checklists** | Buddy checks, CCR build lists, gear packing |
-| **Near-miss log** | Private, non-punitive incident notes; see [Safety](safety.md#near-miss-log) |
 | **Species** | The species catalog; see [Marine Life & Photos](marine-life-and-photos.md) |
 | **Tags** | Manage, merge and delete tags |
 | **Saved Queries** | Rename, reorder and delete saved dive searches |
@@ -217,7 +216,8 @@ The reusable lists and rules Submersion offers throughout the app:
 |------|--------------|
 | **Backup & Restore** | Back up and restore your whole log; see [Backup & Restore](backup-and-restore.md) |
 | **Database Cloud Sync** | Keep your devices in step through cloud storage; see [Multi-Device Sync](multi-device-sync.md) |
-| **Photos & Media** | Where photos come from, and media accounts; see [Media Sync](media-sync.md) |
+| **Photos & Media** | Where photos come from, and where copies are kept; see [Media Sync](media-sync.md) |
+| **Connected Accounts** | The sign-ins used by sync, media storage and shared site libraries |
 
 ### Storage
 

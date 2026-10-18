@@ -3889,6 +3889,12 @@ abstract class AppLocalizations {
   /// **'This backup will be permanently deleted. This cannot be undone.'**
   String get backup_delete_dialog_content;
 
+  /// No description provided for @backup_delete_dialog_content_otherDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup is only in your cloud storage, and nothing shows this device made it. It may be another device\'s only copy, or one this device made before a reinstall. Deleting it cannot be undone.'**
+  String get backup_delete_dialog_content_otherDevice;
+
   /// No description provided for @backup_delete_dialog_delete.
   ///
   /// In en, this message translates to:
@@ -6482,12 +6488,6 @@ abstract class AppLocalizations {
   /// **'Wallet View'**
   String get certifications_list_tooltip_walletView;
 
-  /// No description provided for @certifications_picker_clearTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear certification selection'**
-  String get certifications_picker_clearTooltip;
-
   /// No description provided for @certifications_picker_empty_addButton.
   ///
   /// In en, this message translates to:
@@ -6524,17 +6524,11 @@ abstract class AppLocalizations {
   /// **'New Cert'**
   String get certifications_picker_newCert;
 
-  /// No description provided for @certifications_picker_noSelection.
+  /// Title of the multi-select certification sheet in the course editor
   ///
   /// In en, this message translates to:
-  /// **'No certification selected'**
-  String get certifications_picker_noSelection;
-
-  /// No description provided for @certifications_picker_sheetTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Link to Certification'**
-  String get certifications_picker_sheetTitle;
+  /// **'Select Certifications'**
+  String get certifications_picker_selectTitle;
 
   /// No description provided for @certifications_search_empty_hint.
   ///
@@ -8190,12 +8184,6 @@ abstract class AppLocalizations {
   /// **'Started {date}'**
   String courses_card_started(Object date);
 
-  /// No description provided for @courses_detail_certificationNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'Certification not found'**
-  String get courses_detail_certificationNotFound;
-
   /// No description provided for @courses_detail_noTrainingDives.
   ///
   /// In en, this message translates to:
@@ -8310,11 +8298,11 @@ abstract class AppLocalizations {
   /// **'Instructor Number'**
   String get courses_field_instructorNumber;
 
-  /// No description provided for @courses_field_linkCertificationHint.
+  /// Hint under the Earned Certifications header in the course editor
   ///
   /// In en, this message translates to:
-  /// **'Link a certification earned from this course'**
-  String get courses_field_linkCertificationHint;
+  /// **'Link the certifications earned from this course'**
+  String get courses_field_linkCertificationsHint;
 
   /// No description provided for @courses_field_location.
   ///
@@ -8400,12 +8388,6 @@ abstract class AppLocalizations {
   /// **'Active'**
   String get courses_picker_active;
 
-  /// No description provided for @courses_picker_clearSelection.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear selection'**
-  String get courses_picker_clearSelection;
-
   /// No description provided for @courses_picker_createCourse.
   ///
   /// In en, this message translates to:
@@ -8430,17 +8412,17 @@ abstract class AppLocalizations {
   /// **'No courses yet'**
   String get courses_picker_noCourses;
 
-  /// No description provided for @courses_picker_noneSelected.
+  /// Title of the multi-select course sheet
   ///
   /// In en, this message translates to:
-  /// **'No course selected'**
-  String get courses_picker_noneSelected;
+  /// **'Select Training Courses'**
+  String get courses_picker_selectCoursesTitle;
 
-  /// No description provided for @courses_picker_selectTitle.
+  /// Subtitle on a certification already linked to another course; ticking it moves it here
   ///
   /// In en, this message translates to:
-  /// **'Select Training Course'**
-  String get courses_picker_selectTitle;
+  /// **'Linked to: {courseName}'**
+  String courses_picker_linkedTo(String courseName);
 
   /// No description provided for @courses_picker_selected.
   ///
@@ -8508,11 +8490,11 @@ abstract class AppLocalizations {
   /// **'Course Details'**
   String get courses_section_details;
 
-  /// No description provided for @courses_section_earnedCertification.
+  /// Course editor and course detail section listing the certifications the course earned
   ///
   /// In en, this message translates to:
-  /// **'Earned Certification'**
-  String get courses_section_earnedCertification;
+  /// **'Earned Certifications'**
+  String get courses_section_earnedCertifications;
 
   /// No description provided for @courses_section_instructor.
   ///
@@ -8855,6 +8837,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last dive {days}d ago'**
   String dashboard_gauges_lastDiveDays(int days);
+
+  /// Dashboard chip when the last dive was a year or more ago; span is a formatted elapsed time such as 1y 35d
+  ///
+  /// In en, this message translates to:
+  /// **'Last dive {span} ago'**
+  String dashboard_gauges_lastDiveSpan(String span);
 
   /// No description provided for @dashboard_gauges_lastDiveToday.
   ///
@@ -12031,12 +12019,6 @@ abstract class AppLocalizations {
   /// **'Add site'**
   String get diveLog_edit_row_addSite;
 
-  /// Row label: training course picker
-  ///
-  /// In en, this message translates to:
-  /// **'Course'**
-  String get diveLog_edit_row_course;
-
   /// Row label: dive center picker
   ///
   /// In en, this message translates to:
@@ -12217,11 +12199,11 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get diveLog_edit_section_tags;
 
-  /// No description provided for @diveLog_edit_section_trainingCourse.
+  /// Dive editor, bulk editor and dive detail label for the training courses a dive belongs to
   ///
   /// In en, this message translates to:
-  /// **'Training Course'**
-  String get diveLog_edit_section_trainingCourse;
+  /// **'Training Courses'**
+  String get diveLog_edit_section_trainingCourses;
 
   /// No description provided for @diveLog_edit_section_trip.
   ///
@@ -12367,11 +12349,11 @@ abstract class AppLocalizations {
   /// **'Remove'**
   String get diveLog_edit_tooltip_removeWeight;
 
-  /// No description provided for @diveLog_edit_trainingCourseHint.
+  /// Hint above the course chips in the dive editor
   ///
   /// In en, this message translates to:
-  /// **'Link this dive to a training course'**
-  String get diveLog_edit_trainingCourseHint;
+  /// **'Link this dive to one or more training courses'**
+  String get diveLog_edit_trainingCoursesHint;
 
   /// No description provided for @diveLog_edit_tripSuggested.
   ///
@@ -12522,6 +12504,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove items to add different ones'**
   String get diveLog_equipmentPicker_removeToAdd;
+
+  /// No description provided for @diveLog_equipmentPicker_showLeftKit.
+  ///
+  /// In en, this message translates to:
+  /// **'Show retired and sold gear'**
+  String get diveLog_equipmentPicker_showLeftKit;
 
   /// No description provided for @diveLog_equipmentPicker_spareHint.
   ///
@@ -16069,6 +16057,12 @@ abstract class AppLocalizations {
   /// **'None'**
   String get diveLog_tank_regulatorNone;
 
+  /// No description provided for @diveLog_tank_regulatorShowLeftKit.
+  ///
+  /// In en, this message translates to:
+  /// **'Show retired and sold regulators'**
+  String get diveLog_tank_regulatorShowLeftKit;
+
   /// No description provided for @diveLog_tank_tripCylinderLabel.
   ///
   /// In en, this message translates to:
@@ -16296,12 +16290,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'GTR'**
   String get diveLog_tooltip_gtr;
-
-  /// No description provided for @diveLog_sources_row_metric.
-  ///
-  /// In en, this message translates to:
-  /// **'Metric'**
-  String get diveLog_sources_row_metric;
 
   /// No description provided for @diveLog_sources_row_maxDepth.
   ///
@@ -16561,17 +16549,17 @@ abstract class AppLocalizations {
   /// **'Not entered — assuming {value} {unit}'**
   String divePlanner_info_reserveDefault(Object unit, Object value);
 
-  /// No description provided for @divePlanner_field_bailoutGas.
+  /// No description provided for @divePlanner_field_diluentGas.
   ///
   /// In en, this message translates to:
-  /// **'Bailout gas'**
-  String get divePlanner_field_bailoutGas;
+  /// **'Diluent'**
+  String get divePlanner_field_diluentGas;
 
-  /// No description provided for @divePlanner_field_bailoutGasHint.
+  /// No description provided for @divePlanner_field_diluentGasHint.
   ///
   /// In en, this message translates to:
-  /// **'Open-circuit gas carried in case the loop fails'**
-  String get divePlanner_field_bailoutGasHint;
+  /// **'Unticked cylinders are bailout'**
+  String get divePlanner_field_diluentGasHint;
 
   /// No description provided for @divePlanner_field_hePercent.
   ///
@@ -16759,6 +16747,12 @@ abstract class AppLocalizations {
   /// **'Problem solving time'**
   String get divePlanner_gasOptions_problemSolvingMinutes;
 
+  /// Minimum stop time enforced at every gas switch, main plan and bailout alike; 0 means no floor
+  ///
+  /// In en, this message translates to:
+  /// **'Gas switch stop'**
+  String get divePlanner_gasOptions_gasSwitchStopSeconds;
+
   /// No description provided for @divePlanner_gasOptions_ppO2Bottom.
   ///
   /// In en, this message translates to:
@@ -16788,6 +16782,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tanks'**
   String get divePlanner_label_tanks;
+
+  /// Heading over a CCR plan's diluent and oxygen cylinders in the planner's tank list
+  ///
+  /// In en, this message translates to:
+  /// **'Loop'**
+  String get divePlanner_label_loopGases;
+
+  /// Heading over a CCR plan's open-circuit bailout cylinders in the planner's tank list
+  ///
+  /// In en, this message translates to:
+  /// **'Bailout'**
+  String get divePlanner_label_bailoutGases;
+
+  /// Shown under the Bailout heading of a CCR plan's tank list while no bailout cylinder has been added
+  ///
+  /// In en, this message translates to:
+  /// **'No bailout cylinder yet'**
+  String get divePlanner_label_noBailout;
 
   /// No description provided for @divePlanner_savedTanks_title.
   ///
@@ -18526,6 +18538,12 @@ abstract class AppLocalizations {
   /// **'No country'**
   String get diveSites_group_noCountry;
 
+  /// No description provided for @diveSites_group_noBodyOfWater.
+  ///
+  /// In en, this message translates to:
+  /// **'No body of water'**
+  String get diveSites_group_noBodyOfWater;
+
   /// No description provided for @diveSites_group_siteCount.
   ///
   /// In en, this message translates to:
@@ -18550,11 +18568,23 @@ abstract class AppLocalizations {
   /// **'Country & region'**
   String get diveSites_list_groupBy_location;
 
+  /// No description provided for @diveSites_list_groupBy_locationAndWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Country & body of water'**
+  String get diveSites_list_groupBy_locationAndWater;
+
   /// No description provided for @diveSites_list_groupBy_none.
   ///
   /// In en, this message translates to:
   /// **'None'**
   String get diveSites_list_groupBy_none;
+
+  /// No description provided for @diveSites_list_groupBy_water.
+  ///
+  /// In en, this message translates to:
+  /// **'Body of water'**
+  String get diveSites_list_groupBy_water;
 
   /// No description provided for @diveSites_list_tile_diveCount.
   ///
@@ -21979,6 +22009,12 @@ abstract class AppLocalizations {
   /// **'Filled from {name}'**
   String passport_scan_filledFrom(String name);
 
+  /// No description provided for @passport_scan_filledFromUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Filled from {name}. Used on {count} earlier dive.} other{Filled from {name}. Used on {count} earlier dives.}}'**
+  String passport_scan_filledFromUsed(String name, int count);
+
   /// No description provided for @passport_foreign_title.
   ///
   /// In en, this message translates to:
@@ -21990,6 +22026,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This cylinder is not in your gear.'**
   String get passport_foreign_notInGear;
+
+  /// No description provided for @passport_usage_foreignTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{You have used this cylinder {count} time} other{You have used this cylinder {count} times}}'**
+  String passport_usage_foreignTitle(int count);
+
+  /// No description provided for @passport_usage_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get passport_usage_title;
+
+  /// No description provided for @passport_usage_ownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Used on {count} dive} other{Used on {count} dives}}'**
+  String passport_usage_ownTitle(int count);
+
+  /// No description provided for @passport_usage_lastUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last used {date}'**
+  String passport_usage_lastUsed(String date);
+
+  /// No description provided for @passport_usage_noSite.
+  ///
+  /// In en, this message translates to:
+  /// **'No site'**
+  String get passport_usage_noSite;
+
+  /// No description provided for @passport_usage_diveNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive {number}'**
+  String passport_usage_diveNumber(int number);
+
+  /// No description provided for @passport_usage_showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all {count}'**
+  String passport_usage_showAll(int count);
+
+  /// No description provided for @passport_usage_loadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your dives with this cylinder'**
+  String get passport_usage_loadFailed;
 
   /// No description provided for @passport_foreign_writtenOn.
   ///
@@ -22627,12 +22711,6 @@ abstract class AppLocalizations {
   /// **'{hours}h {minutes}m'**
   String pdf_hoursMinutes(String hours, String minutes);
 
-  /// No description provided for @pdf_minutesShort.
-  ///
-  /// In en, this message translates to:
-  /// **'{minutes}m'**
-  String pdf_minutesShort(String minutes);
-
   /// No description provided for @pdf_minutes.
   ///
   /// In en, this message translates to:
@@ -23149,11 +23227,11 @@ abstract class AppLocalizations {
   /// **'End'**
   String get pdf_pressureEnd;
 
-  /// No description provided for @pdf_surfaceIntervalShort.
+  /// Short surface interval line in the NAUI logbook; interval is a formatted elapsed time
   ///
   /// In en, this message translates to:
-  /// **'SI: {minutes}min'**
-  String pdf_surfaceIntervalShort(String minutes);
+  /// **'SI: {interval}'**
+  String pdf_surfaceIntervalSpan(String interval);
 
   /// No description provided for @pdf_diveDataHeading.
   ///
@@ -23674,7 +23752,7 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_serviceClocks_divesUsedAndLeft.
   ///
   /// In en, this message translates to:
-  /// **'{used} dives, {remaining} of {total} dives left'**
+  /// **'{used} of {total} dives, {remaining} left'**
   String equipment_serviceClocks_divesUsedAndLeft(
     int used,
     int remaining,
@@ -23843,6 +23921,12 @@ abstract class AppLocalizations {
   /// **'Material'**
   String get cylinderConfigs_fieldMaterial;
 
+  /// No description provided for @cylinderConfigs_fieldGasMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas mix'**
+  String get cylinderConfigs_fieldGasMix;
+
   /// No description provided for @cylinderConfigs_sectionTitle.
   ///
   /// In en, this message translates to:
@@ -23858,7 +23942,7 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_serviceClocks_hoursUsedAndLeft.
   ///
   /// In en, this message translates to:
-  /// **'{used} hours, {remaining} of {total} hours left'**
+  /// **'{used} of {total} hours, {remaining} left'**
   String equipment_serviceClocks_hoursUsedAndLeft(
     String used,
     String remaining,
@@ -23868,7 +23952,7 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_serviceClocks_saltHoursUsedAndLeft.
   ///
   /// In en, this message translates to:
-  /// **'{used} salt-water hours, {remaining} of {total} salt-water hours left'**
+  /// **'{used} of {total} salt-water hours, {remaining} left'**
   String equipment_serviceClocks_saltHoursUsedAndLeft(
     String used,
     String remaining,
@@ -23878,7 +23962,7 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_serviceClocks_coldDivesUsedAndLeft.
   ///
   /// In en, this message translates to:
-  /// **'{used} cold dives, {remaining} of {total} cold dives left'**
+  /// **'{used} of {total} cold dives, {remaining} left'**
   String equipment_serviceClocks_coldDivesUsedAndLeft(
     String used,
     String remaining,
@@ -23888,7 +23972,7 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_serviceClocks_o2HoursUsedAndLeft.
   ///
   /// In en, this message translates to:
-  /// **'{used} high-O2 hours, {remaining} of {total} high-O2 hours left'**
+  /// **'{used} of {total} high-O2 hours, {remaining} left'**
   String equipment_serviceClocks_o2HoursUsedAndLeft(
     String used,
     String remaining,
@@ -23898,7 +23982,7 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_serviceClocks_deepCyclesUsedAndLeft.
   ///
   /// In en, this message translates to:
-  /// **'{used} deep dives, {remaining} of {total} deep dives left'**
+  /// **'{used} of {total} deep dives, {remaining} left'**
   String equipment_serviceClocks_deepCyclesUsedAndLeft(
     String used,
     String remaining,
@@ -23908,7 +23992,7 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_serviceClocks_cyclesUsedAndLeft.
   ///
   /// In en, this message translates to:
-  /// **'{used} battery cycles, {remaining} of {total} battery cycles left'**
+  /// **'{used} of {total} battery cycles, {remaining} left'**
   String equipment_serviceClocks_cyclesUsedAndLeft(
     String used,
     String remaining,
@@ -24545,6 +24629,12 @@ abstract class AppLocalizations {
   /// **'e.g., 5, 5/4, 7/5/3'**
   String get equipment_edit_thicknessDesignationHint;
 
+  /// No description provided for @equipment_edit_focalLengthHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 60 or 15-45'**
+  String get equipment_edit_focalLengthHint;
+
   /// No description provided for @equipment_edit_webLinkHint.
   ///
   /// In en, this message translates to:
@@ -24629,6 +24719,18 @@ abstract class AppLocalizations {
   /// **'Add your diving equipment to track usage and service'**
   String get equipment_list_emptyState_addPrompt;
 
+  /// Empty Equipment list when the diver's default view (Settings > Manage > Default equipment view) hides every item they own
+  ///
+  /// In en, this message translates to:
+  /// **'Your default view hides the rest of your gear.'**
+  String get equipment_list_emptyState_defaultView_subtitle;
+
+  /// Heading of the empty Equipment list when the default view hides every item the diver owns
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment in your default view'**
+  String get equipment_list_emptyState_defaultView_title;
+
   /// No description provided for @equipment_list_emptyState_filterText_equipment.
   ///
   /// In en, this message translates to:
@@ -24695,6 +24797,12 @@ abstract class AppLocalizations {
   /// **'No equipment in this category'**
   String get equipment_list_emptyState_noTypeMatch;
 
+  /// Button on the empty Equipment list that switches the status filter to All Equipment
+  ///
+  /// In en, this message translates to:
+  /// **'Show All Equipment'**
+  String get equipment_list_emptyState_showAll;
+
   /// No description provided for @equipment_list_emptyState_serviceDueUpToDate.
   ///
   /// In en, this message translates to:
@@ -24725,10 +24833,10 @@ abstract class AppLocalizations {
   /// **'All Equipment'**
   String get equipment_list_filterAll;
 
-  /// Equipment filter status chip for the default view: every item except retired and sold gear
+  /// Equipment filter status chip for the diver's default view: the statuses chosen in Settings > Manage > Default equipment view (issue #2628)
   ///
   /// In en, this message translates to:
-  /// **'Current Equipment'**
+  /// **'Default View'**
   String get equipment_list_filterCurrent;
 
   /// No description provided for @equipment_list_filterServiceDue.
@@ -24802,6 +24910,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status'**
   String get equipment_filter_section_status;
+
+  /// Button beside the Status heading in the equipment filter panel that opens the default equipment view settings
+  ///
+  /// In en, this message translates to:
+  /// **'Edit default'**
+  String get equipment_filter_editDefault;
 
   /// No description provided for @equipment_filter_section_tags.
   ///
@@ -27021,17 +27135,17 @@ abstract class AppLocalizations {
   /// **'Make it comply'**
   String get gasCalculators_icd_suggestionsTitle;
 
-  /// No description provided for @gasCalculators_icd_suggestionKeepA.
+  /// No description provided for @gasCalculators_icd_suggestionSetHe.
   ///
   /// In en, this message translates to:
-  /// **'Keep the current gas, set the switched-to gas\'s He to {he}%'**
-  String gasCalculators_icd_suggestionKeepA(String he);
+  /// **'Set He to {he}%'**
+  String gasCalculators_icd_suggestionSetHe(String he);
 
-  /// No description provided for @gasCalculators_icd_suggestionKeepB.
+  /// No description provided for @gasCalculators_icd_suggestionSetO2.
   ///
   /// In en, this message translates to:
-  /// **'Keep the switched-to gas, set the current gas\'s He to {he}%'**
-  String gasCalculators_icd_suggestionKeepB(String he);
+  /// **'Set O2 to {o2}%'**
+  String gasCalculators_icd_suggestionSetO2(String o2);
 
   /// No description provided for @gasCalculators_icd_applyButton.
   ///
@@ -30067,12 +30181,6 @@ abstract class AppLocalizations {
   /// **'Courses'**
   String get nav_courses;
 
-  /// Subtitle for courses menu item
-  ///
-  /// In en, this message translates to:
-  /// **'Training & Education'**
-  String get nav_coursesSubtitle;
-
   /// Navigation label for dive centers section
   ///
   /// In en, this message translates to:
@@ -30583,6 +30691,12 @@ abstract class AppLocalizations {
   /// **'Apply'**
   String get media_library_filter_apply;
 
+  /// Tooltip and screen-reader label of the media library slider that makes thumbnails smaller or larger
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail size'**
+  String get media_library_thumbnailSize;
+
   /// Title of the media library sort sheet, and the sort button's tooltip
   ///
   /// In en, this message translates to:
@@ -30817,6 +30931,18 @@ abstract class AppLocalizations {
   /// **'GPS and underwater tracks'**
   String get nav_tracksSubtitle;
 
+  /// Navigation label for the Training section, which holds the certifications and courses tabs
+  ///
+  /// In en, this message translates to:
+  /// **'Training'**
+  String get nav_training;
+
+  /// Subtitle for the Training menu item in the More sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Certifications and courses'**
+  String get nav_trainingSubtitle;
+
   /// Navigation label for data transfer section
   ///
   /// In en, this message translates to:
@@ -30840,6 +30966,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bailout gas insufficient for the worst case'**
   String get plannerCanvas_bailout_insufficient;
+
+  /// No description provided for @plannerCanvas_bailout_schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule from the worst case'**
+  String get plannerCanvas_bailout_schedule;
 
   /// No description provided for @plannerCanvas_bailout_required.
   ///
@@ -31075,6 +31207,12 @@ abstract class AppLocalizations {
   /// **'Diluent exceeds its Dil MOD at {depth} (ppO₂ {value} bar)'**
   String plannerCanvas_issue_diluentModExceeded(String depth, String value);
 
+  /// No description provided for @plannerCanvas_issue_ceilingViolated.
+  ///
+  /// In en, this message translates to:
+  /// **'The profile goes above the {ceiling} decompression ceiling, skipping required stops'**
+  String plannerCanvas_issue_ceilingViolated(String ceiling);
+
   /// No description provided for @plannerCanvas_issue_noBailout.
   ///
   /// In en, this message translates to:
@@ -31116,12 +31254,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Setup'**
   String get plannerCanvas_tab_setup;
-
-  /// No description provided for @plannerCanvas_o2Narcotic.
-  ///
-  /// In en, this message translates to:
-  /// **'Treat O₂ as narcotic'**
-  String get plannerCanvas_o2Narcotic;
 
   /// No description provided for @plannerCanvas_rates_ascent.
   ///
@@ -31231,6 +31363,24 @@ abstract class AppLocalizations {
   /// **'BO {minutes}′'**
   String plannerCanvas_scrub_bailout(String minutes);
 
+  /// No description provided for @plannerCanvas_chartMode_bailout.
+  ///
+  /// In en, this message translates to:
+  /// **'Bailout'**
+  String get plannerCanvas_chartMode_bailout;
+
+  /// No description provided for @plannerCanvas_chartMode_ccr.
+  ///
+  /// In en, this message translates to:
+  /// **'CCR'**
+  String get plannerCanvas_chartMode_ccr;
+
+  /// No description provided for @plannerCanvas_scrub_tts.
+  ///
+  /// In en, this message translates to:
+  /// **'TTS {minutes}′'**
+  String plannerCanvas_scrub_tts(String minutes);
+
   /// No description provided for @plannerCanvas_scrub_readout.
   ///
   /// In en, this message translates to:
@@ -31308,6 +31458,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Duration'**
   String get plannerCanvas_table_duration;
+
+  /// No description provided for @plannerCanvas_table_ppO2.
+  ///
+  /// In en, this message translates to:
+  /// **'PO2'**
+  String get plannerCanvas_table_ppO2;
+
+  /// No description provided for @plannerCanvas_table_end.
+  ///
+  /// In en, this message translates to:
+  /// **'END'**
+  String get plannerCanvas_table_end;
 
   /// No description provided for @plannerCanvas_turnRule_allUsable.
   ///
@@ -31927,7 +32089,7 @@ abstract class AppLocalizations {
   /// **'Clear highlight'**
   String get safetyReview_clearHighlight;
 
-  /// Semantics label for a clustered chip in the chart safety lane
+  /// Safety review findings count: the semantics label for a clustered chip in the chart safety lane, and the tooltip of the dive list safety badge
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 safety observation} other{{count} safety observations}}'**
@@ -32088,18 +32250,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tide cycle graph and timing'**
   String get diveDetailSection_tide_description;
-
-  /// No description provided for @diveDetailSection_reefHealth_name.
-  ///
-  /// In en, this message translates to:
-  /// **'Water Conditions'**
-  String get diveDetailSection_reefHealth_name;
-
-  /// No description provided for @diveDetailSection_reefHealth_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Satellite water conditions on the dive date'**
-  String get diveDetailSection_reefHealth_description;
 
   /// No description provided for @diveDetailSection_surfaceGps_name.
   ///
@@ -32935,6 +33085,90 @@ abstract class AppLocalizations {
   /// **'Default Visible Metrics'**
   String get settings_appearance_subsection_defaultVisibleMetrics;
 
+  /// No description provided for @settings_appearance_metricColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Metric Colors'**
+  String get settings_appearance_metricColors;
+
+  /// No description provided for @settings_appearance_metricColors_subtitleDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default colors'**
+  String get settings_appearance_metricColors_subtitleDefault;
+
+  /// No description provided for @settings_appearance_metricColors_subtitleCustomized.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} customized} other{{count} customized}}'**
+  String settings_appearance_metricColors_subtitleCustomized(int count);
+
+  /// No description provided for @settings_metricColors_resetAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset all'**
+  String get settings_metricColors_resetAll;
+
+  /// No description provided for @settings_metricColors_resetAllTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset metric colors?'**
+  String get settings_metricColors_resetAllTitle;
+
+  /// No description provided for @settings_metricColors_resetAllBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every metric goes back to its default color.'**
+  String get settings_metricColors_resetAllBody;
+
+  /// No description provided for @settings_metricColors_reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get settings_metricColors_reset;
+
+  /// No description provided for @settings_metricColors_default.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get settings_metricColors_default;
+
+  /// No description provided for @settings_metricColors_auto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get settings_metricColors_auto;
+
+  /// No description provided for @settings_metricColors_autoTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto: follows the theme'**
+  String get settings_metricColors_autoTemperature;
+
+  /// No description provided for @settings_metricColors_autoPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto: each gas has its own color'**
+  String get settings_metricColors_autoPressure;
+
+  /// No description provided for @settings_metricColors_pressureCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Used on single-tank dives'**
+  String get settings_metricColors_pressureCustom;
+
+  /// No description provided for @settings_metricColors_sheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{metric} color'**
+  String settings_metricColors_sheetTitle(String metric);
+
+  /// No description provided for @settings_metricColors_swapsWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Swaps with {metric}'**
+  String settings_metricColors_swapsWith(String metric);
+
   /// No description provided for @settings_appearance_subsection_standardMetrics.
   ///
   /// In en, this message translates to:
@@ -33059,6 +33293,204 @@ abstract class AppLocalizations {
   /// **'Could not save navigation layout. Please try again.'**
   String get settings_navCustomization_saveError;
 
+  /// Nav shortcut label for the Planning no-fly calculator.
+  ///
+  /// In en, this message translates to:
+  /// **'No-fly time'**
+  String get navShortcut_noFly;
+
+  /// Nav shortcut label for the Planning CNS/OTU calculator.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS/OTU'**
+  String get navShortcut_cnsOtu;
+
+  /// Nav shortcut label for the dive records page.
+  ///
+  /// In en, this message translates to:
+  /// **'Records'**
+  String get navShortcut_records;
+
+  /// Nav shortcut label for the dive sites map.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites map'**
+  String get navShortcut_sitesMap;
+
+  /// Nav shortcut label for the map of where dives were logged.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive activity map'**
+  String get navShortcut_diveActivityMap;
+
+  /// Nav shortcut label for the dive centers map.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive centers map'**
+  String get navShortcut_diveCentersMap;
+
+  /// Nav shortcut label for the diver profile settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Diver profile'**
+  String get navShortcut_diverProfile;
+
+  /// Nav shortcut label for the cloud sync settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync'**
+  String get navShortcut_cloudSync;
+
+  /// Nav shortcut label for the offline maps settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline maps'**
+  String get navShortcut_offlineMaps;
+
+  /// Short nav bar label for the Deco Calculator shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco'**
+  String get navShortcut_short_deco;
+
+  /// Short nav bar label for the Gas Calculators shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas calcs'**
+  String get navShortcut_short_gasCalculators;
+
+  /// Short nav bar label for the Weight Calculator shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Weighting'**
+  String get navShortcut_short_weighting;
+
+  /// Short nav bar label for the Surface Interval tool shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface int.'**
+  String get navShortcut_short_surfaceInterval;
+
+  /// Short nav bar label for the Trimix blender shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Blender'**
+  String get navShortcut_short_blender;
+
+  /// Short nav bar label for the Air Consumption insights shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Air use'**
+  String get navShortcut_short_airUse;
+
+  /// Short nav bar label for the Time Patterns insights shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Patterns'**
+  String get navShortcut_short_patterns;
+
+  /// Short nav bar label for the Profile Analysis insights shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles'**
+  String get navShortcut_short_profiles;
+
+  /// Short nav bar label for the dive activity map shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive map'**
+  String get navShortcut_short_diveMap;
+
+  /// Short nav bar label for the dive centers map shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Centers map'**
+  String get navShortcut_short_centersMap;
+
+  /// Short nav bar label for the Equipment Sets shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear sets'**
+  String get navShortcut_short_gearSets;
+
+  /// Short nav bar label for the Certification Wallet shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Cert wallet'**
+  String get navShortcut_short_certWallet;
+
+  /// Short nav bar label for the Emergency card shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency'**
+  String get navShortcut_short_emergency;
+
+  /// Short nav bar label for the Backup & Restore shortcut; must fit one bottom-bar slot.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get navShortcut_short_backup;
+
+  /// Short nav label for the shortcut to Insights > Species (marine life statistics); distinct from the Species section.
+  ///
+  /// In en, this message translates to:
+  /// **'Species stats'**
+  String get navShortcut_short_speciesStats;
+
+  /// Short nav label for the shortcut to Insights > Equipment (gear statistics); distinct from the Equipment section.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear stats'**
+  String get navShortcut_short_gearStats;
+
+  /// Button on the navigation layout page that opens the picker for adding a deep page to the nav.
+  ///
+  /// In en, this message translates to:
+  /// **'Add shortcut'**
+  String get settings_navCustomization_addShortcut;
+
+  /// Title of the sheet or dialog listing pages that can be added to the nav.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a shortcut'**
+  String get settings_navCustomization_shortcutPickerTitle;
+
+  /// Hint in the search field of the nav shortcut picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Search pages'**
+  String get settings_navCustomization_shortcutSearchHint;
+
+  /// Shown in the nav shortcut picker when the search matches nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching pages'**
+  String get settings_navCustomization_shortcutNoMatches;
+
+  /// Tooltip on a picker entry that is already in the nav layout being edited.
+  ///
+  /// In en, this message translates to:
+  /// **'Already in this layout'**
+  String get settings_navCustomization_shortcutAlreadyAdded;
+
+  /// Tooltip on the button that removes a shortcut from the nav layout.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {destination}'**
+  String settings_navCustomization_removeShortcutLabel(String destination);
+
+  /// Picker group header for map, wallet and list views inside a section.
+  ///
+  /// In en, this message translates to:
+  /// **'Views'**
+  String get settings_navCustomization_group_views;
+
+  /// Picker group header for settings pages and tools such as the emergency card.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings and tools'**
+  String get settings_navCustomization_group_settingsAndTools;
+
   /// No description provided for @settings_backToSettings_tooltip.
   ///
   /// In en, this message translates to:
@@ -33106,6 +33538,1138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync via cloud storage'**
   String get settings_cloudSync_entry_subtitle;
+
+  /// No description provided for @sharedLibrary_settings_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared Site Libraries'**
+  String get sharedLibrary_settings_title;
+
+  /// No description provided for @sharedLibrary_settings_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive sites kept together with other divers'**
+  String get sharedLibrary_settings_subtitle;
+
+  /// No description provided for @sharedLibrary_list_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No shared site library connected yet.'**
+  String get sharedLibrary_list_empty;
+
+  /// No description provided for @sharedLibrary_connect_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect a library'**
+  String get sharedLibrary_connect_action;
+
+  /// No description provided for @sharedLibrary_connect_addAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add storage account'**
+  String get sharedLibrary_connect_addAccount;
+
+  /// No description provided for @sharedLibrary_connect_saveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Save account'**
+  String get sharedLibrary_connect_saveAccount;
+
+  /// No description provided for @sharedLibrary_connect_account_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage account'**
+  String get sharedLibrary_connect_account_label;
+
+  /// No description provided for @sharedLibrary_connect_prefix_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder (prefix)'**
+  String get sharedLibrary_connect_prefix_label;
+
+  /// No description provided for @sharedLibrary_connect_prefix_help.
+  ///
+  /// In en, this message translates to:
+  /// **'A folder inside submersion-sites, at the top of the bucket or server, such as site-sync.'**
+  String get sharedLibrary_connect_prefix_help;
+
+  /// No description provided for @sharedLibrary_connect_reservedFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'A library folder cannot start with sites, members, suggestions or backups.'**
+  String get sharedLibrary_connect_reservedFolder;
+
+  /// Connect page: the typed library folder holds a character storage access policies treat as a wildcard or variable
+  ///
+  /// In en, this message translates to:
+  /// **'A library folder cannot contain *, ? or dollar signs.'**
+  String get sharedLibrary_connect_folderChars;
+
+  /// No description provided for @sharedLibrary_setup_title.
+  ///
+  /// In en, this message translates to:
+  /// **'How to set up storage'**
+  String get sharedLibrary_setup_title;
+
+  /// No description provided for @sharedLibrary_setup_where.
+  ///
+  /// In en, this message translates to:
+  /// **'This library lives in {folder} at the top of the bucket or server, beside submersion-sync and submersion-media.'**
+  String sharedLibrary_setup_where(String folder);
+
+  /// No description provided for @sharedLibrary_setup_keys.
+  ///
+  /// In en, this message translates to:
+  /// **'Give owners and editors keys that read and write the library folder. Give everyone else keys that read it and write only members/ and suggestions/. The storage, not the app, is what stops a key from writing.'**
+  String get sharedLibrary_setup_keys;
+
+  /// No description provided for @sharedLibrary_setup_s3Full.
+  ///
+  /// In en, this message translates to:
+  /// **'S3 policy for owners and editors'**
+  String get sharedLibrary_setup_s3Full;
+
+  /// No description provided for @sharedLibrary_setup_s3Reader.
+  ///
+  /// In en, this message translates to:
+  /// **'S3 policy for readers'**
+  String get sharedLibrary_setup_s3Reader;
+
+  /// No description provided for @sharedLibrary_setup_webdav.
+  ///
+  /// In en, this message translates to:
+  /// **'WebDAV: share the folder read-only with readers, and members/ and suggestions/ writable where your server allows it (for example Nextcloud share permissions).'**
+  String get sharedLibrary_setup_webdav;
+
+  /// No description provided for @sharedLibrary_setup_copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get sharedLibrary_setup_copy;
+
+  /// No description provided for @sharedLibrary_setup_copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy copied'**
+  String get sharedLibrary_setup_copied;
+
+  /// No description provided for @sharedLibrary_recovery_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this recovery code'**
+  String get sharedLibrary_recovery_title;
+
+  /// No description provided for @sharedLibrary_recovery_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Whoever has this code can make themselves an owner of the library, and open it if it is encrypted. Store it somewhere safe, apart from the storage keys. It is shown only now.'**
+  String get sharedLibrary_recovery_body;
+
+  /// No description provided for @sharedLibrary_recovery_stored.
+  ///
+  /// In en, this message translates to:
+  /// **'I have stored it'**
+  String get sharedLibrary_recovery_stored;
+
+  /// No description provided for @sharedLibrary_roles_rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The roles file was changed by someone who is not an owner. This device keeps the last roles an owner signed.'**
+  String get sharedLibrary_roles_rejected;
+
+  /// No description provided for @sharedLibrary_members_pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for approval'**
+  String get sharedLibrary_members_pending;
+
+  /// No description provided for @sharedLibrary_members_approve.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get sharedLibrary_members_approve;
+
+  /// No description provided for @sharedLibrary_members_reject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get sharedLibrary_members_reject;
+
+  /// No description provided for @sharedLibrary_members_fingerprint.
+  ///
+  /// In en, this message translates to:
+  /// **'Key {fingerprint}'**
+  String sharedLibrary_members_fingerprint(String fingerprint);
+
+  /// No description provided for @sharedLibrary_members_unsignedCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Card not signed by its member'**
+  String get sharedLibrary_members_unsignedCard;
+
+  /// No description provided for @sharedLibrary_members_rejectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject {name}?'**
+  String sharedLibrary_members_rejectTitle(String name);
+
+  /// No description provided for @sharedLibrary_members_rejectBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Their card is removed and nothing they write counts. Only new storage keys stop them from writing files at all.'**
+  String get sharedLibrary_members_rejectBody;
+
+  /// No description provided for @sharedLibrary_members_left.
+  ///
+  /// In en, this message translates to:
+  /// **'Left the library'**
+  String get sharedLibrary_members_left;
+
+  /// No description provided for @sharedLibrary_members_removeRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove role'**
+  String get sharedLibrary_members_removeRole;
+
+  /// No description provided for @sharedLibrary_owner_onlyOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Only one owner. If they lose access, only the recovery code can restore it.'**
+  String get sharedLibrary_owner_onlyOne;
+
+  /// No description provided for @sharedLibrary_owner_addOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose another owner'**
+  String get sharedLibrary_owner_addOwner;
+
+  /// No description provided for @sharedLibrary_owner_newCode.
+  ///
+  /// In en, this message translates to:
+  /// **'New recovery code'**
+  String get sharedLibrary_owner_newCode;
+
+  /// No description provided for @sharedLibrary_owner_newCodeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Replaces the old code, for example if it may have leaked.'**
+  String get sharedLibrary_owner_newCodeHelp;
+
+  /// No description provided for @sharedLibrary_owner_recover.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover ownership'**
+  String get sharedLibrary_owner_recover;
+
+  /// No description provided for @sharedLibrary_owner_recoverHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'With the library\'s recovery code, become an owner.'**
+  String get sharedLibrary_owner_recoverHelp;
+
+  /// No description provided for @sharedLibrary_owner_recoverPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code'**
+  String get sharedLibrary_owner_recoverPrompt;
+
+  /// No description provided for @sharedLibrary_owner_wrongCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That is not this library\'s recovery code.'**
+  String get sharedLibrary_owner_wrongCode;
+
+  /// No description provided for @sharedLibrary_owner_recovered.
+  ///
+  /// In en, this message translates to:
+  /// **'You are now an owner.'**
+  String get sharedLibrary_owner_recovered;
+
+  /// No description provided for @sharedLibrary_owner_reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset ownership'**
+  String get sharedLibrary_owner_reset;
+
+  /// No description provided for @sharedLibrary_owner_resetHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Only if no owner and no recovery code are left. Every member must accept it.'**
+  String get sharedLibrary_owner_resetHelp;
+
+  /// No description provided for @sharedLibrary_owner_resetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Make yourself the only owner? Every other member\'s device asks them to accept this, and stops writing to the library until they do.'**
+  String get sharedLibrary_owner_resetConfirm;
+
+  /// No description provided for @sharedLibrary_owner_resetPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Ownership of {library} was reset by {name} (key {fingerprint}). Until you accept, this device only reads the library.'**
+  String sharedLibrary_owner_resetPrompt(
+    String library,
+    String name,
+    String fingerprint,
+  );
+
+  /// No description provided for @sharedLibrary_owner_resetAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get sharedLibrary_owner_resetAccept;
+
+  /// No description provided for @sharedLibrary_connect_untrusted.
+  ///
+  /// In en, this message translates to:
+  /// **'This library\'s roles are not signed by one of its owners. Ask an owner to check it.'**
+  String get sharedLibrary_connect_untrusted;
+
+  /// No description provided for @sharedLibrary_retired.
+  ///
+  /// In en, this message translates to:
+  /// **'This library was made by a test build of Submersion. Create it again.'**
+  String get sharedLibrary_retired;
+
+  /// No description provided for @sharedLibrary_encrypted_probe.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted library. Enter the passphrase or the recovery code.'**
+  String get sharedLibrary_encrypted_probe;
+
+  /// No description provided for @sharedLibrary_encrypted_passphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase or recovery code'**
+  String get sharedLibrary_encrypted_passphrase;
+
+  /// No description provided for @sharedLibrary_encrypted_unlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get sharedLibrary_encrypted_unlock;
+
+  /// No description provided for @sharedLibrary_encrypted_wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'That passphrase does not open this library.'**
+  String get sharedLibrary_encrypted_wrong;
+
+  /// Title of a shared site library backups page, and its entry on the library page
+  ///
+  /// In en, this message translates to:
+  /// **'Backups'**
+  String get sharedLibrary_backups_title;
+
+  /// No description provided for @sharedLibrary_backups_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up the library and restore it'**
+  String get sharedLibrary_backups_subtitle;
+
+  /// No description provided for @sharedLibrary_backups_backUpNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up now'**
+  String get sharedLibrary_backups_backUpNow;
+
+  /// No description provided for @sharedLibrary_backups_import.
+  ///
+  /// In en, this message translates to:
+  /// **'Import a backup'**
+  String get sharedLibrary_backups_import;
+
+  /// No description provided for @sharedLibrary_backups_note.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get sharedLibrary_backups_note;
+
+  /// No description provided for @sharedLibrary_backups_automatic.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic'**
+  String get sharedLibrary_backups_automatic;
+
+  /// No description provided for @sharedLibrary_backups_beforeRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Before a restore'**
+  String get sharedLibrary_backups_beforeRestore;
+
+  /// No description provided for @sharedLibrary_backups_onDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'On this device'**
+  String get sharedLibrary_backups_onDevice;
+
+  /// No description provided for @sharedLibrary_backups_inStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'In storage'**
+  String get sharedLibrary_backups_inStorage;
+
+  /// No description provided for @sharedLibrary_backups_both.
+  ///
+  /// In en, this message translates to:
+  /// **'On this device and in storage'**
+  String get sharedLibrary_backups_both;
+
+  /// Second line of a shared site library backup: how many dive sites it holds and its file size
+  ///
+  /// In en, this message translates to:
+  /// **'Sites: {sites} · {size}'**
+  String sharedLibrary_backups_summary(int sites, String size);
+
+  /// No description provided for @sharedLibrary_backups_pin.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin'**
+  String get sharedLibrary_backups_pin;
+
+  /// No description provided for @sharedLibrary_backups_unpin.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get sharedLibrary_backups_unpin;
+
+  /// No description provided for @sharedLibrary_backups_delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get sharedLibrary_backups_delete;
+
+  /// No description provided for @sharedLibrary_backups_deleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this backup?'**
+  String get sharedLibrary_backups_deleteConfirm;
+
+  /// No description provided for @sharedLibrary_backups_deleteWhere.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this backup from where?'**
+  String get sharedLibrary_backups_deleteWhere;
+
+  /// No description provided for @sharedLibrary_backups_export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get sharedLibrary_backups_export;
+
+  /// No description provided for @sharedLibrary_backups_restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get sharedLibrary_backups_restore;
+
+  /// Asks an owner to confirm restoring a shared site library backup; date is when the backup was made
+  ///
+  /// In en, this message translates to:
+  /// **'Restore the library to how it was on {date}? Every member gets this version on their next sync. A pinned backup of the library as it is now is made first.'**
+  String sharedLibrary_backups_restoreConfirm(String date);
+
+  /// No description provided for @sharedLibrary_backups_restoreDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Library restored'**
+  String get sharedLibrary_backups_restoreDone;
+
+  /// No description provided for @sharedLibrary_backups_oldKey.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup was sealed with an earlier passphrase. Enter that passphrase or the recovery code from that time.'**
+  String get sharedLibrary_backups_oldKey;
+
+  /// No description provided for @sharedLibrary_backups_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No backups yet. Owners\' devices make one each day, and Back up now makes one at once.'**
+  String get sharedLibrary_backups_empty;
+
+  /// No description provided for @sharedLibrary_backups_importRefused.
+  ///
+  /// In en, this message translates to:
+  /// **'That file is not a backup of this library.'**
+  String get sharedLibrary_backups_importRefused;
+
+  /// No description provided for @sharedLibrary_backups_ownersOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only owners manage backups.'**
+  String get sharedLibrary_backups_ownersOnly;
+
+  /// No description provided for @sharedLibrary_backups_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup made'**
+  String get sharedLibrary_backups_done;
+
+  /// The member's own signing key fingerprint on a shared site library page, to compare with what an owner sees before approving
+  ///
+  /// In en, this message translates to:
+  /// **'Your key {fingerprint}'**
+  String sharedLibrary_library_myKey(String fingerprint);
+
+  /// Shown to a shared site library owner: suggestions by members not yet approved, held until approval
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 suggestion waits until you approve its author} other{{count} suggestions wait until you approve their authors}}'**
+  String sharedLibrary_suggest_held(int count);
+
+  /// Connect page button for an empty folder: restore a shared site library backup file into it
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from a backup file'**
+  String get sharedLibrary_restoreInto_action;
+
+  /// No description provided for @sharedLibrary_restoreInto_needsKey.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup is encrypted. Enter its passphrase or recovery code.'**
+  String get sharedLibrary_restoreInto_needsKey;
+
+  /// No description provided for @sharedLibrary_restoreInto_refused.
+  ///
+  /// In en, this message translates to:
+  /// **'That file is not a library backup made by an owner.'**
+  String get sharedLibrary_restoreInto_refused;
+
+  /// No description provided for @sharedLibrary_restoreInto_oldStillThere.
+  ///
+  /// In en, this message translates to:
+  /// **'The library is still in its old folder too. Members there keep using that copy until they connect to this folder.'**
+  String get sharedLibrary_restoreInto_oldStillThere;
+
+  /// No description provided for @sharedLibrary_encrypted_locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the passphrase for {library}.'**
+  String sharedLibrary_encrypted_locked(String library);
+
+  /// No description provided for @sharedLibrary_encrypted_changed.
+  ///
+  /// In en, this message translates to:
+  /// **'The passphrase of {library} changed. Enter the new one.'**
+  String sharedLibrary_encrypted_changed(String library);
+
+  /// No description provided for @sharedLibrary_encryption_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption'**
+  String get sharedLibrary_encryption_title;
+
+  /// No description provided for @sharedLibrary_encryption_statusOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted with a passphrase'**
+  String get sharedLibrary_encryption_statusOn;
+
+  /// No description provided for @sharedLibrary_encryption_statusOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Not encrypted: anyone with storage access can read it'**
+  String get sharedLibrary_encryption_statusOff;
+
+  /// No description provided for @sharedLibrary_encryption_on.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on encryption'**
+  String get sharedLibrary_encryption_on;
+
+  /// No description provided for @sharedLibrary_encryption_onHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Members enter the passphrase once per profile. Only the passphrase or the recovery code opens the library. A new recovery code replaces the old one for every owner.'**
+  String get sharedLibrary_encryption_onHelp;
+
+  /// No description provided for @sharedLibrary_encryption_off.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off encryption'**
+  String get sharedLibrary_encryption_off;
+
+  /// No description provided for @sharedLibrary_encryption_offConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Every file is rewritten readable by anyone with storage access. Turn off encryption?'**
+  String get sharedLibrary_encryption_offConfirm;
+
+  /// No description provided for @sharedLibrary_encryption_change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change passphrase'**
+  String get sharedLibrary_encryption_change;
+
+  /// No description provided for @sharedLibrary_encryption_changeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Makes a new key and a new recovery code. A new recovery code replaces the old one for every owner. Share the new passphrase only with the members who stay.'**
+  String get sharedLibrary_encryption_changeHelp;
+
+  /// No description provided for @sharedLibrary_encryption_passphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase'**
+  String get sharedLibrary_encryption_passphrase;
+
+  /// No description provided for @sharedLibrary_encryption_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase again'**
+  String get sharedLibrary_encryption_confirm;
+
+  /// No description provided for @sharedLibrary_connect_probe_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get sharedLibrary_connect_probe_action;
+
+  /// No description provided for @sharedLibrary_connect_join_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Join {name}'**
+  String sharedLibrary_connect_join_action(String name);
+
+  /// No description provided for @sharedLibrary_connect_create_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Create library'**
+  String get sharedLibrary_connect_create_action;
+
+  /// No description provided for @sharedLibrary_connect_create_name_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Library name'**
+  String get sharedLibrary_connect_create_name_label;
+
+  /// No description provided for @sharedLibrary_connect_displayName_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name in this library'**
+  String get sharedLibrary_connect_displayName_label;
+
+  /// No description provided for @sharedLibrary_connect_notALibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'No library here yet.'**
+  String get sharedLibrary_connect_notALibrary;
+
+  /// No description provided for @sharedLibrary_connect_needsNewerApp.
+  ///
+  /// In en, this message translates to:
+  /// **'This library needs a newer version of Submersion.'**
+  String get sharedLibrary_connect_needsNewerApp;
+
+  /// No description provided for @sharedLibrary_connect_onlyS3Webdav.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared site libraries work with S3 and WebDAV accounts.'**
+  String get sharedLibrary_connect_onlyS3Webdav;
+
+  /// No description provided for @sharedLibrary_role_reader.
+  ///
+  /// In en, this message translates to:
+  /// **'Reader'**
+  String get sharedLibrary_role_reader;
+
+  /// No description provided for @sharedLibrary_role_editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Editor'**
+  String get sharedLibrary_role_editor;
+
+  /// No description provided for @sharedLibrary_role_owner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get sharedLibrary_role_owner;
+
+  /// No description provided for @sharedLibrary_library_members.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get sharedLibrary_library_members;
+
+  /// No description provided for @sharedLibrary_library_memberCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 member} other{{count} members}}'**
+  String sharedLibrary_library_memberCount(int count);
+
+  /// No description provided for @sharedLibrary_library_syncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync now'**
+  String get sharedLibrary_library_syncNow;
+
+  /// No description provided for @sharedLibrary_library_lastSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync {when}'**
+  String sharedLibrary_library_lastSync(String when);
+
+  /// No description provided for @sharedLibrary_library_neverSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Not synced yet'**
+  String get sharedLibrary_library_neverSynced;
+
+  /// No description provided for @sharedLibrary_library_readOnlyBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Your credentials allow reading only. You can suggest changes; a referent applies them.'**
+  String get sharedLibrary_library_readOnlyBanner;
+
+  /// No description provided for @sharedLibrary_library_errorBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync failed: {error}'**
+  String sharedLibrary_library_errorBanner(String error);
+
+  /// No description provided for @sharedLibrary_library_addMySites.
+  ///
+  /// In en, this message translates to:
+  /// **'Add my sites'**
+  String get sharedLibrary_library_addMySites;
+
+  /// No description provided for @sharedLibrary_library_suggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions'**
+  String get sharedLibrary_library_suggestions;
+
+  /// No description provided for @sharedLibrary_library_leave.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave library'**
+  String get sharedLibrary_library_leave;
+
+  /// No description provided for @sharedLibrary_library_leaveConfirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave {name}?'**
+  String sharedLibrary_library_leaveConfirm_title(String name);
+
+  /// No description provided for @sharedLibrary_library_leaveConfirm_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared sites your dives use stay as personal copies. Other shared sites are removed from this device.'**
+  String get sharedLibrary_library_leaveConfirm_body;
+
+  /// No description provided for @sharedLibrary_library_rename_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get sharedLibrary_library_rename_label;
+
+  /// No description provided for @sharedLibrary_members_setRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Change role'**
+  String get sharedLibrary_members_setRole;
+
+  /// No description provided for @sharedLibrary_members_lastOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'The last owner cannot be demoted.'**
+  String get sharedLibrary_members_lastOwner;
+
+  /// No description provided for @sharedLibrary_members_keyChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'This member\'s key changed. Compare the new key in person, then approve it.'**
+  String get sharedLibrary_members_keyChanged;
+
+  /// No description provided for @sharedLibrary_members_rolesOutOfDate.
+  ///
+  /// In en, this message translates to:
+  /// **'The roles changed since this device last trusted them. Leave the library and join it again to take up the change, then try again.'**
+  String get sharedLibrary_members_rolesOutOfDate;
+
+  /// No description provided for @sharedLibrary_picker_none.
+  ///
+  /// In en, this message translates to:
+  /// **'No shared site library here lets you add sites.'**
+  String get sharedLibrary_picker_none;
+
+  /// No description provided for @sharedLibrary_list_notConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected on this device'**
+  String get sharedLibrary_list_notConnected;
+
+  /// No description provided for @sharedLibrary_connect_exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone created a library here meanwhile. Check again to join it.'**
+  String get sharedLibrary_connect_exists;
+
+  /// No description provided for @sharedLibrary_library_lastOwnerLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Make another member an owner before you leave.'**
+  String get sharedLibrary_library_lastOwnerLeave;
+
+  /// No description provided for @sharedLibrary_site_badgeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'In {name}'**
+  String sharedLibrary_site_badgeTooltip(String name);
+
+  /// No description provided for @sharedLibrary_site_lastEdited.
+  ///
+  /// In en, this message translates to:
+  /// **'Last edited by {name}, {when}'**
+  String sharedLibrary_site_lastEdited(String name, String when);
+
+  /// No description provided for @sharedLibrary_site_history.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit history'**
+  String get sharedLibrary_site_history;
+
+  /// No description provided for @sharedLibrary_site_addToLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to shared site library'**
+  String get sharedLibrary_site_addToLibrary;
+
+  /// No description provided for @sharedLibrary_add_confirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {name} to {library}?'**
+  String sharedLibrary_add_confirm_title(String name, String library);
+
+  /// No description provided for @sharedLibrary_add_confirm_titleMany.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Add {count} site to {library}?} other{Add {count} sites to {library}?}}'**
+  String sharedLibrary_add_confirm_titleMany(int count, String library);
+
+  /// No description provided for @sharedLibrary_add_confirm_shared.
+  ///
+  /// In en, this message translates to:
+  /// **'Every member will see: name, location, depths, description, hazards, access, entry and exit, mooring, parking, site types, tags, species and features.'**
+  String get sharedLibrary_add_confirm_shared;
+
+  /// No description provided for @sharedLibrary_add_confirm_private.
+  ///
+  /// In en, this message translates to:
+  /// **'Stays yours: your notes and rating. Dives and photos never leave your personal library.'**
+  String get sharedLibrary_add_confirm_private;
+
+  /// No description provided for @sharedLibrary_add_confirm_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get sharedLibrary_add_confirm_action;
+
+  /// No description provided for @sharedLibrary_site_chooseLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a library'**
+  String get sharedLibrary_site_chooseLibrary;
+
+  /// No description provided for @sharedLibrary_site_added.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to {name}'**
+  String sharedLibrary_site_added(String name);
+
+  /// No description provided for @sharedLibrary_site_notConnectedHere.
+  ///
+  /// In en, this message translates to:
+  /// **'This site is in {name}, which is not connected on this device.'**
+  String sharedLibrary_site_notConnectedHere(String name);
+
+  /// No description provided for @sharedLibrary_site_connectHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect on this device'**
+  String get sharedLibrary_site_connectHere;
+
+  /// No description provided for @sharedLibrary_site_deleteFromLibrary_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete from the shared site library?'**
+  String get sharedLibrary_site_deleteFromLibrary_title;
+
+  /// No description provided for @sharedLibrary_site_deleteFromLibrary_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Members whose dives use this site keep a personal copy.'**
+  String get sharedLibrary_site_deleteFromLibrary_body;
+
+  /// No description provided for @sharedLibrary_site_readerCannotDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Only editors and owners delete shared sites.'**
+  String get sharedLibrary_site_readerCannotDelete;
+
+  /// No description provided for @sharedLibrary_suggest_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest changes'**
+  String get sharedLibrary_suggest_title;
+
+  /// No description provided for @sharedLibrary_suggest_note_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Note for the referents'**
+  String get sharedLibrary_suggest_note_label;
+
+  /// No description provided for @sharedLibrary_suggest_send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get sharedLibrary_suggest_send;
+
+  /// No description provided for @sharedLibrary_suggest_sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestion sent'**
+  String get sharedLibrary_suggest_sent;
+
+  /// No description provided for @sharedLibrary_suggest_nothingChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing changed.'**
+  String get sharedLibrary_suggest_nothingChanged;
+
+  /// No description provided for @sharedLibrary_suggest_savedPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Your notes and rating are saved.'**
+  String get sharedLibrary_suggest_savedPrivate;
+
+  /// No description provided for @sharedLibrary_suggest_pending.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 suggestion pending} other{{count} suggestions pending}}'**
+  String sharedLibrary_suggest_pending(int count);
+
+  /// No description provided for @sharedLibrary_suggest_withdraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdraw'**
+  String get sharedLibrary_suggest_withdraw;
+
+  /// No description provided for @sharedLibrary_inbox_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions'**
+  String get sharedLibrary_inbox_title;
+
+  /// No description provided for @sharedLibrary_inbox_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No suggestions waiting.'**
+  String get sharedLibrary_inbox_empty;
+
+  /// No description provided for @sharedLibrary_inbox_from.
+  ///
+  /// In en, this message translates to:
+  /// **'From {name}, {when}'**
+  String sharedLibrary_inbox_from(String name, String when);
+
+  /// No description provided for @sharedLibrary_inbox_accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get sharedLibrary_inbox_accept;
+
+  /// No description provided for @sharedLibrary_inbox_dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get sharedLibrary_inbox_dismiss;
+
+  /// No description provided for @sharedLibrary_inbox_siteDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'This site has been deleted from the library.'**
+  String get sharedLibrary_inbox_siteDeleted;
+
+  /// No description provided for @sharedLibrary_inbox_before.
+  ///
+  /// In en, this message translates to:
+  /// **'Before'**
+  String get sharedLibrary_inbox_before;
+
+  /// No description provided for @sharedLibrary_inbox_after.
+  ///
+  /// In en, this message translates to:
+  /// **'After'**
+  String get sharedLibrary_inbox_after;
+
+  /// No description provided for @sharedLibrary_filter_library.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get sharedLibrary_filter_library;
+
+  /// No description provided for @sharedLibrary_filter_personal.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal sites'**
+  String get sharedLibrary_filter_personal;
+
+  /// No description provided for @sharedLibrary_groupBy_library.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get sharedLibrary_groupBy_library;
+
+  /// No description provided for @sharedLibrary_groupBy_personalGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get sharedLibrary_groupBy_personalGroup;
+
+  /// No description provided for @sharedLibrary_bulk_addToLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to shared site library'**
+  String get sharedLibrary_bulk_addToLibrary;
+
+  /// No description provided for @sharedLibrary_about_title.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get sharedLibrary_about_title;
+
+  /// No description provided for @sharedLibrary_about_edit_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit library details'**
+  String get sharedLibrary_about_edit_title;
+
+  /// No description provided for @sharedLibrary_about_name_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Library name'**
+  String get sharedLibrary_about_name_label;
+
+  /// No description provided for @sharedLibrary_about_description_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get sharedLibrary_about_description_label;
+
+  /// No description provided for @sharedLibrary_about_description_help.
+  ///
+  /// In en, this message translates to:
+  /// **'What this library holds and who it is for. Every member sees it.'**
+  String get sharedLibrary_about_description_help;
+
+  /// No description provided for @sharedLibrary_about_nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name'**
+  String get sharedLibrary_about_nameRequired;
+
+  /// No description provided for @sharedLibrary_connection_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection on this device'**
+  String get sharedLibrary_connection_title;
+
+  /// No description provided for @sharedLibrary_connection_s3.
+  ///
+  /// In en, this message translates to:
+  /// **'S3 account'**
+  String get sharedLibrary_connection_s3;
+
+  /// No description provided for @sharedLibrary_connection_s3Bucket.
+  ///
+  /// In en, this message translates to:
+  /// **'S3 account, bucket {bucket}'**
+  String sharedLibrary_connection_s3Bucket(String bucket);
+
+  /// No description provided for @sharedLibrary_connection_webdav.
+  ///
+  /// In en, this message translates to:
+  /// **'WebDAV account'**
+  String get sharedLibrary_connection_webdav;
+
+  /// No description provided for @sharedLibrary_connection_webdavServer.
+  ///
+  /// In en, this message translates to:
+  /// **'WebDAV account, {server}'**
+  String sharedLibrary_connection_webdavServer(String server);
+
+  /// No description provided for @sharedLibrary_connection_accountMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is no longer on this device'**
+  String get sharedLibrary_connection_accountMissing;
+
+  /// No description provided for @sharedLibrary_connection_folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get sharedLibrary_connection_folder;
+
+  /// No description provided for @sharedLibrary_connection_change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change connection'**
+  String get sharedLibrary_connection_change;
+
+  /// No description provided for @sharedLibrary_connection_check.
+  ///
+  /// In en, this message translates to:
+  /// **'Check location'**
+  String get sharedLibrary_connection_check;
+
+  /// No description provided for @sharedLibrary_connection_same.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {name} here. This is the same library.'**
+  String sharedLibrary_connection_same(String name);
+
+  /// No description provided for @sharedLibrary_connection_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save connection'**
+  String get sharedLibrary_connection_save;
+
+  /// No description provided for @sharedLibrary_connection_olderCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'This copy looks older than the one you have been syncing with.'**
+  String get sharedLibrary_connection_olderCopy;
+
+  /// No description provided for @sharedLibrary_connection_saveAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Save anyway'**
+  String get sharedLibrary_connection_saveAnyway;
+
+  /// No description provided for @sharedLibrary_connection_different.
+  ///
+  /// In en, this message translates to:
+  /// **'This folder holds a different library ({name}). Your connection is unchanged.'**
+  String sharedLibrary_connection_different(String name);
+
+  /// No description provided for @sharedLibrary_connection_differentUnnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'This folder holds a different library. Your connection is unchanged.'**
+  String get sharedLibrary_connection_differentUnnamed;
+
+  /// No description provided for @sharedLibrary_connection_none.
+  ///
+  /// In en, this message translates to:
+  /// **'No library found in this folder. Your connection is unchanged.'**
+  String get sharedLibrary_connection_none;
+
+  /// No description provided for @sharedLibrary_connection_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection updated'**
+  String get sharedLibrary_connection_saved;
 
   /// No description provided for @settings_cloudSync_adopt_confirm.
   ///
@@ -33601,7 +35165,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_cloudSync_provider_webdav_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Nextcloud, ownCloud, Synology, Koofr and other WebDAV servers'**
+  /// **'Any WebDAV server'**
   String get settings_cloudSync_provider_webdav_subtitle;
 
   /// No description provided for @settings_cloudSync_provider_webdav_title.
@@ -35232,6 +36796,12 @@ abstract class AppLocalizations {
   /// **'Role'**
   String get settings_conflict_field_equipmentComponents_role;
 
+  /// No description provided for @settings_conflict_field_equipmentDefaultStatuses.
+  ///
+  /// In en, this message translates to:
+  /// **'Default equipment view'**
+  String get settings_conflict_field_equipmentDefaultStatuses;
+
   /// No description provided for @settings_conflict_field_equipmentFindings_severity.
   ///
   /// In en, this message translates to:
@@ -35699,6 +37269,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shared'**
   String get settings_conflict_field_isShared;
+
+  /// No description provided for @settings_conflict_field_sharedLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared site library'**
+  String get settings_conflict_field_sharedLibrary;
+
+  /// No description provided for @settings_conflict_field_sharedLibraryMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Member id'**
+  String get settings_conflict_field_sharedLibraryMember;
+
+  /// No description provided for @settings_conflict_field_sharedLibraryDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get settings_conflict_field_sharedLibraryDisplayName;
+
+  /// No description provided for @settings_conflict_field_sharedLibraryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Library name'**
+  String get settings_conflict_field_sharedLibraryName;
+
+  /// No description provided for @settings_conflict_field_sharedLibraryBackend.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage type'**
+  String get settings_conflict_field_sharedLibraryBackend;
+
+  /// No description provided for @settings_conflict_field_sharedLibraryLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Library location'**
+  String get settings_conflict_field_sharedLibraryLocation;
+
+  /// Sync conflict label for a shared site library membership's signing key (its value is never shown)
+  ///
+  /// In en, this message translates to:
+  /// **'Signing key'**
+  String get settings_conflict_field_sharedLibrarySigningKey;
+
+  /// Sync conflict label for a shared site library membership's encryption key (its value is never shown)
+  ///
+  /// In en, this message translates to:
+  /// **'Library key'**
+  String get settings_conflict_field_sharedLibraryKey;
 
   /// No description provided for @settings_conflict_field_isTravelGas.
   ///
@@ -36804,6 +38422,12 @@ abstract class AppLocalizations {
   /// **'Linked item'**
   String get settings_conflict_field_sourceItemId;
 
+  /// No description provided for @settings_conflict_field_sourceMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra data from the source'**
+  String get settings_conflict_field_sourceMetadata;
+
   /// No description provided for @settings_conflict_field_sourceRef.
   ///
   /// In en, this message translates to:
@@ -36845,6 +38469,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Category'**
   String get settings_conflict_field_species_category;
+
+  /// No description provided for @settings_conflict_field_splitAtConfiguredRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Split at the configured rate'**
+  String get settings_conflict_field_splitAtConfiguredRate;
 
   /// No description provided for @settings_conflict_field_startDateTime.
   ///
@@ -37157,6 +38787,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Collapse gaps in trend charts'**
   String get settings_conflict_field_trendGapCollapseMonths;
+
+  /// No description provided for @settings_conflict_field_profileColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile color: {metric}'**
+  String settings_conflict_field_profileColor(String metric);
 
   /// No description provided for @settings_conflict_field_tripServiceLeadDays.
   ///
@@ -37896,6 +39532,228 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load documents: {error}'**
   String documents_error_load(String error);
 
+  /// No description provided for @documents_export_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Export all documents'**
+  String get documents_export_action;
+
+  /// No description provided for @documents_export_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Export documents'**
+  String get documents_export_title;
+
+  /// No description provided for @documents_export_summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents: {documents}, files: {files}'**
+  String documents_export_summary(int documents, int files);
+
+  /// No description provided for @documents_export_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get documents_export_password;
+
+  /// No description provided for @documents_export_confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get documents_export_confirmPassword;
+
+  /// No description provided for @documents_export_showPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get documents_export_showPassword;
+
+  /// No description provided for @documents_export_hidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get documents_export_hidePassword;
+
+  /// No description provided for @documents_export_passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Use at least 8 characters'**
+  String get documents_export_passwordTooShort;
+
+  /// No description provided for @documents_export_passwordCharacters.
+  ///
+  /// In en, this message translates to:
+  /// **'Use only letters A to Z, digits, spaces and common symbols, so the ZIP opens on every computer'**
+  String get documents_export_passwordCharacters;
+
+  /// No description provided for @documents_export_passwordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get documents_export_passwordMismatch;
+
+  /// No description provided for @documents_export_note.
+  ///
+  /// In en, this message translates to:
+  /// **'This password cannot be recovered. The ZIP opens by double-clicking on a computer, not on a phone. The protection keeps out casual snooping but is not strong encryption, and file and folder names stay readable without the password.'**
+  String get documents_export_note;
+
+  /// No description provided for @documents_export_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get documents_export_start;
+
+  /// No description provided for @documents_export_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get documents_export_cancel;
+
+  /// No description provided for @documents_export_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'File {done} of {total}'**
+  String documents_export_progress(int done, int total);
+
+  /// No description provided for @documents_export_nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no documents to export'**
+  String get documents_export_nothing;
+
+  /// No description provided for @documents_export_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents exported'**
+  String get documents_export_done;
+
+  /// No description provided for @documents_export_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String documents_export_failed(String error);
+
+  /// No description provided for @documents_export_cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Export cancelled'**
+  String get documents_export_cancelled;
+
+  /// No description provided for @documents_export_fileNamePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion documents'**
+  String get documents_export_fileNamePrefix;
+
+  /// No description provided for @documents_export_unknownRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get documents_export_unknownRecord;
+
+  /// No description provided for @documents_export_front.
+  ///
+  /// In en, this message translates to:
+  /// **'front'**
+  String get documents_export_front;
+
+  /// No description provided for @documents_export_back.
+  ///
+  /// In en, this message translates to:
+  /// **'back'**
+  String get documents_export_back;
+
+  /// No description provided for @documents_export_page.
+  ///
+  /// In en, this message translates to:
+  /// **'page {n}'**
+  String documents_export_page(int n);
+
+  /// No description provided for @documents_export_manifest_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get documents_export_manifest_title;
+
+  /// No description provided for @documents_export_manifest_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get documents_export_manifest_type;
+
+  /// No description provided for @documents_export_manifest_kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Filed under (kind)'**
+  String get documents_export_manifest_kind;
+
+  /// No description provided for @documents_export_manifest_filedUnder.
+  ///
+  /// In en, this message translates to:
+  /// **'Filed under'**
+  String get documents_export_manifest_filedUnder;
+
+  /// No description provided for @documents_export_manifest_issuer.
+  ///
+  /// In en, this message translates to:
+  /// **'Issuer'**
+  String get documents_export_manifest_issuer;
+
+  /// No description provided for @documents_export_manifest_reference.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference number'**
+  String get documents_export_manifest_reference;
+
+  /// No description provided for @documents_export_manifest_issueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue date'**
+  String get documents_export_manifest_issueDate;
+
+  /// No description provided for @documents_export_manifest_expiryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry date'**
+  String get documents_export_manifest_expiryDate;
+
+  /// No description provided for @documents_export_manifest_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get documents_export_manifest_notes;
+
+  /// No description provided for @documents_export_manifest_emergencyPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency phone'**
+  String get documents_export_manifest_emergencyPhone;
+
+  /// No description provided for @documents_export_manifest_phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get documents_export_manifest_phone;
+
+  /// No description provided for @documents_export_manifest_page.
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get documents_export_manifest_page;
+
+  /// No description provided for @documents_export_manifest_side.
+  ///
+  /// In en, this message translates to:
+  /// **'Side'**
+  String get documents_export_manifest_side;
+
+  /// No description provided for @documents_export_manifest_path.
+  ///
+  /// In en, this message translates to:
+  /// **'Path in ZIP'**
+  String get documents_export_manifest_path;
+
   /// No description provided for @documents_filter_all.
   ///
   /// In en, this message translates to:
@@ -37907,6 +39765,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Filed under'**
   String get documents_detail_owner;
+
+  /// No description provided for @documents_owner_pickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'File under'**
+  String get documents_owner_pickerTitle;
+
+  /// No description provided for @documents_owner_search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get documents_owner_search;
+
+  /// No description provided for @documents_owner_none.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to file under yet'**
+  String get documents_owner_none;
+
+  /// No description provided for @documents_owner_locked.
+  ///
+  /// In en, this message translates to:
+  /// **'A card stays with its certification'**
+  String get documents_owner_locked;
 
   /// No description provided for @documents_profileHub_documents.
   ///
@@ -38795,6 +40677,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count}m ago'**
   String settings_data_syncTime_minutesAgo(Object count);
+
+  /// No description provided for @dataHealth_feature_backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get dataHealth_feature_backup;
+
+  /// No description provided for @dataHealth_feature_sync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync'**
+  String get dataHealth_feature_sync;
+
+  /// No description provided for @dataHealth_feature_libraries.
+  ///
+  /// In en, this message translates to:
+  /// **'Libraries'**
+  String get dataHealth_feature_libraries;
+
+  /// No description provided for @dataHealth_feature_media.
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get dataHealth_feature_media;
+
+  /// No description provided for @dataHealth_level_healthy.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get dataHealth_level_healthy;
+
+  /// No description provided for @dataHealth_level_attention.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get dataHealth_level_attention;
+
+  /// No description provided for @dataHealth_level_failing.
+  ///
+  /// In en, this message translates to:
+  /// **'Failing'**
+  String get dataHealth_level_failing;
+
+  /// No description provided for @dataHealth_level_notSetUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set up'**
+  String get dataHealth_level_notSetUp;
+
+  /// No description provided for @dataHealth_semantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{feature}: {status}'**
+  String dataHealth_semantics(String feature, String status);
+
+  /// No description provided for @dataHealth_backup_autoOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended: turn on automatic backups'**
+  String get dataHealth_backup_autoOff;
+
+  /// No description provided for @dataHealth_backup_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup failed: {when}'**
+  String dataHealth_backup_failed(String when);
+
+  /// No description provided for @dataHealth_backup_overdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup overdue (last: {when})'**
+  String dataHealth_backup_overdue(String when);
+
+  /// No description provided for @dataHealth_backup_never.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup yet'**
+  String get dataHealth_backup_never;
+
+  /// No description provided for @dataHealth_backup_cloudCopyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup did not reach the cloud'**
+  String get dataHealth_backup_cloudCopyMissing;
+
+  /// No description provided for @dataHealth_backup_noOffDeviceCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'No copy off this device'**
+  String get dataHealth_backup_noOffDeviceCopy;
+
+  /// No description provided for @dataHealth_sync_off.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended: turn on cloud sync'**
+  String get dataHealth_sync_off;
+
+  /// No description provided for @dataHealth_sync_needsPassphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync paused: enter your passphrase'**
+  String get dataHealth_sync_needsPassphrase;
+
+  /// No description provided for @dataHealth_sync_awaitingAdoption.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync paused: the cloud library was replaced'**
+  String get dataHealth_sync_awaitingAdoption;
+
+  /// No description provided for @dataHealth_sync_signedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync paused: sign in again'**
+  String get dataHealth_sync_signedOut;
+
+  /// No description provided for @dataHealth_sync_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync failed: {when}'**
+  String dataHealth_sync_failed(String when);
+
+  /// No description provided for @dataHealth_sync_offline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline (last synced: {when})'**
+  String dataHealth_sync_offline(String when);
+
+  /// No description provided for @dataHealth_sync_conflicts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} sync conflict to resolve} other{{count} sync conflicts to resolve}}'**
+  String dataHealth_sync_conflicts(int count);
+
+  /// No description provided for @dataHealth_sync_peersHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'Another device needs attention before it can sync'**
+  String get dataHealth_sync_peersHeld;
+
+  /// No description provided for @dataHealth_sync_autoOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended: turn on automatic sync'**
+  String get dataHealth_sync_autoOff;
+
+  /// No description provided for @dataHealth_sync_neverSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Not synced yet'**
+  String get dataHealth_sync_neverSynced;
+
+  /// No description provided for @dataHealth_sync_rowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced: {when}'**
+  String dataHealth_sync_rowSubtitle(String when);
+
+  /// No description provided for @dataHealth_sync_rowSubtitleDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Synced: {when} · {count} device} other{Synced: {when} · {count} devices}}'**
+  String dataHealth_sync_rowSubtitleDevices(String when, int count);
+
+  /// No description provided for @dataHealth_libraries_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: sync failed'**
+  String dataHealth_libraries_failed(String name);
+
+  /// No description provided for @dataHealth_libraries_failedMany.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} library failed to sync} other{{count} libraries failed to sync}}'**
+  String dataHealth_libraries_failedMany(int count);
+
+  /// No description provided for @dataHealth_libraries_editsHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: your edits are on hold'**
+  String dataHealth_libraries_editsHeld(String name);
+
+  /// No description provided for @dataHealth_media_finishSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos: finish setting up this device'**
+  String get dataHealth_media_finishSetup;
+
+  /// No description provided for @dataHealth_media_transfersPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo transfers are paused'**
+  String get dataHealth_media_transfersPaused;
+
+  /// No description provided for @dataHealth_facts_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} dive} other{{count} dives}}'**
+  String dataHealth_facts_dives(int count);
+
+  /// No description provided for @dataHealth_facts_sites.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} site} other{{count} sites}}'**
+  String dataHealth_facts_sites(int count);
+
+  /// No description provided for @dataHealth_facts_media.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} photo or video} other{{count} photos and videos}}'**
+  String dataHealth_facts_media(int count);
 
   /// No description provided for @settings_decompression_aboutContent.
   ///
@@ -39770,6 +41862,24 @@ abstract class AppLocalizations {
   /// **'Where your gear is kept, serviced or lent'**
   String get settings_manage_locations_subtitle;
 
+  /// Explanation at the top of the Default equipment view settings page (issue #2628)
+  ///
+  /// In en, this message translates to:
+  /// **'When no filter is set, the Equipment list shows gear with these statuses.'**
+  String get settings_equipmentDefaultView_intro;
+
+  /// Joins status names in the default equipment view summary, e.g. 'Active, Spare'
+  ///
+  /// In en, this message translates to:
+  /// **', '**
+  String get settings_equipmentDefaultView_listSeparator;
+
+  /// Title of the settings page, and its Settings > Manage row, choosing which statuses the Equipment list shows with no filter set
+  ///
+  /// In en, this message translates to:
+  /// **'Default equipment view'**
+  String get settings_equipmentDefaultView_title;
+
   /// Settings > Manage tile: the certification currency rule catalog
   ///
   /// In en, this message translates to:
@@ -40376,12 +42486,6 @@ abstract class AppLocalizations {
   /// **'WebDAV'**
   String get settings_webdavConfig_appBar_title;
 
-  /// No description provided for @settings_webdavConfig_davRoot_label.
-  ///
-  /// In en, this message translates to:
-  /// **'WebDAV address'**
-  String get settings_webdavConfig_davRoot_label;
-
   /// No description provided for @settings_webdavConfig_error_conflict.
   ///
   /// In en, this message translates to:
@@ -40415,7 +42519,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_webdavConfig_error_notFound.
   ///
   /// In en, this message translates to:
-  /// **'No WebDAV folder at this address. Check the server type and address.'**
+  /// **'No WebDAV folder at this address. Check the address.'**
   String get settings_webdavConfig_error_notFound;
 
   /// No description provided for @settings_webdavConfig_error_notWebDav.
@@ -40496,11 +42600,11 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get settings_webdavConfig_field_password_label;
 
-  /// No description provided for @settings_webdavConfig_field_preset_label.
+  /// No description provided for @settings_webdavConfig_field_serverUrl_helper.
   ///
   /// In en, this message translates to:
-  /// **'Server type'**
-  String get settings_webdavConfig_field_preset_label;
+  /// **'The full WebDAV address from your server\'s settings, including its path'**
+  String get settings_webdavConfig_field_serverUrl_helper;
 
   /// No description provided for @settings_webdavConfig_field_serverUrl_hintDav.
   ///
@@ -40508,22 +42612,10 @@ abstract class AppLocalizations {
   /// **'https://example.com/dav'**
   String get settings_webdavConfig_field_serverUrl_hintDav;
 
-  /// No description provided for @settings_webdavConfig_field_serverUrl_hintHost.
-  ///
-  /// In en, this message translates to:
-  /// **'https://cloud.example.com'**
-  String get settings_webdavConfig_field_serverUrl_hintHost;
-
-  /// No description provided for @settings_webdavConfig_field_serverUrl_hintSynology.
-  ///
-  /// In en, this message translates to:
-  /// **'https://nas.local:5006'**
-  String get settings_webdavConfig_field_serverUrl_hintSynology;
-
   /// No description provided for @settings_webdavConfig_field_serverUrl_label.
   ///
   /// In en, this message translates to:
-  /// **'Server address'**
+  /// **'WebDAV address'**
   String get settings_webdavConfig_field_serverUrl_label;
 
   /// No description provided for @settings_webdavConfig_field_username_label.
@@ -40531,60 +42623,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Username'**
   String get settings_webdavConfig_field_username_label;
-
-  /// No description provided for @settings_webdavConfig_preset_fastmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Fastmail Files'**
-  String get settings_webdavConfig_preset_fastmail;
-
-  /// No description provided for @settings_webdavConfig_preset_koofr.
-  ///
-  /// In en, this message translates to:
-  /// **'Koofr'**
-  String get settings_webdavConfig_preset_koofr;
-
-  /// No description provided for @settings_webdavConfig_preset_nextcloud.
-  ///
-  /// In en, this message translates to:
-  /// **'Nextcloud'**
-  String get settings_webdavConfig_preset_nextcloud;
-
-  /// No description provided for @settings_webdavConfig_preset_other.
-  ///
-  /// In en, this message translates to:
-  /// **'Other WebDAV server'**
-  String get settings_webdavConfig_preset_other;
-
-  /// No description provided for @settings_webdavConfig_preset_owncloud.
-  ///
-  /// In en, this message translates to:
-  /// **'ownCloud'**
-  String get settings_webdavConfig_preset_owncloud;
-
-  /// No description provided for @settings_webdavConfig_preset_pcloudEu.
-  ///
-  /// In en, this message translates to:
-  /// **'pCloud (EU)'**
-  String get settings_webdavConfig_preset_pcloudEu;
-
-  /// No description provided for @settings_webdavConfig_preset_pcloudUs.
-  ///
-  /// In en, this message translates to:
-  /// **'pCloud (US)'**
-  String get settings_webdavConfig_preset_pcloudUs;
-
-  /// No description provided for @settings_webdavConfig_preset_synology.
-  ///
-  /// In en, this message translates to:
-  /// **'Synology NAS'**
-  String get settings_webdavConfig_preset_synology;
-
-  /// No description provided for @settings_webdavConfig_preset_yandex.
-  ///
-  /// In en, this message translates to:
-  /// **'Yandex Disk'**
-  String get settings_webdavConfig_preset_yandex;
 
   /// No description provided for @settings_webdavConfig_remove_confirm_action.
   ///
@@ -40615,12 +42653,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'WebDAV configuration saved'**
   String get settings_webdavConfig_saved;
-
-  /// No description provided for @settings_webdavConfig_synology_helper.
-  ///
-  /// In en, this message translates to:
-  /// **'Turn on WebDAV Server in Package Center. Its HTTPS port is usually 5006.'**
-  String get settings_webdavConfig_synology_helper;
 
   /// No description provided for @settings_webdavConfig_test_success.
   ///
@@ -40759,12 +42791,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Data'**
   String get settings_section_data_title;
-
-  /// No description provided for @settings_section_decompression_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'GF, data sources & narcosis'**
-  String get settings_section_decompression_subtitle;
 
   /// No description provided for @settings_section_decompression_title.
   ///
@@ -42831,6 +44857,108 @@ abstract class AppLocalizations {
   /// **'Gas consumption trend'**
   String get insights_gas_sacTrend_title;
 
+  /// No description provided for @insights_gas_tankConfig_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank configuration'**
+  String get insights_gas_tankConfig_title;
+
+  /// No description provided for @insights_gas_tankConfig_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives by how the tanks were set up'**
+  String get insights_gas_tankConfig_subtitle;
+
+  /// No description provided for @insights_gas_tankConfig_configurationHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Configuration'**
+  String get insights_gas_tankConfig_configurationHeading;
+
+  /// No description provided for @insights_gas_tankConfig_extrasHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Extras'**
+  String get insights_gas_tankConfig_extrasHeading;
+
+  /// No description provided for @insights_gas_tankConfig_rebreather.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebreather'**
+  String get insights_gas_tankConfig_rebreather;
+
+  /// No description provided for @insights_gas_tankConfig_sidemount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sidemount'**
+  String get insights_gas_tankConfig_sidemount;
+
+  /// No description provided for @insights_gas_tankConfig_twinBackmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Twin backmount'**
+  String get insights_gas_tankConfig_twinBackmount;
+
+  /// No description provided for @insights_gas_tankConfig_singleBackmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Single backmount'**
+  String get insights_gas_tankConfig_singleBackmount;
+
+  /// No description provided for @insights_gas_tankConfig_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get insights_gas_tankConfig_other;
+
+  /// No description provided for @insights_gas_tankConfig_noTanks.
+  ///
+  /// In en, this message translates to:
+  /// **'No tanks logged'**
+  String get insights_gas_tankConfig_noTanks;
+
+  /// No description provided for @insights_gas_tankConfig_stages.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage(s)'**
+  String get insights_gas_tankConfig_stages;
+
+  /// No description provided for @insights_gas_tankConfig_decoGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco gas'**
+  String get insights_gas_tankConfig_decoGas;
+
+  /// No description provided for @insights_gas_tankConfig_multiGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-gas'**
+  String get insights_gas_tankConfig_multiGas;
+
+  /// A bar's dive count and its share of all dives in scope, e.g. 131 · 62%
+  ///
+  /// In en, this message translates to:
+  /// **'{count} · {percent}'**
+  String insights_gas_tankConfig_countAndPercent(int count, String percent);
+
+  /// No description provided for @insights_gas_tankConfig_note.
+  ///
+  /// In en, this message translates to:
+  /// **'Twin sets logged as one cylinder are counted when the name says so (twin, double, D12, 2x12) or the cylinder is larger than any common single tank. Set Sidemount Left and Right on a dive\'s tanks for it to count as sidemount.'**
+  String get insights_gas_tankConfig_note;
+
+  /// No description provided for @insights_gas_tankConfig_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives to show'**
+  String get insights_gas_tankConfig_empty;
+
+  /// No description provided for @insights_gas_tankConfig_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load tank configuration'**
+  String get insights_gas_tankConfig_error;
+
   /// No description provided for @insights_focus_title.
   ///
   /// In en, this message translates to:
@@ -42955,6 +45083,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bottom time'**
   String get insights_focus_metric_bottomTime;
+
+  /// No description provided for @insights_focus_metric_runtime.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime'**
+  String get insights_focus_metric_runtime;
 
   /// No description provided for @insights_focus_metric_weight.
   ///
@@ -43845,6 +45979,24 @@ abstract class AppLocalizations {
   /// **'Bottom Time Trend'**
   String get insights_progression_bottomTime_title;
 
+  /// No description provided for @insights_progression_runtime_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load runtime trend'**
+  String get insights_progression_runtime_error;
+
+  /// No description provided for @insights_progression_runtime_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every dive in range'**
+  String get insights_progression_runtime_subtitle;
+
+  /// No description provided for @insights_progression_runtime_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime Trend'**
+  String get insights_progression_runtime_title;
+
   /// No description provided for @insights_progression_cumulative_error.
   ///
   /// In en, this message translates to:
@@ -44368,6 +46520,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{Your last dive was 1 day ago} other{Your last dive was {count} days ago}}'**
   String insights_observations_diveGap(int count);
 
+  /// Observation when the last dive was a year or more ago; span is a formatted elapsed time such as 1y 35d
+  ///
+  /// In en, this message translates to:
+  /// **'Your last dive was {span} ago'**
+  String insights_observations_diveGapSpan(String span);
+
   /// One site holds a large share of recent dives
   ///
   /// In en, this message translates to:
@@ -44774,21 +46932,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load surface interval data'**
   String get insights_timePatterns_surfaceInterval_error;
-
-  /// No description provided for @insights_timePatterns_surfaceInterval_formatHoursMinutes.
-  ///
-  /// In en, this message translates to:
-  /// **'{hours}h {minutes}m'**
-  String insights_timePatterns_surfaceInterval_formatHoursMinutes(
-    Object hours,
-    Object minutes,
-  );
-
-  /// No description provided for @insights_timePatterns_surfaceInterval_formatMinutes.
-  ///
-  /// In en, this message translates to:
-  /// **'{minutes} min'**
-  String insights_timePatterns_surfaceInterval_formatMinutes(Object minutes);
 
   /// No description provided for @insights_timePatterns_surfaceInterval_maximum.
   ///
@@ -46458,6 +48601,18 @@ abstract class AppLocalizations {
   /// **'CSV Export'**
   String get transfer_export_csvTitle;
 
+  /// No description provided for @transfer_export_documentsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All your documents as a password-protected ZIP'**
+  String get transfer_export_documentsSubtitle;
+
+  /// No description provided for @transfer_export_documentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get transfer_export_documentsTitle;
+
   /// No description provided for @transfer_export_excelSubtitle.
   ///
   /// In en, this message translates to:
@@ -47531,6 +49686,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View All'**
   String get trips_photos_viewAll;
+
+  /// No description provided for @trips_picker_alreadyPacked.
+  ///
+  /// In en, this message translates to:
+  /// **'Already packed'**
+  String get trips_picker_alreadyPacked;
 
   /// No description provided for @trips_picker_clearTooltip.
   ///
@@ -49237,6 +51398,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 photo had no file name and could not be linked.} other{{count} photos had no file name and could not be linked.}}'**
   String universalImport_summary_noticePhotosSkippedBody(int count);
+
+  /// No description provided for @universalImport_summary_noticeLogbookImagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Some pictures not imported'**
+  String get universalImport_summary_noticeLogbookImagesTitle;
+
+  /// No description provided for @universalImport_summary_noticeLogbookImagesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} picture stored in the logbook file (a gear photo, site map or the like) could not be imported. Keep the original file to hold on to it.} other{{count} pictures stored in the logbook file (gear photos, site maps and the like) could not be imported. Keep the original file to hold on to them.}}'**
+  String universalImport_summary_noticeLogbookImagesBody(int count);
+
+  /// No description provided for @universalImport_summary_noticeTripsNotImportedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Some trips not imported'**
+  String get universalImport_summary_noticeTripsNotImportedTitle;
+
+  /// No description provided for @universalImport_summary_noticeTripsNotImportedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'These trips have no dates, and none of their dives has one, so they could not be imported: {names}. You can add them again under Trips.'**
+  String universalImport_summary_noticeTripsNotImportedBody(String names);
 
   /// No description provided for @universalImport_summary_noticeSitesUnresolvedTitle.
   ///
@@ -51129,6 +53314,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Duration (min)'**
   String get divePlanner_segmentEditor_duration;
+
+  /// Checkbox in the segment editor: split this leg into travel at the configured descent/ascent rate plus a hold at the target depth for the remainder of the entered duration
+  ///
+  /// In en, this message translates to:
+  /// **'Use configured rate'**
+  String get divePlanner_segmentEditor_splitAtRate;
+
+  /// No description provided for @divePlanner_segmentEditor_splitAtRateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel at the configured rate, the rest of the duration as hold time'**
+  String get divePlanner_segmentEditor_splitAtRateHint;
 
   /// No description provided for @divePlanner_segmentEditor_editTitle.
   ///
@@ -53657,6 +55854,12 @@ abstract class AppLocalizations {
   /// **'Replaced source data'**
   String get universalImport_label_replacedSourceData;
 
+  /// Label for the count of dives already in the log whose start times an Apple Watch re-import corrected
+  ///
+  /// In en, this message translates to:
+  /// **'Dive times corrected'**
+  String get universalImport_label_timesCorrected;
+
   /// Label for the count of consolidated dives in summary
   ///
   /// In en, this message translates to:
@@ -54408,6 +56611,24 @@ abstract class AppLocalizations {
     int repaired,
     int aborted,
   );
+
+  /// No description provided for @settings_mediaStorage_verify_deferred.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was deleted: deletes wait until this device has finished syncing.'**
+  String get settings_mediaStorage_verify_deferred;
+
+  /// No description provided for @settings_mediaStorage_verify_unregistered.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was deleted: reconnect the media store so this dive log knows which files are its own.'**
+  String get settings_mediaStorage_verify_unregistered;
+
+  /// No description provided for @settings_mediaStorage_verify_uploads.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was deleted: deletes wait until uploads finish.'**
+  String get settings_mediaStorage_verify_uploads;
 
   /// No description provided for @settings_mediaStorage_backfill_action.
   ///
@@ -55534,7 +57755,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_photosMedia_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Sources, storage & accounts'**
+  /// **'Sources & storage'**
   String get settings_photosMedia_subtitle;
 
   /// No description provided for @settings_photosMedia_sourcesHeader.
@@ -55548,12 +57769,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Where copies are kept'**
   String get settings_photosMedia_storageHeader;
-
-  /// No description provided for @settings_photosMedia_accountsHeader.
-  ///
-  /// In en, this message translates to:
-  /// **'Accounts'**
-  String get settings_photosMedia_accountsHeader;
 
   /// No description provided for @settings_photosMedia_displayHeader.
   ///
@@ -55600,7 +57815,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_connectedAccounts_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Cloud and service sign-ins'**
+  /// **'Sign-ins used by sync, media storage and shared libraries'**
   String get settings_connectedAccounts_subtitle;
 
   /// No description provided for @settings_connectedAccounts_empty.
@@ -55722,6 +57937,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not load accounts'**
   String get settings_connectedAccounts_loadError;
+
+  /// Connected account row: what the account is used for on this device. uses is a comma-separated list of usage names.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for: {uses}'**
+  String settings_connectedAccounts_usage_label(String uses);
+
+  /// No description provided for @settings_connectedAccounts_usage_none.
+  ///
+  /// In en, this message translates to:
+  /// **'Not used on this device'**
+  String get settings_connectedAccounts_usage_none;
+
+  /// No description provided for @settings_connectedAccounts_usage_databaseSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Database sync'**
+  String get settings_connectedAccounts_usage_databaseSync;
+
+  /// No description provided for @settings_connectedAccounts_usage_mediaStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Media storage'**
+  String get settings_connectedAccounts_usage_mediaStorage;
+
+  /// Connected account usage: a shared site library by name.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared site library: {name}'**
+  String settings_connectedAccounts_usage_sharedLibrary(String name);
+
+  /// No description provided for @settings_connectedAccounts_usage_lightroom.
+  ///
+  /// In en, this message translates to:
+  /// **'Lightroom'**
+  String get settings_connectedAccounts_usage_lightroom;
+
+  /// No description provided for @settings_connectedAccounts_signOutConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out on this device?'**
+  String get settings_connectedAccounts_signOutConfirmTitle;
+
+  /// Sign-out confirmation body; account is the account's label.
+  ///
+  /// In en, this message translates to:
+  /// **'On this device, {account} is used for the features below. They stop working here until you sign in again.'**
+  String settings_connectedAccounts_signOutConfirmBody(String account);
+
+  /// No description provided for @settings_connectedAccounts_removeConfirmUsedHere.
+  ///
+  /// In en, this message translates to:
+  /// **'On this device it is used for the features below, which stop working here:'**
+  String get settings_connectedAccounts_removeConfirmUsedHere;
+
+  /// No description provided for @settings_connectedAccounts_removeConfirmOtherDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Other devices may also use this account.'**
+  String get settings_connectedAccounts_removeConfirmOtherDevices;
+
+  /// No description provided for @settings_connectedAccounts_usage_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check what this account is used for on this device. Anything that uses it here may stop working.'**
+  String get settings_connectedAccounts_usage_unknown;
 
   /// No description provided for @media_unavailablePlaceholder_volumeOffline.
   ///
@@ -57223,6 +59504,12 @@ abstract class AppLocalizations {
   /// **'Use 5, 5/4 or 7/5/3'**
   String get equipment_edit_invalidThickness;
 
+  /// No description provided for @equipment_edit_invalidFocalLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Use 60 or 15-45'**
+  String get equipment_edit_invalidFocalLength;
+
   /// No description provided for @equipment_edit_invalidWebLink.
   ///
   /// In en, this message translates to:
@@ -57304,7 +59591,7 @@ abstract class AppLocalizations {
   /// No description provided for @safetySettings_cnsOtuHeader.
   ///
   /// In en, this message translates to:
-  /// **'Current CNS/OTU load'**
+  /// **'Current dive load'**
   String get safetySettings_cnsOtuHeader;
 
   /// No description provided for @safetySettings_noFlyPreset_standard.
@@ -57318,6 +59605,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Strict (18/24/48 h)'**
   String get safetySettings_noFlyPreset_strict;
+
+  /// Safety hub row subtitle: the safety review is on, with how many rules are enabled and the no-fly preset word
+  ///
+  /// In en, this message translates to:
+  /// **'On, {enabled} of {total} rules, no-fly {noFly}'**
+  String safetyHub_reviewOn(int enabled, int total, String noFly);
+
+  /// Safety hub row subtitle: the safety review is off; the no-fly preset still applies
+  ///
+  /// In en, this message translates to:
+  /// **'Off, no-fly {noFly}'**
+  String safetyHub_reviewOff(String noFly);
+
+  /// Short name of the standard no-fly preset, used inside safetyHub_reviewOn/Off
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get safetyHub_noFlyStandard;
+
+  /// Short name of the strict no-fly preset, used inside safetyHub_reviewOn/Off
+  ///
+  /// In en, this message translates to:
+  /// **'Strict'**
+  String get safetyHub_noFlyStrict;
+
+  /// Safety hub row subtitle: equipment condition checks are on, with how many rules are enabled
+  ///
+  /// In en, this message translates to:
+  /// **'On, {enabled} of {total} rules'**
+  String safetyHub_conditionOn(int enabled, int total);
+
+  /// Safety hub row subtitle: the feature is switched off
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get safetyHub_off;
 
   /// No description provided for @safetySettings_noFlyPreset_subtitle.
   ///
@@ -57414,6 +59737,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Its CNS% and OTU can\'t be calculated without depth samples. The totals below leave it out.'**
   String get safetyHub_cnsOtu_noProfile_body;
+
+  /// No description provided for @safetyHub_cnsOtu_about_title.
+  ///
+  /// In en, this message translates to:
+  /// **'About CNS and OTU'**
+  String get safetyHub_cnsOtu_about_title;
+
+  /// No description provided for @safetyHub_cnsOtu_about_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your CNS% (oxygen clock) decays after a dive with a 90-minute half-life -- it\'s practically back to 0 after about a day.\n\nDaily OTU resets every night at midnight. Weekly OTU is a rolling total of the last 7 days: older dives automatically drop out of the calculation once they fall outside that window.'**
+  String get safetyHub_cnsOtu_about_body;
+
+  /// No description provided for @safetyHub_tissueLoading_about_title.
+  ///
+  /// In en, this message translates to:
+  /// **'About Tissue Loading'**
+  String get safetyHub_tissueLoading_about_title;
+
+  /// No description provided for @safetyHub_tissueLoading_about_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your body has 16 tissue compartments that absorb and release nitrogen (and, on trimix or rebreather dives, helium too) at different speeds. Fast tissues saturate and desaturate quickly; slow tissues take much longer for both.\n\nAfter a dive with helium, nitrogen and helium in a single compartment can briefly move in opposite directions: while helium is still releasing, the same compartment can simultaneously be absorbing a little nitrogen, until both gases reach equilibrium with the air you\'re breathing. That\'s why a compartment can briefly show \"Ongassing\" even while its overall load keeps dropping.'**
+  String get safetyHub_tissueLoading_about_body;
 
   /// No description provided for @safetyHub_noFly_category_single.
   ///
@@ -58039,11 +60386,11 @@ abstract class AppLocalizations {
   /// **'Near-miss log'**
   String get safetyHub_incidentsLink;
 
-  /// No description provided for @safetyHub_incidentsLink_subtitle.
+  /// No description provided for @safetyHub_incidentsLink_count.
   ///
   /// In en, this message translates to:
-  /// **'Private, non-punitive incident notes'**
-  String get safetyHub_incidentsLink_subtitle;
+  /// **'{count, plural, =0{None yet} =1{{count} entry} other{{count} entries}}'**
+  String safetyHub_incidentsLink_count(int count);
 
   /// No description provided for @diveLog_detail_menu_logNearMiss.
   ///
@@ -58180,7 +60527,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_section_safety_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Review rules & flying after diving'**
+  /// **'Review rules, decompression & equipment'**
   String get settings_section_safety_subtitle;
 
   /// No description provided for @settings_section_equipmentCondition_title.
@@ -59794,6 +62141,22 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This tank lost {drop} while the gas timeline says it was not in use'**
   String dataQuality_msg_tankInactive(String drop);
+
+  /// No description provided for @dataQuality_detector_transmitter_role.
+  ///
+  /// In en, this message translates to:
+  /// **'Transmitter role'**
+  String get dataQuality_detector_transmitter_role;
+
+  /// No description provided for @dataQuality_msg_transmitterRoleBailout.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank {tankNumber} is marked {role} from its transmitter\'s name, but it lost {ocDrop} after the switch to open circuit and almost none on the loop, so it looks like the bailout. A bailout that was never breathed, or one breathed without a gas switch on the computer, cannot be detected this way.'**
+  String dataQuality_msg_transmitterRoleBailout(
+    int tankNumber,
+    String role,
+    String ocDrop,
+  );
 
   /// No description provided for @dataQuality_msg_twinTanks.
   ///
@@ -71093,6 +73456,42 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{in {count}d} other{in {count}d}}'**
   String common_relativeTime_inDays(int count);
 
+  /// An elapsed time under an hour, such as a short surface interval
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String common_elapsed_minutes(int minutes);
+
+  /// An elapsed time from one hour up to a day
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String common_elapsed_hoursMinutes(int hours, int minutes);
+
+  /// An elapsed time from one day up to a year, minutes left out
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d {hours}h'**
+  String common_elapsed_daysHours(int days, int hours);
+
+  /// An elapsed time of a year or more (365-day years), hours left out
+  ///
+  /// In en, this message translates to:
+  /// **'{years}y {days}d'**
+  String common_elapsed_yearsDays(int years, int days);
+
+  /// An exact elapsed time from one day up to a year, for the sync conflict dialog where two values must stay distinguishable
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d {hours}h {minutes}m'**
+  String common_elapsed_daysHoursMinutes(int days, int hours, int minutes);
+
+  /// An exact elapsed time of a year or more (365-day years), for the sync conflict dialog
+  ///
+  /// In en, this message translates to:
+  /// **'{years}y {days}d {hours}h'**
+  String common_elapsed_yearsDaysHours(int years, int days, int hours);
+
   /// Relative future time in whole hours (abbreviated)
   ///
   /// In en, this message translates to:
@@ -71815,29 +74214,17 @@ abstract class AppLocalizations {
   /// **'Remove'**
   String get common_action_remove;
 
-  /// No description provided for @equipment_documents_title.
+  /// No description provided for @equipment_documents_linkedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Documents'**
-  String get equipment_documents_title;
+  /// **'Linked files'**
+  String get equipment_documents_linkedTitle;
 
-  /// No description provided for @equipment_documents_subtitle.
+  /// No description provided for @equipment_documents_linkedSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Invoices, receipts and warranty paperwork'**
-  String get equipment_documents_subtitle;
-
-  /// No description provided for @equipment_documents_attachButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Attach'**
-  String get equipment_documents_attachButton;
-
-  /// No description provided for @equipment_documents_empty.
-  ///
-  /// In en, this message translates to:
-  /// **'No documents attached yet'**
-  String get equipment_documents_empty;
+  /// **'Too large, or a format Documents cannot hold'**
+  String get equipment_documents_linkedSubtitle;
 
   /// No description provided for @equipment_documents_removeTitle.
   ///
@@ -73525,6 +75912,36 @@ abstract class AppLocalizations {
   /// **'Download'**
   String get maps_regionDownload_downloadButton;
 
+  /// No description provided for @maps_regionDownload_presetOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get maps_regionDownload_presetOverview;
+
+  /// No description provided for @maps_regionDownload_presetDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Detail'**
+  String get maps_regionDownload_presetDetail;
+
+  /// No description provided for @maps_regionDownload_presetFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get maps_regionDownload_presetFull;
+
+  /// No description provided for @maps_regionDownload_tooManyTiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Over 100,000 tiles: shrink the area or lower the maximum zoom.'**
+  String get maps_regionDownload_tooManyTiles;
+
+  /// No description provided for @maps_regionDownload_socks5Unsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Region downloads can\'t use a SOCKS5 proxy: switch to an HTTP proxy or to No proxy in the network settings.'**
+  String get maps_regionDownload_socks5Unsupported;
+
   /// No description provided for @diveLog_map_title.
   ///
   /// In en, this message translates to:
@@ -73592,6 +76009,16 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name}, {startDate} to {endDate}, selected'**
   String trips_picker_tileSemanticsSelected(
+    Object name,
+    Object startDate,
+    Object endDate,
+  );
+
+  /// No description provided for @trips_picker_tileSemanticsPacked.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {startDate} to {endDate}, already packed'**
+  String trips_picker_tileSemanticsPacked(
     Object name,
     Object startDate,
     Object endDate,
@@ -74506,6 +76933,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Upgrading database... step {currentStep} of {totalSteps}'**
   String startup_migrating_progress(Object currentStep, Object totalSteps);
+
+  /// No description provided for @startup_compacting.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimizing storage...'**
+  String get startup_compacting;
 
   /// Terminal startup screen title when the failure could not be classified. Deliberately neutral: it must NOT claim the database upgrade failed, since most failures reach this screen without a migration having been attempted.
   ///
@@ -76778,6 +79211,54 @@ abstract class AppLocalizations {
   /// **'A small glyph showing where each item is served from. Problem badges always show.'**
   String get settings_media_provenanceBadgesSubtitle;
 
+  /// No description provided for @settings_photosMedia_cacheHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache'**
+  String get settings_photosMedia_cacheHeader;
+
+  /// No description provided for @settings_mediaCache_memory_title.
+  ///
+  /// In en, this message translates to:
+  /// **'In-memory image cache'**
+  String get settings_mediaCache_memory_title;
+
+  /// No description provided for @settings_mediaCache_memory_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Decoded images kept in memory for the galleries and the full-screen viewer. Applies immediately, on this device only.'**
+  String get settings_mediaCache_memory_subtitle;
+
+  /// No description provided for @settings_mediaCache_disk_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail disk cache'**
+  String get settings_mediaCache_disk_title;
+
+  /// No description provided for @settings_mediaCache_disk_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnails kept on this device. Originals and compressed copies are not counted.'**
+  String get settings_mediaCache_disk_subtitle;
+
+  /// No description provided for @settings_mediaCache_disk_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty cache'**
+  String get settings_mediaCache_disk_empty;
+
+  /// No description provided for @settings_mediaCache_disk_emptied.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail cache emptied'**
+  String get settings_mediaCache_disk_emptied;
+
+  /// No description provided for @settings_mediaCache_disk_emptyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not empty the thumbnail cache'**
+  String get settings_mediaCache_disk_emptyFailed;
+
   /// No description provided for @media_status_transferFailed.
   ///
   /// In en, this message translates to:
@@ -77840,6 +80321,42 @@ abstract class AppLocalizations {
   /// **'Dive log database'**
   String get settings_storageUsage_category_database;
 
+  /// No description provided for @settings_storageUsage_reclaimable.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} reclaimable'**
+  String settings_storageUsage_reclaimable(String size);
+
+  /// No description provided for @settings_storageUsage_compact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get settings_storageUsage_compact;
+
+  /// No description provided for @settings_storageUsage_compactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact the database?'**
+  String get settings_storageUsage_compactTitle;
+
+  /// No description provided for @settings_storageUsage_compactBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Runs the next time Submersion starts. A large log may take a minute and needs free space about the size of the database.'**
+  String get settings_storageUsage_compactBody;
+
+  /// No description provided for @settings_storageUsage_compactScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled for next launch'**
+  String get settings_storageUsage_compactScheduled;
+
+  /// No description provided for @settings_storageUsage_quitNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit now'**
+  String get settings_storageUsage_quitNow;
+
   /// No description provided for @settings_storageUsage_category_localCache.
   ///
   /// In en, this message translates to:
@@ -77923,6 +80440,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Imported logbook files'**
   String get settings_storageUsage_category_importedFiles;
+
+  /// No description provided for @settings_storageUsage_totalSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'{device} on this device, {cloud} in the cloud'**
+  String settings_storageUsage_totalSplit(String device, String cloud);
+
+  /// No description provided for @settings_storageUsage_reclaimTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About {size} can be reclaimed'**
+  String settings_storageUsage_reclaimTitle(String size);
+
+  /// No description provided for @settings_storageUsage_reclaimNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to reclaim right now'**
+  String get settings_storageUsage_reclaimNothing;
+
+  /// No description provided for @settings_storageUsage_reclaimLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Last reclaimed {size}, {when}'**
+  String settings_storageUsage_reclaimLast(String size, String when);
+
+  /// No description provided for @settings_storageUsage_reclaimWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} more will be reclaimable after the safety wait'**
+  String settings_storageUsage_reclaimWaiting(String size);
+
+  /// No description provided for @settings_storageUsage_reclaimWaitingSync.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} more will be reclaimable once this device has finished syncing'**
+  String settings_storageUsage_reclaimWaitingSync(String size);
+
+  /// No description provided for @settings_storageUsage_reclaimWaitingUnregistered.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} more will be reclaimable after you reconnect the media store'**
+  String settings_storageUsage_reclaimWaitingUnregistered(String size);
+
+  /// No description provided for @settings_storageUsage_reclaimWaitingUploads.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} more will be reclaimable once uploads finish'**
+  String settings_storageUsage_reclaimWaitingUploads(String size);
+
+  /// No description provided for @settings_storageUsage_reclaimAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reclaim storage'**
+  String get settings_storageUsage_reclaimAction;
+
+  /// No description provided for @settings_storageUsage_reclaimDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Reclaimed {size}'**
+  String settings_storageUsage_reclaimDone(String size);
+
+  /// No description provided for @settings_storageUsage_reclaimDoneDeferred.
+  ///
+  /// In en, this message translates to:
+  /// **'Reclaimed {size}. The cloud cleanup waits until this device has finished syncing.'**
+  String settings_storageUsage_reclaimDoneDeferred(String size);
+
+  /// No description provided for @settings_storageUsage_reclaimDoneUnregistered.
+  ///
+  /// In en, this message translates to:
+  /// **'Reclaimed {size}. Reconnect the media store to clean up the cloud.'**
+  String settings_storageUsage_reclaimDoneUnregistered(String size);
+
+  /// No description provided for @settings_storageUsage_reclaimDoneUploads.
+  ///
+  /// In en, this message translates to:
+  /// **'Reclaimed {size}. The cloud cleanup waits until uploads finish.'**
+  String settings_storageUsage_reclaimDoneUploads(String size);
+
+  /// No description provided for @settings_storageUsage_group_cloud.
+  ///
+  /// In en, this message translates to:
+  /// **'In the Cloud'**
+  String get settings_storageUsage_group_cloud;
+
+  /// No description provided for @settings_storageUsage_cloud_media.
+  ///
+  /// In en, this message translates to:
+  /// **'Media store'**
+  String get settings_storageUsage_cloud_media;
+
+  /// No description provided for @settings_storageUsage_cloud_sync.
+  ///
+  /// In en, this message translates to:
+  /// **'Database sync'**
+  String get settings_storageUsage_cloud_sync;
+
+  /// No description provided for @settings_storageUsage_cloud_libraries.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared site libraries'**
+  String get settings_storageUsage_cloud_libraries;
+
+  /// No description provided for @settings_storageUsage_cloud_scanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned {when}'**
+  String settings_storageUsage_cloud_scanned(String when);
+
+  /// No description provided for @settings_storageUsage_cloud_notScanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Not scanned yet'**
+  String get settings_storageUsage_cloud_notScanned;
+
+  /// No description provided for @settings_storageUsage_cloud_rescan.
+  ///
+  /// In en, this message translates to:
+  /// **'Rescan'**
+  String get settings_storageUsage_cloud_rescan;
 
   /// No description provided for @profilePhoto_sheet_title.
   ///
@@ -78245,6 +80882,12 @@ abstract class AppLocalizations {
   /// **'Newer database, kept when going back - {size}'**
   String backup_history_preDowngradeSubtitle(String size);
 
+  /// No description provided for @backup_history_cloudOnlySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'In cloud storage ({size})'**
+  String backup_history_cloudOnlySubtitle(String size);
+
   /// No description provided for @backup_history_manualSubtitle.
   ///
   /// In en, this message translates to:
@@ -78403,6 +81046,12 @@ abstract class AppLocalizations {
   /// **'Label'**
   String get transmitters_field_label;
 
+  /// No description provided for @transmitters_field_label_helper.
+  ///
+  /// In en, this message translates to:
+  /// **'Becomes the cylinder\'s name on the dive once this transmitter is matched'**
+  String get transmitters_field_label_helper;
+
   /// No description provided for @transmitters_field_serial.
   ///
   /// In en, this message translates to:
@@ -78433,11 +81082,23 @@ abstract class AppLocalizations {
   /// **'Cylinder from gear'**
   String get transmitters_field_gear;
 
+  /// No description provided for @transmitters_field_gear_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The cylinder this transmitter reports pressure for'**
+  String get transmitters_field_gear_subtitle;
+
   /// No description provided for @transmitters_field_transmitterGear.
   ///
   /// In en, this message translates to:
   /// **'Transmitter from gear'**
   String get transmitters_field_transmitterGear;
+
+  /// No description provided for @transmitters_field_transmitterGear_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery/service tracking, not matching'**
+  String get transmitters_field_transmitterGear_subtitle;
 
   /// No description provided for @transmitters_field_material.
   ///
@@ -78450,6 +81111,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'None'**
   String get transmitters_gear_none;
+
+  /// No description provided for @transmitters_hint_missingSize.
+  ///
+  /// In en, this message translates to:
+  /// **'This cylinder has no size or pressure on file, so size will stay empty on the dive'**
+  String get transmitters_hint_missingSize;
 
   /// No description provided for @transmitters_validation_key.
   ///
@@ -78594,6 +81261,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Transmitter {serial} is not assigned to a cylinder'**
   String dataQuality_msg_unknownTransmitter(String serial);
+
+  /// No description provided for @dataQuality_repairLabel_useAsBailout.
+  ///
+  /// In en, this message translates to:
+  /// **'Use as bailout'**
+  String get dataQuality_repairLabel_useAsBailout;
+
+  /// No description provided for @dataQuality_useAsBailout_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Make this tank the bailout?'**
+  String get dataQuality_useAsBailout_title;
+
+  /// No description provided for @dataQuality_useAsBailout_merge.
+  ///
+  /// In en, this message translates to:
+  /// **'Removes the duplicate Bailout cylinder (switches move to Tank {tankNumber})'**
+  String dataQuality_useAsBailout_merge(int tankNumber);
+
+  /// No description provided for @dataQuality_useAsBailout_register.
+  ///
+  /// In en, this message translates to:
+  /// **'Also register this transmitter as {role}'**
+  String dataQuality_useAsBailout_register(String role);
+
+  /// No description provided for @dataQuality_useAsBailout_mixesKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} other dive kept its gas mix. Check it.} other{{count} other dives kept their gas mix. Check them.}}'**
+  String dataQuality_useAsBailout_mixesKept(int count);
+
+  /// No description provided for @dataQuality_useAsBailout_registered.
+  ///
+  /// In en, this message translates to:
+  /// **'Transmitter registered as {role}. Undo changes this dive only.'**
+  String dataQuality_useAsBailout_registered(String role);
 
   /// No description provided for @dataQuality_repairLabel_assignTransmitter.
   ///
@@ -80997,6 +83700,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coordinates'**
   String get query_sites_coordinates;
+
+  /// No description provided for @query_sites_library.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get query_sites_library;
 
   /// Field label in the query builder
   ///

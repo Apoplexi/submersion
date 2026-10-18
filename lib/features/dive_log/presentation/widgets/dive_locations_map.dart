@@ -8,7 +8,7 @@ import 'package:submersion/features/gps_log/domain/track_colorization.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
-import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_corner_controls.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_interaction_options.dart';
 import 'package:submersion/features/maps/presentation/widgets/locked_map_scroll_passthrough.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
@@ -85,6 +85,14 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
       widget.controller ?? _fallbackController;
 
   bool _mapReady = false;
+
+  /// Whether nothing can move the camera after mount: no gestures, no
+  /// controller, and a caller-pinned center rather than a fit applied after
+  /// the first frame. The decorative header is the only such caller.
+  bool get _cameraNeverMoves =>
+      !widget.interactive &&
+      widget.controller == null &&
+      widget.initialCenter != null;
 
   /// The run list the camera is framed on, by identity.
   ///
@@ -245,11 +253,18 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
         // master-detail pane, and the default fade restarts each tile at
         // opacity 0 even when it is already in memory, which blinked
         // the header's map background on every selection.
+        //
+        // Only a camera that never moves may skip the fade. When a tile
+        // loads synchronously from the image cache, instantaneous display
+        // prunes at once against the camera of the layer's previous build,
+        // so after a camera fit, tap-to-focus or track refit it discards the
+        // tiles it just loaded and never asks for them again (issue #3285).
+        // The fade defers that prune until the layer has the new camera.
         submersionTileLayer(
           ref,
-          tileDisplay: interactive
-              ? const TileDisplay.fadeIn()
-              : const TileDisplay.instantaneous(),
+          tileDisplay: _cameraNeverMoves
+              ? const TileDisplay.instantaneous()
+              : const TileDisplay.fadeIn(),
         ),
         // Drawn before the drift line and markers so the surface track
         // sits underneath both.
@@ -288,12 +303,13 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
           TrackpadZoomMap(controller: _effectiveController, child: map)
         else
           LockedMapScrollPassthrough(child: map),
-        // Reset-to-north compass (only when the map accepts rotation gestures)
+        // Map style switcher and reset-to-north compass, only on an interactive
+        // map: the locked decorative header gets neither.
         if (interactive)
           Positioned(
             top: 16,
             right: 16,
-            child: MapCompassButton(controller: _effectiveController),
+            child: MapCornerControls(controller: _effectiveController),
           ),
       ],
     );

@@ -341,5 +341,71 @@ extension RungsFromV231 on AppDatabase {
       await _assertTrendGapCollapseColumn();
     }
     if (from < 281) await reportProgress();
+    // v283: dive_profile_series.activated_at (issue #3189). The column and
+    // its one-time backfill; re-asserted in beforeOpen.
+    if (from < 283) {
+      await _assertProfileSeriesActivatedAt();
+    }
+    if (from < 283) await reportProgress();
+    // v284: diver_settings.profile_color_* (issue #3012). Columns only, null
+    // meaning the default colour; re-asserted in beforeOpen. Renumbered from
+    // 282, which PR #3133 holds, after #3296 shipped 283.
+    if (from < 284) {
+      await _assertProfileMetricColorColumns();
+    }
+    if (from < 284) await reportProgress();
+    // v285: nav_tracks.source_metadata (issue #3047). Column only, no
+    // backfill; re-asserted in beforeOpen through _assertNavTracksSchema.
+    if (from < 285) {
+      await _assertNavTrackSourceMetadataColumn();
+    }
+    if (from < 285) await reportProgress();
+    // v286: diver_settings.equipment_default_statuses (issue #2628). Column
+    // only; re-asserted in beforeOpen.
+    if (from < 286) {
+      await _assertEquipmentDefaultStatusesColumn();
+    }
+    if (from < 286) await reportProgress();
+    // v287: dive_tanks.passport_id (issue #2650). Column only, no backfill:
+    // nothing recorded which tag an older tank came from. Re-asserted in
+    // beforeOpen; the index is in performance_indexes.dart. Renumbered from
+    // 285 and 286, which #3306 and #3319 shipped first.
+    if (from < 287) {
+      await _assertTankPassportIdColumn();
+    }
+    if (from < 287) await reportProgress();
+    // v288: the dive_courses junction and the certification-side course link
+    // (issue #2515). Schema re-asserted and links re-seeded in beforeOpen;
+    // the certification backfill runs here only.
+    if (from < 288) {
+      await _assertDiveCourseSchema();
+      await seedDiveCourseLinks(this);
+      await backfillCertificationCourseLinks(this);
+    }
+    if (from < 288) await reportProgress();
+    // v289: shared dive-site library tables and dive_sites.shared_library_id
+    // (issue #2567), plus the key, trust and backup columns added before it
+    // shipped. Idempotent; re-asserted in beforeOpen, which is how a database
+    // already past 289 gains the later columns. Renumbered from 288 after
+    // #2515 shipped 288.
+    if (from < 289) {
+      await _assertSharedLibrarySchema();
+    }
+    if (from < 289) await reportProgress();
+    // v290: dive_plan_segments.split_at_configured_rate (issue #3264).
+    // Column only, defaulting off; re-asserted in beforeOpen. Renumbered
+    // from 277, 282 then 286, as earlier rungs shipped or were claimed
+    // first.
+    if (from < 290) {
+      await _assertSegmentSplitAtRateColumn();
+    }
+    if (from < 290) await reportProgress();
+    // v291: shared_libraries.description (issue #3389). Column only, read
+    // from each library's info.json at the next sync; re-asserted in
+    // beforeOpen through _assertSharedLibrarySchema.
+    if (from < 291) {
+      await _assertSharedLibrarySchema();
+    }
+    if (from < 291) await reportProgress();
   }
 }

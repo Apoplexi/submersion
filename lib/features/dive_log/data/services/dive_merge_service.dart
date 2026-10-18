@@ -368,6 +368,7 @@ class DiveMergeService {
             computerId: s.computerId,
             sourceId: s.sourceId,
             isPrimary: s.isPrimary,
+            activatedAt: Value(s.activatedAt),
             samples: [
               for (final p in s.samples)
                 p.shiftedBy(result.segmentOffsetsSeconds[s.diveId] ?? 0),
@@ -429,6 +430,7 @@ class DiveMergeService {
               ? null
               : mergedSourceIdFor(d.diveId, d.sourceId),
           isPrimary: d.isPrimary,
+          activatedAt: d.activatedAt,
           samples: d.samples,
           now: now,
         );
@@ -689,6 +691,7 @@ class DiveMergeService {
         );
         batch.deleteWhere(_db.diveEquipment, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveDiveTypes, (t) => t.diveId.equals(mergedId));
+        batch.deleteWhere(_db.diveCourses, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveTags, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveBuddies, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.sightings, (t) => t.diveId.equals(mergedId));
@@ -825,6 +828,16 @@ class DiveMergeService {
           localUpdatedAt: now,
         );
       }
+      for (final r in snapshot.diveCourseRows) {
+        await _db
+            .into(_db.diveCourses)
+            .insert(r.toCompanion(false), mode: InsertMode.insertOrReplace);
+        await _sync.markRecordPending(
+          entityType: 'diveCourses',
+          recordId: r.id,
+          localUpdatedAt: now,
+        );
+      }
       for (final r in snapshot.tagRows) {
         await _db
             .into(_db.diveTags)
@@ -921,6 +934,7 @@ class _SeriesDraft {
     required this.sourceId,
     required this.isPrimary,
     required this.samples,
+    this.activatedAt = const Value.absent(),
     this.synthetic = false,
   });
 
@@ -928,6 +942,10 @@ class _SeriesDraft {
   final String? computerId;
   final String? sourceId;
   final bool isPrimary;
+
+  /// The original series' activation time, carried so the merged copies
+  /// rank as the originals did (issue #3189); absent for a synthetic fill.
+  final Value<int?> activatedAt;
   final bool synthetic;
   final List<ProfileSample> samples;
 }

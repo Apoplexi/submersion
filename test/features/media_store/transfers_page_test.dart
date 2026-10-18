@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/database/app_sql_functions.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/features/media/data/repositories/local_asset_cache_repository.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
@@ -44,7 +45,9 @@ void main() {
   late LocalAssetCacheRepository assetCache;
 
   setUp(() {
-    db = LocalCacheDatabase(NativeDatabase.memory());
+    db = LocalCacheDatabase(
+      NativeDatabase.memory(setup: registerAppSqlFunctions),
+    );
     repo = MediaTransferQueueRepository(database: db);
     assetCache = LocalAssetCacheRepository(database: db);
   });
@@ -55,12 +58,16 @@ void main() {
     List<MediaTransferQueueEntry> entries, {
     Map<String, String> labels = const {},
     bool suspended = false,
+    bool runtimeFails = false,
   }) => ProviderScope(
     overrides: [
       mediaTransferQueueRepositoryProvider.overrideWithValue(repo),
       localAssetCacheRepositoryProvider.overrideWithValue(assetCache),
       mediaTransferEntriesProvider.overrideWith((ref) => Stream.value(entries)),
-      mediaStoreRuntimeProvider.overrideWith((ref) async => null),
+      mediaStoreRuntimeProvider.overrideWith(
+        (ref) async =>
+            runtimeFails ? throw StateError('keychain unavailable') : null,
+      ),
       // The rows name their media; without this the lookup would reach for
       // an uninitialised database.
       mediaTransferLabelsProvider.overrideWith((ref) async => labels),
@@ -300,6 +307,36 @@ void main() {
     await tester.runAsync(() async {
       final remaining = await repo.watchEntries().first;
       expect(remaining, isEmpty);
+    });
+  });
+
+  testWidgets('bulk delete still works when the media store cannot be built', (
+    tester,
+  ) async {
+    // The diver clears stuck rows exactly when the store is broken.
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot, runtimeFails: true));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('enter_selection')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+    await pumpRoute(tester);
+    await tester.tap(find.byKey(const ValueKey('selection_delete')));
+    await pumpRoute(tester);
+    await tester.tap(find.text('Delete').hitTestable().last);
+    await tester.pump();
+    await tester.pump();
+
+    await tester.runAsync(() async {
+      expect(await repo.watchEntries().first, isEmpty);
     });
   });
 

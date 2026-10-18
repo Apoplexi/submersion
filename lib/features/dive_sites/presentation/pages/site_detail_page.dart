@@ -8,12 +8,13 @@ import 'package:submersion/features/connections/domain/entities/node_ref.dart';
 import 'package:submersion/features/connections/presentation/widgets/open_in_connections.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/site_detail_sections.dart';
-import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/data/visibility/shared_item_policy.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/core/router/pushed_route.dart';
+import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
 import 'package:submersion/features/bathymetry/domain/grid_sampling.dart';
@@ -21,11 +22,13 @@ import 'package:submersion/features/bathymetry/presentation/bathymetry_depth_ove
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/library_error_text.dart';
 import 'package:submersion/features/site_scape/presentation/site_feature_marker_layer.dart';
 import 'package:submersion/features/site_scape/presentation/site_feature_sheet.dart';
 import 'package:submersion/features/site_scape/presentation/site_features_section.dart';
 import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
 import 'package:submersion/features/site_scape/presentation/site_seascape_section.dart';
+import 'package:submersion/features/dive_log/presentation/navigation/open_dive_list.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -43,6 +46,7 @@ import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/maps/presentation/widgets/locked_map_scroll_passthrough.dart';
 import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_corner_controls.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/site_marine_life_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -53,13 +57,16 @@ import 'package:submersion/features/reef/presentation/widgets/reef_section.dart'
 import 'package:submersion/features/tides/presentation/widgets/tide_section.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
-import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 import 'package:submersion/shared/widgets/section_properties_menu.dart';
 import 'package:submersion/shared/widgets/shared_items/shared_by_banner.dart';
 import 'package:submersion/shared/widgets/shared_items/shared_item_dialogs.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/altitude_group_label.dart';
 import 'package:submersion/features/documents/presentation/widgets/documents_section.dart';
 import 'package:submersion/features/documents/domain/entities/document.dart';
+import 'package:submersion/core/services/shared_library/shared_library_models.dart';
+import 'package:submersion/features/shared_library/presentation/providers/shared_library_providers.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/library_picker_dialog.dart';
+import 'package:submersion/features/shared_library/presentation/widgets/site_edit_history_sheet.dart';
 
 class SiteDetailPage extends ConsumerStatefulWidget {
   final String siteId;
@@ -84,23 +91,22 @@ class _SiteDetailPageState extends ConsumerState<SiteDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Desktop redirect: if viewing detail page directly on desktop, redirect to master-detail.
-    // Skip in table mode -- table view has no master-detail split to redirect into.
-    // Also skip if we can pop OR if we came from dive detail, which means we arrived here
-    // from another page and want to be able to go back.
-    if (!widget.embedded &&
-        !_hasRedirected &&
-        !Navigator.of(context).canPop() &&
-        ResponsiveBreakpoints.isMasterDetail(context)) {
-      final viewMode = ref.read(siteListViewModeProvider);
-      if (viewMode != ListViewMode.table) {
-        _hasRedirected = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            context.go('/sites?selected=${widget.siteId}');
-          }
-        });
-      }
+    // Desktop redirect: a root visit (deep link, sidebar) moves into the
+    // master-detail split. A pushed page, opened from a dive's details
+    // say, stays put: the redirect's go() would erase the page under it
+    // and its back arrow (#3292).
+    if (!_hasRedirected &&
+        shouldRedirectToMasterDetail(
+          context,
+          embedded: widget.embedded,
+          viewMode: ref.read(siteListViewModeProvider),
+        )) {
+      _hasRedirected = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.go('/sites?selected=${widget.siteId}');
+        }
+      });
     }
 
     final siteAsync = ref.watch(siteProvider(widget.siteId));
@@ -257,11 +263,13 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               onPressed: () =>
                   _showFullscreenMap(context, ref, site, initialScape3d: true),
             ),
-          IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: context.l10n.diveSites_detail_editTooltip,
-            onPressed: () => context.push('/sites/$siteId/edit'),
-          ),
+          if (_canEditSite(ref, site))
+            IconButton(
+              icon: const Icon(Icons.edit),
+              tooltip: context.l10n.diveSites_detail_editTooltip,
+              onPressed: () => context.push('/sites/$siteId/edit'),
+            ),
+          ..._libraryButtons(context, ref, site),
           SiteDetailPropertiesMenu(
             controller: _displayOptionsMenu,
             child: PopupMenuButton<String>(
@@ -270,6 +278,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               itemBuilder: (context) => [
                 openInConnectionsMenuItem(context),
                 displayOptionsMenuItem(context, 'displayOptions'),
+                ..._libraryMenuItems(context, ref, site),
               ],
             ),
           ),
@@ -329,8 +338,15 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       SiteDetailSectionId.features: () => site.hasCoordinates
           ? (_) => SiteFeaturesSection(
               siteId: site.id,
-              onAddFeature: () =>
-                  _showFullscreenMap(context, ref, site, startPlacing: true),
+              // A library site this profile only reads offers no edits.
+              onAddFeature: _canEditSite(ref, site)
+                  ? () => _showFullscreenMap(
+                      context,
+                      ref,
+                      site,
+                      startPlacing: true,
+                    )
+                  : null,
             )
           : null,
       // A quarry or lake has no tides, and a nearby ocean station must not
@@ -346,6 +362,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       SiteDetailSectionId.marineLife: () =>
           (_) => SiteMarineLifeSection(
             siteId: site.id,
+            readOnly: !_canEditSite(ref, site),
             location: site.location,
             waterType: site.waterType,
           ),
@@ -411,6 +428,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     final canDestroy = canDestroySharedItemOnceKnown(
       ref.watch(validatedCurrentDiverIdProvider),
       ownerId: site.diverId,
+      isLibrarySite: site.isLibrarySite,
     );
     // A site this profile already removed offers Unhide (issue #2679).
     final hidden = watchHiddenHere(
@@ -466,33 +484,37 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               onPressed: () =>
                   _showFullscreenMap(context, ref, site, initialScape3d: true),
             ),
-          IconButton(
-            icon: const Icon(Icons.edit, size: 20),
-            tooltip: context.l10n.diveSites_detail_editTooltipShort,
-            onPressed: () {
-              final state = GoRouterState.of(context);
-              final currentPath = state.uri.path;
-              if (currentPath.startsWith('/dives')) {
-                // If we're on the /dives path, keep it and just add mode=edit and site parameter.
-                // The MasterDetailScaffold in DiveListPage will handle showing the site edit panel
-                // because we'll have both ?site=... and &mode=edit in the query params.
-                final params = Map<String, String>.from(
-                  state.uri.queryParameters,
-                );
-                params['mode'] = 'edit';
-                // We do NOT change 'selected' here, because 'selected' is used by DiveListPage's
-                // MasterDetailScaffold to identify the DIVE. If we change it to the siteId,
-                // the scaffold will try to find a dive with that siteId and fail.
-                params['site'] = widget.siteId;
-                context.push(
-                  Uri(path: currentPath, queryParameters: params).toString(),
-                );
-              } else {
-                // Default to /sites path for site-related navigation if not on /dives.
-                context.go('/sites?selected=${widget.siteId}&mode=edit');
-              }
-            },
-          ),
+          if (_canEditSite(ref, site))
+            IconButton(
+              icon: const Icon(Icons.edit, size: 20),
+              tooltip: context.l10n.diveSites_detail_editTooltipShort,
+              onPressed: () {
+                final state = GoRouterState.of(context);
+                final currentPath = state.uri.path;
+                if (currentPath.startsWith('/dives')) {
+                  // If we're on the /dives path, keep it and just add mode=edit and site parameter.
+                  // The MasterDetailScaffold in DiveListPage will handle showing the site edit panel
+                  // because we'll have both ?site=... and &mode=edit in the query params.
+                  final params = Map<String, String>.from(
+                    state.uri.queryParameters,
+                  );
+                  params['mode'] = 'edit';
+                  // We do NOT change 'selected' here, because 'selected' is used by DiveListPage's
+                  // MasterDetailScaffold to identify the DIVE. If we change it to the siteId,
+                  // the scaffold will try to find a dive with that siteId and fail.
+                  params['site'] = widget.siteId;
+                  // In place, not push: a pushed copy of the Dives list would
+                  // stay behind after save, with a back arrow of its own (#3292).
+                  context.goInPlace(
+                    Uri(path: currentPath, queryParameters: params).toString(),
+                  );
+                } else {
+                  // Default to /sites path for site-related navigation if not on /dives.
+                  context.go('/sites?selected=${widget.siteId}&mode=edit');
+                }
+              },
+            ),
+          ..._libraryButtons(context, ref, site),
           SiteDetailPropertiesMenu(
             controller: _displayOptionsMenu,
             child: PopupMenuButton<String>(
@@ -502,6 +524,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               itemBuilder: (context) => [
                 openInConnectionsMenuItem(context),
                 displayOptionsMenuItem(context, 'displayOptions'),
+                ..._libraryMenuItems(context, ref, site),
                 // Delete for the owner; another profile only removes the
                 // shared site from itself (issue #2594); neither while the
                 // profile is unknown (issue #2682).
@@ -543,6 +566,229 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     );
   }
 
+  /// Role and connection state of a shared site library site (issue #2567). A
+  /// personal site is editable by the usual rules.
+  ({bool isLibrary, bool connected, SharedLibraryRole role}) _libraryAccess(
+    WidgetRef ref,
+    DiveSite site, {
+    bool watch = true,
+  }) {
+    final id = site.sharedLibraryId;
+    if (id == null) {
+      // Keep the libraries stream live while the page is up, so the menu
+      // (built later, with a read) knows whether a library is connected.
+      if (watch) ref.watch(sharedLibrariesProvider);
+      return (isLibrary: false, connected: true, role: SharedLibraryRole.owner);
+    }
+    // A popup menu builds its items outside the build method, where only
+    // a read sees the current value.
+    final connected =
+        (watch
+                ? ref.watch(libraryConnectedHereProvider(id))
+                : ref.read(libraryConnectedHereProvider(id)))
+            .valueOrNull ??
+        false;
+    final role =
+        (watch
+                ? ref.watch(libraryRoleProvider(id))
+                : ref.read(libraryRoleProvider(id)))
+            .valueOrNull ??
+        SharedLibraryRole.reader;
+    return (isLibrary: true, connected: connected, role: role);
+  }
+
+  bool _canEditSite(WidgetRef ref, DiveSite site) {
+    final access = _libraryAccess(ref, site);
+    return !access.isLibrary ||
+        (access.connected && canEditLibrarySite(access.role));
+  }
+
+  /// Suggest changes for a reader, Connect on this device for a library
+  /// the device has not connected.
+  List<Widget> _libraryButtons(
+    BuildContext context,
+    WidgetRef ref,
+    DiveSite site,
+  ) {
+    final access = _libraryAccess(ref, site);
+    if (!access.isLibrary) return const [];
+    final l10n = context.l10n;
+    if (!access.connected) {
+      return [
+        TextButton.icon(
+          icon: const Icon(Icons.link, size: 18),
+          label: Text(l10n.sharedLibrary_site_connectHere),
+          onPressed: () => _connectHere(context, ref, site),
+        ),
+      ];
+    }
+    if (canSuggestOnLibrarySite(access.role)) {
+      return [
+        TextButton.icon(
+          icon: const Icon(Icons.rate_review_outlined, size: 18),
+          label: Text(l10n.sharedLibrary_suggest_title),
+          onPressed: () => context.push('/sites/${site.id}/edit?suggest=1'),
+        ),
+      ];
+    }
+    return const [];
+  }
+
+  List<PopupMenuEntry<String>> _libraryMenuItems(
+    BuildContext context,
+    WidgetRef ref,
+    DiveSite site,
+  ) {
+    final l10n = context.l10n;
+    final access = _libraryAccess(ref, site, watch: false);
+    PopupMenuItem<String> item(
+      String value,
+      IconData icon,
+      String title, {
+      Color? color,
+    }) => PopupMenuItem(
+      value: value,
+      child: ListTile(
+        leading: Icon(icon, color: color),
+        title: Text(
+          title,
+          style: color == null ? null : TextStyle(color: color),
+        ),
+        contentPadding: EdgeInsets.zero,
+      ),
+    );
+    if (!access.isLibrary) {
+      final libraries = ref.read(sharedLibrariesProvider).valueOrNull;
+      if (libraries == null || libraries.isEmpty) return const [];
+      // Pushing takes the site from every other profile: only the profile
+      // that may destroy it may push it.
+      final mayPush = canDestroySharedItemOnceKnown(
+        ref.read(validatedCurrentDiverIdProvider),
+        ownerId: site.diverId,
+      );
+      if (mayPush != true) return const [];
+      return [
+        item(
+          'addToLibrary',
+          Icons.groups_outlined,
+          l10n.sharedLibrary_site_addToLibrary,
+        ),
+      ];
+    }
+    if (!access.connected) return const [];
+    return [
+      item('libraryHistory', Icons.history, l10n.sharedLibrary_site_history),
+      if (canDeleteLibrarySite(access.role))
+        item(
+          'libraryDelete',
+          Icons.delete,
+          l10n.diveSites_detail_deleteMenu_label,
+          color: Colors.red,
+        ),
+    ];
+  }
+
+  Future<void> _connectHere(
+    BuildContext context,
+    WidgetRef ref,
+    DiveSite site,
+  ) async {
+    final membership = await ref.read(
+      currentMembershipProvider(site.sharedLibraryId!).future,
+    );
+    final prefix = membership?.prefixHint ?? '';
+    if (!context.mounted) return;
+    context.push(
+      '/settings/shared-libraries/connect?prefix=${Uri.encodeQueryComponent(prefix)}',
+    );
+  }
+
+  Future<void> _deleteFromLibrary(
+    BuildContext context,
+    WidgetRef ref,
+    DiveSite site,
+  ) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.sharedLibrary_site_deleteFromLibrary_title),
+        content: Text(l10n.sharedLibrary_site_deleteFromLibrary_body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(MaterialLocalizations.of(ctx).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.diveSites_detail_deleteMenu_label),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+    if (diverId == null) return;
+    try {
+      await ref
+          .read(sharedSitePublisherProvider)
+          .deleteFromLibrary(siteId: site.id, diverId: diverId);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(libraryErrorText(context.l10n, e))),
+        );
+      }
+      return;
+    }
+    ref.invalidate(siteProvider(site.id));
+    ref.invalidate(sitesProvider);
+    ref.invalidate(sitesWithCountsProvider);
+    if (!context.mounted) return;
+    if (widget.onClose != null) {
+      widget.onClose!();
+    } else if (context.canPop()) {
+      context.pop();
+    }
+  }
+
+  Future<void> _addToLibrary(
+    BuildContext context,
+    WidgetRef ref,
+    DiveSite site,
+  ) async {
+    final library = await pickLibraryToAddTo(
+      context,
+      ref,
+      siteCount: 1,
+      siteName: site.name,
+    );
+    if (library == null) return;
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+    if (diverId == null) return;
+    try {
+      await ref
+          .read(sharedSitePublisherProvider)
+          .push(siteId: site.id, libraryId: library.id, diverId: diverId);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(libraryErrorText(context.l10n, e))),
+        );
+      }
+      return;
+    }
+    ref.invalidate(siteProvider(site.id));
+    ref.invalidate(sitesProvider);
+    ref.invalidate(sitesWithCountsProvider);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.sharedLibrary_site_added(library.name)),
+      ),
+    );
+  }
+
   Future<void> _handleMenuAction(
     BuildContext context,
     WidgetRef ref,
@@ -559,6 +805,18 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     }
     if (action == 'remove') {
       await _removeFromProfile(context, ref, site);
+      return;
+    }
+    if (action == 'libraryHistory') {
+      await showSiteEditHistorySheet(context, site: site);
+      return;
+    }
+    if (action == 'libraryDelete') {
+      await _deleteFromLibrary(context, ref, site);
+      return;
+    }
+    if (action == 'addToLibrary') {
+      await _addToLibrary(context, ref, site);
       return;
     }
     if (action == 'unhide') {
@@ -782,6 +1040,8 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                 ),
               ),
             ),
+            // No map style switcher on the locked preview: the fullscreen map
+            // carries one.
           ],
         ),
       ),
@@ -1322,10 +1582,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       child: TextButton.icon(
         key: const ValueKey('siteViewAllDivesButton'),
         onPressed: () {
-          ref.read(diveFilterProvider.notifier).state = DiveFilterState(
-            siteId: site.id,
-          );
-          context.go('/dives');
+          openDiveList(context, ref, DiveFilterState(siteId: site.id));
         },
         icon: const Icon(Icons.list_alt, size: 18),
         label: Text(
@@ -2025,9 +2282,11 @@ class _FullscreenSiteScapePageState
       initialDepthMeters: sampled,
     );
     if (result is! SiteFeatureSheetSave) return;
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
     await ref
         .read(siteFeatureRepositoryProvider)
         .addFeature(
+          actingDiverId: diverId,
           siteId: site.id,
           typeName: result.typeName,
           latitude: latLng.latitude,
@@ -2119,11 +2378,15 @@ class _FullscreenSiteScapePageState
                 ],
               ),
             ),
+            // Map style switcher. No compass: this map does not rotate.
+            const Positioned(top: 8, right: 8, child: MapCornerControls()),
+            // Stops short of the right edge so the style switcher stays
+            // reachable while placing a feature.
             if (_placing)
               Positioned(
                 top: 8,
                 left: 56,
-                right: 8,
+                right: 60,
                 child: Material(
                   key: const ValueKey('siteFeaturePlaceBanner'),
                   color: colorScheme.secondaryContainer,

@@ -15,6 +15,7 @@ import 'package:submersion/features/insights/presentation/providers/insights_gas
 import 'package:submersion/features/insights/data/services/deco_classification_service.dart';
 import 'package:submersion/features/insights/domain/entities/species_insights.dart';
 import 'package:submersion/features/insights/domain/suit_thickness_stats.dart';
+import 'package:submersion/features/insights/domain/tank_configuration/tank_configuration.dart';
 import 'package:submersion/features/insights/domain/water_temp_band_metrics.dart';
 import 'package:submersion/features/insights/domain/water_temp_bands.dart';
 import 'package:submersion/features/insights/presentation/providers/insights_filter_provider.dart';
@@ -158,6 +159,20 @@ final gasMixDistributionProvider = FutureProvider<List<DistributionSegment>>((
   );
 });
 
+/// Dives by tank configuration and extras for the Gas page (issue #3421).
+final tankConfigurationStatsProvider = FutureProvider<TankConfigurationStats>((
+  ref,
+) async {
+  _keepAliveWithExpiry(ref);
+  final repository = ref.watch(insightsRepositoryProvider);
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  final filter = ref.watch(insightsFilterProvider);
+  return repository.getTankConfigurationStats(
+    diverId: currentDiverId,
+    filter: filter,
+  );
+});
+
 /// Best and highest consumption for the lane the gas page shows.
 final sacRecordsProvider =
     FutureProvider<({RankingItem? best, RankingItem? worst})>((ref) async {
@@ -230,6 +245,15 @@ final depthProgressionTrendProvider = FutureProvider<List<TrendDataPoint>>((
   final currentDiverId = ref.watch(currentDiverIdProvider);
   final filter = ref.watch(insightsFilterProvider);
   return repository.getDepthPerDive(diverId: currentDiverId, filter: filter);
+});
+
+/// Runtime per dive (issue #3059), for the Progression chart and Dive focus.
+final runtimeTrendProvider = FutureProvider<List<TrendDataPoint>>((ref) async {
+  _keepAliveWithExpiry(ref);
+  final repository = ref.watch(insightsRepositoryProvider);
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  final filter = ref.watch(insightsFilterProvider);
+  return repository.getRuntimePerDive(diverId: currentDiverId, filter: filter);
 });
 
 final bottomTimeTrendProvider = FutureProvider<List<TrendDataPoint>>((

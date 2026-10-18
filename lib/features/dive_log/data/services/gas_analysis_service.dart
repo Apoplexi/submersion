@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/utils/gas_compressibility.dart';
 import 'package:submersion/features/dive_log/domain/entities/cylinder_sac.dart';
@@ -8,6 +7,8 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/services/multi_cylinder_consumption.dart';
+import 'package:submersion/features/dive_log/domain/services/tank_pressure_lookup.dart';
+import 'package:submersion/features/dive_log/domain/services/tank_usage_range.dart';
 
 /// Service for calculating SAC (Surface Air Consumption) metrics
 /// per segment and per cylinder.
@@ -47,7 +48,7 @@ class GasAnalysisService {
   }) {
     if (profile.isEmpty || gasSwitches.isEmpty) return null;
 
-    final resolvedPressures = _resolveTankPressureSeries(tanks, tankPressures);
+    final resolvedPressures = resolveTankPressureSeries(tanks, tankPressures);
     final segments = <SacSegment>[];
     final diveEndTimestamp = profile.last.timestamp;
 
@@ -87,7 +88,7 @@ class GasAnalysisService {
       // Calculate SAC for this segment
       // Window to prorate a pressure-series-less tank across: its own
       // usage range when the gas switches identify one, else the dive.
-      final usageRange = _getTankUsageRange(
+      final usageRange = tankUsageRange(
         tank: tank,
         gasSwitches: sortedSwitches,
         diveStart: profile.first.timestamp,
@@ -147,7 +148,7 @@ class GasAnalysisService {
   }) {
     if (profile.length < 10) return null;
 
-    final resolvedPressures = _resolveTankPressureSeries(tanks, tankPressures);
+    final resolvedPressures = resolveTankPressureSeries(tanks, tankPressures);
 
     // Find max depth
     final maxDepth = profile.map((p) => p.depth).reduce(math.max);
@@ -203,7 +204,12 @@ class GasAnalysisService {
       if (segmentProfile.isEmpty) continue;
 
       // Find active tank for this segment
-      final tank = _getActiveTankAtTimestamp(tanks, gasSwitches, seg.start);
+      final tank = activeTankAt(
+        tanks: tanks,
+        gasSwitches: gasSwitches,
+        timestamp: seg.start,
+        diveStart: profile.first.timestamp,
+      );
       if (tank == null) continue;
 
       // Calculate depth statistics
@@ -216,7 +222,7 @@ class GasAnalysisService {
       // Same proration window as the gas-switch path: a tank that was only
       // breathed for part of the dive must not have its drop spread across
       // the whole of it.
-      final usageRange = _getTankUsageRange(
+      final usageRange = tankUsageRange(
         tank: tank,
         gasSwitches: gasSwitches,
         diveStart: profile.first.timestamp,
@@ -275,15 +281,21 @@ class GasAnalysisService {
     final results = <CylinderSac>[];
 
     // Resolve each tank's time-series pressure, tolerating series that were
-    // re-keyed under a stale tank id (see [_resolveTankPressureSeries]).
-    final resolvedPressures = _resolveTankPressureSeries(
+    // re-keyed under a stale tank id (see [resolveTankPressureSeries]).
+    final resolvedPressures = resolveTankPressureSeries(
       dive.tanks,
       tankPressures,
     );
 
     final diveEnd =
         dive.effectiveRuntime?.inSeconds ?? profile.lastOrNull?.timestamp ?? 0;
-    final hasGasSwitches = gasSwitches != null && gasSwitches.isNotEmpty;
+    // Only a switch that says when a cylinder was breathed overrides a
+    // recorded duration: not a stale id (#110), nor one after the dive.
+    final hasGasSwitches = knownGasSwitches(
+      dive.tanks,
+      gasSwitches,
+      before: diveEnd,
+    ).isNotEmpty;
 
     for (final tank in dive.tanks) {
       // Its own size, else its matched partner's (issue #3109).
@@ -300,7 +312,7 @@ class GasAnalysisService {
       // long but not when, so its depth window is the whole dive.
       final usageRange = hasRecordedUsage
           ? (start: 0, end: diveEnd > 0 ? diveEnd : recordedSeconds)
-          : _getTankUsageRange(
+          : tankUsageRange(
               tank: tank,
               gasSwitches: gasSwitches,
               diveStart: 0,
@@ -349,7 +361,11 @@ class GasAnalysisService {
           gasMix: tank.gasMix,
           breathingSeconds: usageSeconds,
         );
-      } else if (tank.startPressure != null &&
+      }
+      // A series that shows no drop over the window (a flat or lost
+      // transmitter) falls back to the logged pressures (issue #3373).
+      if (sacRate == null &&
+          tank.startPressure != null &&
           tank.endPressure != null &&
           (avgDepthDuringUse ?? dive.avgDepth) != null) {
         // Basic calculation from start/end pressures with Z-factor correction.
@@ -410,71 +426,6 @@ class GasAnalysisService {
   // ─────────────────────────────────────────────────────────────────────────
   // Private Helper Methods
   // ─────────────────────────────────────────────────────────────────────────
-
-  /// Map each tank to its time-series pressure, tolerating a re-keyed series.
-  ///
-  /// A dive's transmitter pressure is stored in `tank_pressure_series` keyed
-  /// by tank id. A reparse, re-import, or multi-computer consolidation can
-  /// regenerate the dive's tanks with fresh UUIDs while the pressure rows keep
-  /// the old tank id (issue #276). The overall SAC curve already tolerates this
-  /// (`combineMultiTankPressures`); this does the same for per-cylinder SAC so
-  /// it does not silently go blank on those dives (issue #510).
-  ///
-  /// Exact id matches win. Any remaining series whose key matches no current
-  /// tank ("orphaned") is adopted by a still-unmatched tank so the
-  /// single-transmitter case (one tank, one orphaned series) is always
-  /// resolved and multi-tank is a stable best effort.
-  ///
-  /// Both sides are sorted with a full tie-breaker so the pairing is
-  /// deterministic regardless of map insertion order or tanks sharing the same
-  /// [DiveTank.order] (the default is 0): orphaned series by earliest sample
-  /// then key; unmatched tanks by order then id. This mirrors the v102 data
-  /// migration exactly, so the runtime result and the healed data agree.
-  static Map<String, List<TankPressurePoint>> _resolveTankPressureSeries(
-    List<DiveTank> tanks,
-    Map<String, List<TankPressurePoint>>? tankPressures,
-  ) {
-    final resolved = <String, List<TankPressurePoint>>{};
-    if (tankPressures == null || tankPressures.isEmpty) return resolved;
-
-    final tankIds = {for (final t in tanks) t.id};
-
-    for (final tank in tanks) {
-      final series = tankPressures[tank.id];
-      if (series != null) resolved[tank.id] = series;
-    }
-
-    final orphanEntries =
-        [
-          for (final entry in tankPressures.entries)
-            if (!tankIds.contains(entry.key)) entry,
-        ]..sort((a, b) {
-          final aFirst = a.value.isEmpty ? 0 : a.value.first.timestamp;
-          final bFirst = b.value.isEmpty ? 0 : b.value.first.timestamp;
-          final byTime = aFirst.compareTo(bFirst);
-          return byTime != 0 ? byTime : a.key.compareTo(b.key);
-        });
-    if (orphanEntries.isEmpty) return resolved;
-
-    final unmatchedTanks =
-        [
-          for (final tank in tanks)
-            if (!resolved.containsKey(tank.id)) tank,
-        ]..sort((a, b) {
-          final byOrder = a.order.compareTo(b.order);
-          return byOrder != 0 ? byOrder : a.id.compareTo(b.id);
-        });
-
-    for (
-      var i = 0;
-      i < unmatchedTanks.length && i < orphanEntries.length;
-      i++
-    ) {
-      resolved[unmatchedTanks[i].id] = orphanEntries[i].value;
-    }
-
-    return resolved;
-  }
 
   /// Compute SAC rate under [model], using its gas volumes.
   ///
@@ -607,102 +558,6 @@ class GasAnalysisService {
     return merged;
   }
 
-  /// Get the active tank at a given timestamp
-  DiveTank? _getActiveTankAtTimestamp(
-    List<DiveTank> tanks,
-    List<GasSwitchWithTank>? gasSwitches,
-    int timestamp,
-  ) {
-    if (tanks.isEmpty) return null;
-
-    if (gasSwitches == null || gasSwitches.isEmpty) {
-      // No gas switches - use first tank (or back gas)
-      return tanks.firstWhere(
-        (t) => t.role == TankRole.backGas,
-        orElse: () => tanks.first,
-      );
-    }
-
-    // Find the last switch before this timestamp
-    final sortedSwitches = List<GasSwitchWithTank>.from(gasSwitches)
-      ..sort((a, b) => a.gasSwitch.timestamp.compareTo(b.gasSwitch.timestamp));
-
-    GasSwitchWithTank? activeSwitch;
-    for (final sw in sortedSwitches) {
-      if (sw.gasSwitch.timestamp <= timestamp) {
-        activeSwitch = sw;
-      } else {
-        break;
-      }
-    }
-
-    if (activeSwitch == null) {
-      // Before first switch - use first tank
-      return tanks.firstWhere(
-        (t) => t.role == TankRole.backGas,
-        orElse: () => tanks.first,
-      );
-    }
-
-    return tanks.firstWhere(
-      (t) => t.id == activeSwitch!.gasSwitch.tankId,
-      orElse: () => tanks.first,
-    );
-  }
-
-  /// Get the time range when a tank was in use
-  ({int start, int end})? _getTankUsageRange({
-    required DiveTank tank,
-    required List<GasSwitchWithTank>? gasSwitches,
-    required int diveStart,
-    required int diveEnd,
-    required List<DiveTank> tanks,
-  }) {
-    if (diveEnd <= diveStart) return null;
-
-    if (gasSwitches == null || gasSwitches.isEmpty) {
-      // No gas switches - assume single tank used entire dive
-      // For multi-tank without switches, use the back gas
-      if (tanks.length > 1 && tank.role != TankRole.backGas) {
-        return null; // Can't determine usage without gas switches
-      }
-      return (start: diveStart, end: diveEnd);
-    }
-
-    final sortedSwitches = List<GasSwitchWithTank>.from(gasSwitches)
-      ..sort((a, b) => a.gasSwitch.timestamp.compareTo(b.gasSwitch.timestamp));
-
-    // Find all time ranges where this tank was active
-    int? rangeStart;
-    int totalEnd = diveEnd;
-
-    // Check if this tank is the initial tank (before first switch)
-    final firstSwitch = sortedSwitches.first;
-    if (firstSwitch.gasSwitch.tankId == tank.id) {
-      rangeStart = diveStart;
-    }
-
-    // Find switches to and from this tank
-    for (int i = 0; i < sortedSwitches.length; i++) {
-      final sw = sortedSwitches[i];
-      if (sw.gasSwitch.tankId == tank.id) {
-        // Switched TO this tank
-        rangeStart ??= sw.gasSwitch.timestamp;
-      } else if (rangeStart != null) {
-        // Switched AWAY from this tank
-        totalEnd = sw.gasSwitch.timestamp;
-        break;
-      }
-    }
-
-    // If we found a start but no end, tank was used until dive end
-    if (rangeStart != null) {
-      return (start: rangeStart, end: totalEnd);
-    }
-
-    return null;
-  }
-
   /// Calculate SAC for a segment from profile data
   double? _calculateSegmentSac({
     required List<DiveProfilePoint> profile,
@@ -731,8 +586,8 @@ class GasAnalysisService {
 
     // Try time-series pressure data first
     if (tankPressures != null && tankPressures.length >= 2) {
-      startPressure = _interpolatePressureAtTime(tankPressures, startTime);
-      endPressure = _interpolatePressureAtTime(tankPressures, endTime);
+      startPressure = pressureAtTime(tankPressures, startTime);
+      endPressure = pressureAtTime(tankPressures, endTime);
       if (startPressure != null && endPressure != null) {
         pressureUsed = startPressure - endPressure;
       }
@@ -800,8 +655,8 @@ class GasAnalysisService {
   }) {
     if (pressurePoints.length < 2) return null;
 
-    final startPressure = _interpolatePressureAtTime(pressurePoints, startTime);
-    final endPressure = _interpolatePressureAtTime(pressurePoints, endTime);
+    final startPressure = pressureAtTime(pressurePoints, startTime);
+    final endPressure = pressureAtTime(pressurePoints, endTime);
 
     if (startPressure == null || endPressure == null) return null;
 
@@ -830,46 +685,5 @@ class GasAnalysisService {
 
     // Fallback: simple pressure-based (no volume correction possible)
     return pressureUsed / durationMin / ambientPressureBar;
-  }
-
-  /// Interpolate pressure at a specific timestamp from time-series data
-  double? _interpolatePressureAtTime(
-    List<TankPressurePoint> pressurePoints,
-    int timestamp,
-  ) {
-    if (pressurePoints.isEmpty) return null;
-
-    // Sort by timestamp
-    final sorted = List<TankPressurePoint>.from(pressurePoints)
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    // Exact match
-    final exact = sorted.where((p) => p.timestamp == timestamp).firstOrNull;
-    if (exact != null) return exact.pressure;
-
-    // Find surrounding points
-    TankPressurePoint? before;
-    TankPressurePoint? after;
-
-    for (final point in sorted) {
-      if (point.timestamp <= timestamp) {
-        before = point;
-      } else {
-        after = point;
-        break;
-      }
-    }
-
-    // Edge cases
-    if (before == null && after != null) return after.pressure;
-    if (before != null && after == null) return before.pressure;
-    if (before == null) return null;
-
-    // Linear interpolation
-    final timeDiff = after!.timestamp - before.timestamp;
-    if (timeDiff == 0) return before.pressure;
-
-    final ratio = (timestamp - before.timestamp) / timeDiff;
-    return before.pressure + (after.pressure - before.pressure) * ratio;
   }
 }

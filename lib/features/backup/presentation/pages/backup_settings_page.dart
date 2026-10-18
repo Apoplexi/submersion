@@ -27,6 +27,7 @@ import 'package:submersion/features/settings/presentation/providers/sync_provide
 import 'package:submersion/features/settings/presentation/widgets/encryption_passphrase_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/tile_subtitle_action.dart';
+import 'package:submersion/shared/widgets/label_with_control.dart';
 import 'package:path/path.dart' as p;
 
 class BackupSettingsPage extends ConsumerWidget {
@@ -451,7 +452,8 @@ class BackupSettingsPage extends ConsumerWidget {
       if (record.pinned) {
         await service.unpinBackup(record.id);
       } else {
-        await service.pinBackup(record.id);
+        // Adopts a cloud backup the history had no record of.
+        await service.pinRecord(record);
       }
       ref.invalidate(backupHistoryProvider);
     } catch (e, stackTrace) {
@@ -499,19 +501,34 @@ class BackupSettingsPage extends ConsumerWidget {
           }
         }
       case 'delete':
-        final confirmed = await _showDeleteConfirmation(context);
+        // A cloud-only row may be another device's only copy (issue #3214).
+        final mayBeShared = await ref
+            .read(backupServiceProvider)
+            .mayBeAnotherDevicesCopy(record);
+        if (!context.mounted) return;
+        final confirmed = await _showDeleteConfirmation(
+          context,
+          mayBeAnotherDevicesCopy: mayBeShared,
+        );
         if (confirmed) {
           ref.read(backupOperationProvider.notifier).deleteBackup(record);
         }
     }
   }
 
-  Future<bool> _showDeleteConfirmation(BuildContext context) async {
+  Future<bool> _showDeleteConfirmation(
+    BuildContext context, {
+    bool mayBeAnotherDevicesCopy = false,
+  }) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.backup_delete_dialog_title),
-        content: Text(context.l10n.backup_delete_dialog_content),
+        content: Text(
+          mayBeAnotherDevicesCopy
+              ? context.l10n.backup_delete_dialog_content_otherDevice
+              : context.l10n.backup_delete_dialog_content,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -568,42 +585,48 @@ class BackupSettingsPage extends ConsumerWidget {
         // Frequency
         if (settings.enabled)
           ListTile(
-            title: Text(context.l10n.backup_schedule_frequency),
-            trailing: DropdownButton<BackupFrequency>(
-              value: settings.frequency,
-              underline: const SizedBox(),
-              onChanged: (value) {
-                if (value != null) {
-                  ref.read(backupSettingsProvider.notifier).setFrequency(value);
-                }
-              },
-              items: BackupFrequency.values.map((f) {
-                return DropdownMenuItem(
-                  value: f,
-                  child: Text(_frequencyLabel(context, f)),
-                );
-              }).toList(),
+            title: LabelWithControl(
+              label: Text(context.l10n.backup_schedule_frequency),
+              control: DropdownButton<BackupFrequency>(
+                value: settings.frequency,
+                underline: const SizedBox(),
+                onChanged: (value) {
+                  if (value != null) {
+                    ref
+                        .read(backupSettingsProvider.notifier)
+                        .setFrequency(value);
+                  }
+                },
+                items: BackupFrequency.values.map((f) {
+                  return DropdownMenuItem(
+                    value: f,
+                    child: Text(_frequencyLabel(context, f)),
+                  );
+                }).toList(),
+              ),
             ),
           ),
         // Retention
         if (settings.enabled)
           ListTile(
-            title: Text(context.l10n.backup_schedule_retention),
-            subtitle: _buildRetentionSubtitle(context, ref),
-            trailing: DropdownButton<int>(
-              value: settings.retentionCount,
-              underline: const SizedBox(),
-              onChanged: (value) {
-                if (value != null) {
-                  ref
-                      .read(backupSettingsProvider.notifier)
-                      .setRetentionCount(value);
-                }
-              },
-              items: [5, 10, 15, 20, 30].map((count) {
-                return DropdownMenuItem(value: count, child: Text('$count'));
-              }).toList(),
+            title: LabelWithControl(
+              label: Text(context.l10n.backup_schedule_retention),
+              control: DropdownButton<int>(
+                value: settings.retentionCount,
+                underline: const SizedBox(),
+                onChanged: (value) {
+                  if (value != null) {
+                    ref
+                        .read(backupSettingsProvider.notifier)
+                        .setRetentionCount(value);
+                  }
+                },
+                items: [5, 10, 15, 20, 30].map((count) {
+                  return DropdownMenuItem(value: count, child: Text('$count'));
+                }).toList(),
+              ),
             ),
+            subtitle: _buildRetentionSubtitle(context, ref),
           ),
         // Backup location: the destination row sits directly above the
         // Cloud backup switch it is mutually exclusive with.
