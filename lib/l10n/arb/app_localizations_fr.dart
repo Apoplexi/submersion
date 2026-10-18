@@ -21123,6 +21123,33 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sharedLibrary_members_removeRole => 'Retirer le rôle';
 
   @override
+  String get sharedLibrary_members_remove => 'Retirer de la bibliothèque';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return 'Retirer $name ?';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return '$name ne pourra plus modifier de sites ni suggérer de changements. Les sites et modifications déjà apportés restent dans la bibliothèque.\n\nLa bibliothèque reste lisible pour cette personne jusqu\'à ce que vous changiez ses clés de stockage, et sa phrase secrète si elle est chiffrée.';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => 'Retirer';
+
+  @override
+  String get sharedLibrary_members_removedHeader => 'Retirés';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return 'Retiré le $date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => 'Réadmettre';
+
+  @override
   String get sharedLibrary_owner_onlyOne =>
       'Un seul propriétaire. S\'il perd l\'accès, seul le code de récupération peut le rétablir.';
 
@@ -21435,6 +21462,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       'Vos identifiants permettent uniquement la lecture. Vous pouvez suggérer des modifications, un référent les appliquera.';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      'Un référent vous a retiré de cette bibliothèque. Ses sites restent sur cet appareil, mais vous ne pouvez plus les modifier. En quittant la bibliothèque, vous gardez des copies personnelles des sites où vous avez plongé.';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {

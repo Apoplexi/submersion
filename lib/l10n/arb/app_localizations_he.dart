@@ -20591,6 +20591,33 @@ class AppLocalizationsHe extends AppLocalizations {
   String get sharedLibrary_members_removeRole => 'הסרת תפקיד';
 
   @override
+  String get sharedLibrary_members_remove => 'הסרה מהספרייה';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return 'להסיר את $name?';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return '$name לא יוכל עוד לערוך אתרים או להציע שינויים. אתרים ועריכות שכבר תרם נשארים בספרייה.\n\nעדיין אפשר יהיה לקרוא את הספרייה עד שתחליף את מפתחות האחסון שלה, ואת משפט הסיסמה אם היא מוצפנת.';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => 'הסרה';
+
+  @override
+  String get sharedLibrary_members_removedHeader => 'הוסרו';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return 'הוסר ב-$date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => 'החזרה';
+
+  @override
   String get sharedLibrary_owner_onlyOne =>
       'יש רק בעלים אחד. אם הגישה תאבד, רק קוד השחזור יוכל להחזיר אותה.';
 
@@ -20891,6 +20918,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       'ההרשאות שלך מאפשרות קריאה בלבד. אפשר להציע שינויים ואחראי יחיל אותם.';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      'אחראי הסיר אותך מהספרייה הזו. האתרים שלה נשארים במכשיר הזה, אבל אי אפשר עוד לשנות אותם. עזיבת הספרייה שומרת עותקים אישיים של האתרים שצללת בהם.';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {

@@ -21062,6 +21062,33 @@ class AppLocalizationsIt extends AppLocalizations {
   String get sharedLibrary_members_removeRole => 'Rimuovi ruolo';
 
   @override
+  String get sharedLibrary_members_remove => 'Rimuovi dalla libreria';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return 'Rimuovere $name?';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return '$name non potrà più modificare siti né suggerire modifiche. I siti e le modifiche già apportati restano nella libreria.\n\nPotrà ancora leggere la libreria finché non cambi le sue chiavi di archiviazione, e la sua passphrase se è cifrata.';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => 'Rimuovi';
+
+  @override
+  String get sharedLibrary_members_removedHeader => 'Rimossi';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return 'Rimosso il $date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => 'Riammetti';
+
+  @override
   String get sharedLibrary_owner_onlyOne =>
       'C\'è un solo proprietario. Se perde l\'accesso, solo il codice di recupero può ripristinarlo.';
 
@@ -21370,6 +21397,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       'Le tue credenziali consentono solo la lettura. Puoi suggerire modifiche; un referente le applicherà.';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      'Un referente ti ha rimosso da questa libreria. I suoi siti restano su questo dispositivo, ma non puoi più modificarli. Lasciando la libreria conservi copie personali dei siti in cui hai fatto immersioni.';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {

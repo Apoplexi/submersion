@@ -21064,6 +21064,33 @@ class AppLocalizationsPt extends AppLocalizations {
   String get sharedLibrary_members_removeRole => 'Remover função';
 
   @override
+  String get sharedLibrary_members_remove => 'Remover da biblioteca';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return 'Remover $name?';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return '$name deixa de poder editar locais ou sugerir alterações. Os locais e alterações que já contribuiu ficam na biblioteca.\n\nAinda poderá ler a biblioteca até mudar as chaves de armazenamento, e a frase-passe se estiver cifrada.';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => 'Remover';
+
+  @override
+  String get sharedLibrary_members_removedHeader => 'Removidos';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return 'Removido em $date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => 'Readmitir';
+
+  @override
   String get sharedLibrary_owner_onlyOne =>
       'Só há um proprietário. Se perder o acesso, só o código de recuperação o pode repor.';
 
@@ -21373,6 +21400,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       'As suas credenciais permitem apenas leitura. Pode sugerir alterações; um responsável aplica-as.';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      'Um responsável removeu-o desta biblioteca. Os locais ficam neste dispositivo, mas já não os pode alterar. Ao sair da biblioteca, fica com cópias pessoais dos locais onde mergulhou.';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {

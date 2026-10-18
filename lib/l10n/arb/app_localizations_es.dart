@@ -21066,6 +21066,33 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sharedLibrary_members_removeRole => 'Quitar rol';
 
   @override
+  String get sharedLibrary_members_remove => 'Quitar de la biblioteca';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return '¿Quitar a $name?';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return '$name ya no podrá editar sitios ni sugerir cambios. Los sitios y cambios que ya aportó se quedan en la biblioteca.\n\nPodrá seguir leyendo la biblioteca hasta que cambies sus claves de almacenamiento, y su frase de contraseña si está cifrada.';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => 'Quitar';
+
+  @override
+  String get sharedLibrary_members_removedHeader => 'Quitados';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return 'Quitado el $date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => 'Readmitir';
+
+  @override
   String get sharedLibrary_owner_onlyOne =>
       'Solo hay un propietario. Si pierde el acceso, solo el código de recuperación puede devolverlo.';
 
@@ -21378,6 +21405,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       'Tus credenciales solo permiten leer. Puedes sugerir cambios; un responsable los aplicará.';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      'Un responsable te ha quitado de esta biblioteca. Sus sitios se quedan en este dispositivo, pero ya no puedes cambiarlos. Si sales de la biblioteca, conservas copias propias de los sitios en los que has buceado.';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {

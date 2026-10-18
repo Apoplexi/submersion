@@ -21329,6 +21329,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sharedLibrary_members_removeRole => 'إزالة الدور';
 
   @override
+  String get sharedLibrary_members_remove => 'إزالة من المكتبة';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return 'إزالة $name؟';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return 'لن يتمكن $name بعد الآن من تعديل المواقع أو اقتراح تغييرات. تبقى المواقع والتعديلات التي ساهم بها في المكتبة.\n\nيظل قادرًا على قراءة المكتبة حتى تغيّر مفاتيح التخزين الخاصة بها، وعبارة المرور إن كانت مشفّرة.';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => 'إزالة';
+
+  @override
+  String get sharedLibrary_members_removedHeader => 'تمت إزالتهم';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return 'أُزيل في $date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => 'السماح بالعودة';
+
+  @override
   String get sharedLibrary_owner_onlyOne =>
       'مالك واحد فقط. إن فقد الوصول، فلا يعيده إلا رمز الاسترداد.';
 
@@ -21641,6 +21668,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       'تسمح بيانات اعتمادك بالقراءة فقط. يمكنك اقتراح تغييرات ويقوم مرجع بتطبيقها.';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      'أزالك مرجع من هذه المكتبة. تبقى مواقعها على هذا الجهاز، لكن لم يعد بإمكانك تغييرها. عند مغادرة المكتبة تحتفظ بنسخ شخصية من المواقع التي غصت فيها.';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {

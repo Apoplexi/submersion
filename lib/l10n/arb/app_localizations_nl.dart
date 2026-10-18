@@ -20926,6 +20926,33 @@ class AppLocalizationsNl extends AppLocalizations {
   String get sharedLibrary_members_removeRole => 'Rol verwijderen';
 
   @override
+  String get sharedLibrary_members_remove => 'Uit de bibliotheek verwijderen';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return '$name verwijderen?';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return '$name kan dan geen locaties meer bewerken of wijzigingen voorstellen. Locaties en wijzigingen die diegene al heeft bijgedragen, blijven in de bibliotheek.\n\nLezen kan diegene de bibliotheek nog tot je de opslagsleutels wijzigt, en de wachtwoordzin als ze versleuteld is.';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => 'Verwijderen';
+
+  @override
+  String get sharedLibrary_members_removedHeader => 'Verwijderd';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return 'Verwijderd op $date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => 'Weer toelaten';
+
+  @override
   String get sharedLibrary_owner_onlyOne =>
       'Er is maar één eigenaar. Verliest die de toegang, dan kan alleen de herstelcode die terugbrengen.';
 
@@ -21235,6 +21262,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       'Je inloggegevens staan alleen lezen toe. Je kunt wijzigingen voorstellen; een beheerder past ze toe.';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      'Een beheerder heeft je uit deze bibliotheek verwijderd. De locaties blijven op dit apparaat, maar je kunt ze niet meer wijzigen. Als je de bibliotheek verlaat, houd je eigen kopieën van de locaties waar je gedoken hebt.';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {

@@ -21037,6 +21037,33 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sharedLibrary_members_removeRole => 'Rolle entfernen';
 
   @override
+  String get sharedLibrary_members_remove => 'Aus der Bibliothek entfernen';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return '$name entfernen?';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return '$name kann dann keine Orte mehr bearbeiten und keine Änderungen mehr vorschlagen. Orte und Änderungen, die die Person schon beigetragen hat, bleiben in der Bibliothek.\n\nLesen kann sie die Bibliothek weiterhin, bis du ihre Speicherschlüssel änderst, und ihre Passphrase, falls sie verschlüsselt ist.';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => 'Entfernen';
+
+  @override
+  String get sharedLibrary_members_removedHeader => 'Entfernt';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return 'Entfernt am $date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => 'Wieder zulassen';
+
+  @override
   String get sharedLibrary_owner_onlyOne =>
       'Nur ein Eigentümer. Verliert er den Zugriff, kann ihn nur der Wiederherstellungscode zurückbringen.';
 
@@ -21347,6 +21374,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       'Deine Zugangsdaten erlauben nur Lesen. Du kannst Änderungen vorschlagen; ein Verantwortlicher übernimmt sie.';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      'Ein Verantwortlicher hat dich aus dieser Bibliothek entfernt. Ihre Orte bleiben auf diesem Gerät, aber du kannst sie nicht mehr ändern. Wenn du die Bibliothek verlässt, behältst du eigene Kopien der Orte, an denen du getaucht bist.';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {

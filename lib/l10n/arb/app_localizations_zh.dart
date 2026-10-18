@@ -20019,6 +20019,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sharedLibrary_members_removeRole => '移除角色';
 
   @override
+  String get sharedLibrary_members_remove => '从资料库移除';
+
+  @override
+  String sharedLibrary_members_removeTitle(String name) {
+    return '移除 $name？';
+  }
+
+  @override
+  String sharedLibrary_members_removeBody(String name) {
+    return '$name 将无法再编辑潜点或提出修改建议。其已贡献的潜点和修改会保留在资料库中。\n\n在您更换存储密钥（若已加密，还需更换口令）之前，对方仍可读取资料库。';
+  }
+
+  @override
+  String get sharedLibrary_members_removeConfirm => '移除';
+
+  @override
+  String get sharedLibrary_members_removedHeader => '已移除';
+
+  @override
+  String sharedLibrary_members_removedOn(String date) {
+    return '移除于 $date';
+  }
+
+  @override
+  String get sharedLibrary_members_allowBack => '允许重新加入';
+
+  @override
   String get sharedLibrary_owner_onlyOne => '只有一位所有者。若其失去访问权限，只有恢复码能够恢复。';
 
   @override
@@ -20300,6 +20327,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get sharedLibrary_library_readOnlyBanner =>
       '您的凭据仅允许读取。您可以提出修改建议，由负责人应用。';
+
+  @override
+  String get sharedLibrary_library_removedBanner =>
+      '一位负责人已将您从此资料库中移除。其潜点仍保留在此设备上，但您无法再修改。退出资料库后，您将保留自己潜水过的潜点的个人副本。';
 
   @override
   String sharedLibrary_library_errorBanner(String error) {
