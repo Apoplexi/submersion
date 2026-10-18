@@ -3398,6 +3398,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get currencyRule_tdi_refresher_name => 'TDI-Auffrischung';
 
   @override
+  String get currencyRule_iart_refresher_name => 'IART-Auffrischung';
+
+  @override
   String get currencyRule_first_aid_24mo_name =>
       'Erneuerung Erste Hilfe und HLW';
 
@@ -3439,6 +3442,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get currencyRule_tdi_refresher_advisory =>
       'TDI empfiehlt nach sechs bis zwölf Monaten ohne technischen Tauchgang eine Auffrischung.';
+
+  @override
+  String get currencyRule_iart_refresher_advisory =>
+      'IART empfiehlt nach sechs bis zwölf Monaten ohne technischen Tauchgang eine Auffrischung.';
 
   @override
   String get currencyRule_first_aid_advisory =>
@@ -3876,6 +3883,21 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get certifications_edit_group_tdiProfessional => 'Berufsstufen';
+
+  @override
+  String get certifications_edit_group_iartOpenCircuit => 'Offener Kreislauf';
+
+  @override
+  String get certifications_edit_group_iartRebreather => 'Kreislaufgerät';
+
+  @override
+  String get certifications_edit_group_iartOverhead => 'Überkopf-Umgebung';
+
+  @override
+  String get certifications_edit_group_iartService => 'Service';
+
+  @override
+  String get certifications_edit_group_iartProfessional => 'Berufsstufen';
 
   @override
   String get certifications_edit_help_expiryDate =>
@@ -12342,6 +12364,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get enum_certificationAgency_tdi => 'TDI';
+
+  @override
+  String get enum_certificationAgency_iart => 'IART';
 
   @override
   String get enum_certificationLevel_advancedNitrox => 'Advanced Nitrox';

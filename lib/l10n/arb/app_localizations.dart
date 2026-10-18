@@ -5243,6 +5243,12 @@ abstract class AppLocalizations {
   /// **'TDI refresher'**
   String get currencyRule_tdi_refresher_name;
 
+  /// No description provided for @currencyRule_iart_refresher_name.
+  ///
+  /// In en, this message translates to:
+  /// **'IART refresher'**
+  String get currencyRule_iart_refresher_name;
+
   /// Name of the built-in first aid and CPR renewal currency rule
   ///
   /// In en, this message translates to:
@@ -5314,6 +5320,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TDI suggests a refresher after six to twelve months without technical diving.'**
   String get currencyRule_tdi_refresher_advisory;
+
+  /// No description provided for @currencyRule_iart_refresher_advisory.
+  ///
+  /// In en, this message translates to:
+  /// **'IART suggests a refresher after six to twelve months without technical diving.'**
+  String get currencyRule_iart_refresher_advisory;
 
   /// Advisory sentence of the first aid renewal rule
   ///
@@ -6037,6 +6049,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Professional'**
   String get certifications_edit_group_tdiProfessional;
+
+  /// No description provided for @certifications_edit_group_iartOpenCircuit.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Circuit'**
+  String get certifications_edit_group_iartOpenCircuit;
+
+  /// No description provided for @certifications_edit_group_iartRebreather.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebreather'**
+  String get certifications_edit_group_iartRebreather;
+
+  /// No description provided for @certifications_edit_group_iartOverhead.
+  ///
+  /// In en, this message translates to:
+  /// **'Overhead'**
+  String get certifications_edit_group_iartOverhead;
+
+  /// No description provided for @certifications_edit_group_iartService.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get certifications_edit_group_iartService;
+
+  /// No description provided for @certifications_edit_group_iartProfessional.
+  ///
+  /// In en, this message translates to:
+  /// **'Professional'**
+  String get certifications_edit_group_iartProfessional;
 
   /// No description provided for @certifications_edit_help_expiryDate.
   ///
@@ -19794,6 +19836,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TDI'**
   String get enum_certificationAgency_tdi;
+
+  /// No description provided for @enum_certificationAgency_iart.
+  ///
+  /// In en, this message translates to:
+  /// **'IART'**
+  String get enum_certificationAgency_iart;
 
   /// No description provided for @enum_certificationLevel_advancedNitrox.
   ///

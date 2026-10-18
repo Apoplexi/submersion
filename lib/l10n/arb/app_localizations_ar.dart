@@ -3483,6 +3483,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get currencyRule_tdi_refresher_name => 'دورة تنشيطية TDI';
 
   @override
+  String get currencyRule_iart_refresher_name => 'دورة تنشيطية IART';
+
+  @override
   String get currencyRule_first_aid_24mo_name =>
       'تجديد الإسعافات الأولية والإنعاش القلبي الرئوي';
 
@@ -3524,6 +3527,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get currencyRule_tdi_refresher_advisory =>
       'تقترح TDI دورة تنشيطية بعد ستة إلى اثني عشر شهرًا دون غوص تقني.';
+
+  @override
+  String get currencyRule_iart_refresher_advisory =>
+      'تقترح IART دورة تنشيطية بعد ستة إلى اثني عشر شهرًا دون غوص تقني.';
 
   @override
   String get currencyRule_first_aid_advisory =>
@@ -3950,6 +3957,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get certifications_edit_group_tdiProfessional => 'احترافي';
+
+  @override
+  String get certifications_edit_group_iartOpenCircuit => 'دائرة مفتوحة';
+
+  @override
+  String get certifications_edit_group_iartRebreather => 'جهاز إعادة التنفس';
+
+  @override
+  String get certifications_edit_group_iartOverhead => 'بيئة السقف';
+
+  @override
+  String get certifications_edit_group_iartService => 'الخدمة';
+
+  @override
+  String get certifications_edit_group_iartProfessional => 'احترافي';
 
   @override
   String get certifications_edit_help_expiryDate =>
@@ -12502,6 +12524,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_certificationAgency_tdi => 'TDI';
+
+  @override
+  String get enum_certificationAgency_iart => 'IART';
 
   @override
   String get enum_certificationLevel_advancedNitrox => 'نيتروكس متقدم';

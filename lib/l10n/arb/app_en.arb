@@ -2140,6 +2140,7 @@
     "description": "Name of the built-in generic refresher currency rule"
   },
   "currencyRule_tdi_refresher_name": "TDI refresher",
+  "currencyRule_iart_refresher_name": "IART refresher",
   "@currencyRule_tdi_refresher_name": {
     "description": "Name of the built-in TDI refresher currency rule"
   },
@@ -2188,6 +2189,7 @@
     "description": "Advisory sentence of the generic refresher rule"
   },
   "currencyRule_tdi_refresher_advisory": "TDI suggests a refresher after six to twelve months without technical diving.",
+  "currencyRule_iart_refresher_advisory": "IART suggests a refresher after six to twelve months without technical diving.",
   "@currencyRule_tdi_refresher_advisory": {
     "description": "Advisory sentence of the TDI refresher rule"
   },
@@ -2517,6 +2519,11 @@
   "certifications_edit_group_tdiService": "Service",
   "certifications_edit_group_tdiOverhead": "Overhead",
   "certifications_edit_group_tdiProfessional": "Professional",
+  "certifications_edit_group_iartOpenCircuit": "Open Circuit",
+  "certifications_edit_group_iartRebreather": "Rebreather",
+  "certifications_edit_group_iartOverhead": "Overhead",
+  "certifications_edit_group_iartService": "Service",
+  "certifications_edit_group_iartProfessional": "Professional",
   "certifications_edit_help_expiryDate": "Leave empty for certifications that don't expire",
   "certifications_edit_helper_title": "Optional. Leave blank to use the certification",
   "certifications_edit_hint_cardNumber": "Enter certification card number",
@@ -7467,6 +7474,7 @@
   "enum_certificationAgency_sdi": "SDI",
   "enum_certificationAgency_ssi": "SSI",
   "enum_certificationAgency_tdi": "TDI",
+  "enum_certificationAgency_iart": "IART",
   "enum_certificationLevel_advancedNitrox": "Advanced Nitrox",
   "enum_certificationLevel_advancedOpenWater": "Advanced Open Water",
   "enum_certificationLevel_cave": "Cave",
