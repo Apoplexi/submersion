@@ -9,6 +9,7 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/equipment/presentation/widgets/equipment_sharing_row.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_bulk_transfer.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_transfer_gate.dart';
+import 'package:submersion/features/gear_passports/presentation/widgets/gear_passport_entry_card.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/status_colors.dart';
@@ -60,6 +61,8 @@ import 'package:submersion/features/equipment/presentation/widgets/installed_in_
 import 'package:submersion/features/equipment/presentation/widgets/service_clocks_card.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_history_section.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_record_dialog.dart';
+import 'package:submersion/features/documents/presentation/widgets/documents_section.dart';
+import 'package:submersion/features/documents/domain/entities/document.dart';
 
 class EquipmentDetailPage extends ConsumerStatefulWidget {
   final String equipmentId;
@@ -225,6 +228,10 @@ class _EquipmentDetailContent extends ConsumerWidget {
           if (equipment.type == EquipmentType.tank) ...[
             PassportEntryCard(equipment: equipment),
             const SizedBox(height: 24),
+          ] else if (!equipment.isWanted) ...[
+            // Any other gear's tag (issue #2652).
+            GearPassportEntryCard(equipment: equipment),
+            const SizedBox(height: 24),
           ],
           if (!equipment.isWanted) ...[
             ServiceClocksCard(
@@ -286,6 +293,10 @@ class _EquipmentDetailContent extends ConsumerWidget {
             const SizedBox(height: 24),
             _buildNotesSection(context, equipment),
           ],
+          const SizedBox(height: 24),
+          DocumentsSection(
+            owner: DocumentOwner(DocumentOwnerKind.equipment, equipmentId),
+          ),
         ],
       ),
     );
@@ -426,7 +437,8 @@ class _EquipmentDetailContent extends ConsumerWidget {
   }
 
   /// Open in Connections is for everyone who can see the item, a sharee
-  /// included: shared gear sits on their own dives. Delete needs the owner.
+  /// included: shared gear sits on their own dives. So is Clone (#3184): the
+  /// clone is the viewer's own item. Delete needs the owner.
   List<PopupMenuEntry<String>> _buildMenuItems(
     BuildContext context, {
     required bool canDelete,
@@ -434,6 +446,14 @@ class _EquipmentDetailContent extends ConsumerWidget {
   }) {
     return [
       openInConnectionsMenuItem(context),
+      PopupMenuItem(
+        value: 'clone',
+        child: ListTile(
+          leading: const Icon(Icons.copy),
+          title: Text(context.l10n.equipment_menu_clone),
+          contentPadding: EdgeInsets.zero,
+        ),
+      ),
       if (canTransfer)
         PopupMenuItem(
           value: 'transfer',
@@ -794,17 +814,11 @@ class _EquipmentDetailContent extends ConsumerWidget {
     WidgetRef ref, {
     required String serviceKindId,
   }) {
-    showDialog(
-      context: context,
-      builder: (context) => ServiceRecordDialog(
-        equipmentId: equipmentId,
-        serviceKindId: serviceKindId,
-        onSave: (record) async {
-          await ref
-              .read(serviceRecordNotifierProvider(equipmentId).notifier)
-              .addRecord(record);
-        },
-      ),
+    showLogServiceDialog(
+      context,
+      ref,
+      equipmentId: equipmentId,
+      serviceKindId: serviceKindId,
     );
   }
 
@@ -1028,6 +1042,8 @@ class _EquipmentDetailContent extends ConsumerWidget {
           context,
           NodeRef(ConnectionKind.equipment, equipmentId),
         );
+      case 'clone':
+        context.push('/equipment/new?cloneFrom=$equipmentId');
       case 'transfer':
         final activeDiverId = await ref.read(
           validatedCurrentDiverIdProvider.future,

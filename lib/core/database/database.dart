@@ -5,6 +5,7 @@ import 'package:submersion/core/database/tables/app_tables.dart';
 import 'package:submersion/core/database/tables/buddy_tables.dart';
 import 'package:submersion/core/database/tables/certification_currency_tables.dart';
 import 'package:submersion/core/database/tables/cylinder_tables.dart';
+import 'package:submersion/core/database/tables/dive_computer_connection_tables.dart';
 import 'package:submersion/core/database/tables/dive_plan_tables.dart';
 import 'package:submersion/core/database/tables/dive_derived_metrics_tables.dart';
 import 'package:submersion/core/database/tables/dive_plan_mission_tables.dart';
@@ -12,6 +13,7 @@ import 'package:submersion/core/database/tables/dive_profile_tables.dart';
 import 'package:submersion/core/database/tables/dive_tables.dart';
 import 'package:submersion/core/database/tables/diver_tables.dart';
 import 'package:submersion/core/database/tables/equipment_condition_tables.dart';
+import 'package:submersion/core/database/tables/document_tables.dart';
 import 'package:submersion/core/database/tables/equipment_location_tables.dart';
 import 'package:submersion/core/database/tables/equipment_service_status_tables.dart';
 import 'package:submersion/core/database/tables/equipment_tables.dart';
@@ -38,10 +40,12 @@ export 'package:submersion/core/database/tables/cylinder_tables.dart';
 export 'package:submersion/core/database/tables/dive_plan_tables.dart';
 export 'package:submersion/core/database/tables/dive_derived_metrics_tables.dart';
 export 'package:submersion/core/database/tables/dive_plan_mission_tables.dart';
+export 'package:submersion/core/database/tables/dive_computer_connection_tables.dart';
 export 'package:submersion/core/database/tables/dive_profile_tables.dart';
 export 'package:submersion/core/database/tables/dive_tables.dart';
 export 'package:submersion/core/database/tables/diver_tables.dart';
 export 'package:submersion/core/database/tables/equipment_condition_tables.dart';
+export 'package:submersion/core/database/tables/document_tables.dart';
 export 'package:submersion/core/database/tables/equipment_location_tables.dart';
 export 'package:submersion/core/database/tables/equipment_service_status_tables.dart';
 export 'package:submersion/core/database/tables/equipment_tables.dart';
@@ -235,6 +239,8 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     ConnectionMaps,
     // Gear packed for a trip (v248, issue #2338)
     TripEquipment,
+    // Download connections per dive computer (v279, issue #3106)
+    DiveComputerConnections,
     // A profile's hidden shared trips and sites (v250, issue #2594)
     TripHides,
     SiteHides,
@@ -244,6 +250,9 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     CertificationCurrencyRules,
     CertificationCurrencyPrefs,
     CertificationCurrencyEvents,
+    // Documents store (v277, issue #2613)
+    Documents,
+    DocumentPages,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -253,7 +262,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 273;
+  static const int currentSchemaVersion = 281;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -339,7 +348,24 @@ class AppDatabase extends _$AppDatabase {
   /// prevent. Peers below 240 are held until they update; their own payloads
   /// still arrive here, and the merge's scope guard keeps their copies of
   /// deleted events from coming back.
-  static const int minimumCompatibleSchemaVersion = 240;
+  ///
+  /// Raised 240 -> 275 by the decimal start pressure (#3091): v275 retypes
+  /// the synced column diver_settings.default_start_pressure from INTEGER
+  /// to REAL, which the first rule above classifies as breaking. An older
+  /// reader decodes the field with a hard int cast in DiverSetting.fromJson,
+  /// so a start pressure entered in psi (206.84 bar for 3000 psi) would
+  /// throw there. Peers below 275 are held until they update. Their own
+  /// payloads still arrive here and decode cleanly: drift's fromJson widens
+  /// an int to a double.
+  ///
+  /// Raised 275 -> 280 by the WebDAV backend (#2361): AccountKind.webdav is
+  /// a new value in the synced column connected_accounts.kind, and every
+  /// build before 280 decodes that column with AccountKind.values.byName,
+  /// which throws on a name it does not know. Schema 280 changes no data; it
+  /// exists so the floor can rise past the 275 to 279 betas. From 280 on
+  /// the accounts repository skips unknown kinds, so later kinds need no
+  /// floor bump of their own.
+  static const int minimumCompatibleSchemaVersion = 280;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -1160,6 +1186,34 @@ class AppDatabase extends _$AppDatabase {
     // shipped those; 268 is held by an open branch (#3043).
     272,
     273,
+    // v274: diver_settings.has_accepted_planning_disclaimer (issue #3120).
+    274,
+    // v275: diver_settings.default_start_pressure retyped INTEGER to REAL
+    // (issue #3091), so a start pressure entered in psi is kept exactly.
+    // Retyping a synced column raises the floor to 275; see
+    // minimumCompatibleSchemaVersion.
+    275,
+    // v276: diver_settings.icd_warnings_enabled (issue #3121).
+    276,
+    // v277: documents and document_pages; insurance, medical clearance and
+    // certification card photos copied in (issue #2613).
+    277,
+    // v278: dives.visibility_min_meters / visibility_max_meters (issue #3226).
+    278,
+    // v279: dive_computer_connections (issue #3106). Table-only rung, no
+    // backfill; the floor does not move.
+    279,
+    // v280: no data change (issue #2361). AccountKind.webdav is a new value
+    // in the synced connected_accounts.kind column, which builds before this
+    // one decode with a throwing AccountKind.values.byName. Raising the
+    // floor to 280 holds them until they update; see
+    // minimumCompatibleSchemaVersion. Renumbered from 277, 278 and 279 as
+    // main shipped those first.
+    280,
+    // v281: diver_settings.trend_gap_collapse_months (issue #3251). Additive
+    // defaulted column, so the floor stays at 280. Renumbered from 278, 279
+    // and 280, which #3226, #3106 and #2361 shipped first.
+    281,
   ];
 
   /// Returns the number of migration steps that will execute when upgrading

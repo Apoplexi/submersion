@@ -1,5 +1,6 @@
 import 'package:sqlite3/sqlite3.dart';
 
+import 'package:submersion/features/universal_import/data/services/divinglog_id_list.dart';
 import 'package:submersion/features/universal_import/data/services/divinglog_raw_types.dart';
 import 'package:submersion/features/universal_import/data/services/divinglog_row_values.dart';
 
@@ -58,6 +59,8 @@ class DivingLogReferenceReader {
   static const _placeColumns = [
     'ID',
     'CountryID',
+    'Country',
+    'Region',
     'Place',
     'Lat',
     'Lon',
@@ -73,7 +76,13 @@ class DivingLogReferenceReader {
   static const _countryColumns = ['ID', 'Country'];
   static const _equipmentColumns = [
     'ID',
+    'Name',
     'Object',
+    'Category',
+    'Info',
+    'TypeID',
+    'Val1',
+    'Val3',
     'Manufacturer',
     'Serial',
     'DateP',
@@ -131,7 +140,7 @@ class DivingLogReferenceReader {
     'Place': ['Place'],
     'City': ['City'],
     'Country': ['Country'],
-    'Equipment': ['Object'],
+    'Equipment': ['Object', 'Name'],
     'Trip': ['TripName'],
     'Shop': ['ShopName'],
     'Divetype': ['Typename'],
@@ -160,14 +169,22 @@ class DivingLogReferenceReader {
     'Pictures': ['LogID'],
   };
 
+  /// Diving Log tables DiveMate never writes (#3110).
+  static const _notInDiveMate = {'City', 'Country', 'Trip', 'Fish', 'FishRel'};
+
   /// One schema note per reference table this file cannot use, naming what
   /// the diver loses. A table that is present but keyless is a different
   /// message from one that is absent, because "no Buddy table" would be
   /// factually wrong for a table that exists.
-  static List<String> schemaNotes(DivingLogCapabilities caps) {
+  static List<String> schemaNotes(
+    DivingLogCapabilities caps, {
+    bool isDiveMate = false,
+  }) {
     final notes = <String>[];
     for (final entry in _tables.entries) {
       if (!caps.hasTable(entry.key)) {
+        // DiveMate has no such table at all, so its absence loses nothing.
+        if (isDiveMate && _notInDiveMate.contains(entry.key)) continue;
         notes.add('No ${entry.key} table, so its records were not imported.');
         continue;
       }
@@ -195,7 +212,14 @@ class DivingLogReferenceReader {
     return notes;
   }
 
-  static DivingLogReferences read(Database db, DivingLogCapabilities caps) {
+  /// [isDiveMate] gates the equipment columns whose codes only DiveMate
+  /// defines (`TypeID`, `Val1`, `Val3` and the set marker): a Diving Log
+  /// file is never read through DiveMate's code tables.
+  static DivingLogReferences read(
+    Database db,
+    DivingLogCapabilities caps, {
+    bool isDiveMate = false,
+  }) {
     final cities = _read(
       db,
       caps,
@@ -239,6 +263,8 @@ class DivingLogReferenceReader {
         (r) => DivingLogRawPlace(
           id: rowInt(r, 'ID')!,
           countryId: rowInt(r, 'CountryID'),
+          country: rowString(r, 'Country'),
+          region: rowString(r, 'Region'),
           place: rowString(r, 'Place'),
           // Stored as degrees, minutes and seconds text in the real
           // export, not as a decimal, so this cannot be rowDouble.
@@ -263,7 +289,15 @@ class DivingLogReferenceReader {
         'ID',
         (r) => DivingLogRawEquipment(
           id: rowInt(r, 'ID')!,
+          name: rowString(r, 'Name'),
           object: rowString(r, 'Object'),
+          category: rowString(r, 'Category'),
+          setMemberIds: isDiveMate ? _setMemberIds(r) : null,
+          typeId: isDiveMate ? rowInt(r, 'TypeID') : null,
+          volumeLiters: isDiveMate
+              ? positiveOrNull(rowDouble(r, 'Val1'))
+              : null,
+          materialCode: isDiveMate ? rowInt(r, 'Val3') : null,
           manufacturer: rowString(r, 'Manufacturer'),
           serial: rowString(r, 'Serial'),
           purchaseDate: rowDate(r, 'DateP'),
@@ -352,6 +386,14 @@ class DivingLogReferenceReader {
       speciesIdsByLogId: _readSpeciesLinks(db, caps),
       picturesByLogId: _readPictures(db, caps),
     );
+  }
+
+  /// DiveMate's set marker: the `---SET` category, or type 9. A set lists
+  /// its members' ids in `Info`.
+  static List<int>? _setMemberIds(Row r) {
+    final isSet =
+        rowString(r, 'Category') == '---SET' || rowInt(r, 'TypeID') == 9;
+    return isSet ? parseDivingLogIdList(rowString(r, 'Info')) : null;
   }
 
   static Map<int, String> _named(Map<int, String?> raw) => {

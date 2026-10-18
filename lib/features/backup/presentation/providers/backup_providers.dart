@@ -308,8 +308,8 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     }
   }
 
-  /// Perform a manual backup
-  Future<void> performBackup() async {
+  /// Perform a manual backup, with the diver's optional [note].
+  Future<void> performBackup({String? note}) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
     state = BackupOperationState(
@@ -318,10 +318,19 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     );
 
     try {
-      final record = await _service.performBackup();
+      final record = await _service.performBackup(note: note);
+      // The cloud copy fails closed while sync encryption is locked on this
+      // device (issue #3089); say why it stayed local.
+      final withheldFromCloud =
+          record.location == BackupLocation.local &&
+          await _isCloudBackupBlockedByEncryptionLock();
       state = BackupOperationState(
         status: BackupOperationStatus.success,
-        message: _l10n.backup_operation_created(record.formattedSize),
+        message: withheldFromCloud
+            ? _l10n.backup_operation_createdLocalOnlyLocked(
+                record.formattedSize,
+              )
+            : _l10n.backup_operation_created(record.formattedSize),
         lastRecord: record,
       );
       _ref.read(backupSettingsProvider.notifier).refresh();
@@ -331,6 +340,22 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
         status: BackupOperationStatus.error,
         message: _l10n.backup_operation_backupFailed('$e'),
       );
+    }
+  }
+
+  /// The lock check reads the keychain after the backup is already written,
+  /// so a keychain error must not turn that backup into a reported failure;
+  /// it only drops the explanatory message.
+  Future<bool> _isCloudBackupBlockedByEncryptionLock() async {
+    try {
+      return await _service.isCloudBackupBlockedByEncryptionLock();
+    } catch (e, st) {
+      _log.warning(
+        'Could not check the sync encryption lock after a backup',
+        error: e,
+        stackTrace: st,
+      );
+      return false;
     }
   }
 
@@ -417,8 +442,8 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     }
   }
 
-  /// Export backup to a user-chosen file path
-  Future<void> exportToPath(String destinationPath) async {
+  /// Export backup to a user-chosen file path, with an optional [note].
+  Future<void> exportToPath(String destinationPath, {String? note}) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
     state = BackupOperationState(
@@ -427,7 +452,10 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     );
 
     try {
-      final record = await _service.exportBackupToPath(destinationPath);
+      final record = await _service.exportBackupToPath(
+        destinationPath,
+        note: note,
+      );
       state = BackupOperationState(
         status: BackupOperationStatus.success,
         message: _l10n.backup_operation_exported(record.formattedSize),
@@ -443,8 +471,8 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     }
   }
 
-  /// Export backup to temp file for sharing
-  Future<File?> exportForSharing() async {
+  /// Export backup to temp file for sharing, with an optional [note].
+  Future<File?> exportForSharing({String? note}) async {
     if (state.status == BackupOperationStatus.inProgress) return null;
 
     state = BackupOperationState(
@@ -453,7 +481,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     );
 
     try {
-      final file = await _service.exportBackupToTemp();
+      final file = await _service.exportBackupToTemp(note: note);
       state = BackupOperationState(
         status: BackupOperationStatus.success,
         message: _l10n.backup_operation_shareReady,
@@ -477,9 +505,13 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   /// when backup encryption is on, exactly as every other export path does)
   /// and then streamed into the tree by the same platform channel the
   /// scheduled backup uses.
+  ///
+  /// [note] is stamped into the artifact, the only place it is kept for an
+  /// export that leaves no history record.
   Future<void> exportToSafTree({
     required String treeUri,
     required String fileName,
+    String? note,
   }) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
@@ -490,7 +522,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
 
     File? temp;
     try {
-      temp = await _service.exportBackupToTemp();
+      temp = await _service.exportBackupToTemp(note: note);
       await SubmersionSaf.writeBackup(
         treeUri: treeUri,
         fileName: fileName,

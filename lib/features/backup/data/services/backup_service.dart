@@ -24,6 +24,7 @@ import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
 import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/sync_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_crypto.dart';
+import 'package:submersion/features/backup/data/services/backup_note_stamp.dart';
 import 'package:submersion/features/backup/data/services/backup_encryption_key_store.dart';
 import 'package:submersion/core/services/database_service.dart'
     show DatabaseService;
@@ -158,7 +159,14 @@ class BackupService {
   /// Returns the [BackupRecord] describing the created backup.
   /// If cloud provider is available and cloud backup is enabled,
   /// the backup is also uploaded to cloud storage.
-  Future<BackupRecord> performBackup({bool isAutomatic = false}) async {
+  ///
+  /// [note] is the diver's optional description: it is stamped into the file
+  /// and kept on the record. An automatic backup never carries one, so it is
+  /// ignored when [isAutomatic] is set.
+  Future<BackupRecord> performBackup({
+    bool isAutomatic = false,
+    String? note,
+  }) async {
     _log.info('Starting backup (automatic: $isAutomatic)');
     // Resolve where the backup goes (filesystem dir or Android SAF tree) and
     // arm any security-scoped access; release it once the write+prune are done.
@@ -167,7 +175,11 @@ class BackupService {
       saf: _safPort,
     );
     try {
-      return await _performBackupInto(lease.target, isAutomatic: isAutomatic);
+      return await _performBackupInto(
+        lease.target,
+        isAutomatic: isAutomatic,
+        note: isAutomatic ? null : normalizeBackupNote(note),
+      );
     } finally {
       await lease.release();
     }
@@ -176,6 +188,7 @@ class BackupService {
   Future<BackupRecord> _performBackupInto(
     BackupTarget target, {
     required bool isAutomatic,
+    String? note,
   }) async {
     final filename = await _generateFilename();
     final encKey = await _activeBackupKey();
@@ -189,7 +202,7 @@ class BackupService {
       // URI, and the size comes back with it. A SAF ref has no File length to
       // ask, and the live database file's length is not the answer either: the
       // export is compacted and folds in rows that were still in the WAL.
-      final written = await target.write(_dbAdapter, filename);
+      final written = await target.write(_dbAdapter, filename, note: note);
       ref = written.ref;
       sizeBytes = written.sizeBytes;
     } else {
@@ -206,7 +219,7 @@ class BackupService {
       final tempPlain = p.join(tempDir.path, '$tempPrefix-$filename');
       final tempSbe = p.join(tempDir.path, '$tempPrefix-$storedName');
       try {
-        await _dbAdapter.backup(tempPlain);
+        await _dbAdapter.backup(tempPlain, note: note);
         await BackupCrypto.encryptFile(
           inPath: tempPlain,
           outPath: tempSbe,
@@ -243,9 +256,10 @@ class BackupService {
       try {
         cloudFileId = await _uploadToCloud(ref, storedName);
         // Only a real file id means a cloud copy exists: the upload also
-        // gives up (returning null) when the backup folder is unreachable,
-        // and history that claims `both` with no id sends restore looking
-        // for a file that was never written.
+        // gives up (returning null) when the backup folder is unreachable or
+        // sync encryption is locked on this device (issue #3089), and history
+        // that claims `both` with no id sends restore looking for a file that
+        // was never written.
         if (cloudFileId != null) {
           location = BackupLocation.both;
           _log.info('Backup uploaded to cloud: $cloudFileId');
@@ -273,6 +287,7 @@ class BackupService {
       cloudFileId: cloudFileId,
       localPath: ref,
       isAutomatic: isAutomatic,
+      note: note,
     );
 
     // Persist record and update last backup time
@@ -289,12 +304,17 @@ class BackupService {
   /// Export a backup to a user-specified file path.
   ///
   /// Records the export in backup history with the actual destination path.
-  Future<BackupRecord> exportBackupToPath(String destinationPath) async {
+  /// [note] is stamped into the file and kept on the record.
+  Future<BackupRecord> exportBackupToPath(
+    String destinationPath, {
+    String? note,
+  }) async {
     _log.info('Exporting backup to: $destinationPath');
+    final normalizedNote = normalizeBackupNote(note);
 
     final encKey = await _activeBackupKey();
     if (encKey == null) {
-      await _dbAdapter.backup(destinationPath);
+      await _dbAdapter.backup(destinationPath, note: normalizedNote);
     } else {
       final tempDir = await resolveSyncTempDir();
       final plainPath = p.join(tempDir.path, 'export_${_uuid.v4()}.db');
@@ -302,7 +322,7 @@ class BackupService {
         // Inside the try so a failed/partial backup still gets its plaintext
         // temp cleaned up in the finally -- never leave an unencrypted DB behind
         // when encryption is enabled.
-        await _dbAdapter.backup(plainPath);
+        await _dbAdapter.backup(plainPath, note: normalizedNote);
         await BackupCrypto.encryptFile(
           inPath: plainPath,
           outPath: destinationPath,
@@ -338,6 +358,7 @@ class BackupService {
       diveCount: counts.diveCount,
       siteCount: counts.siteCount,
       localPath: destinationPath,
+      note: normalizedNote,
     );
 
     await _preferences.addRecord(record);
@@ -351,9 +372,11 @@ class BackupService {
   ///
   /// The file is NOT recorded in backup history since its destination
   /// is ephemeral (share sheet, AirDrop, email, etc.).
-  /// Returns the temporary [File] for use with share sheet.
-  Future<File> exportBackupToTemp() async {
+  /// Returns the temporary [File] for use with share sheet. [note] is
+  /// stamped into the file, the only place it is kept for a share.
+  Future<File> exportBackupToTemp({String? note}) async {
     _log.info('Exporting backup to temp for sharing');
+    final normalizedNote = normalizeBackupNote(note);
 
     final encKey = await _activeBackupKey();
     final filename = await _generateFilename();
@@ -361,7 +384,7 @@ class BackupService {
 
     if (encKey == null) {
       final tempPath = p.join(tempDir.path, filename);
-      await _dbAdapter.backup(tempPath);
+      await _dbAdapter.backup(tempPath, note: normalizedNote);
       _log.info('Temp export completed: $filename');
       return File(tempPath);
     }
@@ -374,7 +397,7 @@ class BackupService {
       // Inside the try so a failed/partial backup still gets its plaintext temp
       // cleaned up in the finally -- never leave an unencrypted DB behind when
       // encryption is enabled.
-      await _dbAdapter.backup(plainPath);
+      await _dbAdapter.backup(plainPath, note: normalizedNote);
       await BackupCrypto.encryptFile(
         inPath: plainPath,
         outPath: sbePath,
@@ -1489,8 +1512,54 @@ class BackupService {
     return (mlk: key.mlk, libraryKeyId: key.libraryKeyId, keyslotBytes: mirror);
   }
 
+  /// True when cloud backup is on and end-to-end sync encryption is on, but
+  /// this device has not been unlocked yet (no key or keyslot mirror in its
+  /// keychain). Cloud uploads fail closed in that state, so callers use this
+  /// to tell the user why a backup stayed on the device (issue #3089). Backup
+  /// encryption exempts the device: its .sbe backups upload regardless.
+  Future<bool> isCloudBackupBlockedByEncryptionLock() async {
+    if (_cloudProvider == null) return false;
+    final settings = _preferences.getSettings();
+    if (!settings.cloudBackupEnabled || settings.backupEncryptionEnabled) {
+      return false;
+    }
+    if (!(_syncPreferences?.syncEncryptionEnabled ?? false)) return false;
+    return await _unlockedSyncKey() == null;
+  }
+
+  /// The sync-encryption key and its keyslot mirror, or null when either is
+  /// missing from this device's keychain.
+  Future<({SecretKey mlk, String libraryKeyId, Uint8List keyslotBytes})?>
+  _unlockedSyncKey() async {
+    final key = await _encryptionKeyStore?.loadKey();
+    final mirror = await _encryptionKeyStore?.loadKeyslotMirror();
+    if (key == null || mirror == null) return null;
+    return (mlk: key.mlk, libraryKeyId: key.libraryKeyId, keyslotBytes: mirror);
+  }
+
   Future<String?> _uploadToCloud(String localPath, String filename) async {
     if (_cloudProvider == null) return null;
+
+    // When backup encryption (issue #580) already produced a framed .sbe, the
+    // local artifact IS the encrypted upload -- send it verbatim. Otherwise, if
+    // sync encryption is on, the CLOUD copy becomes a framed .sbe here (local
+    // artifacts stay plaintext by design). The cloud decorator exempts
+    // submersion_backup_*.sbe, so a pass-through .sbe is never double-encrypted.
+    final alreadyEncrypted = await BackupCrypto.isEncryptedBackup(localPath);
+    final needsSyncEncryption =
+        !alreadyEncrypted && (_syncPreferences?.syncEncryptionEnabled ?? false);
+    final unlocked = needsSyncEncryption ? await _unlockedSyncKey() : null;
+    if (needsSyncEncryption && unlocked == null) {
+      // Fail closed (issue #3089): a diver who turned on end-to-end
+      // encryption must never get a plaintext copy in the cloud. Checked
+      // before touching the cloud folder, and the caller keeps the backup
+      // local-only.
+      _log.warning(
+        'Sync encryption is enabled but this device is not unlocked; '
+        'cloud upload skipped',
+      );
+      return null;
+    }
 
     final folderId = await _getOrCreateCloudBackupFolder();
     if (folderId == null) return null;
@@ -1499,35 +1568,19 @@ class BackupService {
     var uploadName = filename;
     File? encryptedTemp;
 
-    // When backup encryption (issue #580) already produced a framed .sbe, the
-    // local artifact IS the encrypted upload -- send it verbatim. Otherwise, if
-    // sync encryption is on, the CLOUD copy becomes a framed .sbe here (local
-    // artifacts stay plaintext by design). The cloud decorator exempts
-    // submersion_backup_*.sbe, so a pass-through .sbe is never double-encrypted.
-    final alreadyEncrypted = await BackupCrypto.isEncryptedBackup(localPath);
-    if (!alreadyEncrypted &&
-        (_syncPreferences?.syncEncryptionEnabled ?? false)) {
-      final key = await _encryptionKeyStore?.loadKey();
-      final mirror = await _encryptionKeyStore?.loadKeyslotMirror();
-      if (key == null || mirror == null) {
-        _log.error(
-          'Encryption is enabled but no key/keyslots are available; '
-          'uploading backup UNENCRYPTED',
-        );
-      } else {
-        final tempDir = await resolveSyncTempDir();
-        uploadName =
-            p.basenameWithoutExtension(filename) + BackupCrypto.fileExtension;
-        uploadPath = p.join(tempDir.path, uploadName);
-        await BackupCrypto.encryptFile(
-          inPath: localPath,
-          outPath: uploadPath,
-          mlk: key.mlk,
-          libraryKeyId: key.libraryKeyId,
-          keyslotBytes: mirror,
-        );
-        encryptedTemp = File(uploadPath);
-      }
+    if (unlocked != null) {
+      final tempDir = await resolveSyncTempDir();
+      uploadName =
+          p.basenameWithoutExtension(filename) + BackupCrypto.fileExtension;
+      uploadPath = p.join(tempDir.path, uploadName);
+      await BackupCrypto.encryptFile(
+        inPath: localPath,
+        outPath: uploadPath,
+        mlk: unlocked.mlk,
+        libraryKeyId: unlocked.libraryKeyId,
+        keyslotBytes: unlocked.keyslotBytes,
+      );
+      encryptedTemp = File(uploadPath);
     }
 
     try {

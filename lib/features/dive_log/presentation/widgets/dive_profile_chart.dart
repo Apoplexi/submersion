@@ -44,6 +44,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/profile_cursor
 import 'package:submersion/features/dive_log/presentation/widgets/partial_pressure_line_builders.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_metric_line_builders.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_right_axis_metric_labels.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_right_axis_tick_format.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tank_line_builders.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_metric_colors.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/range_selection_overlay.dart';
@@ -3918,6 +3919,27 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         playbackCursorTooltip?.cursorLocal ?? _lastPointerLocal;
     final tooltipRows = playbackCursorTooltip?.rows ?? _liveCursorTooltipRows;
 
+    // The safety lane and its callout render as two layers with the photo
+    // markers between them (#3051); both share this configuration.
+    SafetyFindingsOverlay safetyLayer({required bool lane}) =>
+        SafetyFindingsOverlay(
+          findings: widget.safetyFindings!,
+          selectedFindingId: widget.selectedSafetyFindingId,
+          visibleMinSeconds: visibleMinX,
+          visibleMaxSeconds: visibleMaxX,
+          insets: plotInsets,
+          laneHeight: DiveProfileChart.safetyLaneHeight,
+          laneBottomOffset:
+              DiveProfileChart._bottomAxisNameSize +
+              DiveProfileChart._bottomTickReservedSize,
+          units: units,
+          onFindingTap: widget.onSafetyFindingTap!,
+          onFindingDismiss: widget.onSafetyFindingDismiss ?? (_) {},
+          onFindingDetails: widget.onSafetyFindingDetails,
+          showLane: lane,
+          showCallout: !lane,
+        );
+
     return Stack(
       // Clip.none: with many active metrics the cursor tooltip's real
       // height can exceed the plot's own vertical space despite its text
@@ -4070,13 +4092,23 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     final metricColor = effectiveRightAxisMetric.getColor(
                       colorScheme,
                     );
+                    // Metric distance to the neighbouring tick, so the
+                    // label carries enough decimals to differ from it.
+                    final tickStep =
+                        metricBand.unmap(
+                          -(value + meta.appliedInterval),
+                          rightAxisRange.min,
+                          rightAxisRange.max,
+                        ) -
+                        metricValue;
                     return SideTitleWidget(
                       meta: meta,
                       child: Text(
-                        _formatRightAxisValue(
+                        formatRightAxisTick(
                           effectiveRightAxisMetric,
                           metricValue,
                           units,
+                          tickStep: tickStep,
                         ),
                         style: Theme.of(
                           context,
@@ -4704,6 +4736,19 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
               );
             },
           ),
+        // Safety findings lane: a widget layer like the photo markers,
+        // occupying the extra bottom reservation added by _hasSafetyLane,
+        // directly between the gas strip (or plot) and the tick labels.
+        // Below the photo markers, so a preview card opened from a deep
+        // photo paints over the lane strip rather than under it (#3051).
+        // Keyed, like the stateful layers around it, so that the lane and
+        // callout appearing or disappearing never shifts the photo or range
+        // overlay into another layer's element and resets it.
+        if (_hasSafetyLane)
+          Positioned.fill(
+            key: const ValueKey('safetyLaneLayer'),
+            child: safetyLayer(lane: true),
+          ),
         // Photo markers: tappable camera chips at each photo's (time, depth).
         // A widget layer (not an fl_chart element) so its taps never enter
         // the chart's gesture arena; positioned by the shared plot rect.
@@ -4711,6 +4756,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
             widget.photoMarkers != null &&
             widget.photoMarkers!.isNotEmpty)
           Positioned.fill(
+            key: const ValueKey('photoMarkerLayer'),
             child: PhotoMarkerOverlay(
               markers: widget.photoMarkers!,
               visibleMinSeconds: visibleMinX,
@@ -4721,33 +4767,21 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
               units: units,
             ),
           ),
-        // Safety findings lane + callout: a widget layer like the photo
-        // markers, occupying the extra bottom reservation added by
-        // _hasSafetyLane, directly between the gas strip (or plot) and the
-        // tick labels.
+        // Safety finding callout: its own layer above the photo markers, so
+        // camera chips never poke through the open card (#3051). Present
+        // whenever the lane is, even with nothing selected (it then renders
+        // nothing), so selecting a finding never reshapes the child list.
         if (_hasSafetyLane)
           Positioned.fill(
-            child: SafetyFindingsOverlay(
-              findings: widget.safetyFindings!,
-              selectedFindingId: widget.selectedSafetyFindingId,
-              visibleMinSeconds: visibleMinX,
-              visibleMaxSeconds: visibleMaxX,
-              insets: plotInsets,
-              laneHeight: DiveProfileChart.safetyLaneHeight,
-              laneBottomOffset:
-                  DiveProfileChart._bottomAxisNameSize +
-                  DiveProfileChart._bottomTickReservedSize,
-              units: units,
-              onFindingTap: widget.onSafetyFindingTap!,
-              onFindingDismiss: widget.onSafetyFindingDismiss ?? (_) {},
-              onFindingDetails: widget.onSafetyFindingDetails,
-            ),
+            key: const ValueKey('safetyCalloutLayer'),
+            child: safetyLayer(lane: false),
           ),
         // Range-statistics handles. Topmost so a handle wins the pointer
         // over the layers below it, and inside the chart so it shares the
         // plot rect and visible window (issue #1579).
         if (widget.rangeSelection != null)
           Positioned.fill(
+            key: const ValueKey('rangeSelectionLayer'),
             child: RangeSelectionOverlay(
               startSeconds: widget.rangeSelection!.startSeconds,
               endSeconds: widget.rangeSelection!.endSeconds,
@@ -7173,54 +7207,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     o2CellMvMax: _o2CellMvMax,
     ascentRateAxisRange: _ascentRateAxisRange,
   );
-
-  /// Format right axis tick values as plain numbers (units shown in axis label).
-  ///
-  /// Values from [_getMetricRange] are in storage units (bar, meters, etc.).
-  /// Temperature is pre-converted in [_getMetricRange]; all others are
-  /// converted here at display time to match the user's unit preferences.
-  String _formatRightAxisValue(
-    ProfileRightAxisMetric metric,
-    double value,
-    UnitFormatter units,
-  ) {
-    switch (metric) {
-      // Temperature range is already in user units (converted in _getMetricRange)
-      case ProfileRightAxisMetric.temperature:
-        return value.toStringAsFixed(0);
-      // Pressure stored in bar -> convert to user unit
-      case ProfileRightAxisMetric.pressure:
-        return units.convertPressure(value).toStringAsFixed(0);
-      // SAC stored in bar/min -> convert pressure component to user unit
-      case ProfileRightAxisMetric.sac:
-        return units.convertPressure(value).toStringAsFixed(1);
-      // Ascent rate stored in m/min -> convert depth component to user unit
-      case ProfileRightAxisMetric.ascentRate:
-        return units.convertDepth(value).toStringAsFixed(0);
-      // Mean depth stored in meters -> convert to user unit
-      case ProfileRightAxisMetric.meanDepth:
-        return units.convertDepth(value).toStringAsFixed(0);
-      // Universal units - no conversion needed
-      case ProfileRightAxisMetric.heartRate:
-      case ProfileRightAxisMetric.gf:
-      case ProfileRightAxisMetric.surfaceGf:
-        return value.toStringAsFixed(0);
-      case ProfileRightAxisMetric.ppO2:
-      case ProfileRightAxisMetric.ppN2:
-      case ProfileRightAxisMetric.ppHe:
-      case ProfileRightAxisMetric.gasDensity:
-        return value.toStringAsFixed(1);
-      case ProfileRightAxisMetric.ndl:
-      case ProfileRightAxisMetric.tts:
-      case ProfileRightAxisMetric.gtr:
-        return (value / 60).round().toString();
-      case ProfileRightAxisMetric.cns:
-      case ProfileRightAxisMetric.otu:
-        return value.toStringAsFixed(0);
-      case ProfileRightAxisMetric.o2CellMv:
-        return value.toStringAsFixed(0);
-    }
-  }
 
   /// Build axis label text for the right axis (e.g. "Temp (°C)").
   String _rightAxisLabel(ProfileRightAxisMetric metric, UnitFormatter units) =>

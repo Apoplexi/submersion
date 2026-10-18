@@ -25,6 +25,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_status_indicator.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/master_detail/keyboard_list_navigator.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/select_items_menu_entries.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
@@ -34,6 +35,7 @@ import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
+import 'package:submersion/shared/widgets/master_detail/master_detail_form_scope.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_field.dart';
@@ -470,7 +472,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                       icon: const Icon(Icons.more_vert),
                       onSelected: (value) {
                         if (value == scanTagMenuValue) {
-                          unawaited(scanAndOpenCylinderTag(context, ref));
+                          unawaited(scanAndOpenTag(context, ref));
                           return;
                         }
                         if (value.startsWith('view_')) {
@@ -601,8 +603,8 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
         id: 'printLabels',
         icon: Icons.qr_code_2,
         label: context.l10n.passport_tag_printLabels,
-        isEnabled: (ids) =>
-            everyChecked(ids, (e) => e.type == EquipmentType.tank),
+        // Any gear the diver owns takes a label (issue #2652).
+        isEnabled: (ids) => everyChecked(ids, (e) => !e.isWanted),
         onInvoke: () async {
           final ids = _selectedIds.toList();
           final messenger = ScaffoldMessenger.of(context);
@@ -864,6 +866,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           units: units,
           onSortFieldChanged: notifier.setSortField,
           onResizeColumn: notifier.resizeColumn,
+          onHideColumn: notifier.hideColumn,
           onEntityTapDown: (id) {
             ref.read(highlightedEquipmentIdProvider.notifier).state = id;
           },
@@ -925,7 +928,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           padding: dense ? EdgeInsets.zero : const EdgeInsets.all(8),
           onSelected: (value) {
             if (value == scanTagMenuValue) {
-              unawaited(scanAndOpenCylinderTag(context, ref));
+              unawaited(scanAndOpenTag(context, ref));
               return;
             }
             if (value.startsWith('view_')) {
@@ -1172,71 +1175,92 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
         });
       }
     }
+    final itemsById = {
+      for (final row in rows)
+        if (row is _EquipmentItemRow) row.item.id: row.item,
+    };
     return RefreshIndicator(
       onRefresh: () async {
         _invalidateCurrentProvider(ref);
       },
-      child: ListView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.only(bottom: 80),
-        itemCount: rows.length,
-        itemBuilder: (context, index) {
-          final EquipmentItem item;
-          switch (rows[index]) {
-            case _EquipmentLocationHeadingRow(:final location, :final count):
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: EquipmentLocationGroupHeader(
-                  location: location,
-                  count: count,
-                ),
-              );
-            case _EquipmentHeadingRow(:final type, :final sectionKey):
-              // Keyed by place and type: grouped by location, one type can
-              // head a run under several places.
-              return KeyedSubtree(
-                key: ValueKey(
-                  'equipment-type-${sectionKey ?? ''}-${type.name}',
-                ),
-                child: Padding(
-                  // Level with the card edges below it.
+      child: KeyboardListNavigator(
+        // The group headings are labels, not folds, so only items are stops.
+        keys: itemsById.keys.toList(),
+        currentKey:
+            widget.selectedId ?? ref.watch(highlightedEquipmentIdProvider),
+        onMove: (id) => moveListCursor(
+          context,
+          canOpen: !_isSelectionMode && widget.onItemSelected != null,
+          open: () => _handleRowTap(itemsById[id]!),
+          highlight: () =>
+              ref.read(highlightedEquipmentIdProvider.notifier).state = id,
+        ),
+        onActivate: (id) => _handleRowTap(itemsById[id]!),
+        child: ListView.builder(
+          controller: _scrollController,
+          padding: const EdgeInsets.only(bottom: 80),
+          itemCount: rows.length,
+          itemBuilder: (context, index) {
+            final EquipmentItem item;
+            switch (rows[index]) {
+              case _EquipmentLocationHeadingRow(:final location, :final count):
+                return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: EquipmentGroupHeader(type: type),
-                ),
-              );
-            case _EquipmentItemRow(item: final rowItem):
-              item = rowItem;
-          }
-          final isSelected =
-              widget.selectedId == item.id ||
-              ref.watch(highlightedEquipmentIdProvider) == item.id;
-          final viewMode = ref.watch(equipmentListViewModeProvider);
-          final isChecked = _selectedIds.contains(item.id);
-          void onCheckChanged(bool _) => _selection.toggle(item.id);
-          return switch (viewMode) {
-            ListViewMode.detailed || ListViewMode.compact => EquipmentListTile(
-              item: item,
-              isSelected: isSelected,
-              onTap: () => _handleRowTap(item),
-              isSelectionMode: _isSelectionMode,
-              isChecked: isChecked,
-              onCheckChanged: onCheckChanged,
-              // Chips only in the detailed mode; compact stays one line.
-              tags: viewMode == ListViewMode.detailed
-                  ? tagsByEquipment[item.id] ?? const []
-                  : const [],
-              label: labels[item.id],
-            ),
-            ListViewMode.dense || ListViewMode.table => DenseEquipmentListTile(
-              item: item,
-              isSelected: isSelected,
-              onTap: () => _handleRowTap(item),
-              isSelectionMode: _isSelectionMode,
-              isChecked: isChecked,
-              onCheckChanged: onCheckChanged,
-            ),
-          };
-        },
+                  child: EquipmentLocationGroupHeader(
+                    location: location,
+                    count: count,
+                  ),
+                );
+              case _EquipmentHeadingRow(:final type, :final sectionKey):
+                // Keyed by place and type: grouped by location, one type can
+                // head a run under several places.
+                return KeyedSubtree(
+                  key: ValueKey(
+                    'equipment-type-${sectionKey ?? ''}-${type.name}',
+                  ),
+                  child: Padding(
+                    // Level with the card edges below it.
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: EquipmentGroupHeader(type: type),
+                  ),
+                );
+              case _EquipmentItemRow(item: final rowItem):
+                item = rowItem;
+            }
+            final isSelected =
+                widget.selectedId == item.id ||
+                ref.watch(highlightedEquipmentIdProvider) == item.id;
+            final viewMode = ref.watch(equipmentListViewModeProvider);
+            final isChecked = _selectedIds.contains(item.id);
+            void onCheckChanged(bool _) => _selection.toggle(item.id);
+            final tile = switch (viewMode) {
+              ListViewMode.detailed ||
+              ListViewMode.compact => EquipmentListTile(
+                item: item,
+                isSelected: isSelected,
+                onTap: () => _handleRowTap(item),
+                isSelectionMode: _isSelectionMode,
+                isChecked: isChecked,
+                onCheckChanged: onCheckChanged,
+                // Chips only in the detailed mode; compact stays one line.
+                tags: viewMode == ListViewMode.detailed
+                    ? tagsByEquipment[item.id] ?? const []
+                    : const [],
+                label: labels[item.id],
+              ),
+              ListViewMode.dense ||
+              ListViewMode.table => DenseEquipmentListTile(
+                item: item,
+                isSelected: isSelected,
+                onTap: () => _handleRowTap(item),
+                isSelectionMode: _isSelectionMode,
+                isChecked: isChecked,
+                onCheckChanged: onCheckChanged,
+              ),
+            };
+            return KeyboardListItem(navigationKey: item.id, child: tile);
+          },
+        ),
       ),
     );
   }
@@ -1316,7 +1340,10 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             ),
             textAlign: TextAlign.center,
           ),
-          if (!filter.hasActiveFilters) ...[
+          // Hidden beside an open form: it reads as the form's submit button
+          // but only reopens the create form (issue #3192).
+          if (!filter.hasActiveFilters &&
+              !MasterDetailFormScope.isFormOpenOf(context)) ...[
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () {

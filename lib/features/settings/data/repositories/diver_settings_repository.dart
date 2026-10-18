@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:submersion/features/insights/domain/trend_gap_threshold.dart';
 import 'package:submersion/core/built_ins/hidden_built_ins_codec.dart';
 import 'package:submersion/core/constants/place_name_language.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
@@ -250,6 +251,7 @@ class DiverSettingsRepository {
               ascentGasSet: Value(s.ascentGasSet.index),
               o2Narcotic: Value(s.o2Narcotic),
               endLimit: Value(s.endLimit),
+              icdWarningsEnabled: Value(s.icdWarningsEnabled),
               defaultNdlSource: Value(s.defaultNdlSource.toInt()),
               defaultDecoStopSource: Value(s.defaultDecoStopSource.toInt()),
               defaultTtsSource: Value(s.defaultTtsSource.toInt()),
@@ -320,6 +322,7 @@ class DiverSettingsRepository {
                 _formatReminderDays(s.serviceReminderDays),
               ),
               tripServiceLeadDays: Value(s.tripServiceLeadDays),
+              trendGapCollapseMonths: Value(s.trendGapThreshold.months),
               reminderTime: Value(_formatReminderTime(s.reminderTime)),
               showDataSourceBadges: Value(s.showDataSourceBadges),
               showDiveFigure: Value(s.showDiveFigure),
@@ -342,6 +345,9 @@ class DiverSettingsRepository {
                 SiteDetailSectionConfig.sectionsToJson(s.siteDetailSections),
               ),
               siteDetailLayout: Value(s.siteDetailLayout.name),
+              hasAcceptedPlanningDisclaimer: Value(
+                s.hasAcceptedPlanningDisclaimer,
+              ),
               createdAt: Value(now),
               updatedAt: Value(now),
             ),
@@ -540,6 +546,7 @@ class DiverSettingsRepository {
     ascentGasSet: Value(settings.ascentGasSet.index),
     o2Narcotic: Value(settings.o2Narcotic),
     endLimit: Value(settings.endLimit),
+    icdWarningsEnabled: Value(settings.icdWarningsEnabled),
     defaultNdlSource: Value(settings.defaultNdlSource.toInt()),
     defaultDecoStopSource: Value(settings.defaultDecoStopSource.toInt()),
     defaultTtsSource: Value(settings.defaultTtsSource.toInt()),
@@ -604,6 +611,7 @@ class DiverSettingsRepository {
       _formatReminderDays(settings.serviceReminderDays),
     ),
     tripServiceLeadDays: Value(settings.tripServiceLeadDays),
+    trendGapCollapseMonths: Value(settings.trendGapThreshold.months),
     reminderTime: Value(_formatReminderTime(settings.reminderTime)),
     showDataSourceBadges: Value(settings.showDataSourceBadges),
     showDiveFigure: Value(settings.showDiveFigure),
@@ -626,6 +634,9 @@ class DiverSettingsRepository {
       SiteDetailSectionConfig.sectionsToJson(settings.siteDetailSections),
     ),
     siteDetailLayout: Value(settings.siteDetailLayout.name),
+    hasAcceptedPlanningDisclaimer: Value(
+      settings.hasAcceptedPlanningDisclaimer,
+    ),
   );
 
   /// Get or create settings for a diver (ensures settings always exist)
@@ -754,6 +765,7 @@ class DiverSettingsRepository {
           : AscentGasSet.allCarried,
       o2Narcotic: row.o2Narcotic,
       endLimit: row.endLimit,
+      icdWarningsEnabled: row.icdWarningsEnabled,
       defaultNdlSource: MetricDataSource.fromInt(row.defaultNdlSource),
       defaultDecoStopSource: MetricDataSource.fromInt(
         row.defaultDecoStopSource,
@@ -824,6 +836,9 @@ class DiverSettingsRepository {
       notificationsEnabled: row.notificationsEnabled,
       serviceReminderDays: _parseReminderDays(row.serviceReminderDays),
       tripServiceLeadDays: row.tripServiceLeadDays,
+      trendGapThreshold: TrendGapThreshold.fromMonths(
+        row.trendGapCollapseMonths,
+      ),
       reminderTime: _parseReminderTime(row.reminderTime),
       showDataSourceBadges: row.showDataSourceBadges,
       showDiveFigure: row.showDiveFigure,
@@ -844,6 +859,7 @@ class DiverSettingsRepository {
         row.siteDetailSections,
       ),
       siteDetailLayout: DiveDetailLayout.fromName(row.siteDetailLayout),
+      hasAcceptedPlanningDisclaimer: row.hasAcceptedPlanningDisclaimer,
     );
   }
 
