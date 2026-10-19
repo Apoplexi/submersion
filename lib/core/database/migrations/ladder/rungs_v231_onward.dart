@@ -428,5 +428,12 @@ extension RungsFromV231 on AppDatabase {
       await _assertConnectedAccountsSchema();
     }
     if (from < 295) await reportProgress();
+    // v296: media.color_adjustment and diver_settings.auto_color_correction
+    // (issue #3520). Re-asserted in beforeOpen. Renumbered from 292,
+    // claimed first by #3481.
+    if (from < 296) {
+      await _assertColorCorrectionColumns();
+    }
+    if (from < 296) await reportProgress();
   }
 }
