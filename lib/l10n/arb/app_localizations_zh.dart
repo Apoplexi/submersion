@@ -24694,7 +24694,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_manage_siteTypes_subtitle => '内置和自定义潜水点类型';
 
   @override
-  String get settings_manage_header_manageData => '管理数据';
+  String get settings_manage_header_equipment => '装备';
+
+  @override
+  String get settings_manage_header_dives => '潜水';
+
+  @override
+  String get settings_manage_header_planning => '计划';
+
+  @override
+  String get settings_manage_header_training => '培训';
+
+  @override
+  String get settings_manage_header_checklists => '检查清单';
+
+  @override
+  String get settings_manage_header_organization => '整理';
+
+  @override
+  String get settings_manage_header_setup => '初始设置';
 
   @override
   String get settings_manage_species => '物种';

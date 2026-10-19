@@ -25966,7 +25966,25 @@ class AppLocalizationsNl extends AppLocalizations {
       'Ingebouwde en eigen duikstektypes';
 
   @override
-  String get settings_manage_header_manageData => 'Gegevens beheren';
+  String get settings_manage_header_equipment => 'Uitrusting';
+
+  @override
+  String get settings_manage_header_dives => 'Duiken';
+
+  @override
+  String get settings_manage_header_planning => 'Planning';
+
+  @override
+  String get settings_manage_header_training => 'Opleiding';
+
+  @override
+  String get settings_manage_header_checklists => 'Checklists';
+
+  @override
+  String get settings_manage_header_organization => 'Organisatie';
+
+  @override
+  String get settings_manage_header_setup => 'Eerste configuratie';
 
   @override
   String get settings_manage_species => 'Soorten';
