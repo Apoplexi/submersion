@@ -16594,7 +16594,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_mod_rowEadd => 'EADD (levegősűrűség)';
 
   @override
-  String get gasCalculators_mod_rowDensity => 'Gázsűrűség 0 °C-on';
+  String gasCalculators_mod_rowDensity(String temp) {
+    return 'Gázsűrűség $temp-on';
+  }
+
+  @override
+  String get gasCalculators_mod_checkTemperature =>
+      'Gázsűrűség ellenőrzése más hőmérsékleten';
+
+  @override
+  String get gasCalculators_mod_temperatureHint =>
+      'A hidegebb gáz sűrűbb, ezért a sűrűségvizsgálat az itt kiválasztott hőmérsékletet veszi alapul, nem a gáz tényleges hőmérsékletét a mélységben.';
 
   @override
   String get gasCalculators_mod_openDensity =>
@@ -16640,18 +16650,20 @@ class AppLocalizationsHu extends AppLocalizations {
   String gasCalculators_mod_densityWarn(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: a gázsűrűség ($density g/L) meghaladja az ajánlott $limit g/L-t.';
+    return '$where: a gázsűrűség ($density g/L, $temp) meghaladja az ajánlott $limit g/L-t.';
   }
 
   @override
   String gasCalculators_mod_densityCritical(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: a gázsűrűség ($density g/L) meghaladja a $limit g/L kemény határt.';
+    return '$where: a gázsűrűség ($density g/L, $temp) meghaladja a $limit g/L kemény határt.';
   }
 
   @override

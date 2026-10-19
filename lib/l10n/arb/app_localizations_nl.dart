@@ -16541,7 +16541,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_mod_rowEadd => 'EADD (luchtdichtheid)';
 
   @override
-  String get gasCalculators_mod_rowDensity => 'Gasdichtheid bij 0 °C';
+  String gasCalculators_mod_rowDensity(String temp) {
+    return 'Gasdichtheid bij $temp';
+  }
+
+  @override
+  String get gasCalculators_mod_checkTemperature =>
+      'Gasdichtheid bij een andere temperatuur controleren';
+
+  @override
+  String get gasCalculators_mod_temperatureHint =>
+      'Kouder gas is dichter, dus de dichtheidscontrole volgt de hier gekozen temperatuur, niet de werkelijke gastemperatuur op diepte.';
 
   @override
   String get gasCalculators_mod_openDensity =>
@@ -16587,18 +16597,20 @@ class AppLocalizationsNl extends AppLocalizations {
   String gasCalculators_mod_densityWarn(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: gasdichtheid $density g/L ligt boven de aanbevolen $limit g/L.';
+    return '$where: gasdichtheid $density g/L bij $temp ligt boven de aanbevolen $limit g/L.';
   }
 
   @override
   String gasCalculators_mod_densityCritical(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: gasdichtheid $density g/L ligt boven de harde limiet van $limit g/L.';
+    return '$where: gasdichtheid $density g/L bij $temp ligt boven de harde limiet van $limit g/L.';
   }
 
   @override

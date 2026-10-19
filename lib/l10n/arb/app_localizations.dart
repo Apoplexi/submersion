@@ -26917,8 +26917,20 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_mod_rowDensity.
   ///
   /// In en, this message translates to:
-  /// **'Gas density at 0 °C'**
-  String get gasCalculators_mod_rowDensity;
+  /// **'Gas density at {temp}'**
+  String gasCalculators_mod_rowDensity(String temp);
+
+  /// No description provided for @gasCalculators_mod_checkTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Check gas density at a different temperature'**
+  String get gasCalculators_mod_checkTemperature;
+
+  /// No description provided for @gasCalculators_mod_temperatureHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Colder gas is denser. The density check assumes the temperature chosen here, not the actual gas temperature at depth.'**
+  String get gasCalculators_mod_temperatureHint;
 
   /// No description provided for @gasCalculators_mod_openDensity.
   ///
@@ -26975,20 +26987,22 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_mod_densityWarn.
   ///
   /// In en, this message translates to:
-  /// **'{where}: gas density {density} g/L is above the recommended {limit} g/L.'**
+  /// **'{where}: gas density {density} g/L at {temp} is above the recommended {limit} g/L.'**
   String gasCalculators_mod_densityWarn(
     String where,
     String density,
+    String temp,
     String limit,
   );
 
   /// No description provided for @gasCalculators_mod_densityCritical.
   ///
   /// In en, this message translates to:
-  /// **'{where}: gas density {density} g/L is above the hard limit of {limit} g/L.'**
+  /// **'{where}: gas density {density} g/L at {temp} is above the hard limit of {limit} g/L.'**
   String gasCalculators_mod_densityCritical(
     String where,
     String density,
+    String temp,
     String limit,
   );
 

@@ -16639,7 +16639,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gasCalculators_mod_rowEadd => 'EADD (densidad del aire)';
 
   @override
-  String get gasCalculators_mod_rowDensity => 'Densidad del gas a 0 °C';
+  String gasCalculators_mod_rowDensity(String temp) {
+    return 'Densidad del gas a $temp';
+  }
+
+  @override
+  String get gasCalculators_mod_checkTemperature =>
+      'Comprobar la densidad del gas a otra temperatura';
+
+  @override
+  String get gasCalculators_mod_temperatureHint =>
+      'El gas más frío es más denso, así que la comprobación de densidad sigue la temperatura elegida aquí, no la temperatura real del gas a la profundidad.';
 
   @override
   String get gasCalculators_mod_openDensity =>
@@ -16685,18 +16695,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String gasCalculators_mod_densityWarn(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: la densidad del gas $density g/L supera los $limit g/L recomendados.';
+    return '$where: la densidad del gas $density g/L a $temp supera los $limit g/L recomendados.';
   }
 
   @override
   String gasCalculators_mod_densityCritical(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: la densidad del gas $density g/L supera el límite estricto de $limit g/L.';
+    return '$where: la densidad del gas $density g/L a $temp supera el límite estricto de $limit g/L.';
   }
 
   @override

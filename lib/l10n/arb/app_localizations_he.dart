@@ -16290,7 +16290,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_mod_rowEadd => 'EADD (צפיפות אוויר)';
 
   @override
-  String get gasCalculators_mod_rowDensity => 'צפיפות גז ב-0 °C';
+  String gasCalculators_mod_rowDensity(String temp) {
+    return 'צפיפות גז ב-$temp';
+  }
+
+  @override
+  String get gasCalculators_mod_checkTemperature =>
+      'בדוק את צפיפות הגז בטמפרטורה אחרת';
+
+  @override
+  String get gasCalculators_mod_temperatureHint =>
+      'גז קר יותר צפוף יותר, כך שבדיקת הצפיפות מתבססת על הטמפרטורה שנבחרה כאן, לא על טמפרטורת הגז בפועל בעומק.';
 
   @override
   String get gasCalculators_mod_openDensity => 'פתח במחשבון צפיפות הגז';
@@ -16335,18 +16345,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String gasCalculators_mod_densityWarn(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: צפיפות הגז $density ג/ל מעל $limit ג/ל המומלצים.';
+    return '$where: צפיפות הגז $density ג/ל ב-$temp מעל $limit ג/ל המומלצים.';
   }
 
   @override
   String gasCalculators_mod_densityCritical(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: צפיפות הגז $density ג/ל מעל הגבול המוחלט של $limit ג/ל.';
+    return '$where: צפיפות הגז $density ג/ל ב-$temp מעל הגבול המוחלט של $limit ג/ל.';
   }
 
   @override

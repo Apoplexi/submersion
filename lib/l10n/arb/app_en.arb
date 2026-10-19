@@ -9929,7 +9929,16 @@
   "gasCalculators_mod_rowEad": "EAD (N₂ narcotic)",
   "gasCalculators_mod_rowEnd": "END (N₂ + O₂ narcotic)",
   "gasCalculators_mod_rowEadd": "EADD (air density)",
-  "gasCalculators_mod_rowDensity": "Gas density at 0 °C",
+  "gasCalculators_mod_rowDensity": "Gas density at {temp}",
+  "@gasCalculators_mod_rowDensity": {
+    "placeholders": {
+      "temp": {
+        "type": "String"
+      }
+    }
+  },
+  "gasCalculators_mod_checkTemperature": "Check gas density at a different temperature",
+  "gasCalculators_mod_temperatureHint": "Colder gas is denser. The density check assumes the temperature chosen here, not the actual gas temperature at depth.",
   "gasCalculators_mod_openDensity": "Open in the gas density calculator",
   "gasCalculators_mod_assessmentTitle": "Assessment",
   "gasCalculators_mod_recBeyondLimit": "The MOD lies deeper than the recreational limit of {limit}. Down there narcosis and gas density, not oxygen, set the limit.",
@@ -9979,7 +9988,7 @@
       }
     }
   },
-  "gasCalculators_mod_densityWarn": "{where}: gas density {density} g/L is above the recommended {limit} g/L.",
+  "gasCalculators_mod_densityWarn": "{where}: gas density {density} g/L at {temp} is above the recommended {limit} g/L.",
   "@gasCalculators_mod_densityWarn": {
     "placeholders": {
       "where": {
@@ -9988,18 +9997,24 @@
       "density": {
         "type": "String"
       },
+      "temp": {
+        "type": "String"
+      },
       "limit": {
         "type": "String"
       }
     }
   },
-  "gasCalculators_mod_densityCritical": "{where}: gas density {density} g/L is above the hard limit of {limit} g/L.",
+  "gasCalculators_mod_densityCritical": "{where}: gas density {density} g/L at {temp} is above the hard limit of {limit} g/L.",
   "@gasCalculators_mod_densityCritical": {
     "placeholders": {
       "where": {
         "type": "String"
       },
       "density": {
+        "type": "String"
+      },
+      "temp": {
         "type": "String"
       },
       "limit": {

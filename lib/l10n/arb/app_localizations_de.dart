@@ -16634,7 +16634,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_mod_rowEadd => 'EADD (Luftdichte)';
 
   @override
-  String get gasCalculators_mod_rowDensity => 'Gasdichte bei 0 °C';
+  String gasCalculators_mod_rowDensity(String temp) {
+    return 'Gasdichte bei $temp';
+  }
+
+  @override
+  String get gasCalculators_mod_checkTemperature =>
+      'Gasdichte bei anderer Temperatur prüfen';
+
+  @override
+  String get gasCalculators_mod_temperatureHint =>
+      'Kälteres Gas ist dichter. Die Dichteprüfung folgt der hier gewählten Temperatur, nicht der tatsächlichen Gastemperatur in der Tiefe.';
 
   @override
   String get gasCalculators_mod_openDensity => 'Im Gasdichte-Rechner öffnen';
@@ -16679,18 +16689,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String gasCalculators_mod_densityWarn(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: Gasdichte $density g/L liegt über den empfohlenen $limit g/L.';
+    return '$where: Gasdichte $density g/L bei $temp liegt über den empfohlenen $limit g/L.';
   }
 
   @override
   String gasCalculators_mod_densityCritical(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: Gasdichte $density g/L liegt über der harten Grenze von $limit g/L.';
+    return '$where: Gasdichte $density g/L bei $temp liegt über der harten Grenze von $limit g/L.';
   }
 
   @override

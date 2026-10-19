@@ -16857,7 +16857,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_mod_rowEadd => 'EADD (كثافة الهواء)';
 
   @override
-  String get gasCalculators_mod_rowDensity => 'كثافة الغاز عند 0 °C';
+  String gasCalculators_mod_rowDensity(String temp) {
+    return 'كثافة الغاز عند $temp';
+  }
+
+  @override
+  String get gasCalculators_mod_checkTemperature =>
+      'فحص كثافة الغاز عند درجة حرارة مختلفة';
+
+  @override
+  String get gasCalculators_mod_temperatureHint =>
+      'الغاز الأبرد أكثر كثافة، لذلك يعتمد فحص الكثافة على درجة الحرارة المختارة هنا، لا على درجة حرارة الغاز الفعلية في العمق.';
 
   @override
   String get gasCalculators_mod_openDensity => 'فتح في حاسبة كثافة الغاز';
@@ -16902,18 +16912,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String gasCalculators_mod_densityWarn(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: كثافة الغاز $density غ/ل أعلى من $limit غ/ل الموصى بها.';
+    return '$where: كثافة الغاز $density غ/ل عند $temp أعلى من $limit غ/ل الموصى بها.';
   }
 
   @override
   String gasCalculators_mod_densityCritical(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where: كثافة الغاز $density غ/ل أعلى من الحد الأقصى البالغ $limit غ/ل.';
+    return '$where: كثافة الغاز $density غ/ل عند $temp أعلى من الحد الأقصى البالغ $limit غ/ل.';
   }
 
   @override

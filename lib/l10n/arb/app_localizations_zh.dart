@@ -15870,7 +15870,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_mod_rowEadd => 'EADD（空气密度）';
 
   @override
-  String get gasCalculators_mod_rowDensity => '0 °C 时的气体密度';
+  String gasCalculators_mod_rowDensity(String temp) {
+    return '$temp 时的气体密度';
+  }
+
+  @override
+  String get gasCalculators_mod_checkTemperature => '在不同温度下检查气体密度';
+
+  @override
+  String get gasCalculators_mod_temperatureHint =>
+      '较冷的气体密度更大，因此密度检查采用此处选择的温度，而非深度处气体的实际温度。';
 
   @override
   String get gasCalculators_mod_openDensity => '在气体密度计算器中打开';
@@ -15914,18 +15923,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String gasCalculators_mod_densityWarn(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where：气体密度 $density g/L 高于建议的 $limit g/L。';
+    return '$where：气体密度 $density g/L（$temp）高于建议的 $limit g/L。';
   }
 
   @override
   String gasCalculators_mod_densityCritical(
     String where,
     String density,
+    String temp,
     String limit,
   ) {
-    return '$where：气体密度 $density g/L 高于 $limit g/L 的硬性限值。';
+    return '$where：气体密度 $density g/L（$temp）高于 $limit g/L 的硬性限值。';
   }
 
   @override
