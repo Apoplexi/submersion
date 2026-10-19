@@ -4600,6 +4600,43 @@ class AppLocalizationsAr extends AppLocalizations {
   String get checklists_template_addItem => 'إضافة عنصر';
 
   @override
+  String get sectionEditor_addSection => 'إضافة قسم';
+
+  @override
+  String get sectionEditor_newSectionTitle => 'قسم جديد';
+
+  @override
+  String get sectionEditor_noSection => 'بلا قسم';
+
+  @override
+  String sectionEditor_delete_title(String title) {
+    return 'حذف \"$title\"؟';
+  }
+
+  @override
+  String sectionEditor_delete_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ماذا يجب أن يحدث لعناصره البالغ عددها $count؟',
+      many: 'ماذا يجب أن يحدث لعناصره البالغ عددها $count؟',
+      few: 'ماذا يجب أن يحدث لعناصره البالغ عددها $count؟',
+      two: 'ماذا يجب أن يحدث لعنصريه؟',
+      one: 'ماذا يجب أن يحدث لعنصره الواحد؟',
+      zero: 'لا يحتوي هذا القسم على عناصر.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sectionEditor_delete_moveTo(String title) {
+    return 'نقل العناصر إلى \"$title\"';
+  }
+
+  @override
+  String get sectionEditor_delete_deleteItems => 'حذف العناصر أيضًا';
+
+  @override
   String get preDive_templates_title => 'قوائم تحقق ما قبل الغوص';
 
   @override
@@ -25192,7 +25229,23 @@ class AppLocalizationsAr extends AppLocalizations {
       'قالب قائمة التحقق قبل الغوص';
 
   @override
+  String get settings_conflict_ref_preDiveChecklistTemplateSection =>
+      'قسم من قالب قائمة التحقق قبل الغوص';
+
+  @override
   String get settings_conflict_ref_preDiveSession => 'قائمة التحقق قبل الغوص';
+
+  @override
+  String get settings_conflict_ref_preDiveSessionSection =>
+      'قسم من قائمة التحقق قبل الغوص';
+
+  @override
+  String get settings_conflict_ref_checklistTemplateSection =>
+      'قسم من قالب قائمة التحقق';
+
+  @override
+  String get settings_conflict_ref_tripChecklistSection =>
+      'قسم من قائمة التحقق';
 
   @override
   String get settings_conflict_ref_regulator => 'المنظم';

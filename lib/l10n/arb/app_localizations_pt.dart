@@ -4518,6 +4518,40 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checklists_template_addItem => 'Adicionar item';
 
   @override
+  String get sectionEditor_addSection => 'Adicionar seção';
+
+  @override
+  String get sectionEditor_newSectionTitle => 'Nova seção';
+
+  @override
+  String get sectionEditor_noSection => 'Sem seção';
+
+  @override
+  String sectionEditor_delete_title(String title) {
+    return 'Excluir \"$title\"?';
+  }
+
+  @override
+  String sectionEditor_delete_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'O que deve acontecer com seus $count itens?',
+      one: 'O que deve acontecer com seu $count item?',
+      zero: 'Esta seção não tem itens.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sectionEditor_delete_moveTo(String title) {
+    return 'Mover itens para \"$title\"';
+  }
+
+  @override
+  String get sectionEditor_delete_deleteItems => 'Excluir os itens também';
+
+  @override
   String get preDive_templates_title => 'Listas de Verificação Pré-Mergulho';
 
   @override
@@ -24984,7 +25018,23 @@ class AppLocalizationsPt extends AppLocalizations {
       'Modelo de lista pré-mergulho';
 
   @override
+  String get settings_conflict_ref_preDiveChecklistTemplateSection =>
+      'Seção do modelo de lista pré-mergulho';
+
+  @override
   String get settings_conflict_ref_preDiveSession => 'Lista pré-mergulho';
+
+  @override
+  String get settings_conflict_ref_preDiveSessionSection =>
+      'Seção da lista pré-mergulho';
+
+  @override
+  String get settings_conflict_ref_checklistTemplateSection =>
+      'Seção do modelo de lista de verificação';
+
+  @override
+  String get settings_conflict_ref_tripChecklistSection =>
+      'Seção da lista de verificação';
 
   @override
   String get settings_conflict_ref_regulator => 'Regulador';

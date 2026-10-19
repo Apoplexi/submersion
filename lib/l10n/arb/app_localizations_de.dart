@@ -4522,6 +4522,40 @@ class AppLocalizationsDe extends AppLocalizations {
   String get checklists_template_addItem => 'Eintrag hinzufügen';
 
   @override
+  String get sectionEditor_addSection => 'Abschnitt hinzufügen';
+
+  @override
+  String get sectionEditor_newSectionTitle => 'Neuer Abschnitt';
+
+  @override
+  String get sectionEditor_noSection => 'Kein Abschnitt';
+
+  @override
+  String sectionEditor_delete_title(String title) {
+    return '\"$title\" löschen?';
+  }
+
+  @override
+  String sectionEditor_delete_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Was soll mit seinen $count Einträgen passieren?',
+      one: 'Was soll mit seinem 1 Eintrag passieren?',
+      zero: 'Dieser Abschnitt enthält keine Einträge.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sectionEditor_delete_moveTo(String title) {
+    return 'Einträge zu \"$title\" verschieben';
+  }
+
+  @override
+  String get sectionEditor_delete_deleteItems => 'Einträge mitlöschen';
+
+  @override
   String get preDive_templates_title => 'Checklisten vor dem Tauchgang';
 
   @override
@@ -24941,8 +24975,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Vorlage für Checkliste vor dem Tauchgang';
 
   @override
+  String get settings_conflict_ref_preDiveChecklistTemplateSection =>
+      'Abschnitt einer Vorlage für Checkliste vor dem Tauchgang';
+
+  @override
   String get settings_conflict_ref_preDiveSession =>
       'Checkliste vor dem Tauchgang';
+
+  @override
+  String get settings_conflict_ref_preDiveSessionSection =>
+      'Abschnitt einer Checkliste vor dem Tauchgang';
+
+  @override
+  String get settings_conflict_ref_checklistTemplateSection =>
+      'Abschnitt einer Checklistenvorlage';
+
+  @override
+  String get settings_conflict_ref_tripChecklistSection =>
+      'Abschnitt einer Checkliste';
 
   @override
   String get settings_conflict_ref_regulator => 'Atemregler';

@@ -4520,6 +4520,40 @@ class AppLocalizationsIt extends AppLocalizations {
   String get checklists_template_addItem => 'Aggiungi elemento';
 
   @override
+  String get sectionEditor_addSection => 'Aggiungi sezione';
+
+  @override
+  String get sectionEditor_newSectionTitle => 'Nuova sezione';
+
+  @override
+  String get sectionEditor_noSection => 'Nessuna sezione';
+
+  @override
+  String sectionEditor_delete_title(String title) {
+    return 'Eliminare \"$title\"?';
+  }
+
+  @override
+  String sectionEditor_delete_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Cosa deve succedere ai suoi $count elementi?',
+      one: 'Cosa deve succedere al suo 1 elemento?',
+      zero: 'Questa sezione non contiene elementi.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sectionEditor_delete_moveTo(String title) {
+    return 'Sposta gli elementi in \"$title\"';
+  }
+
+  @override
+  String get sectionEditor_delete_deleteItems => 'Elimina anche gli elementi';
+
+  @override
   String get preDive_templates_title => 'Checklist pre-immersione';
 
   @override
@@ -25006,7 +25040,23 @@ class AppLocalizationsIt extends AppLocalizations {
       'Modello di lista pre-immersione';
 
   @override
+  String get settings_conflict_ref_preDiveChecklistTemplateSection =>
+      'Sezione del modello di lista pre-immersione';
+
+  @override
   String get settings_conflict_ref_preDiveSession => 'Lista pre-immersione';
+
+  @override
+  String get settings_conflict_ref_preDiveSessionSection =>
+      'Sezione della lista pre-immersione';
+
+  @override
+  String get settings_conflict_ref_checklistTemplateSection =>
+      'Sezione del modello di lista di controllo';
+
+  @override
+  String get settings_conflict_ref_tripChecklistSection =>
+      'Sezione della lista di controllo';
 
   @override
   String get settings_conflict_ref_regulator => 'Erogatore';

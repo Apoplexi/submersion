@@ -4502,6 +4502,40 @@ class AppLocalizationsHu extends AppLocalizations {
   String get checklists_template_addItem => 'Tétel hozzáadása';
 
   @override
+  String get sectionEditor_addSection => 'Szakasz hozzáadása';
+
+  @override
+  String get sectionEditor_newSectionTitle => 'Új szakasz';
+
+  @override
+  String get sectionEditor_noSection => 'Nincs szakasz';
+
+  @override
+  String sectionEditor_delete_title(String title) {
+    return 'Törli: „$title”?';
+  }
+
+  @override
+  String sectionEditor_delete_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mi történjen a $count tételével?',
+      one: 'Mi történjen az 1 tételével?',
+      zero: 'Ennek a szakasznak nincs tétele.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sectionEditor_delete_moveTo(String title) {
+    return 'Tételek áthelyezése ide: „$title”';
+  }
+
+  @override
+  String get sectionEditor_delete_deleteItems => 'Tételek törlése is';
+
+  @override
   String get preDive_templates_title => 'Merülés előtti ellenőrzőlisták';
 
   @override
@@ -24868,8 +24902,24 @@ class AppLocalizationsHu extends AppLocalizations {
       'Merülés előtti ellenőrzőlista sablon';
 
   @override
+  String get settings_conflict_ref_preDiveChecklistTemplateSection =>
+      'Merülés előtti ellenőrzőlista sablon szakasza';
+
+  @override
   String get settings_conflict_ref_preDiveSession =>
       'Merülés előtti ellenőrzőlista';
+
+  @override
+  String get settings_conflict_ref_preDiveSessionSection =>
+      'Merülés előtti ellenőrzőlista szakasza';
+
+  @override
+  String get settings_conflict_ref_checklistTemplateSection =>
+      'Ellenőrzőlista sablon szakasza';
+
+  @override
+  String get settings_conflict_ref_tripChecklistSection =>
+      'Ellenőrzőlista szakasza';
 
   @override
   String get settings_conflict_ref_regulator => 'Légzőautomata';

@@ -4426,6 +4426,40 @@ class AppLocalizationsHe extends AppLocalizations {
   String get checklists_template_addItem => 'הוסף פריט';
 
   @override
+  String get sectionEditor_addSection => 'הוספת קטע';
+
+  @override
+  String get sectionEditor_newSectionTitle => 'קטע חדש';
+
+  @override
+  String get sectionEditor_noSection => 'ללא קטע';
+
+  @override
+  String sectionEditor_delete_title(String title) {
+    return 'למחוק את \"$title\"?';
+  }
+
+  @override
+  String sectionEditor_delete_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'מה לעשות עם $count הפריטים שבו?',
+      one: 'מה לעשות עם הפריט שבו?',
+      zero: 'בקטע הזה אין פריטים.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sectionEditor_delete_moveTo(String title) {
+    return 'העבר פריטים אל \"$title\"';
+  }
+
+  @override
+  String get sectionEditor_delete_deleteItems => 'מחק גם את הפריטים';
+
+  @override
   String get preDive_templates_title => 'רשימות בדיקה לפני צלילה';
 
   @override
@@ -24360,7 +24394,22 @@ class AppLocalizationsHe extends AppLocalizations {
       'תבנית רשימת בדיקות לפני צלילה';
 
   @override
+  String get settings_conflict_ref_preDiveChecklistTemplateSection =>
+      'קטע בתבנית רשימת בדיקות לפני צלילה';
+
+  @override
   String get settings_conflict_ref_preDiveSession => 'רשימת בדיקות לפני צלילה';
+
+  @override
+  String get settings_conflict_ref_preDiveSessionSection =>
+      'קטע ברשימת בדיקות לפני צלילה';
+
+  @override
+  String get settings_conflict_ref_checklistTemplateSection =>
+      'קטע בתבנית רשימת משימות';
+
+  @override
+  String get settings_conflict_ref_tripChecklistSection => 'קטע ברשימת משימות';
 
   @override
   String get settings_conflict_ref_regulator => 'וסת';

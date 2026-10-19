@@ -7040,6 +7040,48 @@ abstract class AppLocalizations {
   /// **'Add item'**
   String get checklists_template_addItem;
 
+  /// No description provided for @sectionEditor_addSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Add section'**
+  String get sectionEditor_addSection;
+
+  /// No description provided for @sectionEditor_newSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New section'**
+  String get sectionEditor_newSectionTitle;
+
+  /// No description provided for @sectionEditor_noSection.
+  ///
+  /// In en, this message translates to:
+  /// **'No section'**
+  String get sectionEditor_noSection;
+
+  /// No description provided for @sectionEditor_delete_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\"?'**
+  String sectionEditor_delete_title(String title);
+
+  /// No description provided for @sectionEditor_delete_content.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{This section has no items.} =1{What should happen to its 1 item?} other{What should happen to its {count} items?}}'**
+  String sectionEditor_delete_content(int count);
+
+  /// No description provided for @sectionEditor_delete_moveTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Move items to \"{title}\"'**
+  String sectionEditor_delete_moveTo(String title);
+
+  /// No description provided for @sectionEditor_delete_deleteItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete items too'**
+  String get sectionEditor_delete_deleteItems;
+
   /// No description provided for @preDive_templates_title.
   ///
   /// In en, this message translates to:
@@ -40170,11 +40212,35 @@ abstract class AppLocalizations {
   /// **'Pre-dive checklist template'**
   String get settings_conflict_ref_preDiveChecklistTemplate;
 
+  /// No description provided for @settings_conflict_ref_preDiveChecklistTemplateSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-dive checklist template section'**
+  String get settings_conflict_ref_preDiveChecklistTemplateSection;
+
   /// No description provided for @settings_conflict_ref_preDiveSession.
   ///
   /// In en, this message translates to:
   /// **'Pre-dive checklist run'**
   String get settings_conflict_ref_preDiveSession;
+
+  /// No description provided for @settings_conflict_ref_preDiveSessionSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-dive checklist section'**
+  String get settings_conflict_ref_preDiveSessionSection;
+
+  /// No description provided for @settings_conflict_ref_checklistTemplateSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist template section'**
+  String get settings_conflict_ref_checklistTemplateSection;
+
+  /// No description provided for @settings_conflict_ref_tripChecklistSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist section'**
+  String get settings_conflict_ref_tripChecklistSection;
 
   /// No description provided for @settings_conflict_ref_regulator.
   ///

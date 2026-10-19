@@ -4496,6 +4496,40 @@ class AppLocalizationsNl extends AppLocalizations {
   String get checklists_template_addItem => 'Item toevoegen';
 
   @override
+  String get sectionEditor_addSection => 'Sectie toevoegen';
+
+  @override
+  String get sectionEditor_newSectionTitle => 'Nieuwe sectie';
+
+  @override
+  String get sectionEditor_noSection => 'Geen sectie';
+
+  @override
+  String sectionEditor_delete_title(String title) {
+    return '\"$title\" verwijderen?';
+  }
+
+  @override
+  String sectionEditor_delete_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Wat moet er met de $count items gebeuren?',
+      one: 'Wat moet er met het 1 item gebeuren?',
+      zero: 'Deze sectie heeft geen items.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sectionEditor_delete_moveTo(String title) {
+    return 'Items verplaatsen naar \"$title\"';
+  }
+
+  @override
+  String get sectionEditor_delete_deleteItems => 'Items ook verwijderen';
+
+  @override
   String get preDive_templates_title => 'Pre-dive checklists';
 
   @override
@@ -24830,7 +24864,23 @@ class AppLocalizationsNl extends AppLocalizations {
       'Sjabloon voor checklist voor de duik';
 
   @override
+  String get settings_conflict_ref_preDiveChecklistTemplateSection =>
+      'Sectie van het sjabloon voor checklist voor de duik';
+
+  @override
   String get settings_conflict_ref_preDiveSession => 'Checklist voor de duik';
+
+  @override
+  String get settings_conflict_ref_preDiveSessionSection =>
+      'Sectie van de checklist voor de duik';
+
+  @override
+  String get settings_conflict_ref_checklistTemplateSection =>
+      'Sectie van het checklistsjabloon';
+
+  @override
+  String get settings_conflict_ref_tripChecklistSection =>
+      'Sectie van de checklist';
 
   @override
   String get settings_conflict_ref_regulator => 'Ademautomaat';
