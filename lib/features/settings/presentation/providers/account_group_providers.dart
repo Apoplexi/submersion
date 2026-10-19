@@ -187,8 +187,10 @@ void refreshAccountState(void Function(ProviderOrFamily provider) invalidate) {
 Duration? _noRetry(int _, Object _) => null;
 
 /// A kind the diver can add here, in the order the account sheet lists them
-/// (spec section 7.4). S3 and WebDAV are one entry, "My own server".
-enum AccountKindOffer { icloud, googleDrive, dropbox, ownServer }
+/// (spec section 7.4). S3 and WebDAV are one entry, "My own server"; a Git
+/// repository has its own, since its setup differs (branch, token help, the
+/// public-repository check).
+enum AccountKindOffer { icloud, googleDrive, dropbox, ownServer, git }
 
 /// The kinds this platform and build can sign in to, gated exactly as the
 /// sync page gates its providers today.
@@ -204,6 +206,7 @@ final offerableAccountKindsProvider =
           AccountKindOffer.googleDrive,
         if (ref.watch(dropboxConfiguredProvider)) AccountKindOffer.dropbox,
         AccountKindOffer.ownServer,
+        AccountKindOffer.git,
       ];
     });
 
@@ -213,4 +216,5 @@ AccountKind? kindOfOffer(AccountKindOffer offer) => switch (offer) {
   AccountKindOffer.googleDrive => AccountKind.googledrive,
   AccountKindOffer.dropbox => AccountKind.dropbox,
   AccountKindOffer.ownServer => null,
+  AccountKindOffer.git => AccountKind.git,
 };
