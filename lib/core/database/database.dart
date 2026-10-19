@@ -1265,6 +1265,9 @@ class AppDatabase extends _$AppDatabase {
     // v292: shared_libraries.removals_json (issue #3481). Additive nullable
     // column, so the floor stays at 280.
     292,
+    // v293: connected_accounts.location (issue #3482). Additive nullable
+    // column, so the floor stays at 280.
+    293,
     294,
     // v295: connected_accounts.nickname (issue #3522). Additive nullable
     // column, so the floor stays at 280.

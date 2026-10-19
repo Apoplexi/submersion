@@ -414,6 +414,13 @@ extension RungsFromV231 on AppDatabase {
       await _assertSharedLibrarySchema();
     }
     if (from < 292) await reportProgress();
+    // v293: connected_accounts.location (issue #3482). Column only, written
+    // when a device saves or signs in to an S3 or WebDAV account;
+    // re-asserted in beforeOpen through _assertConnectedAccountsSchema.
+    if (from < 293) {
+      await _assertConnectedAccountsSchema();
+    }
+    if (from < 293) await reportProgress();
     // v294: clears certifications.photo_front / photo_back wherever the
     // v277 copy put the card in the documents store (issue #3502). Data
     // step, rung only. 293 is claimed by the accounts work (#3482).
