@@ -20649,6 +20649,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Alleen pictogrammen, ook als er ruimte is voor labels';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'Beginstatus van de zijbalk; het pijltje kan deze voor deze sessie nog steeds in- of uitklappen';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'Sleep items om de zijbalk opnieuw te ordenen. Home blijft altijd bovenaan.';
 

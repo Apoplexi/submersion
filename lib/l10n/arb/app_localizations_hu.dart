@@ -20714,6 +20714,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Csak ikonok, még akkor is, ha elférne a címke';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'Az oldalsáv kezdőállapota; a nyíl ebben a munkamenetben továbbra is kinyithatja vagy összecsukhatja';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'Húzza az elemeket az oldalsáv átrendezéséhez. A Kezdőlap mindig felül marad.';
 

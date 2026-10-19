@@ -21050,6 +21050,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'أيقونات فقط، حتى عند توفر مساحة للتسميات';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'الحالة الابتدائية للشريط الجانبي؛ لا يزال بإمكان السهم توسيعه أو طيّه لهذه الجلسة';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'اسحب العناصر لإعادة ترتيب الشريط الجانبي. تبقى الصفحة الرئيسية دائمًا في الأعلى.';
 

@@ -20757,6 +20757,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nur Icons, auch wenn Platz für Beschriftungen wäre';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'Startzustand der Seitenleiste; der Pfeil kann sie für diese Sitzung weiterhin ein- oder ausklappen';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'Elemente ziehen, um die Seitenleiste neu zu ordnen. Startseite bleibt immer oben.';
 

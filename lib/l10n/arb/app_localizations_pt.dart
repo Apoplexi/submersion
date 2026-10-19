@@ -20784,6 +20784,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Apenas ícones, mesmo quando os rótulos caberiam';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'Estado inicial da barra lateral; a seta ainda pode expandi-la ou recolhê-la durante esta sessão';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'Arraste os itens para reordenar a barra lateral. O Início fica sempre no topo.';
 

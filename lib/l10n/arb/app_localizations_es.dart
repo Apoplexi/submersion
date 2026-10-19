@@ -20785,6 +20785,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Solo iconos, incluso cuando las etiquetas cabrían';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'Estado inicial de la barra lateral; la flecha aún puede expandirla o contraerla durante esta sesión';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'Arrastra los elementos para reordenar la barra lateral. Inicio siempre permanece arriba.';
 

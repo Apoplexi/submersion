@@ -20323,6 +20323,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'סמלים בלבד, גם כשיש מקום לתוויות';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'מצב ההתחלה של סרגל הצד; החץ עדיין יכול להרחיב או לכווץ אותו עבור הפעלה זו';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'גררו פריטים כדי לסדר מחדש את סרגל הצד. דף הבית תמיד נשאר למעלה.';
 

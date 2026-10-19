@@ -20476,6 +20476,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Icons only, even where labels would normally fit';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'Starting state of the sidebar; the collapse arrow can still expand or collapse it for this session';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'Drag items to reorder the sidebar. Home always stays at the top.';
 

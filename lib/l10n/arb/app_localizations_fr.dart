@@ -20842,6 +20842,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Icônes uniquement, même si les libellés auraient de la place';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'État initial de la barre latérale ; la flèche peut toujours la développer ou la réduire pour cette session';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'Faites glisser les éléments pour réorganiser la barre latérale. Accueil reste toujours en haut.';
 

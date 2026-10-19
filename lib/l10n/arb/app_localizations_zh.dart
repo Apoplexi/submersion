@@ -19758,6 +19758,10 @@ class AppLocalizationsZh extends AppLocalizations {
       '仅显示图标,即使有空间显示标签';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      '侧边栏的初始状态,该箭头仍可在本次会话中将其展开或折叠。';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       '拖动项目以重新排列侧边栏。主页始终位于顶部。';
 

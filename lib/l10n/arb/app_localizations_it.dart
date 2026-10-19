@@ -20782,6 +20782,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Solo icone, anche quando ci sarebbe spazio per le etichette';
 
   @override
+  String get settings_navCustomization_alwaysHideLabels_subtitleDesktop =>
+      'Stato iniziale della barra laterale; la freccia può comunque espanderla o comprimerla per questa sessione';
+
+  @override
   String get settings_navCustomization_descriptionDesktop =>
       'Trascina gli elementi per riordinare la barra laterale. Home resta sempre in alto.';
 
