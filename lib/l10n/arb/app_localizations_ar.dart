@@ -24019,6 +24019,52 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_field_ruleId => 'القاعدة';
 
   @override
+  String get settings_conflict_field_ruleActions => 'الإجراءات';
+
+  @override
+  String get settings_conflict_field_ruleChangeAfter => 'بعد';
+
+  @override
+  String get settings_conflict_field_ruleChangeBefore => 'قبل';
+
+  @override
+  String get settings_conflict_field_ruleChangeField => 'الحقل المُغيَّر';
+
+  @override
+  String get settings_conflict_field_ruleCondition => 'الشرط';
+
+  @override
+  String get settings_conflict_field_ruleName => 'اسم القاعدة';
+
+  @override
+  String get settings_conflict_field_ruleRun => 'تشغيل القاعدة';
+
+  @override
+  String get settings_conflict_field_ruleRunAt => 'وقت التشغيل';
+
+  @override
+  String get settings_conflict_field_ruleRunChangedCount =>
+      'العناصر المُغيَّرة';
+
+  @override
+  String get settings_conflict_field_ruleRunDevice => 'الجهاز';
+
+  @override
+  String get settings_conflict_field_ruleRunSource => 'المصدر';
+
+  @override
+  String get settings_conflict_field_ruleRunTrigger => 'بدأه';
+
+  @override
+  String get settings_conflict_field_ruleRunUndoneAt => 'وقت التراجع';
+
+  @override
+  String get settings_conflict_field_ruleTarget => 'العنصر المُغيَّر';
+
+  @override
+  String get settings_conflict_field_ruleTriggers => 'وقت التشغيل';
+
+  @override
   String get settings_conflict_field_sacBottom => 'استهلاك الغاز في القاع';
 
   @override
@@ -54379,6 +54425,787 @@ class AppLocalizationsAr extends AppLocalizations {
   String savedQueries_snackbar_deleted(String name) {
     return 'تم حذف \"$name\"';
   }
+
+  @override
+  String get settings_manage_rules => 'القواعد';
+
+  @override
+  String get settings_manage_rules_subtitle =>
+      'صنّف الغطسات والمواقع واملأ بياناتها تلقائيًا';
+
+  @override
+  String get rules_page_title => 'القواعد';
+
+  @override
+  String get rules_section_dives => 'قواعد الغطسات';
+
+  @override
+  String get rules_section_sites => 'قواعد المواقع';
+
+  @override
+  String rules_empty(String depth) {
+    return 'تطبّق القواعد شروطك الخاصة على سجلك، مثل إضافة نوع الغطسة «عميقة» إلى كل غطسة أعمق من $depth. لا يُشغَّل شيء حتى تنشئ قاعدة.';
+  }
+
+  @override
+  String get rules_action_new => 'قاعدة جديدة';
+
+  @override
+  String get rules_action_history => 'السجل';
+
+  @override
+  String get rules_action_runAll => 'تشغيل القواعد';
+
+  @override
+  String get rules_action_runAllDives => 'تشغيل قواعد الغطسات على كل الغطسات';
+
+  @override
+  String get rules_action_runAllSites => 'تشغيل قواعد المواقع على كل المواقع';
+
+  @override
+  String get rules_row_runOnAllDives => 'تشغيل على كل الغطسات';
+
+  @override
+  String get rules_row_runOnAllSites => 'تشغيل على كل المواقع';
+
+  @override
+  String get rules_row_duplicate => 'تكرار';
+
+  @override
+  String get rules_row_delete => 'حذف';
+
+  @override
+  String get rules_row_menuTooltip => 'إجراءات القاعدة';
+
+  @override
+  String get rules_row_enabled => 'مفعّلة';
+
+  @override
+  String get rules_reorderTooltip => 'اسحب لتغيير ترتيب تشغيل القواعد';
+
+  @override
+  String get rules_deleteDialog_title => 'حذف القاعدة؟';
+
+  @override
+  String rules_deleteDialog_content(String name) {
+    return 'حذف «$name»؟ ما غيّرته بالفعل يبقى في السجل ويمكن التراجع عنه.';
+  }
+
+  @override
+  String rules_snackbar_deleted(String name) {
+    return 'تم حذف «$name»';
+  }
+
+  @override
+  String get rules_copySuffix => ' (نسخة)';
+
+  @override
+  String get rules_trigger_afterImport => 'بعد الاستيراد';
+
+  @override
+  String get rules_trigger_afterManualDive => 'بعد تسجيل غطسة يدويًا';
+
+  @override
+  String get rules_trigger_afterManualSite => 'بعد إنشاء موقع يدويًا';
+
+  @override
+  String get rules_trigger_onDemandOnly => 'فقط عندما تشغّلها';
+
+  @override
+  String get rules_trigger_off => 'متوقفة: تعمل فقط من قائمتها';
+
+  @override
+  String get rules_condition_everyDive => 'كل غطسة';
+
+  @override
+  String get rules_condition_everySite => 'كل موقع';
+
+  @override
+  String get rules_problem_unreadable =>
+      'لا يمكن قراءة شرط هذه القاعدة. عدّلها أو احذفها.';
+
+  @override
+  String get rules_problem_invalid =>
+      'لم يعد شرط هذه القاعدة صالحًا. عدّلها أو احذفها.';
+
+  @override
+  String get rules_problem_unknownSubject =>
+      'هذه القاعدة لشيء لا يتوفر في هذا الإصدار.';
+
+  @override
+  String get rules_problem_unresolvedRef =>
+      'يذكر الشرط شيئًا تم حذفه. عدّل القاعدة لتشغيلها.';
+
+  @override
+  String get rules_problem_newerVersion =>
+      'أُنشئت بإصدار أحدث من Submersion. حدّث التطبيق لتشغيلها أو تعديلها.';
+
+  @override
+  String get rules_problem_noActions => 'لا تحتوي هذه القاعدة على إجراءات.';
+
+  @override
+  String get rules_problem_brokenAction =>
+      'يذكر أحد الإجراءات شيئًا تم حذفه؛ سيتم تخطي هذا الإجراء.';
+
+  @override
+  String rules_actionSummary_set(String field, String value) {
+    return 'تعيين $field إلى $value';
+  }
+
+  @override
+  String rules_actionSummary_add(String collection, String items) {
+    return 'إضافة $collection: $items';
+  }
+
+  @override
+  String rules_actionSummary_remove(String collection, String items) {
+    return 'إزالة $collection: $items';
+  }
+
+  @override
+  String rules_actionSummary_appendNotes(String text) {
+    return 'إلحاق بالملاحظات: $text';
+  }
+
+  @override
+  String rules_actionSummary_appendDescription(String text) {
+    return 'إلحاق بالوصف: $text';
+  }
+
+  @override
+  String get rules_actionSummary_unknown => 'إجراء من إصدار أحدث';
+
+  @override
+  String get rules_actionSummary_missing => '(محذوف)';
+
+  @override
+  String get rules_value_yes => 'نعم';
+
+  @override
+  String get rules_value_no => 'لا';
+
+  @override
+  String get rules_value_empty => '(فارغ)';
+
+  @override
+  String get rules_collection_diveTypes => 'أنواع الغطس';
+
+  @override
+  String get rules_collection_tags => 'الوسوم';
+
+  @override
+  String get rules_collection_equipment => 'المعدات';
+
+  @override
+  String get rules_collection_buddies => 'الرفاق';
+
+  @override
+  String get rules_collection_courses => 'الدورات';
+
+  @override
+  String get rules_collection_siteTags => 'وسوم المواقع';
+
+  @override
+  String get rules_collection_siteTypes => 'أنواع المواقع';
+
+  @override
+  String get rules_field_diveCenter => 'مركز الغوص';
+
+  @override
+  String get rules_field_diveOperator => 'مشغّل الغوص';
+
+  @override
+  String get rules_field_boatName => 'اسم القارب';
+
+  @override
+  String get rules_field_boatCaptain => 'قائد القارب';
+
+  @override
+  String get rules_field_trip => 'الرحلة';
+
+  @override
+  String get rules_field_rating => 'التقييم';
+
+  @override
+  String get rules_field_isFavorite => 'المفضلة';
+
+  @override
+  String get rules_field_excludedFromStats => 'مستبعدة من الإحصاءات';
+
+  @override
+  String get rules_field_excludedFromGasStats => 'مستبعدة من إحصاءات الغاز';
+
+  @override
+  String get rules_field_waterType => 'نوع المياه';
+
+  @override
+  String get rules_field_visibility => 'الرؤية';
+
+  @override
+  String get rules_field_currentDirection => 'اتجاه التيار';
+
+  @override
+  String get rules_field_currentStrength => 'قوة التيار';
+
+  @override
+  String get rules_field_swellHeight => 'ارتفاع الموج';
+
+  @override
+  String get rules_field_surfaceConditions => 'ظروف السطح';
+
+  @override
+  String get rules_field_entryMethod => 'طريقة الدخول';
+
+  @override
+  String get rules_field_exitMethod => 'طريقة الخروج';
+
+  @override
+  String get rules_field_altitude => 'الارتفاع';
+
+  @override
+  String get rules_field_surfacePressure => 'الضغط السطحي';
+
+  @override
+  String get rules_field_surfaceInterval => 'الفاصل السطحي';
+
+  @override
+  String get rules_field_gradientFactorLow => 'GF المنخفض';
+
+  @override
+  String get rules_field_gradientFactorHigh => 'GF المرتفع';
+
+  @override
+  String get rules_field_decoAlgorithm => 'خوارزمية تخفيف الضغط';
+
+  @override
+  String get rules_field_decoConservatism => 'درجة التحفظ';
+
+  @override
+  String get rules_field_diveComputerModel => 'طراز حاسوب الغوص';
+
+  @override
+  String get rules_field_windSpeed => 'سرعة الرياح';
+
+  @override
+  String get rules_field_windDirection => 'اتجاه الرياح';
+
+  @override
+  String get rules_field_cloudCover => 'الغطاء السحابي';
+
+  @override
+  String get rules_field_precipitation => 'الهطول';
+
+  @override
+  String get rules_field_humidity => 'الرطوبة';
+
+  @override
+  String get rules_field_weatherDescription => 'وصف الطقس';
+
+  @override
+  String get rules_field_diveMode => 'وضع الغوص';
+
+  @override
+  String get rules_field_setpointLow => 'نقطة الضبط المنخفضة';
+
+  @override
+  String get rules_field_setpointHigh => 'نقطة الضبط المرتفعة';
+
+  @override
+  String get rules_field_setpointDeco => 'نقطة ضبط تخفيف الضغط';
+
+  @override
+  String get rules_field_diluentGas => 'المُخفِّف (O2/He)';
+
+  @override
+  String get rules_field_scrubberType => 'نوع جهاز التنقية';
+
+  @override
+  String get rules_field_scrubberDuration => 'مدة جهاز التنقية';
+
+  @override
+  String get rules_field_diverRole => 'دوري';
+
+  @override
+  String get rules_field_notes => 'الملاحظات';
+
+  @override
+  String get rules_siteField_difficulty => 'الصعوبة';
+
+  @override
+  String get rules_siteField_country => 'الدولة';
+
+  @override
+  String get rules_siteField_region => 'المنطقة';
+
+  @override
+  String get rules_siteField_city => 'المدينة';
+
+  @override
+  String get rules_siteField_island => 'الجزيرة';
+
+  @override
+  String get rules_siteField_bodyOfWater => 'المسطح المائي';
+
+  @override
+  String get rules_siteField_minDepth => 'أدنى عمق';
+
+  @override
+  String get rules_siteField_maxDepth => 'أقصى عمق';
+
+  @override
+  String get rules_siteField_hazards => 'المخاطر';
+
+  @override
+  String get rules_siteField_accessNotes => 'ملاحظات الوصول';
+
+  @override
+  String get rules_siteField_mooringNumber => 'رقم المرسى';
+
+  @override
+  String get rules_siteField_parkingInfo => 'معلومات الركن';
+
+  @override
+  String get rules_edit_titleNew => 'قاعدة جديدة';
+
+  @override
+  String get rules_edit_titleEdit => 'تعديل القاعدة';
+
+  @override
+  String get rules_edit_name => 'الاسم';
+
+  @override
+  String get rules_edit_appliesTo => 'تنطبق على';
+
+  @override
+  String get rules_edit_subjectDives => 'الغطسات';
+
+  @override
+  String get rules_edit_subjectSites => 'المواقع';
+
+  @override
+  String get rules_edit_whenRuns => 'وقت التشغيل';
+
+  @override
+  String get rules_edit_runNote =>
+      'يمكنك دائمًا تشغيل القاعدة بنفسك، من صفحة القواعد أو على عناصر محددة.';
+
+  @override
+  String get rules_edit_if => 'إذا';
+
+  @override
+  String get rules_edit_then => 'فعندئذٍ';
+
+  @override
+  String rules_edit_matchCountDives(int count) {
+    return 'تطابق $count من غطساتك';
+  }
+
+  @override
+  String rules_edit_matchCountSites(int count) {
+    return 'تطابق $count من مواقعك';
+  }
+
+  @override
+  String get rules_edit_matchesEveryDive => 'بلا شرط: تطابق القاعدة كل غطسة';
+
+  @override
+  String get rules_edit_matchesEverySite => 'بلا شرط: تطابق القاعدة كل موقع';
+
+  @override
+  String get rules_edit_addAction => 'إضافة إجراء';
+
+  @override
+  String get rules_edit_noActions => 'أضف إجراءً واحدًا على الأقل.';
+
+  @override
+  String get rules_picker_search => 'البحث في الإجراءات';
+
+  @override
+  String rules_picker_set(String field) {
+    return 'تعيين $field';
+  }
+
+  @override
+  String rules_picker_add(String collection) {
+    return 'إضافة $collection';
+  }
+
+  @override
+  String rules_picker_remove(String collection) {
+    return 'إزالة $collection';
+  }
+
+  @override
+  String get rules_picker_appendNotes => 'إلحاق بالملاحظات';
+
+  @override
+  String get rules_picker_appendDescription => 'إلحاق بالوصف';
+
+  @override
+  String get rules_actionEditor_value => 'القيمة';
+
+  @override
+  String get rules_actionEditor_text => 'النص المراد إلحاقه';
+
+  @override
+  String get rules_actionEditor_role => 'الدور';
+
+  @override
+  String get rules_actionEditor_o2 => 'O2 %';
+
+  @override
+  String get rules_actionEditor_he => 'He %';
+
+  @override
+  String rules_actionEditor_choose(String field) {
+    return 'اختر $field';
+  }
+
+  @override
+  String get rules_action_undo => 'تراجع';
+
+  @override
+  String rules_preview_titleDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تطبيق القواعد على $count غطسة؟',
+      many: 'تطبيق القواعد على $count غطسة؟',
+      few: 'تطبيق القواعد على $count غطسات؟',
+      two: 'تطبيق القواعد على غطستين؟',
+      one: 'تطبيق القواعد على $count غطسة؟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_titleSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تطبيق القواعد على $count موقع؟',
+      many: 'تطبيق القواعد على $count موقعًا؟',
+      few: 'تطبيق القواعد على $count مواقع؟',
+      two: 'تطبيق القواعد على موقعين؟',
+      one: 'تطبيق القواعد على $count موقع؟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_willChangeDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ستتغير $count غطسة.',
+      many: 'ستتغير $count غطسة.',
+      few: 'ستتغير $count غطسات.',
+      two: 'ستتغير غطستان.',
+      one: 'ستتغير $count غطسة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_willChangeSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'سيتغير $count موقع.',
+      many: 'سيتغير $count موقعًا.',
+      few: 'ستتغير $count مواقع.',
+      two: 'سيتغير موقعان.',
+      one: 'سيتغير $count موقع.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_outOfScope(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عنصر محدد لا يحق لك تغييره وتم استبعاده.',
+      many: '$count عنصرًا محددًا لا يحق لك تغييره وتم استبعاده.',
+      few: '$count عناصر محددة لا يحق لك تغييرها وتم استبعادها.',
+      two: 'عنصران محددان لا يحق لك تغييرهما وتم استبعادهما.',
+      one: '$count عنصر محدد لا يحق لك تغييره وتم استبعاده.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_skippedRules(String names) {
+    return 'لا يمكن تشغيل هذه القواعد وتم تخطيها: $names';
+  }
+
+  @override
+  String rules_preview_skippedActions(String names) {
+    return 'بعض الإجراءات تذكر عناصر محذوفة وتم تخطيها: $names';
+  }
+
+  @override
+  String get rules_preview_groupByTarget => 'حسب العنصر';
+
+  @override
+  String get rules_preview_groupByRule => 'حسب القاعدة';
+
+  @override
+  String rules_preview_applyDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تطبيق على $count غطسة',
+      many: 'تطبيق على $count غطسة',
+      few: 'تطبيق على $count غطسات',
+      two: 'تطبيق على غطستين',
+      one: 'تطبيق على $count غطسة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_applySites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تطبيق على $count موقع',
+      many: 'تطبيق على $count موقعًا',
+      few: 'تطبيق على $count مواقع',
+      two: 'تطبيق على موقعين',
+      one: 'تطبيق على $count موقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_run_noChangesDives =>
+      'لا تغييرات: هذه الغطسات تطابق قواعدك بالفعل.';
+
+  @override
+  String get rules_run_noChangesSites =>
+      'لا تغييرات: هذه المواقع تطابق قواعدك بالفعل.';
+
+  @override
+  String get rules_run_noRulesOnDives =>
+      'لا توجد قواعد غطسات مفعّلة. فعّل واحدة، أو شغّلها من قائمتها.';
+
+  @override
+  String get rules_run_noRulesOnSites =>
+      'لا توجد قواعد مواقع مفعّلة. فعّل واحدة، أو شغّلها من قائمتها.';
+
+  @override
+  String rules_run_doneDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'غيّرت القواعد $count غطسة',
+      many: 'غيّرت القواعد $count غطسة',
+      few: 'غيّرت القواعد $count غطسات',
+      two: 'غيّرت القواعد غطستين',
+      one: 'غيّرت القواعد $count غطسة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_run_doneSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'غيّرت القواعد $count موقع',
+      many: 'غيّرت القواعد $count موقعًا',
+      few: 'غيّرت القواعد $count مواقع',
+      two: 'غيّرت القواعد موقعين',
+      one: 'غيّرت القواعد $count موقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_undo_done => 'تم التراجع.';
+
+  @override
+  String rules_undo_doneSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'تم التراجع. عُدِّل $count عنصر بعد هذا التشغيل؛ تُركت تغييراتها كما هي.',
+      many:
+          'تم التراجع. عُدِّل $count عنصرًا بعد هذا التشغيل؛ تُركت تغييراتها كما هي.',
+      few:
+          'تم التراجع. عُدِّلت $count عناصر بعد هذا التشغيل؛ تُركت تغييراتها كما هي.',
+      two:
+          'تم التراجع. عُدِّل عنصران بعد هذا التشغيل؛ تُركت تغييراتهما كما هي.',
+      one:
+          'تم التراجع. عُدِّل $count عنصر بعد هذا التشغيل؛ تُركت تغييراته كما هي.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_undo_nothingYet =>
+      'لا شيء للتراجع عنه على هذا الجهاز بعد. حاول مجددًا بعد المزامنة.';
+
+  @override
+  String get rules_undo_alreadyUndone => 'تم التراجع بالفعل.';
+
+  @override
+  String rules_change_line(
+    String rule,
+    String field,
+    String before,
+    String after,
+  ) {
+    return '$rule: $field $before ← $after';
+  }
+
+  @override
+  String rules_change_appended(String field, String text) {
+    return '$field: أُلحق «$text»';
+  }
+
+  @override
+  String get rules_target_noSite => 'بلا موقع';
+
+  @override
+  String get rules_siteField_description => 'الوصف';
+
+  @override
+  String get rules_history_title => 'سجل القواعد';
+
+  @override
+  String get rules_history_empty =>
+      'في كل مرة تغيّر فيها قواعدك شيئًا، يظهر التشغيل هنا لتراجعه أو تتراجع عنه.';
+
+  @override
+  String get rules_history_triggerImported => 'بعد الاستيراد';
+
+  @override
+  String rules_history_triggerImportedFrom(String source) {
+    return 'بعد الاستيراد ($source)';
+  }
+
+  @override
+  String get rules_history_triggerCreatedByHand => 'أُنشئ يدويًا';
+
+  @override
+  String get rules_history_triggerOnDemandAll => 'تشغيل يدوي على الكل';
+
+  @override
+  String get rules_history_triggerOnDemandSelection => 'تشغيل على عناصر محددة';
+
+  @override
+  String rules_history_changed(int count, String rules) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عنصر غيّرتها $rules',
+      many: '$count عنصرًا غيّرتها $rules',
+      few: '$count عناصر غيّرتها $rules',
+      two: 'عنصران غيّرتهما $rules',
+      one: '$count عنصر غيّرته $rules',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_history_device(String device) {
+    return 'على $device';
+  }
+
+  @override
+  String rules_history_undone(String date) {
+    return 'تم التراجع $date';
+  }
+
+  @override
+  String get rules_history_undoTooltip => 'التراجع عن هذا التشغيل';
+
+  @override
+  String get rules_history_deleteTooltip => 'حذف هذا الإدخال';
+
+  @override
+  String get rules_history_clear => 'مسح السجل';
+
+  @override
+  String get rules_history_clearDialog_title => 'مسح سجل القواعد؟';
+
+  @override
+  String get rules_history_clearDialog_content =>
+      'يزيل هذا كل الإدخالات. ما غيّرته القواعد يبقى كما هو؛ لكن لا يمكن التراجع عنه من هنا بعد الآن.';
+
+  @override
+  String get rules_run_title => 'تشغيل القاعدة';
+
+  @override
+  String get rules_run_undo => 'التراجع عن هذا التشغيل';
+
+  @override
+  String rules_import_changedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'غيّرت القواعد $count من هذه الغطسات',
+      many: 'غيّرت القواعد $count من هذه الغطسات',
+      few: 'غيّرت القواعد $count من هذه الغطسات',
+      two: 'غيّرت القواعد اثنتين من هذه الغطسات',
+      one: 'غيّرت القواعد $count من هذه الغطسات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_import_changedSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'غيّرت القواعد $count من هذه المواقع',
+      many: 'غيّرت القواعد $count من هذه المواقع',
+      few: 'غيّرت القواعد $count من هذه المواقع',
+      two: 'غيّرت القواعد اثنين من هذه المواقع',
+      one: 'غيّرت القواعد $count من هذه المواقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_import_seeChanges => 'عرض التغييرات';
+
+  @override
+  String get rules_import_undo => 'التراجع عن تغييرات القواعد';
+
+  @override
+  String get rules_import_undoNote => 'يُبقي التراجع الغطسات المستوردة.';
+
+  @override
+  String get rules_import_failed =>
+      'تم استيراد الغطسات، لكن تعذّر تشغيل قواعدك.';
+
+  @override
+  String rules_create_changedDive(String rules) {
+    return 'غيّرت القواعد هذه الغطسة: $rules';
+  }
+
+  @override
+  String rules_create_changedSite(String rules) {
+    return 'غيّرت القواعد هذا الموقع: $rules';
+  }
+
+  @override
+  String rules_create_changedSites(String rules) {
+    return 'غيّرت القواعد هذه المواقع: $rules';
+  }
+
+  @override
+  String get rules_create_details => 'التفاصيل';
+
+  @override
+  String get rules_create_failed => 'تم الحفظ، لكن تعذّر تشغيل قواعدك.';
+
+  @override
+  String get rules_action_applyRules => 'تطبيق القواعد';
 
   @override
   String get settings_manage_savedQueries => 'الاستعلامات المحفوظة';

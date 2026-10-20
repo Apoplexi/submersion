@@ -23761,6 +23761,52 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_conflict_field_ruleId => 'Regel';
 
   @override
+  String get settings_conflict_field_ruleActions => 'Aktionen';
+
+  @override
+  String get settings_conflict_field_ruleChangeAfter => 'Danach';
+
+  @override
+  String get settings_conflict_field_ruleChangeBefore => 'Davor';
+
+  @override
+  String get settings_conflict_field_ruleChangeField => 'Geändertes Feld';
+
+  @override
+  String get settings_conflict_field_ruleCondition => 'Bedingung';
+
+  @override
+  String get settings_conflict_field_ruleName => 'Regelname';
+
+  @override
+  String get settings_conflict_field_ruleRun => 'Regellauf';
+
+  @override
+  String get settings_conflict_field_ruleRunAt => 'Ausgeführt am';
+
+  @override
+  String get settings_conflict_field_ruleRunChangedCount =>
+      'Geänderte Einträge';
+
+  @override
+  String get settings_conflict_field_ruleRunDevice => 'Gerät';
+
+  @override
+  String get settings_conflict_field_ruleRunSource => 'Quelle';
+
+  @override
+  String get settings_conflict_field_ruleRunTrigger => 'Ausgelöst durch';
+
+  @override
+  String get settings_conflict_field_ruleRunUndoneAt => 'Rückgängig gemacht am';
+
+  @override
+  String get settings_conflict_field_ruleTarget => 'Geänderter Eintrag';
+
+  @override
+  String get settings_conflict_field_ruleTriggers => 'Läuft wann';
+
+  @override
   String get settings_conflict_field_sacBottom => 'Gasverbrauch am Grund';
 
   @override
@@ -53577,6 +53623,759 @@ class AppLocalizationsDe extends AppLocalizations {
   String savedQueries_snackbar_deleted(String name) {
     return '\"$name\" gelöscht';
   }
+
+  @override
+  String get settings_manage_rules => 'Regeln';
+
+  @override
+  String get settings_manage_rules_subtitle =>
+      'Tauchgänge und Tauchplätze automatisch einordnen und ausfüllen';
+
+  @override
+  String get rules_page_title => 'Regeln';
+
+  @override
+  String get rules_section_dives => 'Tauchgangsregeln';
+
+  @override
+  String get rules_section_sites => 'Tauchplatzregeln';
+
+  @override
+  String rules_empty(String depth) {
+    return 'Regeln wenden deine eigenen Bedingungen auf dein Logbuch an, zum Beispiel den Tauchgangstyp Tief für jeden Tauchgang tiefer als $depth. Nichts läuft, bevor du eine Regel anlegst.';
+  }
+
+  @override
+  String get rules_action_new => 'Neue Regel';
+
+  @override
+  String get rules_action_history => 'Verlauf';
+
+  @override
+  String get rules_action_runAll => 'Regeln ausführen';
+
+  @override
+  String get rules_action_runAllDives =>
+      'Tauchgangsregeln auf alle Tauchgänge anwenden';
+
+  @override
+  String get rules_action_runAllSites =>
+      'Tauchplatzregeln auf alle Tauchplätze anwenden';
+
+  @override
+  String get rules_row_runOnAllDives => 'Auf alle Tauchgänge anwenden';
+
+  @override
+  String get rules_row_runOnAllSites => 'Auf alle Tauchplätze anwenden';
+
+  @override
+  String get rules_row_duplicate => 'Duplizieren';
+
+  @override
+  String get rules_row_delete => 'Löschen';
+
+  @override
+  String get rules_row_menuTooltip => 'Regelaktionen';
+
+  @override
+  String get rules_row_enabled => 'Aktiv';
+
+  @override
+  String get rules_reorderTooltip =>
+      'Ziehen, um die Reihenfolge der Regeln zu ändern';
+
+  @override
+  String get rules_deleteDialog_title => 'Regel löschen?';
+
+  @override
+  String rules_deleteDialog_content(String name) {
+    return '„$name“ löschen? Was sie bereits geändert hat, bleibt im Verlauf und kann weiterhin rückgängig gemacht werden.';
+  }
+
+  @override
+  String rules_snackbar_deleted(String name) {
+    return '„$name“ gelöscht';
+  }
+
+  @override
+  String get rules_copySuffix => ' (Kopie)';
+
+  @override
+  String get rules_trigger_afterImport => 'Nach dem Import';
+
+  @override
+  String get rules_trigger_afterManualDive =>
+      'Nach manuellem Erfassen eines Tauchgangs';
+
+  @override
+  String get rules_trigger_afterManualSite =>
+      'Nach manuellem Anlegen eines Tauchplatzes';
+
+  @override
+  String get rules_trigger_onDemandOnly => 'Nur wenn du sie ausführst';
+
+  @override
+  String get rules_trigger_off => 'Aus: läuft nur über ihr eigenes Menü';
+
+  @override
+  String get rules_condition_everyDive => 'Jeder Tauchgang';
+
+  @override
+  String get rules_condition_everySite => 'Jeder Tauchplatz';
+
+  @override
+  String get rules_problem_unreadable =>
+      'Die Bedingung dieser Regel ist nicht lesbar. Bearbeite oder lösche sie.';
+
+  @override
+  String get rules_problem_invalid =>
+      'Die Bedingung dieser Regel ist nicht mehr gültig. Bearbeite oder lösche sie.';
+
+  @override
+  String get rules_problem_unknownSubject =>
+      'Diese Regel gilt für etwas, das diese Version nicht kennt.';
+
+  @override
+  String get rules_problem_unresolvedRef =>
+      'Die Bedingung nennt etwas, das gelöscht wurde. Bearbeite die Regel, um sie auszuführen.';
+
+  @override
+  String get rules_problem_newerVersion =>
+      'Mit einer neueren Version von Submersion erstellt. Aktualisiere die App, um sie auszuführen oder zu bearbeiten.';
+
+  @override
+  String get rules_problem_noActions => 'Diese Regel hat keine Aktionen.';
+
+  @override
+  String get rules_problem_brokenAction =>
+      'Eine Aktion nennt etwas, das gelöscht wurde; diese Aktion wird übersprungen.';
+
+  @override
+  String rules_actionSummary_set(String field, String value) {
+    return '$field auf $value setzen';
+  }
+
+  @override
+  String rules_actionSummary_add(String collection, String items) {
+    return '$collection hinzufügen: $items';
+  }
+
+  @override
+  String rules_actionSummary_remove(String collection, String items) {
+    return '$collection entfernen: $items';
+  }
+
+  @override
+  String rules_actionSummary_appendNotes(String text) {
+    return 'An Notizen anhängen: $text';
+  }
+
+  @override
+  String rules_actionSummary_appendDescription(String text) {
+    return 'An Beschreibung anhängen: $text';
+  }
+
+  @override
+  String get rules_actionSummary_unknown =>
+      'Eine Aktion aus einer neueren Version';
+
+  @override
+  String get rules_actionSummary_missing => '(gelöscht)';
+
+  @override
+  String get rules_value_yes => 'Ja';
+
+  @override
+  String get rules_value_no => 'Nein';
+
+  @override
+  String get rules_value_empty => '(leer)';
+
+  @override
+  String get rules_collection_diveTypes => 'Tauchgangstypen';
+
+  @override
+  String get rules_collection_tags => 'Tags';
+
+  @override
+  String get rules_collection_equipment => 'Ausrüstung';
+
+  @override
+  String get rules_collection_buddies => 'Tauchpartner';
+
+  @override
+  String get rules_collection_courses => 'Kurse';
+
+  @override
+  String get rules_collection_siteTags => 'Tauchplatz-Tags';
+
+  @override
+  String get rules_collection_siteTypes => 'Tauchplatztypen';
+
+  @override
+  String get rules_field_diveCenter => 'Tauchbasis';
+
+  @override
+  String get rules_field_diveOperator => 'Tauchanbieter';
+
+  @override
+  String get rules_field_boatName => 'Bootsname';
+
+  @override
+  String get rules_field_boatCaptain => 'Bootskapitän';
+
+  @override
+  String get rules_field_trip => 'Reise';
+
+  @override
+  String get rules_field_rating => 'Bewertung';
+
+  @override
+  String get rules_field_isFavorite => 'Favorit';
+
+  @override
+  String get rules_field_excludedFromStats => 'von Statistiken ausgeschlossen';
+
+  @override
+  String get rules_field_excludedFromGasStats =>
+      'von Gasstatistiken ausgeschlossen';
+
+  @override
+  String get rules_field_waterType => 'Wasserart';
+
+  @override
+  String get rules_field_visibility => 'Sicht';
+
+  @override
+  String get rules_field_currentDirection => 'Strömungsrichtung';
+
+  @override
+  String get rules_field_currentStrength => 'Strömungsstärke';
+
+  @override
+  String get rules_field_swellHeight => 'Wellenhöhe';
+
+  @override
+  String get rules_field_surfaceConditions => 'Oberflächenbedingungen';
+
+  @override
+  String get rules_field_entryMethod => 'Einstiegsart';
+
+  @override
+  String get rules_field_exitMethod => 'Ausstiegsart';
+
+  @override
+  String get rules_field_altitude => 'Höhe';
+
+  @override
+  String get rules_field_surfacePressure => 'Oberflächendruck';
+
+  @override
+  String get rules_field_surfaceInterval => 'Oberflächenpause';
+
+  @override
+  String get rules_field_gradientFactorLow => 'GF niedrig';
+
+  @override
+  String get rules_field_gradientFactorHigh => 'GF hoch';
+
+  @override
+  String get rules_field_decoAlgorithm => 'Dekoalgorithmus';
+
+  @override
+  String get rules_field_decoConservatism => 'Konservatismus';
+
+  @override
+  String get rules_field_diveComputerModel => 'Tauchcomputermodell';
+
+  @override
+  String get rules_field_windSpeed => 'Windgeschwindigkeit';
+
+  @override
+  String get rules_field_windDirection => 'Windrichtung';
+
+  @override
+  String get rules_field_cloudCover => 'Bewölkung';
+
+  @override
+  String get rules_field_precipitation => 'Niederschlag';
+
+  @override
+  String get rules_field_humidity => 'Luftfeuchtigkeit';
+
+  @override
+  String get rules_field_weatherDescription => 'Wetterbeschreibung';
+
+  @override
+  String get rules_field_diveMode => 'Tauchmodus';
+
+  @override
+  String get rules_field_setpointLow => 'niedriger Setpoint';
+
+  @override
+  String get rules_field_setpointHigh => 'hoher Setpoint';
+
+  @override
+  String get rules_field_setpointDeco => 'Deko-Setpoint';
+
+  @override
+  String get rules_field_diluentGas => 'Diluentgas (O2/He)';
+
+  @override
+  String get rules_field_scrubberType => 'Kalktyp';
+
+  @override
+  String get rules_field_scrubberDuration => 'Kalkstandzeit';
+
+  @override
+  String get rules_field_diverRole => 'meine Rolle';
+
+  @override
+  String get rules_field_notes => 'Notizen';
+
+  @override
+  String get rules_siteField_difficulty => 'Schwierigkeit';
+
+  @override
+  String get rules_siteField_country => 'Land';
+
+  @override
+  String get rules_siteField_region => 'Region';
+
+  @override
+  String get rules_siteField_city => 'Stadt';
+
+  @override
+  String get rules_siteField_island => 'Insel';
+
+  @override
+  String get rules_siteField_bodyOfWater => 'Gewässer';
+
+  @override
+  String get rules_siteField_minDepth => 'Mindesttiefe';
+
+  @override
+  String get rules_siteField_maxDepth => 'Maximaltiefe';
+
+  @override
+  String get rules_siteField_hazards => 'Gefahren';
+
+  @override
+  String get rules_siteField_accessNotes => 'Zugangshinweise';
+
+  @override
+  String get rules_siteField_mooringNumber => 'Bojennummer';
+
+  @override
+  String get rules_siteField_parkingInfo => 'Parkinformationen';
+
+  @override
+  String get rules_edit_titleNew => 'Neue Regel';
+
+  @override
+  String get rules_edit_titleEdit => 'Regel bearbeiten';
+
+  @override
+  String get rules_edit_name => 'Name';
+
+  @override
+  String get rules_edit_appliesTo => 'Gilt für';
+
+  @override
+  String get rules_edit_subjectDives => 'Tauchgänge';
+
+  @override
+  String get rules_edit_subjectSites => 'Tauchplätze';
+
+  @override
+  String get rules_edit_whenRuns => 'Wann sie läuft';
+
+  @override
+  String get rules_edit_runNote =>
+      'Du kannst eine Regel jederzeit selbst ausführen, auf der Regelseite oder für ausgewählte Einträge.';
+
+  @override
+  String get rules_edit_if => 'Wenn';
+
+  @override
+  String get rules_edit_then => 'Dann';
+
+  @override
+  String rules_edit_matchCountDives(int count) {
+    return 'Trifft auf $count deiner Tauchgänge zu';
+  }
+
+  @override
+  String rules_edit_matchCountSites(int count) {
+    return 'Trifft auf $count deiner Tauchplätze zu';
+  }
+
+  @override
+  String get rules_edit_matchesEveryDive =>
+      'Keine Bedingung: Die Regel trifft auf jeden Tauchgang zu';
+
+  @override
+  String get rules_edit_matchesEverySite =>
+      'Keine Bedingung: Die Regel trifft auf jeden Tauchplatz zu';
+
+  @override
+  String get rules_edit_addAction => 'Aktion hinzufügen';
+
+  @override
+  String get rules_edit_noActions => 'Füge mindestens eine Aktion hinzu.';
+
+  @override
+  String get rules_picker_search => 'Aktionen suchen';
+
+  @override
+  String rules_picker_set(String field) {
+    return '$field setzen';
+  }
+
+  @override
+  String rules_picker_add(String collection) {
+    return '$collection hinzufügen';
+  }
+
+  @override
+  String rules_picker_remove(String collection) {
+    return '$collection entfernen';
+  }
+
+  @override
+  String get rules_picker_appendNotes => 'An Notizen anhängen';
+
+  @override
+  String get rules_picker_appendDescription => 'An Beschreibung anhängen';
+
+  @override
+  String get rules_actionEditor_value => 'Wert';
+
+  @override
+  String get rules_actionEditor_text => 'Anzuhängender Text';
+
+  @override
+  String get rules_actionEditor_role => 'Rolle';
+
+  @override
+  String get rules_actionEditor_o2 => 'O2 %';
+
+  @override
+  String get rules_actionEditor_he => 'He %';
+
+  @override
+  String rules_actionEditor_choose(String field) {
+    return '$field wählen';
+  }
+
+  @override
+  String get rules_action_undo => 'Rückgängig';
+
+  @override
+  String rules_preview_titleDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regeln auf $count Tauchgänge anwenden?',
+      one: 'Regeln auf $count Tauchgang anwenden?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_titleSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regeln auf $count Tauchplätze anwenden?',
+      one: 'Regeln auf $count Tauchplatz anwenden?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_willChangeDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge werden geändert.',
+      one: '$count Tauchgang wird geändert.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_willChangeSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchplätze werden geändert.',
+      one: '$count Tauchplatz wird geändert.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_outOfScope(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count ausgewählte Einträge dürfen von dir nicht geändert werden und wurden ausgelassen.',
+      one:
+          '$count ausgewählter Eintrag darf von dir nicht geändert werden und wurde ausgelassen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_skippedRules(String names) {
+    return 'Diese Regeln können nicht laufen und wurden übersprungen: $names';
+  }
+
+  @override
+  String rules_preview_skippedActions(String names) {
+    return 'Einige Aktionen nennen gelöschte Einträge und wurden übersprungen: $names';
+  }
+
+  @override
+  String get rules_preview_groupByTarget => 'Nach Eintrag';
+
+  @override
+  String get rules_preview_groupByRule => 'Nach Regel';
+
+  @override
+  String rules_preview_applyDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Auf $count Tauchgänge anwenden',
+      one: 'Auf $count Tauchgang anwenden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_applySites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Auf $count Tauchplätze anwenden',
+      one: 'Auf $count Tauchplatz anwenden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_run_noChangesDives =>
+      'Keine Änderungen: Diese Tauchgänge entsprechen deinen Regeln bereits.';
+
+  @override
+  String get rules_run_noChangesSites =>
+      'Keine Änderungen: Diese Tauchplätze entsprechen deinen Regeln bereits.';
+
+  @override
+  String get rules_run_noRulesOnDives =>
+      'Keine Tauchgangsregel ist an. Schalte eine ein oder führe sie über ihr eigenes Menü aus.';
+
+  @override
+  String get rules_run_noRulesOnSites =>
+      'Keine Tauchplatzregel ist an. Schalte eine ein oder führe sie über ihr eigenes Menü aus.';
+
+  @override
+  String rules_run_doneDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regeln haben $count Tauchgänge geändert',
+      one: 'Regeln haben $count Tauchgang geändert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_run_doneSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regeln haben $count Tauchplätze geändert',
+      one: 'Regeln haben $count Tauchplatz geändert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_undo_done => 'Rückgängig gemacht.';
+
+  @override
+  String rules_undo_doneSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Rückgängig gemacht. $count Einträge wurden nach diesem Lauf bearbeitet; ihre Änderungen blieben unangetastet.',
+      one:
+          'Rückgängig gemacht. $count Eintrag wurde nach diesem Lauf bearbeitet; seine Änderungen blieben unangetastet.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_undo_nothingYet =>
+      'Auf diesem Gerät gibt es noch nichts rückgängig zu machen. Versuche es nach dem Synchronisieren erneut.';
+
+  @override
+  String get rules_undo_alreadyUndone => 'Bereits rückgängig gemacht.';
+
+  @override
+  String rules_change_line(
+    String rule,
+    String field,
+    String before,
+    String after,
+  ) {
+    return '$rule: $field $before → $after';
+  }
+
+  @override
+  String rules_change_appended(String field, String text) {
+    return '$field: „$text“ angehängt';
+  }
+
+  @override
+  String get rules_target_noSite => 'Kein Tauchplatz';
+
+  @override
+  String get rules_siteField_description => 'Beschreibung';
+
+  @override
+  String get rules_history_title => 'Regelverlauf';
+
+  @override
+  String get rules_history_empty =>
+      'Jedes Mal, wenn deine Regeln etwas ändern, erscheint der Lauf hier, damit du ihn prüfen oder rückgängig machen kannst.';
+
+  @override
+  String get rules_history_triggerImported => 'Nach dem Import';
+
+  @override
+  String rules_history_triggerImportedFrom(String source) {
+    return 'Nach dem Import ($source)';
+  }
+
+  @override
+  String get rules_history_triggerCreatedByHand => 'Manuell angelegt';
+
+  @override
+  String get rules_history_triggerOnDemandAll => 'Manuell auf alles angewendet';
+
+  @override
+  String get rules_history_triggerOnDemandSelection =>
+      'Auf eine Auswahl angewendet';
+
+  @override
+  String rules_history_changed(int count, String rules) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Einträge geändert durch $rules',
+      one: '$count Eintrag geändert durch $rules',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_history_device(String device) {
+    return 'auf $device';
+  }
+
+  @override
+  String rules_history_undone(String date) {
+    return 'Rückgängig gemacht $date';
+  }
+
+  @override
+  String get rules_history_undoTooltip => 'Diesen Lauf rückgängig machen';
+
+  @override
+  String get rules_history_deleteTooltip => 'Diesen Eintrag löschen';
+
+  @override
+  String get rules_history_clear => 'Verlauf löschen';
+
+  @override
+  String get rules_history_clearDialog_title => 'Regelverlauf löschen?';
+
+  @override
+  String get rules_history_clearDialog_content =>
+      'Dadurch werden alle Einträge entfernt. Was die Regeln geändert haben, bleibt bestehen; es lässt sich nur hier nicht mehr rückgängig machen.';
+
+  @override
+  String get rules_run_title => 'Regellauf';
+
+  @override
+  String get rules_run_undo => 'Diesen Lauf rückgängig machen';
+
+  @override
+  String rules_import_changedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regeln haben $count dieser Tauchgänge geändert',
+      one: 'Regeln haben $count dieser Tauchgänge geändert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_import_changedSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regeln haben $count dieser Tauchplätze geändert',
+      one: 'Regeln haben $count dieser Tauchplätze geändert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_import_seeChanges => 'Änderungen ansehen';
+
+  @override
+  String get rules_import_undo => 'Regeländerungen rückgängig machen';
+
+  @override
+  String get rules_import_undoNote =>
+      'Rückgängig machen behält die importierten Tauchgänge.';
+
+  @override
+  String get rules_import_failed =>
+      'Tauchgänge importiert, aber deine Regeln konnten nicht ausgeführt werden.';
+
+  @override
+  String rules_create_changedDive(String rules) {
+    return 'Regeln haben diesen Tauchgang geändert: $rules';
+  }
+
+  @override
+  String rules_create_changedSite(String rules) {
+    return 'Regeln haben diesen Tauchplatz geändert: $rules';
+  }
+
+  @override
+  String rules_create_changedSites(String rules) {
+    return 'Regeln haben diese Tauchplätze geändert: $rules';
+  }
+
+  @override
+  String get rules_create_details => 'Details';
+
+  @override
+  String get rules_create_failed =>
+      'Gespeichert, aber deine Regeln konnten nicht ausgeführt werden.';
+
+  @override
+  String get rules_action_applyRules => 'Regeln anwenden';
 
   @override
   String get settings_manage_savedQueries => 'Gespeicherte Abfragen';

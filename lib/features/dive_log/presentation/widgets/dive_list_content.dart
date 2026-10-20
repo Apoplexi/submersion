@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:submersion/features/rules/presentation/run_rules_flow.dart';
+import 'package:submersion/features/rules/domain/rule_subject.dart';
 import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/core/router/pushed_route.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/search/dive_search_action.dart';
@@ -1710,6 +1712,14 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
         // useful with nothing checked.
         alwaysEnabled: true,
         onInvoke: () => _selectByDateRange(dives),
+      ),
+      // Logbook rules on the checked dives, previewed first (#3513). Last,
+      // so the existing inline actions keep their places.
+      rulesBulkAction(
+        context,
+        ref,
+        subject: RuleSubject.dives,
+        selected: () => _selectedIds.toSet(),
       ),
     ];
   }

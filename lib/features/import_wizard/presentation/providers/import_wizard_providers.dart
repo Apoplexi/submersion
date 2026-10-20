@@ -10,6 +10,9 @@ import 'package:submersion/features/import_wizard/domain/models/import_cancellat
 import 'package:submersion/features/import_wizard/domain/models/import_phase.dart';
 import 'package:submersion/features/import_wizard/domain/models/tag_selection.dart';
 import 'package:submersion/features/import_wizard/domain/models/unified_import_result.dart';
+import 'package:submersion/features/rules/data/services/import_rules_pass.dart';
+import 'package:submersion/features/rules/data/services/rule_engine.dart';
+import 'package:submersion/features/rules/domain/entities/rule_run.dart';
 import 'package:submersion/features/tags/data/repositories/tag_repository.dart';
 
 // ============================================================================
@@ -59,6 +62,10 @@ class ImportWizardState {
     this.isImporting = false,
     this.isCancellationRequested = false,
     this.error,
+    this.ruleRuns = const [],
+    this.rulesFailed = false,
+    this.ruleSkippedRules = const [],
+    this.ruleSkippedActions = const [],
   });
 
   /// The current wizard step index.
@@ -129,6 +136,17 @@ class ImportWizardState {
   /// Non-null when an error has occurred.
   final String? error;
 
+  /// What the diver's logbook rules changed after the import (#3513).
+  final List<RuleRunResult> ruleRuns;
+
+  /// The rules could not run after the import; the import stands.
+  final bool rulesFailed;
+
+  /// Rules the import skipped, and rules with an action naming a deleted
+  /// item, for the summary to report.
+  final List<String> ruleSkippedRules;
+  final List<String> ruleSkippedActions;
+
   ImportWizardState copyWith({
     int? currentStep,
     ImportBundle? bundle,
@@ -151,6 +169,10 @@ class ImportWizardState {
     bool? isCancellationRequested,
     String? error,
     bool clearError = false,
+    List<RuleRunResult>? ruleRuns,
+    bool? rulesFailed,
+    List<String>? ruleSkippedRules,
+    List<String>? ruleSkippedActions,
   }) {
     return ImportWizardState(
       currentStep: currentStep ?? this.currentStep,
@@ -175,6 +197,10 @@ class ImportWizardState {
       isCancellationRequested:
           isCancellationRequested ?? this.isCancellationRequested,
       error: clearError ? null : (error ?? this.error),
+      ruleRuns: ruleRuns ?? this.ruleRuns,
+      rulesFailed: rulesFailed ?? this.rulesFailed,
+      ruleSkippedRules: ruleSkippedRules ?? this.ruleSkippedRules,
+      ruleSkippedActions: ruleSkippedActions ?? this.ruleSkippedActions,
     );
   }
 
@@ -215,14 +241,17 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
     this._adapter, {
     TagRepository? tagRepository,
     String? diverId,
+    RuleEngine? ruleEngine,
   }) : _tagRepository = tagRepository,
        _diverId = diverId,
+       _ruleEngine = ruleEngine,
        super(const ImportWizardState());
 
   static final _log = LoggerService.forClass(ImportWizardNotifier);
 
   final ImportSourceAdapter _adapter;
   final TagRepository? _tagRepository;
+  final RuleEngine? _ruleEngine;
   String? _diverId;
 
   /// Active cancellation token for the currently-running import, or null
@@ -1008,11 +1037,28 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
         }
       }
 
+      // Logbook rules run once the import has written everything (#3513);
+      // like tagging, a failure keeps the import.
+      final engine = _ruleEngine;
+      final rules = token.isCancelled || engine == null
+          ? const ImportRulesOutcome()
+          : await runImportRules(
+              engine,
+              result,
+              activeDiverId: _diverId,
+              sourceLabel: _adapter.displayName,
+              isCancelled: () => token.isCancelled,
+            );
+
       state = state.copyWith(
         isImporting: false,
         importResult: result,
         currentStep: state.currentStep + 1,
         error: tagWarning,
+        ruleRuns: rules.runs,
+        rulesFailed: rules.failed,
+        ruleSkippedRules: rules.skippedRules,
+        ruleSkippedActions: rules.skippedActions,
       );
     } catch (e, stackTrace) {
       // The summary shows only the message; the trace is what finds the

@@ -49,6 +49,8 @@ import 'package:submersion/shared/widgets/forms/responsive_form_columns.dart';
 import 'package:submersion/shared/widgets/forms/number_input_validation.dart';
 import 'package:submersion/features/shared_library/presentation/providers/shared_library_providers.dart';
 import 'package:submersion/features/site_types/data/repositories/site_type_repository.dart';
+import 'package:submersion/features/rules/presentation/run_rules_flow.dart';
+import 'package:submersion/features/rules/domain/rule_subject.dart';
 
 /// Seeds a depth field at the single decimal place it has always shown, and an
 /// altitude field at the whole units it has always shown, both in the active
@@ -1965,6 +1967,12 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
+    // A site created by hand gets its logbook rules (#3513); edits and
+    // merges never run them. Read now: the diver can leave while the save
+    // runs, and the new site gets them either way.
+    final rulesAfterCreate = widget.isEditing || widget.isMerging
+        ? null
+        : captureRulesAfterCreate(context, ref);
 
     try {
       final settings = ref.read(settingsProvider);
@@ -2137,6 +2145,9 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
         ref.invalidate(siteExpectedSpeciesProvider(savedId));
         ref.invalidate(siteSpottedSpeciesProvider(savedId));
       }
+
+      // The new site's rules, once its types, tags and species are saved.
+      await rulesAfterCreate?.call(subject: RuleSubject.sites, ids: [savedId]);
 
       ref.invalidate(sitesWithCountsProvider);
       ref.invalidate(sitesProvider);

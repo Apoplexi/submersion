@@ -151,7 +151,7 @@ import 'package:submersion/shared/widgets/forms/form_row.dart';
 import 'package:submersion/shared/widgets/forms/form_section.dart';
 import 'package:submersion/shared/widgets/forms/responsive_form_columns.dart';
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart';
-import 'package:submersion/features/dive_log/presentation/pages/bulk_edit_field_set.dart';
+import 'package:submersion/features/dive_log/domain/bulk_edit/bulk_edit_field_set.dart';
 import 'package:submersion/features/dive_log/presentation/providers/bulk_dive_edit_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_collection_mode_selector.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_tank_specs_editor.dart';
@@ -166,6 +166,8 @@ import 'package:submersion/features/dive_log/presentation/widgets/dive_weight_en
 import 'package:submersion/features/dive_log/presentation/formatters/altitude_group_label.dart';
 import 'package:submersion/features/tides/data/services/dive_tide_recorder.dart';
 import 'package:submersion/features/dive_log/presentation/providers/shared_gear_overlap_providers.dart';
+import 'package:submersion/features/rules/presentation/run_rules_flow.dart';
+import 'package:submersion/features/rules/domain/rule_subject.dart';
 
 const _createNewDiveCenterSentinel = '__create_new_dive_center__';
 const _createNewTripSentinel = '__create_new_trip__';
@@ -6139,6 +6141,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
+    // Read now: the diver can leave while the save runs, and a dive logged
+    // by hand gets its rules either way (#3513).
+    final rulesAfterCreate = captureRulesAfterCreate(context, ref);
 
     try {
       // Build entry DateTime from date and time
@@ -6348,6 +6353,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       // Save using the notifier
       final notifier = ref.read(paginatedDiveListProvider.notifier);
       String? savedDiveId;
+      // A plan the diver just turned into a dive counts as logged by hand
+      // for the logbook rules (#3513).
+      final promotedPlan =
+          widget.isEditing &&
+          (_existingDive?.isPlanned ?? false) &&
+          !_isPlanned;
       if (widget.isEditing) {
         await notifier.updateDive(dive);
         savedDiveId = widget.diveId;
@@ -6543,6 +6554,16 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         scheduleQualityScan([savedDiveId]);
         scheduleSensorSummaryRefresh([savedDiveId]);
         scheduleDerivedMetricsRefresh([savedDiveId]);
+      }
+
+      // Logbook rules for a dive logged by hand (#3513): its first save, or
+      // a plan just turned into a dive, once its children are saved so the
+      // rules see the whole dive. Later edits never run them.
+      if (savedDiveId != null &&
+          !_isPlanned &&
+          !widget.isBulk &&
+          (!widget.isEditing || promotedPlan)) {
+        await rulesAfterCreate(subject: RuleSubject.dives, ids: [savedDiveId]);
       }
 
       // Offer to log the dive for linked buddies (issue #2002). Runs before

@@ -23652,6 +23652,51 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_conflict_field_ruleId => 'Regel';
 
   @override
+  String get settings_conflict_field_ruleActions => 'Acties';
+
+  @override
+  String get settings_conflict_field_ruleChangeAfter => 'Na';
+
+  @override
+  String get settings_conflict_field_ruleChangeBefore => 'Voor';
+
+  @override
+  String get settings_conflict_field_ruleChangeField => 'Gewijzigd veld';
+
+  @override
+  String get settings_conflict_field_ruleCondition => 'Voorwaarde';
+
+  @override
+  String get settings_conflict_field_ruleName => 'Regelnaam';
+
+  @override
+  String get settings_conflict_field_ruleRun => 'Regeluitvoering';
+
+  @override
+  String get settings_conflict_field_ruleRunAt => 'Uitgevoerd op';
+
+  @override
+  String get settings_conflict_field_ruleRunChangedCount => 'Gewijzigde items';
+
+  @override
+  String get settings_conflict_field_ruleRunDevice => 'Apparaat';
+
+  @override
+  String get settings_conflict_field_ruleRunSource => 'Bron';
+
+  @override
+  String get settings_conflict_field_ruleRunTrigger => 'Gestart door';
+
+  @override
+  String get settings_conflict_field_ruleRunUndoneAt => 'Ongedaan gemaakt op';
+
+  @override
+  String get settings_conflict_field_ruleTarget => 'Gewijzigd item';
+
+  @override
+  String get settings_conflict_field_ruleTriggers => 'Wanneer uitvoeren';
+
+  @override
   String get settings_conflict_field_sacBottom => 'Gasverbruik op de bodem';
 
   @override
@@ -53358,6 +53403,759 @@ class AppLocalizationsNl extends AppLocalizations {
   String savedQueries_snackbar_deleted(String name) {
     return '\"$name\" verwijderd';
   }
+
+  @override
+  String get settings_manage_rules => 'Regels';
+
+  @override
+  String get settings_manage_rules_subtitle =>
+      'Duiken en duikstekken automatisch indelen en aanvullen';
+
+  @override
+  String get rules_page_title => 'Regels';
+
+  @override
+  String get rules_section_dives => 'Duikregels';
+
+  @override
+  String get rules_section_sites => 'Duikstekregels';
+
+  @override
+  String rules_empty(String depth) {
+    return 'Regels passen je eigen voorwaarden toe op je logboek, bijvoorbeeld het duiktype Diep toevoegen aan elke duik dieper dan $depth. Er gebeurt niets tot je een regel maakt.';
+  }
+
+  @override
+  String get rules_action_new => 'Nieuwe regel';
+
+  @override
+  String get rules_action_history => 'Geschiedenis';
+
+  @override
+  String get rules_action_runAll => 'Regels uitvoeren';
+
+  @override
+  String get rules_action_runAllDives => 'Duikregels uitvoeren op alle duiken';
+
+  @override
+  String get rules_action_runAllSites =>
+      'Duikstekregels uitvoeren op alle duikstekken';
+
+  @override
+  String get rules_row_runOnAllDives => 'Uitvoeren op alle duiken';
+
+  @override
+  String get rules_row_runOnAllSites => 'Uitvoeren op alle duikstekken';
+
+  @override
+  String get rules_row_duplicate => 'Dupliceren';
+
+  @override
+  String get rules_row_delete => 'Verwijderen';
+
+  @override
+  String get rules_row_menuTooltip => 'Regelacties';
+
+  @override
+  String get rules_row_enabled => 'Ingeschakeld';
+
+  @override
+  String get rules_reorderTooltip =>
+      'Sleep om de volgorde van de regels te wijzigen';
+
+  @override
+  String get rules_deleteDialog_title => 'Regel verwijderen?';
+
+  @override
+  String rules_deleteDialog_content(String name) {
+    return '\"$name\" verwijderen? Wat de regel al heeft gewijzigd, blijft in de geschiedenis en kan nog ongedaan worden gemaakt.';
+  }
+
+  @override
+  String rules_snackbar_deleted(String name) {
+    return '\"$name\" verwijderd';
+  }
+
+  @override
+  String get rules_copySuffix => ' (kopie)';
+
+  @override
+  String get rules_trigger_afterImport => 'Na het importeren';
+
+  @override
+  String get rules_trigger_afterManualDive =>
+      'Na het handmatig loggen van een duik';
+
+  @override
+  String get rules_trigger_afterManualSite =>
+      'Na het handmatig aanmaken van een duikstek';
+
+  @override
+  String get rules_trigger_onDemandOnly => 'Alleen als je hem uitvoert';
+
+  @override
+  String get rules_trigger_off =>
+      'Uit: wordt alleen uitgevoerd vanuit het eigen menu';
+
+  @override
+  String get rules_condition_everyDive => 'Elke duik';
+
+  @override
+  String get rules_condition_everySite => 'Elke duikstek';
+
+  @override
+  String get rules_problem_unreadable =>
+      'De voorwaarde van deze regel is onleesbaar. Bewerk of verwijder hem.';
+
+  @override
+  String get rules_problem_invalid =>
+      'De voorwaarde van deze regel is niet meer geldig. Bewerk of verwijder hem.';
+
+  @override
+  String get rules_problem_unknownSubject =>
+      'Deze regel is voor iets dat deze versie niet kent.';
+
+  @override
+  String get rules_problem_unresolvedRef =>
+      'De voorwaarde noemt iets dat is verwijderd. Bewerk de regel om hem uit te voeren.';
+
+  @override
+  String get rules_problem_newerVersion =>
+      'Gemaakt met een nieuwere versie van Submersion. Werk de app bij om hem uit te voeren of te bewerken.';
+
+  @override
+  String get rules_problem_noActions => 'Deze regel heeft geen acties.';
+
+  @override
+  String get rules_problem_brokenAction =>
+      'Een actie noemt iets dat is verwijderd; die actie wordt overgeslagen.';
+
+  @override
+  String rules_actionSummary_set(String field, String value) {
+    return '$field instellen op $value';
+  }
+
+  @override
+  String rules_actionSummary_add(String collection, String items) {
+    return '$collection toevoegen: $items';
+  }
+
+  @override
+  String rules_actionSummary_remove(String collection, String items) {
+    return '$collection verwijderen: $items';
+  }
+
+  @override
+  String rules_actionSummary_appendNotes(String text) {
+    return 'Toevoegen aan notities: $text';
+  }
+
+  @override
+  String rules_actionSummary_appendDescription(String text) {
+    return 'Toevoegen aan beschrijving: $text';
+  }
+
+  @override
+  String get rules_actionSummary_unknown => 'Een actie uit een nieuwere versie';
+
+  @override
+  String get rules_actionSummary_missing => '(verwijderd)';
+
+  @override
+  String get rules_value_yes => 'Ja';
+
+  @override
+  String get rules_value_no => 'Nee';
+
+  @override
+  String get rules_value_empty => '(leeg)';
+
+  @override
+  String get rules_collection_diveTypes => 'duiktypes';
+
+  @override
+  String get rules_collection_tags => 'tags';
+
+  @override
+  String get rules_collection_equipment => 'uitrusting';
+
+  @override
+  String get rules_collection_buddies => 'buddy\'s';
+
+  @override
+  String get rules_collection_courses => 'cursussen';
+
+  @override
+  String get rules_collection_siteTags => 'duikstektags';
+
+  @override
+  String get rules_collection_siteTypes => 'duikstektypes';
+
+  @override
+  String get rules_field_diveCenter => 'duikcentrum';
+
+  @override
+  String get rules_field_diveOperator => 'duikoperator';
+
+  @override
+  String get rules_field_boatName => 'naam van de boot';
+
+  @override
+  String get rules_field_boatCaptain => 'kapitein';
+
+  @override
+  String get rules_field_trip => 'reis';
+
+  @override
+  String get rules_field_rating => 'beoordeling';
+
+  @override
+  String get rules_field_isFavorite => 'favoriet';
+
+  @override
+  String get rules_field_excludedFromStats => 'uitgesloten van statistieken';
+
+  @override
+  String get rules_field_excludedFromGasStats =>
+      'uitgesloten van gasstatistieken';
+
+  @override
+  String get rules_field_waterType => 'watertype';
+
+  @override
+  String get rules_field_visibility => 'zicht';
+
+  @override
+  String get rules_field_currentDirection => 'stromingsrichting';
+
+  @override
+  String get rules_field_currentStrength => 'stromingssterkte';
+
+  @override
+  String get rules_field_swellHeight => 'golfhoogte';
+
+  @override
+  String get rules_field_surfaceConditions =>
+      'omstandigheden aan het oppervlak';
+
+  @override
+  String get rules_field_entryMethod => 'instapmethode';
+
+  @override
+  String get rules_field_exitMethod => 'uitstapmethode';
+
+  @override
+  String get rules_field_altitude => 'hoogte';
+
+  @override
+  String get rules_field_surfacePressure => 'oppervlaktedruk';
+
+  @override
+  String get rules_field_surfaceInterval => 'oppervlakte-interval';
+
+  @override
+  String get rules_field_gradientFactorLow => 'GF laag';
+
+  @override
+  String get rules_field_gradientFactorHigh => 'GF hoog';
+
+  @override
+  String get rules_field_decoAlgorithm => 'deco-algoritme';
+
+  @override
+  String get rules_field_decoConservatism => 'conservatisme';
+
+  @override
+  String get rules_field_diveComputerModel => 'duikcomputermodel';
+
+  @override
+  String get rules_field_windSpeed => 'windsnelheid';
+
+  @override
+  String get rules_field_windDirection => 'windrichting';
+
+  @override
+  String get rules_field_cloudCover => 'bewolking';
+
+  @override
+  String get rules_field_precipitation => 'neerslag';
+
+  @override
+  String get rules_field_humidity => 'luchtvochtigheid';
+
+  @override
+  String get rules_field_weatherDescription => 'weersomschrijving';
+
+  @override
+  String get rules_field_diveMode => 'duikmodus';
+
+  @override
+  String get rules_field_setpointLow => 'lage setpoint';
+
+  @override
+  String get rules_field_setpointHigh => 'hoge setpoint';
+
+  @override
+  String get rules_field_setpointDeco => 'deco-setpoint';
+
+  @override
+  String get rules_field_diluentGas => 'diluentgas (O2/He)';
+
+  @override
+  String get rules_field_scrubberType => 'kalktype';
+
+  @override
+  String get rules_field_scrubberDuration => 'standtijd van de kalk';
+
+  @override
+  String get rules_field_diverRole => 'mijn rol';
+
+  @override
+  String get rules_field_notes => 'notities';
+
+  @override
+  String get rules_siteField_difficulty => 'moeilijkheid';
+
+  @override
+  String get rules_siteField_country => 'land';
+
+  @override
+  String get rules_siteField_region => 'regio';
+
+  @override
+  String get rules_siteField_city => 'stad';
+
+  @override
+  String get rules_siteField_island => 'eiland';
+
+  @override
+  String get rules_siteField_bodyOfWater => 'watermassa';
+
+  @override
+  String get rules_siteField_minDepth => 'minimale diepte';
+
+  @override
+  String get rules_siteField_maxDepth => 'maximale diepte';
+
+  @override
+  String get rules_siteField_hazards => 'gevaren';
+
+  @override
+  String get rules_siteField_accessNotes => 'toegangsnotities';
+
+  @override
+  String get rules_siteField_mooringNumber => 'boeinummer';
+
+  @override
+  String get rules_siteField_parkingInfo => 'parkeerinformatie';
+
+  @override
+  String get rules_edit_titleNew => 'Nieuwe regel';
+
+  @override
+  String get rules_edit_titleEdit => 'Regel bewerken';
+
+  @override
+  String get rules_edit_name => 'Naam';
+
+  @override
+  String get rules_edit_appliesTo => 'Geldt voor';
+
+  @override
+  String get rules_edit_subjectDives => 'Duiken';
+
+  @override
+  String get rules_edit_subjectSites => 'Duikstekken';
+
+  @override
+  String get rules_edit_whenRuns => 'Wanneer hij wordt uitgevoerd';
+
+  @override
+  String get rules_edit_runNote =>
+      'Je kunt een regel altijd zelf uitvoeren, via de pagina Regels of op geselecteerde items.';
+
+  @override
+  String get rules_edit_if => 'Als';
+
+  @override
+  String get rules_edit_then => 'Dan';
+
+  @override
+  String rules_edit_matchCountDives(int count) {
+    return 'Komt overeen met $count van je duiken';
+  }
+
+  @override
+  String rules_edit_matchCountSites(int count) {
+    return 'Komt overeen met $count van je duikstekken';
+  }
+
+  @override
+  String get rules_edit_matchesEveryDive =>
+      'Geen voorwaarde: de regel komt overeen met elke duik';
+
+  @override
+  String get rules_edit_matchesEverySite =>
+      'Geen voorwaarde: de regel komt overeen met elke duikstek';
+
+  @override
+  String get rules_edit_addAction => 'Actie toevoegen';
+
+  @override
+  String get rules_edit_noActions => 'Voeg minstens één actie toe.';
+
+  @override
+  String get rules_picker_search => 'Acties zoeken';
+
+  @override
+  String rules_picker_set(String field) {
+    return '$field instellen';
+  }
+
+  @override
+  String rules_picker_add(String collection) {
+    return '$collection toevoegen';
+  }
+
+  @override
+  String rules_picker_remove(String collection) {
+    return '$collection verwijderen';
+  }
+
+  @override
+  String get rules_picker_appendNotes => 'Toevoegen aan notities';
+
+  @override
+  String get rules_picker_appendDescription => 'Toevoegen aan beschrijving';
+
+  @override
+  String get rules_actionEditor_value => 'Waarde';
+
+  @override
+  String get rules_actionEditor_text => 'Toe te voegen tekst';
+
+  @override
+  String get rules_actionEditor_role => 'Rol';
+
+  @override
+  String get rules_actionEditor_o2 => 'O2 %';
+
+  @override
+  String get rules_actionEditor_he => 'He %';
+
+  @override
+  String rules_actionEditor_choose(String field) {
+    return '$field kiezen';
+  }
+
+  @override
+  String get rules_action_undo => 'Ongedaan maken';
+
+  @override
+  String rules_preview_titleDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regels toepassen op $count duiken?',
+      one: 'Regels toepassen op $count duik?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_titleSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regels toepassen op $count duikstekken?',
+      one: 'Regels toepassen op $count duikstek?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_willChangeDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken worden gewijzigd.',
+      one: '$count duik wordt gewijzigd.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_willChangeSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duikstekken worden gewijzigd.',
+      one: '$count duikstek wordt gewijzigd.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_outOfScope(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count geselecteerde items mag jij niet wijzigen en zijn overgeslagen.',
+      one: '$count geselecteerd item mag jij niet wijzigen en is overgeslagen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_skippedRules(String names) {
+    return 'Deze regels kunnen niet worden uitgevoerd en zijn overgeslagen: $names';
+  }
+
+  @override
+  String rules_preview_skippedActions(String names) {
+    return 'Sommige acties noemen verwijderde items en zijn overgeslagen: $names';
+  }
+
+  @override
+  String get rules_preview_groupByTarget => 'Per item';
+
+  @override
+  String get rules_preview_groupByRule => 'Per regel';
+
+  @override
+  String rules_preview_applyDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Toepassen op $count duiken',
+      one: 'Toepassen op $count duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_preview_applySites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Toepassen op $count duikstekken',
+      one: 'Toepassen op $count duikstek',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_run_noChangesDives =>
+      'Geen wijzigingen: deze duiken voldoen al aan je regels.';
+
+  @override
+  String get rules_run_noChangesSites =>
+      'Geen wijzigingen: deze duikstekken voldoen al aan je regels.';
+
+  @override
+  String get rules_run_noRulesOnDives =>
+      'Er staat geen duikregel aan. Zet er een aan, of voer hem uit vanuit het eigen menu.';
+
+  @override
+  String get rules_run_noRulesOnSites =>
+      'Er staat geen stekregel aan. Zet er een aan, of voer hem uit vanuit het eigen menu.';
+
+  @override
+  String rules_run_doneDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regels hebben $count duiken gewijzigd',
+      one: 'Regels hebben $count duik gewijzigd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_run_doneSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regels hebben $count duikstekken gewijzigd',
+      one: 'Regels hebben $count duikstek gewijzigd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_undo_done => 'Ongedaan gemaakt.';
+
+  @override
+  String rules_undo_doneSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Ongedaan gemaakt. $count items zijn na deze uitvoering bewerkt; die wijzigingen zijn behouden.',
+      one:
+          'Ongedaan gemaakt. $count item is na deze uitvoering bewerkt; die wijzigingen zijn behouden.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_undo_nothingYet =>
+      'Er is op dit apparaat nog niets ongedaan te maken. Probeer het opnieuw na het synchroniseren.';
+
+  @override
+  String get rules_undo_alreadyUndone => 'Al ongedaan gemaakt.';
+
+  @override
+  String rules_change_line(
+    String rule,
+    String field,
+    String before,
+    String after,
+  ) {
+    return '$rule: $field $before → $after';
+  }
+
+  @override
+  String rules_change_appended(String field, String text) {
+    return '$field: \"$text\" toegevoegd';
+  }
+
+  @override
+  String get rules_target_noSite => 'Geen duikstek';
+
+  @override
+  String get rules_siteField_description => 'beschrijving';
+
+  @override
+  String get rules_history_title => 'Regelgeschiedenis';
+
+  @override
+  String get rules_history_empty =>
+      'Telkens als je regels iets wijzigen, verschijnt de uitvoering hier zodat je die kunt bekijken of ongedaan maken.';
+
+  @override
+  String get rules_history_triggerImported => 'Na het importeren';
+
+  @override
+  String rules_history_triggerImportedFrom(String source) {
+    return 'Na het importeren ($source)';
+  }
+
+  @override
+  String get rules_history_triggerCreatedByHand => 'Handmatig aangemaakt';
+
+  @override
+  String get rules_history_triggerOnDemandAll =>
+      'Handmatig uitgevoerd op alles';
+
+  @override
+  String get rules_history_triggerOnDemandSelection =>
+      'Uitgevoerd op een selectie';
+
+  @override
+  String rules_history_changed(int count, String rules) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items gewijzigd door $rules',
+      one: '$count item gewijzigd door $rules',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_history_device(String device) {
+    return 'op $device';
+  }
+
+  @override
+  String rules_history_undone(String date) {
+    return 'Ongedaan gemaakt op $date';
+  }
+
+  @override
+  String get rules_history_undoTooltip => 'Deze uitvoering ongedaan maken';
+
+  @override
+  String get rules_history_deleteTooltip => 'Deze vermelding verwijderen';
+
+  @override
+  String get rules_history_clear => 'Geschiedenis wissen';
+
+  @override
+  String get rules_history_clearDialog_title => 'Regelgeschiedenis wissen?';
+
+  @override
+  String get rules_history_clearDialog_content =>
+      'Hiermee worden alle vermeldingen verwijderd. Wat de regels hebben gewijzigd, blijft zoals het is; het kan alleen hier niet meer ongedaan worden gemaakt.';
+
+  @override
+  String get rules_run_title => 'Regeluitvoering';
+
+  @override
+  String get rules_run_undo => 'Deze uitvoering ongedaan maken';
+
+  @override
+  String rules_import_changedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regels hebben $count van deze duiken gewijzigd',
+      one: 'Regels hebben $count van deze duiken gewijzigd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rules_import_changedSites(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Regels hebben $count van deze duikstekken gewijzigd',
+      one: 'Regels hebben $count van deze duikstekken gewijzigd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rules_import_seeChanges => 'Wijzigingen bekijken';
+
+  @override
+  String get rules_import_undo => 'Wijzigingen van regels ongedaan maken';
+
+  @override
+  String get rules_import_undoNote =>
+      'Ongedaan maken behoudt de geïmporteerde duiken.';
+
+  @override
+  String get rules_import_failed =>
+      'Duiken geïmporteerd, maar je regels konden niet worden uitgevoerd.';
+
+  @override
+  String rules_create_changedDive(String rules) {
+    return 'Regels hebben deze duik gewijzigd: $rules';
+  }
+
+  @override
+  String rules_create_changedSite(String rules) {
+    return 'Regels hebben deze duikstek gewijzigd: $rules';
+  }
+
+  @override
+  String rules_create_changedSites(String rules) {
+    return 'Regels hebben deze duikstekken gewijzigd: $rules';
+  }
+
+  @override
+  String get rules_create_details => 'Details';
+
+  @override
+  String get rules_create_failed =>
+      'Opgeslagen, maar je regels konden niet worden uitgevoerd.';
+
+  @override
+  String get rules_action_applyRules => 'Regels toepassen';
 
   @override
   String get settings_manage_savedQueries => 'Opgeslagen query\'s';

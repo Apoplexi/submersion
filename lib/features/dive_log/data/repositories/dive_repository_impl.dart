@@ -6289,6 +6289,18 @@ class DiveRepository {
         recordId: diveId,
         localUpdatedAt: now,
       );
+      // A dive that moves to another trip, or leaves its trip, keeps no
+      // tank link into the old trip's slots, as with [bulkUpdateTrip] (bulk
+      // edit's Trip row and a logbook rule both set the trip here).
+      if (partial.tripId.present) {
+        await clearForeignTripCylinderLinks(
+          _db,
+          _syncRepository,
+          diveId,
+          tripId: partial.tripId.value,
+          now: now,
+        );
+      }
     }
   }
 
@@ -6651,6 +6663,11 @@ class DiveRepository {
   /// Each dive's course ids, representative first (#2515).
   Future<Map<String, List<String>>> courseIdsForDives(List<String> diveIds) =>
       _courseLinks.courseIdsForDives(diveIds);
+
+  /// Each dive's dive types in order, the representative first; a dive with
+  /// no junction rows (a legacy dive) is absent.
+  Future<Map<String, List<String>>> diveTypeIdsForDives(List<String> diveIds) =>
+      _diveTypesForDives(diveIds);
 
   /// {courseId: how many of [diveIds] are in it}, for the bulk editor.
   Future<Map<String, int>> courseCountsForDives(List<String> diveIds) =>
@@ -7621,7 +7638,13 @@ class DiveRepository {
   }
 
   /// Bulk add tags to multiple dives
-  Future<void> bulkAddTags(List<String> diveIds, List<String> tagIds) async {
+  /// [notify] false leaves the sync notification to the caller (a rules
+  /// run notifies once; its rolled-back preview must not notify at all).
+  Future<void> bulkAddTags(
+    List<String> diveIds,
+    List<String> tagIds, {
+    bool notify = true,
+  }) async {
     if (diveIds.isEmpty || tagIds.isEmpty) return;
 
     try {
@@ -7670,7 +7693,7 @@ class DiveRepository {
           localUpdatedAt: now,
         );
       }
-      SyncEventBus.notifyLocalChange();
+      if (notify) SyncEventBus.notifyLocalChange();
       _log.info('Bulk added ${tagIds.length} tags to ${diveIds.length} dives');
     } catch (e, stackTrace) {
       _log.error('Failed to bulk add tags', error: e, stackTrace: stackTrace);
@@ -7679,7 +7702,12 @@ class DiveRepository {
   }
 
   /// Bulk remove tags from multiple dives
-  Future<void> bulkRemoveTags(List<String> diveIds, List<String> tagIds) async {
+  /// [notify] as for [bulkAddTags].
+  Future<void> bulkRemoveTags(
+    List<String> diveIds,
+    List<String> tagIds, {
+    bool notify = true,
+  }) async {
     if (diveIds.isEmpty || tagIds.isEmpty) return;
 
     try {
@@ -7706,7 +7734,7 @@ class DiveRepository {
           localUpdatedAt: now,
         );
       }
-      SyncEventBus.notifyLocalChange();
+      if (notify) SyncEventBus.notifyLocalChange();
       _log.info(
         'Bulk removed ${tagIds.length} tags from ${diveIds.length} dives',
       );

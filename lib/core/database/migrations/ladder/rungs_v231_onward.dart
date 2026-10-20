@@ -478,5 +478,13 @@ extension RungsFromV231 on AppDatabase {
       await _assertAndBackfillPreDiveSessionSections();
     }
     if (from < 300) await reportProgress();
+
+    // v301: logbook rules and their run history (issue #3513). Tables
+    // only; re-asserted in beforeOpen through _assertRuleSchema.
+    // Renumbered from 292, then 296, then 297 as main took each.
+    if (from < 301) {
+      await _assertRuleSchema();
+    }
+    if (from < 301) await reportProgress();
   }
 }

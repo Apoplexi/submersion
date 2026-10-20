@@ -142,6 +142,12 @@ class ManageSectionContent extends StatelessWidget {
                 route: '/saved-queries',
               ),
               _ManageTile(
+                icon: Icons.rule,
+                title: l10n.settings_manage_rules,
+                subtitle: l10n.settings_manage_rules_subtitle,
+                route: '/rules',
+              ),
+              _ManageTile(
                 icon: Icons.sell,
                 title: l10n.settings_manage_tags,
                 subtitle: l10n.settings_manage_tags_subtitle,

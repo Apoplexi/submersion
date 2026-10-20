@@ -98,8 +98,8 @@ void main() {
     return cols.map((c) => c.read<String>('name')).toSet();
   }
 
-  test('v300 is the current schema version and the floor', () {
-    expect(AppDatabase.currentSchemaVersion, 300);
+  test('v300 is in the ladder and is the floor', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(300));
     expect(AppDatabase.migrationVersions, contains(300));
     expect(AppDatabase.minimumCompatibleSchemaVersion, 300);
   });

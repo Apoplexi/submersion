@@ -56,6 +56,9 @@ void main() {
     'cylinder_fills': 'cylinderFills',
     'connection_maps': 'connectionMaps',
     'saved_queries': 'savedQueries',
+    'rules': 'rules',
+    'rule_runs': 'ruleRuns',
+    'rule_run_changes': 'ruleRunChanges',
     'insight_observation_dismissals': 'insightObservationDismissals',
     'dive_computers': 'diveComputers',
     'dive_computer_connections': 'diveComputerConnections',
@@ -174,6 +177,7 @@ void main() {
     'dive_computers': 'diveComputers',
     'checklist_templates': 'checklistTemplates',
     'media': 'media',
+    'rule_runs': 'ruleRuns',
     // Checklist sections (issue #3360): a section is deletable (its items
     // fall back to no section, ON DELETE SET NULL), so this FK direction
     // needs checking too. Deliberately not also adding
