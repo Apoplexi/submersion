@@ -7,11 +7,13 @@ import 'dart:typed_data';
 import 'package:submersion/core/services/cloud_storage/git/git_branch_files.dart';
 import 'package:submersion/core/services/cloud_storage/git/git_errors.dart';
 import 'package:submersion/core/services/cloud_storage/git/git_http_transport.dart';
+import 'package:submersion/core/services/cloud_storage/git/git_index_reconcile.dart';
 import 'package:submersion/core/services/cloud_storage/git/git_object_id.dart';
 import 'package:submersion/core/services/cloud_storage/git/git_object_store.dart';
 import 'package:submersion/core/services/cloud_storage/git/git_objects.dart';
 import 'package:submersion/core/services/cloud_storage/git/git_tree_editor.dart';
 import 'package:submersion/core/services/cloud_storage/git/pack_writer.dart';
+import 'package:submersion/core/services/logger_service.dart';
 
 /// Who a commit says it is from. [messageLabel] goes in the message
 /// (`Sync from <label>`).
@@ -43,6 +45,16 @@ final class GitBranchSnapshot {
   final bool isDefaultBranch;
   final int indexBlobSize;
   final int metaBlobSize;
+
+  GitBranchSnapshot _withIndex(GitIndex index) => GitBranchSnapshot(
+    tip: tip,
+    rootTree: rootTree,
+    index: index,
+    meta: meta,
+    isDefaultBranch: isDefaultBranch,
+    indexBlobSize: indexBlobSize,
+    metaBlobSize: metaBlobSize,
+  );
 }
 
 /// A file to write, from memory or from disk.
@@ -122,6 +134,7 @@ class GitBranchSession {
   int _appliedLook = 0;
 
   static final Random _random = Random();
+  static final _log = LoggerService.forClass(GitBranchSession);
   static Duration _jitter(int attempt) =>
       Duration(milliseconds: 200 * attempt + _random.nextInt(300));
 
@@ -301,30 +314,41 @@ class GitBranchSession {
     }
     final metaBytes = await _blob(meta.id, tip);
     final indexEntry = await lookupTreePath(store, commit.tree, kGitIndexPath);
-    // Every Submersion branch carries a readable index. Reading a missing,
-    // damaged or newer one as empty would hide every file, and the next
-    // commit would write that empty index back: refuse instead.
-    GitException unreadable(Object? cause) => GitException(
-      'The file index on the branch $branch is missing, damaged or from a '
-      'newer version.',
-      code: GitErrorCode.indexUnreadable,
-      cause: cause,
-    );
-    if (indexEntry == null || indexEntry.isTree) throw unreadable(null);
-    final indexBytes = await _blob(indexEntry.id, tip);
-    final GitIndex index;
-    try {
-      index = GitIndex.decode(indexBytes);
-    } on FormatException catch (e) {
-      throw unreadable(e);
+    // A missing or damaged index is rebuilt from the tree below, so no file
+    // disappears. A newer version's is refused: the next commit would write
+    // it back in this version's format, losing what the newer one adds.
+    var read = GitIndex.empty;
+    var indexBlobSize = 0;
+    if (indexEntry != null && !indexEntry.isTree) {
+      final indexBytes = await _blob(indexEntry.id, tip);
+      indexBlobSize = indexBytes.length;
+      try {
+        read = GitIndex.decode(indexBytes);
+      } on GitIndexTooNew catch (e) {
+        throw GitException(
+          'The file index on the branch $branch is from a newer version.',
+          code: GitErrorCode.indexUnreadable,
+          cause: e,
+        );
+      } on FormatException catch (e) {
+        _log.warning(
+          'Rebuilding the damaged file index on $branch from its tree: $e',
+        );
+        read = GitIndex.empty;
+      }
     }
     return GitBranchSnapshot(
       tip: tip,
       rootTree: commit.tree,
-      index: index,
+      index: await reconcileGitIndex(
+        store,
+        commit.tree,
+        read,
+        tipMs: commit.landedAt.millisecondsSinceEpoch,
+      ),
       meta: GitBranchMeta.decode(metaBytes),
       isDefaultBranch: isDefault,
-      indexBlobSize: indexBytes.length,
+      indexBlobSize: indexBlobSize,
       metaBlobSize: metaBytes.length,
     );
   }
@@ -361,8 +385,27 @@ class GitBranchSession {
           code: GitErrorCode.notFound,
         );
       }
-      return _blob(entry.id, snap.tip);
+      final bytes = await _blob(entry.id, snap.tip);
+      _learnSize(path, entry.id, bytes.length);
+      return bytes;
     });
+  }
+
+  /// Records the size of a file whose index entry lacked one, so the next
+  /// commit writes it. Only while the snapshot still holds that blob there.
+  void _learnSize(String path, GitObjectId blobId, int size) {
+    final current = _current;
+    final known = current?.index.entries[path];
+    if (current == null || known == null) return;
+    if (known.size != null || known.blobId != blobId) return;
+    _current = current._withIndex(
+      GitIndex(
+        Map.unmodifiable({
+          ...current.index.entries,
+          path: known.copyWith(size: size),
+        }),
+      ),
+    );
   }
 
   /// Writes the file to [destination] whole, or not at all.
