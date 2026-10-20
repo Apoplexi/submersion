@@ -52517,6 +52517,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transmitters_saved => 'تم حفظ جهاز الإرسال';
 
   @override
+  String transmitters_copySerial_title(String gearName) {
+    return 'نسخ الرقم التسلسلي إلى \"$gearName\"؟';
+  }
+
+  @override
+  String transmitters_copySerial_content(String serial) {
+    return 'الرقم التسلسلي الذي يطابقه هذا الإدخال ($serial) غير مسجَّل بعد على عنصر معدات جهاز الإرسال.';
+  }
+
+  @override
   String get diveComputer_detail_transmitters => 'أجهزة الإرسال';
 
   @override
@@ -52598,6 +52608,15 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'جهاز الإرسال $serial غير معيّن لأسطوانة';
+  }
+
+  @override
+  String get dataQuality_detector_transmitter_gear_serial_mismatch =>
+      'عدم تطابق الرقم التسلسلي لجهاز الإرسال';
+
+  @override
+  String dataQuality_msg_transmitterGearSerialMismatch(String serial) {
+    return 'جهاز الإرسال $serial مرتبط بعنصر معدات مسجَّل برقم تسلسلي مختلف';
   }
 
   @override

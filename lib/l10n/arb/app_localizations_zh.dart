@@ -48649,6 +48649,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transmitters_saved => '发射器已保存';
 
   @override
+  String transmitters_copySerial_title(String gearName) {
+    return '将序列号复制到“$gearName”？';
+  }
+
+  @override
+  String transmitters_copySerial_content(String serial) {
+    return '此条目匹配的序列号（$serial）尚未记录在发射器装备项目上。';
+  }
+
+  @override
   String get diveComputer_detail_transmitters => '发射器';
 
   @override
@@ -48725,6 +48735,15 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return '发射器 $serial 未分配到气瓶';
+  }
+
+  @override
+  String get dataQuality_detector_transmitter_gear_serial_mismatch =>
+      '发射器序列号不匹配';
+
+  @override
+  String dataQuality_msg_transmitterGearSerialMismatch(String serial) {
+    return '发射器 $serial 关联的装备项目记录的序列号不同';
   }
 
   @override

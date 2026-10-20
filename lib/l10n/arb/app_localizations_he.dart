@@ -50746,6 +50746,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transmitters_saved => 'המשדר נשמר';
 
   @override
+  String transmitters_copySerial_title(String gearName) {
+    return 'להעתיק את המספר הסידורי אל \"$gearName\"?';
+  }
+
+  @override
+  String transmitters_copySerial_content(String serial) {
+    return 'המספר הסידורי שעליו רשומה זו מתאימה ($serial) אינו רשום עדיין בפריט הציוד של המשדר.';
+  }
+
+  @override
   String get diveComputer_detail_transmitters => 'משדרים';
 
   @override
@@ -50823,6 +50833,15 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'משדר $serial אינו משויך למיכל';
+  }
+
+  @override
+  String get dataQuality_detector_transmitter_gear_serial_mismatch =>
+      'אי-התאמה במספר הסידורי של המשדר';
+
+  @override
+  String dataQuality_msg_transmitterGearSerialMismatch(String serial) {
+    return 'המשדר $serial משויך לפריט ציוד הרשום עם מספר סידורי שונה';
   }
 
   @override

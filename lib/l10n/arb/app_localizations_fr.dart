@@ -51955,6 +51955,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get transmitters_saved => 'Émetteur enregistré';
 
   @override
+  String transmitters_copySerial_title(String gearName) {
+    return 'Copier le numéro de série vers « $gearName » ?';
+  }
+
+  @override
+  String transmitters_copySerial_content(String serial) {
+    return 'Le numéro de série sur lequel correspond cette entrée ($serial) n\'est pas encore enregistré sur l\'article d\'équipement de l\'émetteur.';
+  }
+
+  @override
   String get diveComputer_detail_transmitters => 'Émetteurs';
 
   @override
@@ -52033,6 +52043,15 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'L\'émetteur $serial n\'est associé à aucune bouteille';
+  }
+
+  @override
+  String get dataQuality_detector_transmitter_gear_serial_mismatch =>
+      'Numéro de série de l\'émetteur incohérent';
+
+  @override
+  String dataQuality_msg_transmitterGearSerialMismatch(String serial) {
+    return 'L\'émetteur $serial est associé à un article d\'équipement enregistré avec un numéro de série différent';
   }
 
   @override

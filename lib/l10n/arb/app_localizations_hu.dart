@@ -51554,6 +51554,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get transmitters_saved => 'Jeladó mentve';
 
   @override
+  String transmitters_copySerial_title(String gearName) {
+    return 'Átmásolja a sorozatszámot ide: „$gearName”?';
+  }
+
+  @override
+  String transmitters_copySerial_content(String serial) {
+    return 'A sorozatszám, amellyel ez a bejegyzés egyezik ($serial), még nincs rögzítve a jeladó felszerelési elemén.';
+  }
+
+  @override
   String get diveComputer_detail_transmitters => 'Jeladók';
 
   @override
@@ -51633,6 +51643,15 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'A(z) $serial jeladó nincs palackhoz rendelve';
+  }
+
+  @override
+  String get dataQuality_detector_transmitter_gear_serial_mismatch =>
+      'Jeladó sorozatszám-eltérés';
+
+  @override
+  String dataQuality_msg_transmitterGearSerialMismatch(String serial) {
+    return 'A(z) $serial jeladó egy olyan felszerelési elemhez van kapcsolva, amely eltérő sorozatszámmal van rögzítve';
   }
 
   @override

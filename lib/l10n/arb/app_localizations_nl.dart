@@ -51516,6 +51516,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get transmitters_saved => 'Zender opgeslagen';
 
   @override
+  String transmitters_copySerial_title(String gearName) {
+    return 'Serienummer kopiëren naar \"$gearName\"?';
+  }
+
+  @override
+  String transmitters_copySerial_content(String serial) {
+    return 'Het serienummer waarop deze registratie overeenkomt ($serial) is nog niet vastgelegd bij het zenderuitrustingsitem.';
+  }
+
+  @override
   String get diveComputer_detail_transmitters => 'Zenders';
 
   @override
@@ -51595,6 +51605,15 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String dataQuality_msg_unknownTransmitter(String serial) {
     return 'Zender $serial is niet aan een fles toegewezen';
+  }
+
+  @override
+  String get dataQuality_detector_transmitter_gear_serial_mismatch =>
+      'Afwijkend zenderserienummer';
+
+  @override
+  String dataQuality_msg_transmitterGearSerialMismatch(String serial) {
+    return 'Zender $serial is gekoppeld aan een uitrustingsitem dat met een ander serienummer is vastgelegd';
   }
 
   @override
