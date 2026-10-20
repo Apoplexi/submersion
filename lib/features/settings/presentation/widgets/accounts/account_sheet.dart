@@ -29,7 +29,61 @@ Future<AccountGroup?> showAccountSheet(
   bool addOnly = false,
   String? Function(AccountGroup choice)? consequenceOf,
   WebDavCheck? webdavCheck,
-}) => showModalBottomSheet<AccountGroup>(
+}) async => switch (await _showSheet(
+  context,
+  allowedKinds: allowedKinds,
+  currentKey: currentKey,
+  addOnly: addOnly,
+  consequenceOf: consequenceOf,
+  webdavCheck: webdavCheck,
+)) {
+  ChoseAccount(:final group) => group,
+  _ => null,
+};
+
+/// What the diver picked in a sheet that also offers "none".
+sealed class AccountSheetChoice {
+  const AccountSheetChoice();
+}
+
+final class ChoseAccount extends AccountSheetChoice {
+  const ChoseAccount(this.group);
+  final AccountGroup group;
+}
+
+final class ChoseNone extends AccountSheetChoice {
+  const ChoseNone();
+}
+
+/// [showAccountSheet] with a first choice of no account, [noneLabel] (the
+/// Backups copy's "No copy off this device", spec section 12), shown as
+/// selected when [noneSelected]. Null when the diver backs out.
+Future<AccountSheetChoice?> showAccountOrNoneSheet(
+  BuildContext context, {
+  required String noneLabel,
+  required bool noneSelected,
+  Set<AccountKind>? allowedKinds,
+  String? currentKey,
+  String? Function(AccountGroup choice)? consequenceOf,
+}) => _showSheet(
+  context,
+  allowedKinds: allowedKinds,
+  currentKey: currentKey,
+  consequenceOf: consequenceOf,
+  noneLabel: noneLabel,
+  noneSelected: noneSelected,
+);
+
+Future<AccountSheetChoice?> _showSheet(
+  BuildContext context, {
+  Set<AccountKind>? allowedKinds,
+  String? currentKey,
+  bool addOnly = false,
+  String? Function(AccountGroup choice)? consequenceOf,
+  WebDavCheck? webdavCheck,
+  String? noneLabel,
+  bool noneSelected = false,
+}) => showModalBottomSheet<AccountSheetChoice>(
   context: context,
   isScrollControlled: true,
   useSafeArea: true,
@@ -44,6 +98,8 @@ Future<AccountGroup?> showAccountSheet(
       addOnly: addOnly,
       consequenceOf: consequenceOf,
       webdavCheck: webdavCheck,
+      noneLabel: noneLabel,
+      noneSelected: noneSelected,
     ),
   ),
 );
@@ -56,6 +112,8 @@ class _AccountSheet extends ConsumerStatefulWidget {
     required this.addOnly,
     required this.consequenceOf,
     required this.webdavCheck,
+    required this.noneLabel,
+    required this.noneSelected,
   });
 
   final ScrollController controller;
@@ -64,6 +122,8 @@ class _AccountSheet extends ConsumerStatefulWidget {
   final bool addOnly;
   final String? Function(AccountGroup)? consequenceOf;
   final WebDavCheck? webdavCheck;
+  final String? noneLabel;
+  final bool noneSelected;
 
   @override
   ConsumerState<_AccountSheet> createState() => _AccountSheetState();
@@ -145,7 +205,7 @@ class _AccountSheetState extends ConsumerState<_AccountSheet> {
     if (!mounted) return;
     final text = widget.consequenceOf?.call(group);
     if (text == null) {
-      Navigator.of(context).pop(group);
+      Navigator.of(context).pop(ChoseAccount(group));
       return;
     }
     setState(() {
@@ -179,7 +239,8 @@ class _AccountSheetState extends ConsumerState<_AccountSheet> {
                 ),
               ),
               FilledButton(
-                onPressed: () => Navigator.of(context).pop(pending),
+                onPressed: () =>
+                    Navigator.of(context).pop(ChoseAccount(pending)),
                 child: Text(l10n.settings_accounts_continue),
               ),
             ],
@@ -218,6 +279,7 @@ class _AccountSheetState extends ConsumerState<_AccountSheet> {
       for (final o in ref.watch(offerableAccountKindsProvider))
         if (_offerAllowed(o) && !alreadyAdded(o)) o,
     ];
+    final noneLabel = widget.noneLabel;
     // Not closed while a sign-in or switch runs: what follows it needs this
     // sheet's context and ref.
     return PopScope(
@@ -228,7 +290,8 @@ class _AccountSheetState extends ConsumerState<_AccountSheet> {
           controller: widget.controller,
           padding: const EdgeInsets.only(bottom: 24),
           children: [
-            if (!widget.addOnly && groups.isNotEmpty) ...[
+            if (!widget.addOnly &&
+                (groups.isNotEmpty || noneLabel != null)) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                 child: buildSettingsSectionHeader(
@@ -236,6 +299,16 @@ class _AccountSheetState extends ConsumerState<_AccountSheet> {
                   l10n.settings_accounts_sheet_yours,
                 ),
               ),
+              if (noneLabel != null)
+                ListTile(
+                  leading: const Icon(Icons.phone_android),
+                  title: Text(noneLabel),
+                  selected: widget.noneSelected,
+                  trailing: widget.noneSelected
+                      ? const Icon(Icons.check)
+                      : null,
+                  onTap: () => Navigator.of(context).pop(const ChoseNone()),
+                ),
               for (final g in groups)
                 AccountGroupTile(
                   group: g,

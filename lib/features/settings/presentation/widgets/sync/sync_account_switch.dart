@@ -10,13 +10,11 @@ import 'package:submersion/core/services/accounts/account_group.dart';
 import 'package:submersion/core/services/accounts/account_identity.dart';
 import 'package:submersion/core/services/accounts/account_kind.dart';
 import 'package:submersion/core/services/accounts/account_provider_adapter.dart';
-import 'package:submersion/core/services/accounts/account_usage_service.dart';
 import 'package:submersion/core/services/accounts/connected_account.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/git/git_credentials_store.dart';
 import 'package:submersion/core/services/cloud_storage/icloud_native_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
-import 'package:submersion/features/backup/presentation/providers/backup_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/account_group_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/git_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
@@ -167,9 +165,7 @@ Future<void> selectProvider(
 }
 
 /// The account sync uses on this device, or null.
-AccountGroup? currentSyncGroup(List<AccountGroup> groups) => groups
-    .where((g) => g.usages.any((u) => u.kind == AccountUsageKind.databaseSync))
-    .firstOrNull;
+AccountGroup? currentSyncGroup(List<AccountGroup> groups) => groups.syncing;
 
 /// What choosing [choice] for sync will do, for the account sheet to show
 /// before it returns: today's "Switch sync backend?" text when this device
@@ -347,15 +343,16 @@ Future<ConnectedAccount?> _lastSyncedRowIn(
 
 /// Takes sync off the account this device syncs through, as it is signed
 /// out or removed, so nothing brings it back: the sync selection and its
-/// metadata are cleared (and a Dropbox legacy key, by the sync sign-out),
-/// and cloud backups, which ride on sync, stop. The S3 and WebDAV adapters
-/// clear their own legacy settings when they sign the sync row out.
+/// metadata are cleared (and a Dropbox legacy key, by the sync sign-out).
+/// The S3 and WebDAV adapters clear their own legacy settings when they sign
+/// the sync row out. The backup copy is the caller's to settle, since only
+/// it knows whether the copy goes with the account
+/// (`backupCopyGoesWith`).
 ///
 /// Takes the container rather than a WidgetRef: the confirmation the diver
 /// answered has closed, and the teardown must finish whatever the page does.
 Future<void> leaveSyncForAccount(ProviderContainer container) async {
   await container.read(syncStateProvider.notifier).signOut();
-  await container.read(backupSettingsProvider.notifier).disableCloudBackup();
 }
 
 /// Points sync at an own server's row [row]: its stored config becomes the

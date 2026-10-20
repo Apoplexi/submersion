@@ -4,6 +4,7 @@ import 'package:submersion/core/services/accounts/account_credentials_store.dart
 import 'package:submersion/core/services/accounts/account_identity.dart';
 import 'package:submersion/core/services/accounts/account_kind.dart';
 import 'package:submersion/core/services/accounts/account_provider_adapter.dart';
+import 'package:submersion/core/services/accounts/account_sync_providers.dart';
 import 'package:submersion/core/services/accounts/connected_account.dart'
     as domain;
 import 'package:submersion/core/services/cloud_storage/cloud_provider_instances.dart';
@@ -68,9 +69,5 @@ class GitAccountAdapter extends AccountProviderAdapter implements SyncCapable {
 
   @override
   CloudStorageProvider syncProvider(domain.ConnectedAccount account) =>
-      GitStorageProvider(
-        store: GitCredentialsStore(
-          storageKey: AccountCredentialsStore.keyFor(account.id),
-        ),
-      );
+      gitSyncProviderFor(account.id);
 }

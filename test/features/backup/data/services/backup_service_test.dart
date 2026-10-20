@@ -9,6 +9,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/services/accounts/account_kind.dart';
 import 'package:submersion/core/services/backup_bookmark_service.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/restore_source_missing_exception.dart';
@@ -17,6 +18,7 @@ import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_attribution.dart';
+import 'package:submersion/features/backup/data/services/backup_copy_guard.dart';
 import 'package:submersion/features/backup/data/services/backup_crypto.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
 import 'package:submersion/features/backup/domain/entities/backup_record.dart';
@@ -143,9 +145,13 @@ class _CaptureFailSyncRepository extends SyncRepository {
 class _SyncAccountRepository extends Fake implements SyncRepository {
   _SyncAccountRepository(this.accountId);
   String? accountId;
+  int reads = 0;
 
   @override
-  Future<String?> getSyncAccountId() async => accountId;
+  Future<String?> getSyncAccountId() async {
+    reads++;
+    return accountId;
+  }
 }
 
 class FakeCloudStorageProvider implements CloudStorageProvider {
@@ -823,6 +829,174 @@ void main() {
             ? 'chmod-based permission denial is not portable to Windows'
             : null,
       );
+    });
+
+    group('a cloud copy in another account', () {
+      BackupRecord cloudOnly(String id, {String? account}) => BackupRecord(
+        id: id,
+        filename: 'submersion_backup_$id.db',
+        timestamp: DateTime(2026, 1, 1),
+        sizeBytes: 10,
+        location: BackupLocation.cloud,
+        cloudFileId: 'cloud-$id',
+        cloudAccountId: account,
+      );
+
+      // The copy is pinned to acct-b (unless [pinned] says otherwise); sync
+      // uses acct-sync.
+      BackupService service({String? pinned = 'acct-b'}) => BackupService(
+        dbAdapter: fakeDb,
+        preferences: preferences,
+        cloudProvider: fakeCloud,
+        syncRepository: _SyncAccountRepository('acct-sync'),
+        copyAccountId: pinned,
+      );
+
+      test('a destination change during the upload is not recorded', () async {
+        await preferences.setCloudBackupEnabled(true);
+        fakeCloud.duringUpload = () => preferences.setCopyDestination(
+          accountId: 'acct-c',
+          kind: AccountKind.s3,
+        );
+
+        final record = await service().performBackup();
+
+        expect(record.cloudAccountId, 'acct-b');
+      });
+
+      test('an adopted legacy row notes the sync account it is in', () async {
+        final record = cloudOnly('r1');
+        fakeCloud.storedFiles['cloud-r1'] = Uint8List.fromList([1]);
+
+        await service(pinned: null).pinRecord(record);
+
+        expect(preferences.getHistory().single.cloudAccountId, 'acct-sync');
+      });
+
+      test('the copy account is the pinned one, else sync', () async {
+        expect(await service().cloudCopyAccountId(), 'acct-b');
+        expect(await service(pinned: null).cloudCopyAccountId(), 'acct-sync');
+      });
+
+      test(
+        'a record from before accounts were noted belongs to sync',
+        () async {
+          final legacy = cloudOnly('r1');
+          await preferences.addRecord(legacy);
+
+          // Pinned elsewhere: the legacy copy is in sync's account, not acct-b.
+          await service().deleteBackup(legacy);
+          expect(fakeCloud.deletedFiles, isEmpty);
+
+          // Pinned to the sync account itself: it is reachable.
+          await preferences.addRecord(legacy);
+          await service(pinned: 'acct-sync').deleteBackup(legacy);
+          expect(fakeCloud.deletedFiles, ['cloud-r1']);
+        },
+      );
+
+      test(
+        'pinned with no sync account, a legacy copy is left alone',
+        () async {
+          final legacy = cloudOnly('r1');
+          await preferences.addRecord(legacy);
+
+          await BackupService(
+            dbAdapter: fakeDb,
+            preferences: preferences,
+            cloudProvider: fakeCloud,
+            syncRepository: _SyncAccountRepository(null),
+            copyAccountId: 'acct-b',
+          ).deleteBackup(legacy);
+
+          expect(fakeCloud.deletedFiles, isEmpty);
+        },
+      );
+
+      test('pruning reads the sync account once, not per record', () async {
+        for (final id in ['r1', 'r2', 'r3', 'r4']) {
+          await preferences.addRecord(cloudOnly(id));
+        }
+        final sync = _SyncAccountRepository('acct-sync');
+
+        await BackupService(
+          dbAdapter: fakeDb,
+          preferences: preferences,
+          cloudProvider: fakeCloud,
+          syncRepository: sync,
+          copyAccountId: 'acct-b',
+        ).pruneOldBackups(1);
+
+        expect(sync.reads, 1);
+      });
+
+      test('following sync, a legacy record is reachable as before', () async {
+        final legacy = cloudOnly('r1');
+        await preferences.addRecord(legacy);
+
+        await service(pinned: null).deleteBackup(legacy);
+
+        expect(fakeCloud.deletedFiles, ['cloud-r1']);
+      });
+
+      test('a new cloud copy records the copy account, not sync', () async {
+        await preferences.setCloudBackupEnabled(true);
+
+        final record = await service().performBackup();
+
+        expect(record.location, BackupLocation.both);
+        expect(record.cloudAccountId, 'acct-b');
+        expect(preferences.getSettings().lastBackupCloudAccountId, 'acct-b');
+      });
+
+      test('delete never deletes a cloud file in another account', () async {
+        final record = cloudOnly('r1', account: 'acct-a');
+        await preferences.addRecord(record);
+
+        await service().deleteBackup(record);
+
+        expect(fakeCloud.deletedFiles, isEmpty);
+        expect(preferences.getHistory(), isEmpty);
+      });
+
+      test('delete still deletes a copy in the current account', () async {
+        final record = cloudOnly('r1', account: 'acct-b');
+        await preferences.addRecord(record);
+
+        await service().deleteBackup(record);
+
+        expect(fakeCloud.deletedFiles, ['cloud-r1']);
+      });
+
+      test('pruning skips a cloud copy in another account', () async {
+        for (final id in ['r1', 'r2', 'r3']) {
+          await preferences.addRecord(cloudOnly(id, account: 'acct-a'));
+        }
+
+        await service().pruneOldBackups(1);
+
+        expect(fakeCloud.deletedFiles, isEmpty);
+        expect(preferences.getHistory(), hasLength(1));
+      });
+
+      test('restoring a cloud-only copy in another account says so', () async {
+        final record = cloudOnly('r1', account: 'acct-a');
+        fakeCloud.storedFiles['cloud-r1'] = Uint8List.fromList([1]);
+
+        await expectLater(
+          service().restoreFromBackup(record),
+          throwsA(isA<BackupCopyInOtherAccountException>()),
+        );
+      });
+
+      test('an untracked copy in another account is never adopted', () async {
+        final record = cloudOnly('r1', account: 'acct-a');
+        fakeCloud.storedFiles['cloud-r1'] = Uint8List.fromList([1]);
+
+        await service().pinRecord(record);
+
+        expect(preferences.getHistory(), isEmpty);
+      });
     });
 
     group('deleteBackup', () {

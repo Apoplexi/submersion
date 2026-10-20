@@ -24,6 +24,7 @@ import 'package:submersion/core/services/sync/library_replace_intent.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
 import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/sync_preferences.dart';
+import 'package:submersion/features/backup/data/services/backup_copy_guard.dart';
 import 'package:submersion/features/backup/data/services/backup_crypto.dart';
 import 'package:submersion/features/backup/data/services/backup_note_stamp.dart';
 import 'package:submersion/features/backup/data/services/backup_encryption_key_store.dart';
@@ -46,6 +47,8 @@ import 'package:submersion/features/backup/domain/entities/restore_mode.dart';
 // (background_service, providers, tests) keep resolving these types from
 // backup_service.dart after the extraction that broke the backup_target cycle.
 export 'package:submersion/features/backup/data/services/backup_database_adapter.dart';
+
+part 'backup_service_cloud_copy.dart';
 
 /// A backups directory ready to write into, plus [release] to call when the
 /// caller is done -- which stops any security-scoped access that was armed to
@@ -124,6 +127,11 @@ class BackupService {
   /// species catalog to the restored rows.
   final BuiltInSpeciesSeedVersionStore? _seedVersionStore;
 
+  /// The account the copy is pinned to, fixed with [_cloudProvider] when
+  /// this service is built so the two cannot disagree mid-backup; null
+  /// while the copy follows sync (or is off).
+  final String? _pinnedCopyAccountId;
+
   /// SAF write/read/delete seam for Android custom (`content://`) backup
   /// locations. Defaults to the real platform channel; injectable for tests.
   final BackupSafPort _safPort;
@@ -146,6 +154,7 @@ class BackupService {
     SyncPreferences? syncPreferences,
     BackupEncryptionKeyStore? backupEncryptionKeyStore,
     BuiltInSpeciesSeedVersionStore? seedVersionStore,
+    String? copyAccountId,
   }) : _dbAdapter = dbAdapter,
        _preferences = preferences,
        _cloudProvider = cloudProvider,
@@ -157,7 +166,8 @@ class BackupService {
        _encryptionKeyStore = encryptionKeyStore,
        _syncPreferences = syncPreferences,
        _backupEncryptionKeyStore = backupEncryptionKeyStore,
-       _seedVersionStore = seedVersionStore;
+       _seedVersionStore = seedVersionStore,
+       _pinnedCopyAccountId = copyAccountId;
 
   // ===========================================================================
   // Backup
@@ -207,6 +217,15 @@ class BackupService {
   }) async {
     final filename = await _generateFilename();
     final encKey = await _activeBackupKey();
+    final settings = _preferences.getSettings();
+    // The cloud copy and a backup folder are independent (#3482): the copy
+    // uploads from a filesystem file holding the stored bytes, never from
+    // the folder's ref, which on Android is a content:// URI.
+    final wantsCopy = settings.cloudBackupEnabled && _cloudProvider != null;
+    ({String? fileId, String? accountId}) copy = (
+      fileId: null,
+      accountId: null,
+    );
 
     final String ref;
     final int sizeBytes;
@@ -217,7 +236,14 @@ class BackupService {
       // URI, and the size comes back with it. A SAF ref has no File length to
       // ask, and the live database file's length is not the answer either: the
       // export is compacted and folds in rows that were still in the WAL.
-      final written = await target.write(_dbAdapter, filename, note: note);
+      final written = await target.write(
+        _dbAdapter,
+        filename,
+        note: note,
+        whileWritten: wantsCopy
+            ? (path) async => copy = await _copyToCloud(path, storedName)
+            : null,
+      );
       ref = written.ref;
       sizeBytes = written.sizeBytes;
     } else {
@@ -244,6 +270,7 @@ class BackupService {
         );
         ref = await target.writeSource(tempSbe, storedName);
         sizeBytes = await File(tempSbe).length();
+        if (wantsCopy) copy = await _copyToCloud(tempSbe, storedName);
       } finally {
         for (final t in [tempPlain, tempSbe]) {
           final f = File(t);
@@ -260,40 +287,11 @@ class BackupService {
 
     // Get dive and site counts
     final counts = await _getDiveSiteCounts();
-
-    // Attempt cloud upload (cloud + a custom location are mutually exclusive,
-    // so ref is always a filesystem path here).
-    String? cloudFileId;
-    var location = BackupLocation.local;
-
-    final settings = _preferences.getSettings();
-    // The account the provider uploads through, read before the upload: a
-    // switch while it runs must not be recorded as this copy's account.
-    String? uploadAccountId;
-    if (settings.cloudBackupEnabled && _cloudProvider != null) {
-      uploadAccountId = await _syncAccountIdOrNull();
-      try {
-        cloudFileId = await _uploadToCloud(ref, storedName);
-        // Only a real file id means a cloud copy exists: the upload also
-        // gives up (returning null) when the backup folder is unreachable or
-        // sync encryption is locked on this device (issue #3089), and history
-        // that claims `both` with no id sends restore looking for a file that
-        // was never written.
-        if (cloudFileId != null) {
-          location = BackupLocation.both;
-          _log.info('Backup uploaded to cloud: $cloudFileId');
-        } else {
-          _log.warning('Cloud upload skipped, backup is local-only');
-        }
-      } catch (e, stack) {
-        _log.error(
-          'Cloud upload failed, backup is local-only',
-          error: e,
-          stackTrace: stack,
-        );
-        // Local backup still succeeded — continue with local-only
-      }
-    }
+    final cloudFileId = copy.fileId;
+    final uploadAccountId = copy.accountId;
+    final location = cloudFileId != null
+        ? BackupLocation.both
+        : BackupLocation.local;
 
     final record = BackupRecord(
       id: _uuid.v4(),
@@ -304,6 +302,7 @@ class BackupService {
       diveCount: counts.diveCount,
       siteCount: counts.siteCount,
       cloudFileId: cloudFileId,
+      cloudAccountId: cloudFileId == null ? null : uploadAccountId,
       localPath: ref,
       isAutomatic: isAutomatic,
       note: note,
@@ -532,9 +531,9 @@ class BackupService {
           // it null), fail THIS record rather than commit a local .sbe while the
           // cloud copy stays plaintext -- otherwise the success tally would
           // falsely imply that copy is protected.
-          if (_cloudProvider == null) {
+          if (!await _cloudCopyHere(record)) {
             throw const BackupException(
-              'Cloud copy cannot be re-encrypted: no cloud provider available',
+              'Cloud copy cannot be re-encrypted: its account is not reachable',
             );
           }
           newCloudFileId = await _uploadToCloud(newPath, newName);
@@ -827,7 +826,7 @@ class BackupService {
       }
     } else if (localRef != null && await File(localRef).exists()) {
       sourcePath = localRef;
-    } else if (record.cloudFileId != null && _cloudProvider != null) {
+    } else if (await _cloudCopyHere(record)) {
       // Download from cloud to a temp location
       _log.info('Downloading backup from cloud');
       madeCopy = true;
@@ -835,6 +834,8 @@ class BackupService {
         record.cloudFileId!,
         _restoreCopyName(record.filename),
       );
+    } else if (record.cloudFileId != null && record.cloudAccountId != null) {
+      throw BackupCopyInOtherAccountException(record.cloudAccountId!);
     } else {
       throw const BackupException('Backup file not found locally or in cloud');
     }
@@ -1239,10 +1240,10 @@ class BackupService {
       }
     }
 
-    // Delete cloud file
-    if (deleteCloud && record.cloudFileId != null && _cloudProvider != null) {
+    // Delete cloud file; a copy in another account is left where it is.
+    if (deleteCloud && await _cloudCopyHere(record)) {
       try {
-        await _cloudProvider.deleteFile(record.cloudFileId!);
+        await _cloudProvider!.deleteFile(record.cloudFileId!);
         // A backend that batches deletes (Git) has only recorded it so far.
         await flushDeferredWrites(_cloudProvider);
         _log.info('Deleted cloud file: ${record.cloudFileId}');
@@ -1282,8 +1283,15 @@ class BackupService {
     final cloudFileId = record.cloudFileId;
     final provider = _cloudProvider;
     if (cloudFileId == null || provider == null) return;
+    if (!await _cloudCopyHere(record)) return;
     if (!await provider.fileExists(cloudFileId)) return;
-    await _preferences.addRecord(record.copyWith(pinned: true));
+    // Listed through this provider, so it is in the copy's account now.
+    await _preferences.addRecord(
+      record.copyWith(
+        pinned: true,
+        cloudAccountId: record.cloudAccountId ?? await _copyAccountIdOrNull(),
+      ),
+    );
   }
 
   /// Whether deleting [record] may destroy another device's only copy.
@@ -1352,9 +1360,11 @@ class BackupService {
     var cloudPushed = true;
     if (provider != null) {
       var recorded = 0;
+      final here = await _cloudCopyCheck();
       for (final record in toDelete) {
         final id = record.cloudFileId;
-        if (id == null) continue;
+        // A copy in another account is left where it is.
+        if (id == null || !here(record)) continue;
         try {
           await provider.deleteFile(id);
           recorded++;
@@ -1638,20 +1648,10 @@ class BackupService {
   // Private Helpers
   // ===========================================================================
 
-  /// The connected account driving sync, or null when it cannot be read: a
-  /// missing name only makes Settings > Data say "the cloud".
-  Future<String?> _syncAccountIdOrNull() async {
-    try {
-      return await _syncRepository.getSyncAccountId();
-    } catch (e, stack) {
-      _log.warning(
-        'Could not read the sync account for the backup record',
-        error: e,
-        stackTrace: stack,
-      );
-      return null;
-    }
-  }
+  /// The connected account the cloud copy goes to, and so the account the
+  /// cloud folder this service lists is in: the one it is pinned to, else
+  /// sync's.
+  Future<String?> cloudCopyAccountId() => _copyAccountIdOrNull();
 
   /// Names a new backup, tagging it with the device that wrote it.
   ///
