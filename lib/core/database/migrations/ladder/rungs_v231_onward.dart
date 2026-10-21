@@ -486,5 +486,15 @@ extension RungsFromV231 on AppDatabase {
       await _assertRuleSchema();
     }
     if (from < 301) await reportProgress();
+
+    // v302: media_stores.account_id (issue #3482). Column only, no
+    // backfill; re-asserted in beforeOpen.
+    if (from < 302) await _assertMediaStoresAccountColumn();
+    if (from < 302) await reportProgress();
+
+    // v303: media.remote_store_id (issue #3482). Column only, no backfill;
+    // re-asserted in beforeOpen.
+    if (from < 303) await _assertMediaRemoteStoreColumn();
+    if (from < 303) await reportProgress();
   }
 }
