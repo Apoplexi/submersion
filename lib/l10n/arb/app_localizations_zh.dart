@@ -45755,6 +45755,35 @@ class AppLocalizationsZh extends AppLocalizations {
   String get universalImport_cancel_discardSelections => '放弃所选内容并取消？';
 
   @override
+  String universalImport_background_finished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '导入已完成：已导入 $count 次潜水。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_background_stopped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '导入已停止：已导入 $count 次潜水。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_background_failed => '导入失败。';
+
+  @override
+  String get universalImport_running_title => '仍有导入正在进行';
+
+  @override
+  String get universalImport_running_body => '请等待其完成或将其取消，然后再开始新的导入。';
+
+  @override
   String get universalImport_action_importSelected => '导入所选';
 
   @override

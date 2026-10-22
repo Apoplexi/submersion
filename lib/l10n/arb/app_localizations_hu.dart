@@ -48421,6 +48421,39 @@ class AppLocalizationsHu extends AppLocalizations {
       'Elveted a kijelöléseket és megszakítod?';
 
   @override
+  String universalImport_background_finished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Az importálás befejeződött: $count merülés importálva.',
+      one: 'Az importálás befejeződött: $count merülés importálva.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_background_stopped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Az importálás leállt: $count merülés importálva.',
+      one: 'Az importálás leállt: $count merülés importálva.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_background_failed =>
+      'Az importálás sikertelen volt.';
+
+  @override
+  String get universalImport_running_title => 'Egy importálás még fut';
+
+  @override
+  String get universalImport_running_body =>
+      'Várd meg, amíg befejeződik, vagy szakítsd meg, mielőtt újabb importálást indítasz.';
+
+  @override
   String get universalImport_action_importSelected => 'Kijelöltek importálása';
 
   @override

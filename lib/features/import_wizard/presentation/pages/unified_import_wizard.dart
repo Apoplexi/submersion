@@ -5,19 +5,19 @@ import 'package:submersion/core/router/back_navigation.dart';
 
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
-import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/import_wizard/data/adapters/dive_computer_adapter.dart';
 import 'package:submersion/features/import_wizard/data/adapters/divelogs_import_adapter.dart';
-import 'package:submersion/features/import_wizard/data/services/import_provider_invalidator.dart';
 import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/adapters/import_source_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_step_failure.dart';
 import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 import 'package:submersion/features/import_wizard/domain/services/step_skip_calculator.dart';
+import 'package:submersion/features/import_wizard/presentation/providers/import_job_provider.dart';
 import 'package:submersion/features/import_wizard/presentation/providers/import_wizard_providers.dart';
+import 'package:submersion/features/import_wizard/presentation/widgets/running_import_gate.dart';
 import 'package:submersion/features/rules/presentation/providers/rule_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
@@ -79,20 +79,28 @@ class _UnifiedImportWizardState extends State<UnifiedImportWizard> {
 
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
-      overrides: [
-        importWizardNotifierProvider.overrideWith(
-          widget.notifierFactoryOverride ??
-              (ref) => ImportWizardNotifier(
-                _adapter,
-                tagRepository: ref.read(tagRepositoryProvider),
-                ruleEngine: ref.read(ruleEngineProvider),
-              ),
+    return RunningImportGate(
+      title: _adapter.displayName,
+      child: ProviderScope(
+        overrides: [
+          importWizardNotifierProvider.overrideWith(
+            widget.notifierFactoryOverride ??
+                (ref) => ImportWizardNotifier(
+                  _adapter,
+                  tagRepository: ref.read(tagRepositoryProvider),
+                  ruleEngine: ref.read(ruleEngineProvider),
+                  job: ref.read(importJobProvider.notifier),
+                  // Only the universal adapters read through a container
+                  // that outlives the wizard (#3554); every other source
+                  // stops when the wizard goes away.
+                  continuesWithoutWizard: _adapter is UniversalAdapter,
+                ),
+          ),
+        ],
+        child: _UnifiedImportWizardBody(
+          adapter: _adapter,
+          initialPageOverride: widget.initialPageOverride,
         ),
-      ],
-      child: _UnifiedImportWizardBody(
-        adapter: _adapter,
-        initialPageOverride: widget.initialPageOverride,
       ),
     );
   }
@@ -374,36 +382,11 @@ class _UnifiedImportWizardBodyState
     if (!mounted) return;
     final notifier = ref.read(importWizardNotifierProvider.notifier);
     notifier.setDiverId(diverId);
+    // The import's job refreshes the imported lists when it ends, so they
+    // are fresh here and also when the diver has left the wizard.
     await notifier.performImport();
     if (!mounted) return;
-    _invalidateImportedProviders();
     await _animateToPage(_summaryIndex);
-  }
-
-  /// Invalidate list providers for entity types that were imported so
-  /// list screens reflect the new data without requiring an app restart.
-  void _invalidateImportedProviders() {
-    final result = ref.read(importWizardNotifierProvider).importResult;
-    if (result == null) return;
-
-    // Always refresh the computers list -- ensureComputer() (or
-    // SuuntoCloudAdapter's/GarminCloudAdapter's per-dive computer
-    // resolution) may have created a new record even when all dives were
-    // skipped.
-    if (widget.adapter.sourceType == ImportSourceType.diveComputer ||
-        widget.adapter.sourceType == ImportSourceType.suuntoCloud ||
-        widget.adapter.sourceType == ImportSourceType.suuntoFile ||
-        widget.adapter.sourceType == ImportSourceType.garminCloud) {
-      ref.invalidate(allDiveComputersProvider);
-    }
-
-    invalidateImportRelatedProviders(
-      (provider) => ref.invalidate(provider),
-      result.importedCounts.entries
-          .where((e) => e.value > 0)
-          .map((e) => e.key)
-          .toSet(),
-    );
   }
 
   /// Leaves the wizard. Opened from Transfer there is a page to pop back

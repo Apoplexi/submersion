@@ -47960,6 +47960,38 @@ class AppLocalizationsEn extends AppLocalizations {
       'Discard selections and cancel?';
 
   @override
+  String universalImport_background_finished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Import finished: $count dives imported.',
+      one: 'Import finished: $count dive imported.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_background_stopped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Import stopped: $count dives imported.',
+      one: 'Import stopped: $count dive imported.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_background_failed => 'The import failed.';
+
+  @override
+  String get universalImport_running_title => 'An import is still running';
+
+  @override
+  String get universalImport_running_body =>
+      'Wait for it to finish, or cancel it, before you start another import.';
+
+  @override
   String get universalImport_action_importSelected => 'Import Selected';
 
   @override

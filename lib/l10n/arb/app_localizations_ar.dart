@@ -49363,6 +49363,45 @@ class AppLocalizationsAr extends AppLocalizations {
       'تجاهل التحديدات والإلغاء؟';
 
   @override
+  String universalImport_background_finished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'انتهى الاستيراد: تم استيراد $count غطسة.',
+      many: 'انتهى الاستيراد: تم استيراد $count غطسة.',
+      few: 'انتهى الاستيراد: تم استيراد $count غطسات.',
+      two: 'انتهى الاستيراد: تم استيراد غطستين.',
+      one: 'انتهى الاستيراد: تم استيراد $count غطسة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_background_stopped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'توقف الاستيراد: تم استيراد $count غطسة.',
+      many: 'توقف الاستيراد: تم استيراد $count غطسة.',
+      few: 'توقف الاستيراد: تم استيراد $count غطسات.',
+      two: 'توقف الاستيراد: تم استيراد غطستين.',
+      one: 'توقف الاستيراد: تم استيراد $count غطسة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_background_failed => 'فشل الاستيراد.';
+
+  @override
+  String get universalImport_running_title =>
+      'لا يزال هناك استيراد قيد التشغيل';
+
+  @override
+  String get universalImport_running_body =>
+      'انتظر حتى ينتهي، أو ألغِه، قبل أن تبدأ استيرادًا آخر.';
+
+  @override
   String get universalImport_action_importSelected => 'استيراد المحدد';
 
   @override

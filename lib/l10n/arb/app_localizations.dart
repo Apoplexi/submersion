@@ -77234,6 +77234,36 @@ abstract class AppLocalizations {
   /// **'Discard selections and cancel?'**
   String get universalImport_cancel_discardSelections;
 
+  /// No description provided for @universalImport_background_finished.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Import finished: {count} dive imported.} other{Import finished: {count} dives imported.}}'**
+  String universalImport_background_finished(int count);
+
+  /// No description provided for @universalImport_background_stopped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Import stopped: {count} dive imported.} other{Import stopped: {count} dives imported.}}'**
+  String universalImport_background_stopped(int count);
+
+  /// No description provided for @universalImport_background_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'The import failed.'**
+  String get universalImport_background_failed;
+
+  /// No description provided for @universalImport_running_title.
+  ///
+  /// In en, this message translates to:
+  /// **'An import is still running'**
+  String get universalImport_running_title;
+
+  /// No description provided for @universalImport_running_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait for it to finish, or cancel it, before you start another import.'**
+  String get universalImport_running_body;
+
   /// No description provided for @universalImport_action_importSelected.
   ///
   /// In en, this message translates to:

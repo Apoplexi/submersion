@@ -48394,6 +48394,38 @@ class AppLocalizationsNl extends AppLocalizations {
       'Selecties verwerpen en annuleren?';
 
   @override
+  String universalImport_background_finished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Import voltooid: $count duiken geïmporteerd.',
+      one: 'Import voltooid: $count duik geïmporteerd.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_background_stopped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Import gestopt: $count duiken geïmporteerd.',
+      one: 'Import gestopt: $count duik geïmporteerd.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_background_failed => 'De import is mislukt.';
+
+  @override
+  String get universalImport_running_title => 'Er loopt nog een import';
+
+  @override
+  String get universalImport_running_body =>
+      'Wacht tot die klaar is, of annuleer hem, voordat je een nieuwe import start.';
+
+  @override
   String get universalImport_action_importSelected => 'Selectie importeren';
 
   @override

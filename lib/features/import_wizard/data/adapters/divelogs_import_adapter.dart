@@ -85,9 +85,9 @@ class DivelogsImportAdapter extends UniversalAdapter {
     _session = session;
     _lastUsername = session?.auth?.username ?? _lastUsername;
     _photos = const {};
-    widgetRef.read(divelogsFetchedProvider.notifier).state = false;
-    widgetRef.read(divelogsSessionGenerationProvider.notifier).state++;
-    widgetRef.read(universalImportNotifierProvider.notifier).reset();
+    readProvider(divelogsFetchedProvider.notifier).state = false;
+    readProvider(divelogsSessionGenerationProvider.notifier).state++;
+    readProvider(universalImportNotifierProvider.notifier).reset();
   }
 
   /// Listed photos per payload dive `sourceUuid`, set by the fetch step.
@@ -109,8 +109,8 @@ class DivelogsImportAdapter extends UniversalAdapter {
     _session = null;
     _lastUsername = null;
     _photos = const {};
-    widgetRef.invalidate(divelogsSignedInProvider);
-    widgetRef.invalidate(divelogsFetchedProvider);
+    container.invalidate(divelogsSignedInProvider);
+    container.invalidate(divelogsFetchedProvider);
   }
 
   @override
@@ -154,7 +154,7 @@ class DivelogsImportAdapter extends UniversalAdapter {
     final client = this.client;
     if (client == null || _photos.isEmpty) return (attached: 0, failed: 0);
     final linker = ImportPhotoLinker(
-      widgetRef.read(localFileLinkServiceProvider),
+      readProvider(localFileLinkServiceProvider),
     );
     final outcome = await attachRemotePhotos(
       photosBySourceUuid: _photos,

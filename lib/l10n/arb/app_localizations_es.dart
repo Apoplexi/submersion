@@ -48738,6 +48738,39 @@ class AppLocalizationsEs extends AppLocalizations {
       '¿Descartar la selección y cancelar?';
 
   @override
+  String universalImport_background_finished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Importación terminada: $count inmersiones importadas.',
+      one: 'Importación terminada: $count inmersión importada.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_background_stopped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Importación detenida: $count inmersiones importadas.',
+      one: 'Importación detenida: $count inmersión importada.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_background_failed => 'La importación ha fallado.';
+
+  @override
+  String get universalImport_running_title =>
+      'Todavía hay una importación en curso';
+
+  @override
+  String get universalImport_running_body =>
+      'Espera a que termine, o cancélala, antes de iniciar otra importación.';
+
+  @override
   String get universalImport_action_importSelected => 'Importar selección';
 
   @override

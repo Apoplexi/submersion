@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -10,6 +12,7 @@ import 'package:submersion/features/import_wizard/domain/models/import_cancellat
 import 'package:submersion/features/import_wizard/domain/models/import_phase.dart';
 import 'package:submersion/features/import_wizard/domain/models/tag_selection.dart';
 import 'package:submersion/features/import_wizard/domain/models/unified_import_result.dart';
+import 'package:submersion/features/import_wizard/presentation/providers/import_job_provider.dart';
 import 'package:submersion/features/rules/data/services/import_rules_pass.dart';
 import 'package:submersion/features/rules/data/services/rule_engine.dart';
 import 'package:submersion/features/rules/domain/entities/rule_run.dart';
@@ -62,6 +65,7 @@ class ImportWizardState {
     this.isImporting = false,
     this.isCancellationRequested = false,
     this.error,
+    this.importRefused = false,
     this.ruleRuns = const [],
     this.rulesFailed = false,
     this.ruleSkippedRules = const [],
@@ -136,6 +140,10 @@ class ImportWizardState {
   /// Non-null when an error has occurred.
   final String? error;
 
+  /// The import was refused because another one still runs; the summary
+  /// says so in the diver's language.
+  final bool importRefused;
+
   /// What the diver's logbook rules changed after the import (#3513).
   final List<RuleRunResult> ruleRuns;
 
@@ -169,6 +177,7 @@ class ImportWizardState {
     bool? isCancellationRequested,
     String? error,
     bool clearError = false,
+    bool? importRefused,
     List<RuleRunResult>? ruleRuns,
     bool? rulesFailed,
     List<String>? ruleSkippedRules,
@@ -197,6 +206,7 @@ class ImportWizardState {
       isCancellationRequested:
           isCancellationRequested ?? this.isCancellationRequested,
       error: clearError ? null : (error ?? this.error),
+      importRefused: importRefused ?? this.importRefused,
       ruleRuns: ruleRuns ?? this.ruleRuns,
       rulesFailed: rulesFailed ?? this.rulesFailed,
       ruleSkippedRules: ruleSkippedRules ?? this.ruleSkippedRules,
@@ -242,9 +252,13 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
     TagRepository? tagRepository,
     String? diverId,
     RuleEngine? ruleEngine,
+    ImportJobNotifier? job,
+    bool continuesWithoutWizard = false,
   }) : _tagRepository = tagRepository,
        _diverId = diverId,
        _ruleEngine = ruleEngine,
+       _job = job,
+       _continuesWithoutWizard = continuesWithoutWizard,
        super(const ImportWizardState());
 
   static final _log = LoggerService.forClass(ImportWizardNotifier);
@@ -254,9 +268,19 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
   final RuleEngine? _ruleEngine;
   String? _diverId;
 
-  /// Active cancellation token for the currently-running import, or null
-  /// when no import is in progress. The notifier owns the lifecycle: it's
-  /// allocated fresh in [performImport] and cleared once the adapter returns.
+  /// The app-wide job an import runs as (see [importJobProvider]): it owns
+  /// the cancellation token and outlives this notifier. Null in tests that
+  /// do not need one; the import then runs on a token of its own.
+  final ImportJobNotifier? _job;
+
+  /// Whether the adapter keeps working once the wizard closes, so an import
+  /// may go on without it. One that does not is cancelled when the wizard
+  /// goes away, as leaving always did.
+  final bool _continuesWithoutWizard;
+
+  /// The running import's cancellation token, or null when no import is in
+  /// progress. It comes from the job when there is one, so this notifier and
+  /// the job cancel through the same token.
   ImportCancellationToken? _cancelToken;
 
   /// Set the validated diver ID for tag association during import.
@@ -273,8 +297,29 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
   void cancelImport() {
     final token = _cancelToken;
     if (token == null || token.isCancelled) return;
-    token.cancel();
+    final job = _job;
+    if (job != null) {
+      job.cancel();
+    } else {
+      token.cancel();
+    }
     state = state.copyWith(isCancellationRequested: true);
+  }
+
+  @override
+  void dispose() {
+    final token = _cancelToken;
+    if (token != null) {
+      final job = _job;
+      if (job != null) {
+        // After the tree has settled: this runs while the wizard is being
+        // unmounted, and the job's listeners may rebuild other widgets.
+        scheduleMicrotask(() => job.detach(token));
+      } else if (!_continuesWithoutWizard) {
+        token.cancel();
+      }
+    }
+    super.dispose();
   }
 
   /// The duplicate actions supported by the underlying adapter, across all
@@ -989,16 +1034,45 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
       return;
     }
 
-    final token = ImportCancellationToken();
-    _cancelToken = token;
+    final job = _job;
+    final ImportCancellationToken token;
+    if (job == null) {
+      token = ImportCancellationToken();
+    } else {
+      final started = job.start(
+        continuesWithoutWizard: _continuesWithoutWizard,
+      );
+      if (started == null) {
+        // English for the log only; the summary shows a translated notice.
+        const refused = 'Another import is still running';
+        state = state.copyWith(
+          importRefused: true,
+          error: refused,
+          importResult: const UnifiedImportResult(
+            importedCounts: {},
+            consolidatedCount: 0,
+            skippedCount: 0,
+            errorMessage: refused,
+          ),
+        );
+        return;
+      }
+      token = started;
+    }
 
-    state = state.copyWith(
-      isImporting: true,
-      isCancellationRequested: false,
-      clearError: true,
-    );
-
+    UnifiedImportResult? written;
     try {
+      _cancelToken = token;
+      // Read now: the diver may leave the wizard before the import ends, and
+      // the tags must still reach the dives then.
+      final importTags = state.importTags;
+
+      state = state.copyWith(
+        isImporting: true,
+        isCancellationRequested: false,
+        clearError: true,
+      );
+
       final result = await _adapter.performImport(
         bundle,
         state.selections,
@@ -1009,6 +1083,11 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
         retainSourceDiveNumbers:
             state.retainSourceDiveNumbers && bundle.hasSourceDiveNumbers,
         onProgress: (phase, current, total) {
+          job?.report(token, phase, current, total);
+          // The importer keeps reporting after the diver leaves the wizard
+          // (#3554). Only this copy of the progress has nowhere to go then;
+          // throwing here would stop the importer's loop part-way.
+          if (!mounted) return;
           state = state.copyWith(
             importPhase: phase,
             importCurrent: current,
@@ -1017,6 +1096,7 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
         },
         cancelToken: token,
       );
+      written = result;
 
       // Apply import tags to all imported dives.
       // Tag application is non-fatal: dives are already imported, so we
@@ -1025,12 +1105,12 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
       // us to stop, not to do one more round of DB work.
       String? tagWarning;
       if (!token.isCancelled &&
-          state.importTags.isNotEmpty &&
+          importTags.isNotEmpty &&
           (result.importedDiveIds.isNotEmpty ||
               result.diverOutcomes.any((o) => o.diveIds.isNotEmpty)) &&
           _tagRepository != null) {
         try {
-          await _applyImportTags(result);
+          await _applyImportTags(result, importTags);
         } catch (e) {
           _log.warning('Tag application failed after import: $e');
           tagWarning = 'Dives imported successfully but tagging failed: $e';
@@ -1050,6 +1130,8 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
               isCancelled: () => token.isCancelled,
             );
 
+      // Once the wizard is gone the job reports the outcome instead.
+      if (!mounted) return;
       state = state.copyWith(
         isImporting: false,
         importResult: result,
@@ -1064,6 +1146,7 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
       // The summary shows only the message; the trace is what finds the
       // failing lookup when a diver reports it (issue #3343).
       _log.error('Import failed', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
       state = state.copyWith(
         isImporting: false,
         error: 'Import failed: $e',
@@ -1076,7 +1159,10 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
       );
     } finally {
       _cancelToken = null;
-      if (state.isCancellationRequested) {
+      // Refreshes the imported lists, wizard or not, and records how a job
+      // that outlived its wizard ended.
+      job?.finish(token, result: written, sourceType: _adapter.sourceType);
+      if (mounted && state.isCancellationRequested) {
         state = state.copyWith(isCancellationRequested: false);
       }
     }
@@ -1088,7 +1174,10 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
   /// profiles (issue #1893) each profile gets its own tag of the chosen
   /// name. The existing tags offered in Review are the active diver's, so
   /// they are used as they are only for that diver's dives.
-  Future<void> _applyImportTags(UnifiedImportResult result) async {
+  Future<void> _applyImportTags(
+    UnifiedImportResult result,
+    List<TagSelection> importTags,
+  ) async {
     final divesByDiver = <String?, List<String>>{
       if (result.diverOutcomes.isEmpty)
         _diverId: result.importedDiveIds
@@ -1097,17 +1186,19 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
           if (outcome.diveIds.isNotEmpty) outcome.diverId: outcome.diveIds,
     };
     final total = divesByDiver.values.fold<int>(0, (n, ids) => n + ids.length);
-    state = state.copyWith(
-      importPhase: ImportPhase.applyingTags,
-      importCurrent: 0,
-      importTotal: total,
-    );
+    if (mounted) {
+      state = state.copyWith(
+        importPhase: ImportPhase.applyingTags,
+        importCurrent: 0,
+        importTotal: total,
+      );
+    }
 
     var done = 0;
     for (final MapEntry(key: diverId, value: diveIds) in divesByDiver.entries) {
       // Resolve tag selections to this diver's tag IDs.
       final tagIds = <String>[];
-      for (final tagSelection in state.importTags) {
+      for (final tagSelection in importTags) {
         if (!tagSelection.isNew && diverId == _diverId) {
           tagIds.add(tagSelection.existingTagId!);
         } else {
@@ -1125,7 +1216,7 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
           await _tagRepository!.addTagToDive(diveId, tagId);
         }
         done++;
-        state = state.copyWith(importCurrent: done);
+        if (mounted) state = state.copyWith(importCurrent: done);
       }
     }
   }

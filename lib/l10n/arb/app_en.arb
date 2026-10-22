@@ -28004,6 +28004,25 @@
   "universalImport_cancel_keepImporting": "Keep importing",
   "universalImport_cancel_confirmAction": "Cancel import",
   "universalImport_cancel_discardSelections": "Discard selections and cancel?",
+  "universalImport_background_finished": "{count, plural, one{Import finished: {count} dive imported.} other{Import finished: {count} dives imported.}}",
+  "@universalImport_background_finished": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "universalImport_background_stopped": "{count, plural, one{Import stopped: {count} dive imported.} other{Import stopped: {count} dives imported.}}",
+  "@universalImport_background_stopped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "universalImport_background_failed": "The import failed.",
+  "universalImport_running_title": "An import is still running",
+  "universalImport_running_body": "Wait for it to finish, or cancel it, before you start another import.",
   "universalImport_action_importSelected": "Import Selected",
   "universalImport_action_next": "Next",
   "common_action_yes": "Yes",

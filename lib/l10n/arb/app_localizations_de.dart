@@ -48588,6 +48588,39 @@ class AppLocalizationsDe extends AppLocalizations {
       'Auswahl verwerfen und abbrechen?';
 
   @override
+  String universalImport_background_finished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Import abgeschlossen: $count Tauchgänge importiert.',
+      one: 'Import abgeschlossen: $count Tauchgang importiert.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_background_stopped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Import gestoppt: $count Tauchgänge importiert.',
+      one: 'Import gestoppt: $count Tauchgang importiert.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_background_failed =>
+      'Der Import ist fehlgeschlagen.';
+
+  @override
+  String get universalImport_running_title => 'Ein Import läuft noch';
+
+  @override
+  String get universalImport_running_body =>
+      'Warte, bis er fertig ist, oder brich ihn ab, bevor du einen weiteren Import startest.';
+
+  @override
   String get universalImport_action_importSelected => 'Auswahl importieren';
 
   @override

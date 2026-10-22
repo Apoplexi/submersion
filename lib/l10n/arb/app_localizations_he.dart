@@ -47690,6 +47690,38 @@ class AppLocalizationsHe extends AppLocalizations {
       'להשליך את הבחירות ולבטל?';
 
   @override
+  String universalImport_background_finished(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הייבוא הסתיים: יובאו $count צלילות.',
+      one: 'הייבוא הסתיים: יובאה $count צלילה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_background_stopped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הייבוא נעצר: יובאו $count צלילות.',
+      one: 'הייבוא נעצר: יובאה $count צלילה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_background_failed => 'הייבוא נכשל.';
+
+  @override
+  String get universalImport_running_title => 'ייבוא עדיין פועל';
+
+  @override
+  String get universalImport_running_body =>
+      'יש להמתין לסיומו, או לבטל אותו, לפני שמתחילים ייבוא נוסף.';
+
+  @override
   String get universalImport_action_importSelected => 'ייבוא הנבחרים';
 
   @override

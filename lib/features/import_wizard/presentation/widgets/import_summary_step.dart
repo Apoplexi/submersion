@@ -49,6 +49,16 @@ class ImportSummaryStep extends ConsumerWidget {
     final state = ref.watch(importWizardNotifierProvider);
     final result = state.importResult;
 
+    if (state.importRefused) {
+      final l10n = context.l10n;
+      return _ErrorView(
+        errorMessage:
+            '${l10n.universalImport_running_title}\n'
+            '${l10n.universalImport_running_body}',
+        onDone: onDone,
+      );
+    }
+
     if (result == null) {
       final error = state.error;
       if (error != null) {
