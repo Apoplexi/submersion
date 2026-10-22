@@ -12034,17 +12034,24 @@ class AppLocalizationsNl extends AppLocalizations {
       'Foto\'s worden tijdens het importeren gedownload naar een map die je zelf kiest.';
 
   @override
-  String divelogsImport_fetch_listingPhotos(int current, int total) {
-    return 'Foto\'s voor duik $current van $total worden opgevraagd…';
-  }
-
-  @override
   String divelogsImport_fetch_photoListingsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
       other: 'Foto\'s voor $count duiken konden niet worden opgevraagd.',
       one: 'Foto\'s voor $count duik konden niet worden opgevraagd.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divelogsImport_fetch_photosWithoutLink(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count foto\'s hebben geen downloadlink en worden niet geïmporteerd.',
+      one: '$count foto heeft geen downloadlink en wordt niet geïmporteerd.',
     );
     return '$_temp0';
   }
@@ -32762,6 +32769,22 @@ class AppLocalizationsNl extends AppLocalizations {
           'Foto\'s voor $count duiken konden niet worden opgevraagd en zijn daarom niet geïmporteerd.',
       one:
           'Foto\'s voor $count duik konden niet worden opgevraagd en zijn daarom niet geïmporteerd.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticePhotosWithoutLinkTitle =>
+      'Sommige foto\'s zonder link';
+
+  @override
+  String universalImport_summary_noticePhotosWithoutLinkBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count foto\'s hadden geen downloadlink en zijn daarom niet geïmporteerd.',
+      one: '$count foto had geen downloadlink en is daarom niet geïmporteerd.',
     );
     return '$_temp0';
   }

@@ -7379,19 +7379,16 @@
   "divelogsImport_fetch_gearUnavailable": "Gear could not be fetched; dives will import without gear links.",
   "divelogsImport_fetch_includePhotos": "Include photos",
   "divelogsImport_fetch_includePhotosHint": "Photos are downloaded during the import into a folder you choose.",
-  "divelogsImport_fetch_listingPhotos": "Listing photos for dive {current} of {total}…",
-  "@divelogsImport_fetch_listingPhotos": {
+  "divelogsImport_fetch_photoListingsFailed": "{count, plural, one{Photos for {count} dive could not be listed.} other{Photos for {count} dives could not be listed.}}",
+  "@divelogsImport_fetch_photoListingsFailed": {
     "placeholders": {
-      "current": {
-        "type": "int"
-      },
-      "total": {
+      "count": {
         "type": "int"
       }
     }
   },
-  "divelogsImport_fetch_photoListingsFailed": "{count, plural, one{Photos for {count} dive could not be listed.} other{Photos for {count} dives could not be listed.}}",
-  "@divelogsImport_fetch_photoListingsFailed": {
+  "divelogsImport_fetch_photosWithoutLink": "{count, plural, one{{count} photo has no download link and will not be imported.} other{{count} photos have no download link and will not be imported.}}",
+  "@divelogsImport_fetch_photosWithoutLink": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -19039,6 +19036,15 @@
   "universalImport_summary_noticePhotoListingsUnavailableTitle": "Some photos not listed",
   "universalImport_summary_noticePhotoListingsUnavailableBody": "{count, plural, one{Photos for {count} dive could not be listed, so they were not imported.} other{Photos for {count} dives could not be listed, so they were not imported.}}",
   "@universalImport_summary_noticePhotoListingsUnavailableBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "universalImport_summary_noticePhotosWithoutLinkTitle": "Some photos without a link",
+  "universalImport_summary_noticePhotosWithoutLinkBody": "{count, plural, one{{count} photo had no download link, so it was not imported.} other{{count} photos had no download link, so they were not imported.}}",
+  "@universalImport_summary_noticePhotosWithoutLinkBody": {
     "placeholders": {
       "count": {
         "type": "int"

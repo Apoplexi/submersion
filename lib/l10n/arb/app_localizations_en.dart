@@ -11934,17 +11934,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Photos are downloaded during the import into a folder you choose.';
 
   @override
-  String divelogsImport_fetch_listingPhotos(int current, int total) {
-    return 'Listing photos for dive $current of $total…';
-  }
-
-  @override
   String divelogsImport_fetch_photoListingsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
       other: 'Photos for $count dives could not be listed.',
       one: 'Photos for $count dive could not be listed.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divelogsImport_fetch_photosWithoutLink(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos have no download link and will not be imported.',
+      one: '$count photo has no download link and will not be imported.',
     );
     return '$_temp0';
   }
@@ -32437,6 +32443,21 @@ class AppLocalizationsEn extends AppLocalizations {
           'Photos for $count dives could not be listed, so they were not imported.',
       one:
           'Photos for $count dive could not be listed, so they were not imported.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticePhotosWithoutLinkTitle =>
+      'Some photos without a link';
+
+  @override
+  String universalImport_summary_noticePhotosWithoutLinkBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos had no download link, so they were not imported.',
+      one: '$count photo had no download link, so it was not imported.',
     );
     return '$_temp0';
   }

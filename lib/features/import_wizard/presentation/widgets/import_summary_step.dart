@@ -636,6 +636,13 @@ _FileNoticeWording? _fileNoticeWording(
       ),
       action: null,
     ),
+    ImportNoticeKind.photosWithoutLink => (
+      title: l10n.universalImport_summary_noticePhotosWithoutLinkTitle,
+      body: l10n.universalImport_summary_noticePhotosWithoutLinkBody(
+        notice.count,
+      ),
+      action: null,
+    ),
     ImportNoticeKind.photosNotDownloaded => (
       title: l10n.universalImport_summary_noticePhotosNotDownloadedTitle,
       body: l10n.universalImport_summary_noticePhotosNotDownloadedBody(

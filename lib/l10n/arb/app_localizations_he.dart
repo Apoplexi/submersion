@@ -11857,17 +11857,23 @@ class AppLocalizationsHe extends AppLocalizations {
       'התמונות מורדות במהלך הייבוא לתיקייה שתבחרו.';
 
   @override
-  String divelogsImport_fetch_listingPhotos(int current, int total) {
-    return 'מקבל את רשימת התמונות לצלילה $current מתוך $total…';
-  }
-
-  @override
   String divelogsImport_fetch_photoListingsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
       other: 'לא ניתן היה לקבל את רשימת התמונות של $count צלילות.',
       one: 'לא ניתן היה לקבל את רשימת התמונות של $count צלילה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divelogsImport_fetch_photosWithoutLink(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ל-$count תמונות אין קישור להורדה והן לא ייובאו.',
+      one: 'ל-$count תמונה אין קישור להורדה והיא לא תיובא.',
     );
     return '$_temp0';
   }
@@ -32178,6 +32184,21 @@ class AppLocalizationsHe extends AppLocalizations {
           'לא ניתן היה לקבל את רשימת התמונות של $count צלילות, ולכן הן לא יובאו.',
       one:
           'לא ניתן היה לקבל את רשימת התמונות של $count צלילה, ולכן הן לא יובאו.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticePhotosWithoutLinkTitle =>
+      'חלק מהתמונות ללא קישור';
+
+  @override
+  String universalImport_summary_noticePhotosWithoutLinkBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ל-$count תמונות לא היה קישור להורדה, ולכן הן לא יובאו.',
+      one: 'ל-$count תמונה לא היה קישור להורדה, ולכן היא לא יובאה.',
     );
     return '$_temp0';
   }

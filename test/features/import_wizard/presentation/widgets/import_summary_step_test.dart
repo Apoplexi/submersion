@@ -1755,6 +1755,16 @@ void main() {
       );
     });
 
+    testWidgets('counts photos listed without a usable link', (tester) async {
+      await expectCard(
+        tester,
+        const ImportNotice(kind: ImportNoticeKind.photosWithoutLink, count: 3),
+        title: 'Some photos without a link',
+        bodyFragment: '3 photos had no download link',
+        countLine: null,
+      );
+    });
+
     testWidgets('counts photos that could not be downloaded', (tester) async {
       await expectCard(
         tester,

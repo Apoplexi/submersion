@@ -12115,17 +12115,23 @@ class AppLocalizationsEs extends AppLocalizations {
       'Las fotos se descargan durante la importación en una carpeta que elijas.';
 
   @override
-  String divelogsImport_fetch_listingPhotos(int current, int total) {
-    return 'Listando fotos de la inmersión $current de $total…';
-  }
-
-  @override
   String divelogsImport_fetch_photoListingsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
       other: 'No se pudieron listar las fotos de $count inmersiones.',
       one: 'No se pudieron listar las fotos de $count inmersión.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divelogsImport_fetch_photosWithoutLink(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos no tienen enlace de descarga y no se importarán.',
+      one: '$count foto no tiene enlace de descarga y no se importará.',
     );
     return '$_temp0';
   }
@@ -33012,6 +33018,22 @@ class AppLocalizationsEs extends AppLocalizations {
           'No se pudieron listar las fotos de $count inmersiones, así que no se importaron.',
       one:
           'No se pudieron listar las fotos de $count inmersión, así que no se importaron.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticePhotosWithoutLinkTitle =>
+      'Algunas fotos sin enlace';
+
+  @override
+  String universalImport_summary_noticePhotosWithoutLinkBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count fotos no tenían enlace de descarga, así que no se importaron.',
+      one: '$count foto no tenía enlace de descarga, así que no se importó.',
     );
     return '$_temp0';
   }

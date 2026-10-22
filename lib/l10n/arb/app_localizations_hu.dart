@@ -12089,17 +12089,25 @@ class AppLocalizationsHu extends AppLocalizations {
       'A fényképek az importálás során egy általad választott mappába töltődnek le.';
 
   @override
-  String divelogsImport_fetch_listingPhotos(int current, int total) {
-    return '$total merülésből a(z) $current fényképeinek listázása…';
-  }
-
-  @override
   String divelogsImport_fetch_photoListingsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
       other: '$count merülés fényképeit nem sikerült listázni.',
       one: '$count merülés fényképeit nem sikerült listázni.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divelogsImport_fetch_photosWithoutLink(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count fényképnek nincs letöltési hivatkozása, ezért nem lesznek importálva.',
+      one:
+          '$count fényképnek nincs letöltési hivatkozása, ezért nem lesz importálva.',
     );
     return '$_temp0';
   }
@@ -32806,6 +32814,23 @@ class AppLocalizationsHu extends AppLocalizations {
           '$count merülés fényképeit nem sikerült listázni, ezért nem lettek importálva.',
       one:
           '$count merülés fényképeit nem sikerült listázni, ezért nem lettek importálva.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticePhotosWithoutLinkTitle =>
+      'Néhány fénykép hivatkozás nélkül';
+
+  @override
+  String universalImport_summary_noticePhotosWithoutLinkBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count fényképnek nem volt letöltési hivatkozása, ezért nem lettek importálva.',
+      one:
+          '$count fényképnek nem volt letöltési hivatkozása, ezért nem lett importálva.',
     );
     return '$_temp0';
   }

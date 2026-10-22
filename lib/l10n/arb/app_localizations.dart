@@ -19399,17 +19399,17 @@ abstract class AppLocalizations {
   /// **'Photos are downloaded during the import into a folder you choose.'**
   String get divelogsImport_fetch_includePhotosHint;
 
-  /// No description provided for @divelogsImport_fetch_listingPhotos.
-  ///
-  /// In en, this message translates to:
-  /// **'Listing photos for dive {current} of {total}…'**
-  String divelogsImport_fetch_listingPhotos(int current, int total);
-
   /// No description provided for @divelogsImport_fetch_photoListingsFailed.
   ///
   /// In en, this message translates to:
   /// **'{count, plural, one{Photos for {count} dive could not be listed.} other{Photos for {count} dives could not be listed.}}'**
   String divelogsImport_fetch_photoListingsFailed(int count);
+
+  /// No description provided for @divelogsImport_fetch_photosWithoutLink.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} photo has no download link and will not be imported.} other{{count} photos have no download link and will not be imported.}}'**
+  String divelogsImport_fetch_photosWithoutLink(int count);
 
   /// No description provided for @divelogsImport_fetch_retry.
   ///
@@ -52060,6 +52060,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{Photos for {count} dive could not be listed, so they were not imported.} other{Photos for {count} dives could not be listed, so they were not imported.}}'**
   String universalImport_summary_noticePhotoListingsUnavailableBody(int count);
+
+  /// No description provided for @universalImport_summary_noticePhotosWithoutLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Some photos without a link'**
+  String get universalImport_summary_noticePhotosWithoutLinkTitle;
+
+  /// No description provided for @universalImport_summary_noticePhotosWithoutLinkBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} photo had no download link, so it was not imported.} other{{count} photos had no download link, so they were not imported.}}'**
+  String universalImport_summary_noticePhotosWithoutLinkBody(int count);
 
   /// No description provided for @universalImport_summary_noticePhotosNotDownloadedTitle.
   ///

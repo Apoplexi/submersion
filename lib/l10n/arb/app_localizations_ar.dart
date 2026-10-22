@@ -12283,11 +12283,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'يتم تنزيل الصور أثناء الاستيراد إلى مجلد تختاره.';
 
   @override
-  String divelogsImport_fetch_listingPhotos(int current, int total) {
-    return 'جارٍ سرد صور الغوصة $current من $total…';
-  }
-
-  @override
   String divelogsImport_fetch_photoListingsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -12297,6 +12292,20 @@ class AppLocalizationsAr extends AppLocalizations {
       few: 'تعذّر سرد صور $count غوصات.',
       two: 'تعذّر سرد صور غوصتين.',
       one: 'تعذّر سرد صور $count غوصة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divelogsImport_fetch_photosWithoutLink(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صورة بلا رابط تنزيل ولن تُستورد.',
+      many: '$count صورة بلا رابط تنزيل ولن تُستورد.',
+      few: '$count صور بلا رابط تنزيل ولن تُستورد.',
+      two: 'صورتان بلا رابط تنزيل ولن تُستوردا.',
+      one: '$count صورة بلا رابط تنزيل ولن تُستورد.',
     );
     return '$_temp0';
   }
@@ -33454,6 +33463,24 @@ class AppLocalizationsAr extends AppLocalizations {
       few: 'تعذّر سرد صور $count غطسات، لذا لم يتم استيرادها.',
       two: 'تعذّر سرد صور غطستين، لذا لم يتم استيرادها.',
       one: 'تعذّر سرد صور $count غطسة، لذا لم يتم استيرادها.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticePhotosWithoutLinkTitle =>
+      'بعض الصور بلا رابط';
+
+  @override
+  String universalImport_summary_noticePhotosWithoutLinkBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'لم يكن لـ$count صورة رابط تنزيل، لذا لم يتم استيرادها.',
+      many: 'لم يكن لـ$count صورة رابط تنزيل، لذا لم يتم استيرادها.',
+      few: 'لم يكن لـ$count صور رابط تنزيل، لذا لم يتم استيرادها.',
+      two: 'لم يكن للصورتين رابط تنزيل، لذا لم يتم استيرادهما.',
+      one: 'لم يكن لـ$count صورة رابط تنزيل، لذا لم يتم استيرادها.',
     );
     return '$_temp0';
   }

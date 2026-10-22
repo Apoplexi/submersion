@@ -11541,16 +11541,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divelogsImport_fetch_includePhotosHint => '照片会在导入过程中下载到您选择的文件夹。';
 
   @override
-  String divelogsImport_fetch_listingPhotos(int current, int total) {
-    return '正在列出第 $current 次潜水的照片，共 $total 次…';
-  }
-
-  @override
   String divelogsImport_fetch_photoListingsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
       other: '无法列出 $count 次潜水的照片。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divelogsImport_fetch_photosWithoutLink(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 张照片没有下载链接，将不会导入。',
     );
     return '$_temp0';
   }
@@ -31093,6 +31098,19 @@ class AppLocalizationsZh extends AppLocalizations {
       count,
       locale: localeName,
       other: '无法列出 $count 次潜水的照片，因此这些照片未导入。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_summary_noticePhotosWithoutLinkTitle => '部分照片没有链接';
+
+  @override
+  String universalImport_summary_noticePhotosWithoutLinkBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 张照片没有下载链接，因此未导入。',
     );
     return '$_temp0';
   }
