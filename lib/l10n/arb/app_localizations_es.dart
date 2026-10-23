@@ -26055,6 +26055,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_import_phase_dives => 'Importando inmersiones...';
 
   @override
+  String get settings_import_phase_photos => 'Descargando fotos...';
+
+  @override
+  String get settings_import_phase_finishing => 'Finalizando la importación...';
+
+  @override
   String get settings_import_phase_equipment => 'Importando equipos...';
 
   @override

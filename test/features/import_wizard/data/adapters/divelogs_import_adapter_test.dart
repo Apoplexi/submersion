@@ -15,6 +15,7 @@ import 'package:submersion/features/import_wizard/data/adapters/divelogs_import_
 import 'package:submersion/features/import_wizard/data/adapters/remote_photo_attacher.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart'
     show ImportSourceType;
+import 'package:submersion/features/import_wizard/domain/models/import_phase.dart';
 import 'package:submersion/features/media/data/services/local_file_link_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
@@ -174,6 +175,7 @@ void main() {
       ],
     });
 
+    final progress = <(ImportPhase, int, int)>[];
     final outcome = await tester.runAsync(
       () => adapter.debugAttachAdditionalPhotosFor(
         photoDiveIds: const {0: 'dive-1'},
@@ -181,10 +183,17 @@ void main() {
           {'sourceUuid': 'divelogs-1'},
         ],
         destinationDir: dest.path,
+        onProgress: (phase, current, total) =>
+            progress.add((phase, current, total)),
       ),
     );
 
     expect(outcome, (attached: 1, failed: 1));
+    expect(progress, [
+      (ImportPhase.photos, 0, 2),
+      (ImportPhase.photos, 1, 2),
+      (ImportPhase.photos, 2, 2),
+    ]);
     final saved = File(p.join(dest.path, 'reef.jpg'));
     expect(saved.readAsBytesSync(), [7, 7, 7]);
     expect(linkService.linked.single, (saved.path, 'dive-1'));

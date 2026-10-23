@@ -7266,6 +7266,8 @@
   "settings_import_phase_diveCenters": "מייבא מרכזי צלילה...",
   "settings_import_phase_diveTypes": "מייבא סוגי צלילה...",
   "settings_import_phase_dives": "מייבא צלילות...",
+  "settings_import_phase_photos": "מוריד תמונות...",
+  "settings_import_phase_finishing": "מסיים את הייבוא...",
   "settings_import_phase_equipment": "מייבא ציוד...",
   "settings_import_phase_equipmentSets": "מייבא סטי ציוד...",
   "settings_import_phase_preparing": "מכין...",

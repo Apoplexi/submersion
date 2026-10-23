@@ -7398,6 +7398,8 @@
   "settings_import_phase_diveCenters": "Tauchzentren werden importiert...",
   "settings_import_phase_diveTypes": "Taucharten werden importiert...",
   "settings_import_phase_dives": "Tauchgänge werden importiert...",
+  "settings_import_phase_photos": "Fotos werden heruntergeladen...",
+  "settings_import_phase_finishing": "Import wird abgeschlossen...",
   "settings_import_phase_equipment": "Ausrüstung wird importiert...",
   "settings_import_phase_equipmentSets": "Ausrüstungssets werden importiert...",
   "settings_import_phase_preparing": "Wird vorbereitet...",

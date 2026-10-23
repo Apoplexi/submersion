@@ -1447,6 +1447,39 @@ void main() {
         });
       });
 
+      test('ends on the finishing phase, not on the last photo', () async {
+        notifier.setBundle(buildBundle(diveItems: [makeItem('Dive 1')]));
+        when(
+          mockAdapter.performImport(
+            any,
+            any,
+            any,
+            retainSourceDiveNumbers: anyNamed('retainSourceDiveNumbers'),
+            onProgress: anyNamed('onProgress'),
+            cancelToken: anyNamed('cancelToken'),
+          ),
+        ).thenAnswer((invocation) async {
+          final onProgress =
+              invocation.namedArguments[#onProgress]
+                  as void Function(ImportPhase, int, int)?;
+          onProgress?.call(ImportPhase.photos, 4, 4);
+          return const UnifiedImportResult(
+            importedCounts: {ImportEntityType.dives: 1},
+            consolidatedCount: 0,
+            skippedCount: 0,
+          );
+        });
+        final phases = <(ImportPhase?, int)>[];
+        notifier.addListener(
+          (state) => phases.add((state.importPhase, state.importTotal)),
+        );
+
+        await notifier.performImport();
+
+        final afterPhotos = phases.skipWhile((p) => p.$1 != ImportPhase.photos);
+        expect(afterPhotos.skip(1).first, (ImportPhase.finishing, 0));
+      });
+
       test('does nothing when no bundle is set', () async {
         // No setBundle called
         await notifier.performImport();

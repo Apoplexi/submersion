@@ -26112,6 +26112,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_import_phase_dives => 'Importation des plongées...';
 
   @override
+  String get settings_import_phase_photos => 'Téléchargement des photos...';
+
+  @override
+  String get settings_import_phase_finishing =>
+      'Finalisation de l\'importation...';
+
+  @override
   String get settings_import_phase_equipment =>
       'Importation de l\'équipement...';
 

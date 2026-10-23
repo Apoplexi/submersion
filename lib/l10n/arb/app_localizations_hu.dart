@@ -25912,6 +25912,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_import_phase_dives => 'Merülések importálása...';
 
   @override
+  String get settings_import_phase_photos => 'Fotók letöltése...';
+
+  @override
+  String get settings_import_phase_finishing => 'Importálás befejezése...';
+
+  @override
   String get settings_import_phase_equipment => 'Felszerelés importálása...';
 
   @override

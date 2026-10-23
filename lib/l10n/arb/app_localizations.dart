@@ -41800,6 +41800,18 @@ abstract class AppLocalizations {
   /// **'Importing dives...'**
   String get settings_import_phase_dives;
 
+  /// No description provided for @settings_import_phase_photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading photos...'**
+  String get settings_import_phase_photos;
+
+  /// No description provided for @settings_import_phase_finishing.
+  ///
+  /// In en, this message translates to:
+  /// **'Finishing import...'**
+  String get settings_import_phase_finishing;
+
   /// No description provided for @settings_import_phase_equipment.
   ///
   /// In en, this message translates to:

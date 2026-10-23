@@ -7166,6 +7166,8 @@
   "settings_import_phase_diveCenters": "Merülőközpontok importálása...",
   "settings_import_phase_diveTypes": "Merülés típusok importálása...",
   "settings_import_phase_dives": "Merülések importálása...",
+  "settings_import_phase_photos": "Fotók letöltése...",
+  "settings_import_phase_finishing": "Importálás befejezése...",
   "settings_import_phase_equipment": "Felszerelés importálása...",
   "settings_import_phase_equipmentSets": "Felszerelés szettek importálása...",
   "settings_import_phase_preparing": "Előkészítés...",

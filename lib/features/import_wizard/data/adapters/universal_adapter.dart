@@ -398,7 +398,8 @@ class UniversalAdapter implements ImportSourceAdapter {
   /// targets, and only when the user chose a destination folder.
   ///
   /// Returns what was attached and what failed; a failure is reported in the
-  /// summary and never fails the import. File imports have none.
+  /// summary and never fails the import. File imports have none. Downloads
+  /// report through [onProgress] as [ImportPhase.photos].
   @protected
   Future<RemotePhotoOutcome> attachAdditionalPhotos({
     required Map<int, String> photoDiveIds,
@@ -407,6 +408,7 @@ class UniversalAdapter implements ImportSourceAdapter {
     required List<Map<String, dynamic>> dives,
     required String destinationDir,
     ImportCancellationToken? cancelToken,
+    ImportProgressCallback? onProgress,
   }) async => (attached: 0, failed: 0);
 
   @visibleForTesting
@@ -1203,6 +1205,13 @@ class UniversalAdapter implements ImportSourceAdapter {
       }
     }
 
+    // Linking or downloading thousands of photos takes a while after the
+    // dives are saved; each photo loop reports as its own phase (#3555).
+    final reportPhotos = onProgress == null
+        ? null
+        : (int current, int total) =>
+              onProgress(ImportPhase.photos, current, total);
+
     final bundledFolder = notifierState.bundledPhotoFolderPath;
     var attachedPhotos = 0;
     if (bundledFolder != null &&
@@ -1225,6 +1234,7 @@ class UniversalAdapter implements ImportSourceAdapter {
           destinationDir: bundledFolder,
         ),
         cancelToken: cancelToken,
+        onProgress: reportPhotos,
       );
       attachedPhotos = attached - linker.alreadyLinked;
     }
@@ -1255,6 +1265,7 @@ class UniversalAdapter implements ImportSourceAdapter {
         selectedIndices: selections[wizard.ImportEntityType.media],
         attach: linker.linkResolved,
         cancelToken: cancelToken,
+        onProgress: reportPhotos,
       );
       // Already-linked photos are successful no-ops to the attach loop;
       // keep them out of the summary's attached count.
@@ -1272,6 +1283,7 @@ class UniversalAdapter implements ImportSourceAdapter {
         dives: payload.entitiesOf(ui.ImportEntityType.dives),
         destinationDir: bundledFolder,
         cancelToken: cancelToken,
+        onProgress: onProgress,
       );
     }
 
@@ -1629,6 +1641,8 @@ class UniversalAdapter implements ImportSourceAdapter {
   /// already succeeded and a failed photo must not fail the wizard.
   ///
   /// Stops at the next photo once [cancelToken] is cancelled (issue #3216).
+  /// [onProgress] hears how many photos are done out of how many, before the
+  /// first and after each one.
   ///
   /// Returns the number of photos attached.
   static Future<int> attachImportedPhotos({
@@ -1646,6 +1660,7 @@ class UniversalAdapter implements ImportSourceAdapter {
     )
     attach,
     ImportCancellationToken? cancelToken,
+    void Function(int current, int total)? onProgress,
   }) async {
     if (photoPathsByBaseName.isEmpty || diveIdByIndex.isEmpty) return 0;
 
@@ -1674,7 +1689,7 @@ class UniversalAdapter implements ImportSourceAdapter {
       (divesByBase[base] ??= []).add(entry);
     }
 
-    var attachedCount = 0;
+    final jobs = <({String photoPath, String diveId, DateTime? diveStart})>[];
     for (final entry in divesByBase.entries) {
       final photos = photoPathsByBaseName[entry.key];
       // Photos only attach when the file produced exactly one dive.
@@ -1688,17 +1703,25 @@ class UniversalAdapter implements ImportSourceAdapter {
       final diveStart =
           diveStartById[diveId] ?? dives[diveIndex]['dateTime'] as DateTime?;
       for (final photoPath in photos) {
-        if (cancelToken?.isCancelled ?? false) return attachedCount;
-        try {
-          await attach(File(photoPath), diveId, diveStart);
-          attachedCount++;
-        } catch (e) {
-          // Best-effort: see doc comment. Logged, because this path now
-          // writes into a folder the user chose, and a photo that never
-          // arrived there should be diagnosable.
-          _log.warning('Failed to attach bundled photo $photoPath: $e');
-        }
+        jobs.add((photoPath: photoPath, diveId: diveId, diveStart: diveStart));
       }
+    }
+    if (jobs.isEmpty) return 0;
+
+    var attachedCount = 0;
+    onProgress?.call(0, jobs.length);
+    for (final (done, job) in jobs.indexed) {
+      if (cancelToken?.isCancelled ?? false) break;
+      try {
+        await attach(File(job.photoPath), job.diveId, job.diveStart);
+        attachedCount++;
+      } catch (e) {
+        // Best-effort: see doc comment. Logged, because this path now
+        // writes into a folder the user chose, and a photo that never
+        // arrived there should be diagnosable.
+        _log.warning('Failed to attach bundled photo ${job.photoPath}: $e');
+      }
+      onProgress?.call(done + 1, jobs.length);
     }
     return attachedCount;
   }
@@ -1783,7 +1806,9 @@ class UniversalAdapter implements ImportSourceAdapter {
   /// reports the shortfall against the resolved count.
   ///
   /// Stops at the next photo once [cancelToken] is cancelled (issue #3216):
-  /// a MacDive logbook can reference thousands of photos.
+  /// a MacDive logbook can reference thousands of photos. [onProgress] hears
+  /// how many resolved photos are done out of how many, before the first and
+  /// after each one, skipped ones included.
   ///
   /// Returns the number of photos actually attached.
   static Future<int> attachResolvedPhotos({
@@ -1796,11 +1821,17 @@ class UniversalAdapter implements ImportSourceAdapter {
     Set<int>? selectedIndices,
     required Future<void> Function(ResolvedPhotoAttachment photo) attach,
     ImportCancellationToken? cancelToken,
+    void Function(int current, int total)? onProgress,
   }) async {
     var attachedCount = 0;
+    final total = resolvedPathByIndex.length;
+    if (total > 0) onProgress?.call(0, total);
 
+    var done = 0;
     for (final entry in resolvedPathByIndex.entries) {
       if (cancelToken?.isCancelled ?? false) break;
+      if (done > 0) onProgress?.call(done, total);
+      done++;
       final mediaIndex = entry.key;
       if (mediaIndex < 0 || mediaIndex >= media.length) continue;
       // Photos appear in review like any other entity, so a deselected one
@@ -1849,6 +1880,7 @@ class UniversalAdapter implements ImportSourceAdapter {
         _log.warning('Failed to attach imported photo ${entry.value}: $e');
       }
     }
+    if (done > 0) onProgress?.call(done, total);
 
     return attachedCount;
   }

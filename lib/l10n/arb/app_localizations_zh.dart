@@ -24607,6 +24607,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_import_phase_dives => '正在导入潜水...';
 
   @override
+  String get settings_import_phase_photos => '正在下载照片...';
+
+  @override
+  String get settings_import_phase_finishing => '正在完成导入...';
+
+  @override
   String get settings_import_phase_equipment => '正在导入装备...';
 
   @override

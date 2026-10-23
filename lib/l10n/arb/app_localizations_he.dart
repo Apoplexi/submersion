@@ -25389,6 +25389,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_import_phase_dives => 'מייבא צלילות...';
 
   @override
+  String get settings_import_phase_photos => 'מוריד תמונות...';
+
+  @override
+  String get settings_import_phase_finishing => 'מסיים את הייבוא...';
+
+  @override
   String get settings_import_phase_equipment => 'מייבא ציוד...';
 
   @override

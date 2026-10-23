@@ -26275,6 +26275,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_import_phase_dives => 'جارٍ استيراد الغوصات...';
 
   @override
+  String get settings_import_phase_photos => 'جارٍ تنزيل الصور...';
+
+  @override
+  String get settings_import_phase_finishing => 'جارٍ إنهاء الاستيراد...';
+
+  @override
   String get settings_import_phase_equipment => 'جارٍ استيراد المعدات...';
 
   @override

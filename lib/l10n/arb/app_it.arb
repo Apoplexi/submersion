@@ -7162,6 +7162,8 @@
   "settings_import_phase_diveCenters": "Importazione centri immersione...",
   "settings_import_phase_diveTypes": "Importazione tipi di immersione...",
   "settings_import_phase_dives": "Importazione immersioni...",
+  "settings_import_phase_photos": "Download delle foto...",
+  "settings_import_phase_finishing": "Completamento dell'importazione...",
   "settings_import_phase_equipment": "Importazione attrezzatura...",
   "settings_import_phase_equipmentSets": "Importazione set attrezzatura...",
   "settings_import_phase_preparing": "Preparazione...",

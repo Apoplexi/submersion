@@ -7433,6 +7433,8 @@
   "settings_import_phase_diveCenters": "正在导入潜水中心...",
   "settings_import_phase_diveTypes": "正在导入潜水类型...",
   "settings_import_phase_dives": "正在导入潜水...",
+  "settings_import_phase_photos": "正在下载照片...",
+  "settings_import_phase_finishing": "正在完成导入...",
   "settings_import_phase_equipment": "正在导入装备...",
   "settings_import_phase_equipmentSets": "正在导入装备套装...",
   "settings_import_phase_preparing": "准备中...",

@@ -7266,6 +7266,8 @@
   "settings_import_phase_diveCenters": "Importando centros de buceo...",
   "settings_import_phase_diveTypes": "Importando tipos de inmersión...",
   "settings_import_phase_dives": "Importando inmersiones...",
+  "settings_import_phase_photos": "Descargando fotos...",
+  "settings_import_phase_finishing": "Finalizando la importación...",
   "settings_import_phase_equipment": "Importando equipos...",
   "settings_import_phase_equipmentSets": "Importando conjuntos de equipos...",
   "settings_import_phase_preparing": "Preparando...",

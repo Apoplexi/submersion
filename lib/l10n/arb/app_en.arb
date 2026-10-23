@@ -14830,6 +14830,8 @@
   "settings_import_phase_diveCenters": "Importing dive centers...",
   "settings_import_phase_diveTypes": "Importing dive types...",
   "settings_import_phase_dives": "Importing dives...",
+  "settings_import_phase_photos": "Downloading photos...",
+  "settings_import_phase_finishing": "Finishing import...",
   "settings_import_phase_equipment": "Importing equipment...",
   "settings_import_phase_equipmentSets": "Importing equipment sets...",
   "settings_import_phase_preparing": "Preparing...",

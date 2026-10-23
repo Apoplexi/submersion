@@ -7266,6 +7266,8 @@
   "settings_import_phase_diveCenters": "Duikcentra importeren...",
   "settings_import_phase_diveTypes": "Duiktypes importeren...",
   "settings_import_phase_dives": "Duiken importeren...",
+  "settings_import_phase_photos": "Foto's downloaden...",
+  "settings_import_phase_finishing": "Import afronden...",
   "settings_import_phase_equipment": "Uitrusting importeren...",
   "settings_import_phase_equipmentSets": "Uitrustingssets importeren...",
   "settings_import_phase_preparing": "Voorbereiden...",

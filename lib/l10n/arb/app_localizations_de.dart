@@ -25991,6 +25991,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_import_phase_dives => 'Tauchgänge werden importiert...';
 
   @override
+  String get settings_import_phase_photos => 'Fotos werden heruntergeladen...';
+
+  @override
+  String get settings_import_phase_finishing => 'Import wird abgeschlossen...';
+
+  @override
   String get settings_import_phase_equipment => 'Ausrüstung wird importiert...';
 
   @override

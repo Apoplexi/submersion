@@ -7266,6 +7266,8 @@
   "settings_import_phase_diveCenters": "جارٍ استيراد مراكز الغوص...",
   "settings_import_phase_diveTypes": "جارٍ استيراد أنواع الغوص...",
   "settings_import_phase_dives": "جارٍ استيراد الغوصات...",
+  "settings_import_phase_photos": "جارٍ تنزيل الصور...",
+  "settings_import_phase_finishing": "جارٍ إنهاء الاستيراد...",
   "settings_import_phase_equipment": "جارٍ استيراد المعدات...",
   "settings_import_phase_equipmentSets": "جارٍ استيراد مجموعات المعدات...",
   "settings_import_phase_preparing": "جارٍ التحضير...",

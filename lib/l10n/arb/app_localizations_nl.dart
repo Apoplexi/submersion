@@ -25869,6 +25869,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_import_phase_dives => 'Duiken importeren...';
 
   @override
+  String get settings_import_phase_photos => 'Foto\'s downloaden...';
+
+  @override
+  String get settings_import_phase_finishing => 'Import afronden...';
+
+  @override
   String get settings_import_phase_equipment => 'Uitrusting importeren...';
 
   @override

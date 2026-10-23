@@ -118,5 +118,7 @@ String importPhaseLabel(AppLocalizations l10n, ImportPhase? phase) {
     ImportPhase.diveTypes => l10n.settings_import_phase_diveTypes,
     ImportPhase.courses => l10n.settings_import_phase_courses,
     ImportPhase.applyingTags => l10n.settings_import_phase_applyingTags,
+    ImportPhase.photos => l10n.settings_import_phase_photos,
+    ImportPhase.finishing => l10n.settings_import_phase_finishing,
   };
 }

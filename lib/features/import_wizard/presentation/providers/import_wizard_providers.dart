@@ -1082,21 +1082,14 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
         // reaching the adapter anyway (issue #1832).
         retainSourceDiveNumbers:
             state.retainSourceDiveNumbers && bundle.hasSourceDiveNumbers,
-        onProgress: (phase, current, total) {
-          job?.report(token, phase, current, total);
-          // The importer keeps reporting after the diver leaves the wizard
-          // (#3554). Only this copy of the progress has nowhere to go then;
-          // throwing here would stop the importer's loop part-way.
-          if (!mounted) return;
-          state = state.copyWith(
-            importPhase: phase,
-            importCurrent: current,
-            importTotal: total,
-          );
-        },
+        onProgress: (phase, current, total) =>
+            _report(token, phase, current, total),
         cancelToken: token,
       );
       written = result;
+      // The last photo phase would otherwise sit at 100% while the work
+      // below runs (#3555).
+      _report(token, ImportPhase.finishing, 0, 0);
 
       // Apply import tags to all imported dives.
       // Tag application is non-fatal: dives are already imported, so we
@@ -1120,6 +1113,7 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
       // Logbook rules run once the import has written everything (#3513);
       // like tagging, a failure keeps the import.
       final engine = _ruleEngine;
+      _report(token, ImportPhase.finishing, 0, 0);
       final rules = token.isCancelled || engine == null
           ? const ImportRulesOutcome()
           : await runImportRules(
@@ -1166,6 +1160,25 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
         state = state.copyWith(isCancellationRequested: false);
       }
     }
+  }
+
+  /// Passes progress to the job, and to this wizard while it is still open.
+  void _report(
+    ImportCancellationToken token,
+    ImportPhase phase,
+    int current,
+    int total,
+  ) {
+    _job?.report(token, phase, current, total);
+    // The importer keeps reporting after the diver leaves the wizard
+    // (#3554). Only this copy of the progress has nowhere to go then;
+    // throwing here would stop the importer's loop part-way.
+    if (!mounted) return;
+    state = state.copyWith(
+      importPhase: phase,
+      importCurrent: current,
+      importTotal: total,
+    );
   }
 
   /// Resolve tag selections and apply them to every imported dive.
