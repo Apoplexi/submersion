@@ -45779,6 +45779,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get universalImport_cancel_discardSelections => '放弃所选内容并取消？';
 
   @override
+  String get universalImport_leave_title => '导入仍在进行';
+
+  @override
+  String get universalImport_leave_body => '导入尚未完成。要在后台继续吗？';
+
+  @override
+  String get universalImport_leave_stay => '留在此页';
+
+  @override
+  String get universalImport_leave_continueInBackground => '在后台继续';
+
+  @override
+  String get universalImport_leave_bodyStops => '导入尚未完成。离开将取消导入。';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

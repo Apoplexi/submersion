@@ -47718,6 +47718,23 @@ class AppLocalizationsHe extends AppLocalizations {
       'להשליך את הבחירות ולבטל?';
 
   @override
+  String get universalImport_leave_title => 'הייבוא עדיין פועל';
+
+  @override
+  String get universalImport_leave_body =>
+      'הייבוא עדיין לא הסתיים. להמשיך ברקע?';
+
+  @override
+  String get universalImport_leave_stay => 'להישאר';
+
+  @override
+  String get universalImport_leave_continueInBackground => 'להמשיך ברקע';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'הייבוא עדיין לא הסתיים. יציאה תבטל אותו.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

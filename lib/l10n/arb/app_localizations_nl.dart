@@ -48424,6 +48424,24 @@ class AppLocalizationsNl extends AppLocalizations {
       'Selecties verwerpen en annuleren?';
 
   @override
+  String get universalImport_leave_title => 'Import loopt nog';
+
+  @override
+  String get universalImport_leave_body =>
+      'De import is nog niet klaar. Op de achtergrond voortzetten?';
+
+  @override
+  String get universalImport_leave_stay => 'Blijven';
+
+  @override
+  String get universalImport_leave_continueInBackground =>
+      'Op de achtergrond voortzetten';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'De import is nog niet klaar. Weggaan annuleert hem.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

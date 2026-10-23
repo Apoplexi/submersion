@@ -77258,6 +77258,36 @@ abstract class AppLocalizations {
   /// **'Discard selections and cancel?'**
   String get universalImport_cancel_discardSelections;
 
+  /// No description provided for @universalImport_leave_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Import still running'**
+  String get universalImport_leave_title;
+
+  /// No description provided for @universalImport_leave_body.
+  ///
+  /// In en, this message translates to:
+  /// **'The import has not finished yet. Continue it in the background?'**
+  String get universalImport_leave_body;
+
+  /// No description provided for @universalImport_leave_stay.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get universalImport_leave_stay;
+
+  /// No description provided for @universalImport_leave_continueInBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue in background'**
+  String get universalImport_leave_continueInBackground;
+
+  /// No description provided for @universalImport_leave_bodyStops.
+  ///
+  /// In en, this message translates to:
+  /// **'The import has not finished yet. Leaving cancels it.'**
+  String get universalImport_leave_bodyStops;
+
   /// No description provided for @universalImport_background_finished.
   ///
   /// In en, this message translates to:

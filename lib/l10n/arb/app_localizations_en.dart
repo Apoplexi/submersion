@@ -47988,6 +47988,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'Discard selections and cancel?';
 
   @override
+  String get universalImport_leave_title => 'Import still running';
+
+  @override
+  String get universalImport_leave_body =>
+      'The import has not finished yet. Continue it in the background?';
+
+  @override
+  String get universalImport_leave_stay => 'Stay';
+
+  @override
+  String get universalImport_leave_continueInBackground =>
+      'Continue in background';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'The import has not finished yet. Leaving cancels it.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

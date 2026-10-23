@@ -48453,6 +48453,24 @@ class AppLocalizationsHu extends AppLocalizations {
       'Elveted a kijelöléseket és megszakítod?';
 
   @override
+  String get universalImport_leave_title => 'Az importálás még fut';
+
+  @override
+  String get universalImport_leave_body =>
+      'Az importálás még nem fejeződött be. Folytatod a háttérben?';
+
+  @override
+  String get universalImport_leave_stay => 'Maradok';
+
+  @override
+  String get universalImport_leave_continueInBackground =>
+      'Folytatás a háttérben';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'Az importálás még nem fejeződött be. Ha kilépsz, megszakad.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

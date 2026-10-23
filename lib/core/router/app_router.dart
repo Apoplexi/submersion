@@ -234,6 +234,7 @@ import 'package:submersion/features/planner/presentation/pages/plan_compare_page
 import 'package:submersion/features/planning/presentation/pages/planned_dives_page.dart';
 import 'package:submersion/features/surface_interval_tool/presentation/pages/surface_interval_tool_page.dart';
 import 'package:submersion/features/import_wizard/presentation/pages/universal_import_wizard_route.dart';
+import 'package:submersion/features/import_wizard/presentation/widgets/leave_running_import_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/main_scaffold.dart';
 import 'package:submersion/features/certification_agencies/presentation/pages/certification_agencies_page.dart';
@@ -1193,17 +1194,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'import-wizard',
                 name: 'universalImport',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) => const UniversalImportWizardRoute(),
               ),
               GoRoute(
                 path: 'import-cloud/suunto',
                 name: 'importFromCloudSuunto',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) =>
                     const _SuuntoCloudImportWizardRoute(),
               ),
               GoRoute(
                 path: 'import-file/suunto',
                 name: 'importFromFileSuunto',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) => _SuuntoFileImportWizardRoute(
                   initialFiles: state.extra is List<SuuntoJsonFile>
                       ? state.extra! as List<SuuntoJsonFile>
@@ -1213,12 +1217,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'import-cloud/garmin',
                 name: 'importFromCloudGarmin',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) =>
                     const _GarminCloudImportWizardRoute(),
               ),
               GoRoute(
                 path: 'import-cloud/divelogs',
                 name: 'importFromCloudDivelogs',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) => const _DivelogsImportWizardRoute(),
               ),
             ],
@@ -1540,6 +1546,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'wearable-import',
                 name: 'wearableImport',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) =>
                     const _HealthKitImportWizardRoute(),
               ),
@@ -2068,6 +2075,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'discover',
                 name: 'discoverDevice',
+                onExit: confirmLeaveRunningImport,
                 builder: (context, state) =>
                     const _DiveComputerDiscoveryWizardRoute(),
               ),
@@ -2081,6 +2089,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'download',
                     name: 'computerDownload',
+                    onExit: confirmLeaveRunningImport,
                     builder: (context, state) =>
                         _DiveComputerDownloadWizardRoute(
                           computerId: state.pathParameters['computerId']!,

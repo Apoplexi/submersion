@@ -49397,6 +49397,24 @@ class AppLocalizationsAr extends AppLocalizations {
       'تجاهل التحديدات والإلغاء؟';
 
   @override
+  String get universalImport_leave_title => 'الاستيراد لا يزال قيد التشغيل';
+
+  @override
+  String get universalImport_leave_body =>
+      'لم ينتهِ الاستيراد بعد. هل تريد متابعته في الخلفية؟';
+
+  @override
+  String get universalImport_leave_stay => 'البقاء';
+
+  @override
+  String get universalImport_leave_continueInBackground =>
+      'المتابعة في الخلفية';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'لم ينتهِ الاستيراد بعد. المغادرة ستلغيه.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

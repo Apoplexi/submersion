@@ -48619,6 +48619,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Auswahl verwerfen und abbrechen?';
 
   @override
+  String get universalImport_leave_title => 'Import läuft noch';
+
+  @override
+  String get universalImport_leave_body =>
+      'Der Import ist noch nicht fertig. Im Hintergrund fortsetzen?';
+
+  @override
+  String get universalImport_leave_stay => 'Hierbleiben';
+
+  @override
+  String get universalImport_leave_continueInBackground =>
+      'Im Hintergrund fortsetzen';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'Der Import ist noch nicht fertig. Beim Verlassen wird er abgebrochen.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

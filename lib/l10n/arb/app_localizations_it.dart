@@ -48729,6 +48729,24 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scartare le selezioni e annullare?';
 
   @override
+  String get universalImport_leave_title => 'Importazione in corso';
+
+  @override
+  String get universalImport_leave_body =>
+      'L\'importazione non è ancora terminata. Continuarla in background?';
+
+  @override
+  String get universalImport_leave_stay => 'Resta';
+
+  @override
+  String get universalImport_leave_continueInBackground =>
+      'Continua in background';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'L\'importazione non è ancora terminata. Uscendo verrà annullata.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

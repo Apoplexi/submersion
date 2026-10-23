@@ -48837,6 +48837,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'Abandonner les sélections et annuler ?';
 
   @override
+  String get universalImport_leave_title => 'Importation en cours';
+
+  @override
+  String get universalImport_leave_body =>
+      'L\'importation n\'est pas encore terminée. La poursuivre en arrière-plan ?';
+
+  @override
+  String get universalImport_leave_stay => 'Rester';
+
+  @override
+  String get universalImport_leave_continueInBackground =>
+      'Continuer en arrière-plan';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'L\'importation n\'est pas encore terminée. Quitter l\'annule.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

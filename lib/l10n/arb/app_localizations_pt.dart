@@ -48727,6 +48727,24 @@ class AppLocalizationsPt extends AppLocalizations {
       'Descartar seleções e cancelar?';
 
   @override
+  String get universalImport_leave_title => 'Importação em curso';
+
+  @override
+  String get universalImport_leave_body =>
+      'A importação ainda não terminou. Continuar em segundo plano?';
+
+  @override
+  String get universalImport_leave_stay => 'Ficar';
+
+  @override
+  String get universalImport_leave_continueInBackground =>
+      'Continuar em segundo plano';
+
+  @override
+  String get universalImport_leave_bodyStops =>
+      'A importação ainda não terminou. Sair cancela-a.';
+
+  @override
   String universalImport_background_finished(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

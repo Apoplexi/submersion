@@ -28012,6 +28012,11 @@
   "universalImport_cancel_keepImporting": "Keep importing",
   "universalImport_cancel_confirmAction": "Cancel import",
   "universalImport_cancel_discardSelections": "Discard selections and cancel?",
+  "universalImport_leave_title": "Import still running",
+  "universalImport_leave_body": "The import has not finished yet. Continue it in the background?",
+  "universalImport_leave_stay": "Stay",
+  "universalImport_leave_continueInBackground": "Continue in background",
+  "universalImport_leave_bodyStops": "The import has not finished yet. Leaving cancels it.",
   "universalImport_background_finished": "{count, plural, one{Import finished: {count} dive imported.} other{Import finished: {count} dives imported.}}",
   "@universalImport_background_finished": {
     "placeholders": {
