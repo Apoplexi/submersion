@@ -10377,6 +10377,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get divePlanner_label_airBreaksOnO2 => 'O2-n (perc)';
 
   @override
+  String get divePlanner_label_airBreaksCustom => 'Egyéni';
+
+  @override
+  String divePlanner_label_airBreaksCycle(int o2Minutes, int breakMinutes) {
+    return '$o2Minutes/$breakMinutes perc';
+  }
+
+  @override
   String get divePlanner_label_altitude => 'Magasság:';
 
   @override
@@ -10387,6 +10395,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get divePlanner_label_decompression => 'Dekompresszió';
+
+  @override
+  String divePlanner_label_defaultWithValue(Object value) {
+    return 'Alapértelmezett ($value)';
+  }
+
+  @override
+  String get divePlanner_label_default => 'Alapértelmezett';
 
   @override
   String divePlanner_label_depthAxis(Object depthSymbol) {
@@ -10436,6 +10452,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get divePlanner_gasOptions_sacFactor => 'RMV-szorzó';
 
   @override
+  String get divePlanner_gasOptions_sacStressed => 'Stresszelt RMV';
+
+  @override
+  String get divePlanner_gasOptions_sacStressedFactor =>
+      'Stresszelt RMV-szorzó';
+
+  @override
   String get divePlanner_gasOptions_problemSolvingMinutes =>
       'Problémamegoldási idő';
 
@@ -10455,6 +10478,12 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get divePlanner_gasOptions_o2Narcotic =>
       'O₂ narkotikusként kezelése ebben a tervben';
+
+  @override
+  String get divePlanner_label_on => 'Be';
+
+  @override
+  String get divePlanner_label_off => 'Ki';
 
   @override
   String get divePlanner_label_tanks => 'Palackok';
@@ -26902,6 +26931,13 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_section_decompression_title => 'Dekompresszió';
+
+  @override
+  String get settings_section_plannerDefaults_title => 'Tervező alapértékei';
+
+  @override
+  String get settings_section_plannerDefaults_subtitle =>
+      'Sebességek, gáz, vészhelyzet, DPV csapat';
 
   @override
   String get settings_section_diverProfile_subtitle =>
@@ -47306,6 +47342,40 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_decompression_header_ascentRate_subtitle =>
       'A profil feljövetelsebesség-színei és -eseményei által használt határértékek. A biztonsági áttekintés saját, rögzített határértékeket használ, így ezek módosítása soha nem változtatja meg a már áttekintett merüléseket.';
+
+  @override
+  String get settings_decompression_header_plannerRates => 'Tervező sebességek';
+
+  @override
+  String get settings_decompression_header_plannerRates_subtitle =>
+      'A merülési és felszállási sebességek, amelyekkel egy új terv kezdődik. Egy terven belüli módosítás csak ott írja felül, anélkül, hogy ezt az alapértelmezett értéket megváltoztatná.';
+
+  @override
+  String get settings_decompression_header_plannerGas => 'Tervező gáz';
+
+  @override
+  String get settings_decompression_header_plannerGas_subtitle =>
+      'A gázfogyasztási alapértékek, amelyekkel egy új terv kezdődik. Egy terven belüli módosítás csak ott írja felül, anélkül, hogy ezt az alapértelmezett értéket megváltoztatná.';
+
+  @override
+  String get settings_decompression_header_plannerContingency =>
+      'Tervező vészhelyzet';
+
+  @override
+  String get settings_decompression_header_plannerContingency_subtitle =>
+      'A mi lenne ha eltérés, amellyel egy új terv kezdődik. Egy terven belüli módosítás csak ott írja felül, anélkül, hogy ezt az alapértelmezett értéket megváltoztatná.';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam =>
+      'Tervező DPV csapat';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam_subtitle =>
+      'A robogó akkumulátor-rezerv és gyaloglási sebesség, amellyel egy új DPV-küldetés kezdődik. Egy küldetésen belüli módosítás csak ott írja felül, anélkül, hogy ezt az alapértelmezett értéket megváltoztatná.';
+
+  @override
+  String get settings_decompression_rates_finalAscent =>
+      'Végső felszállási sebesség';
 
   @override
   String get settings_decompression_ascentRateThresholds =>

@@ -9902,6 +9902,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divePlanner_label_airBreaksOnO2 => '吸 O2（分钟）';
 
   @override
+  String get divePlanner_label_airBreaksCustom => '自定义';
+
+  @override
+  String divePlanner_label_airBreaksCycle(int o2Minutes, int breakMinutes) {
+    return '$o2Minutes/$breakMinutes 分钟';
+  }
+
+  @override
   String get divePlanner_label_altitude => '高海拔:';
 
   @override
@@ -9912,6 +9920,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get divePlanner_label_decompression => '减压';
+
+  @override
+  String divePlanner_label_defaultWithValue(Object value) {
+    return '默认（$value）';
+  }
+
+  @override
+  String get divePlanner_label_default => '默认';
 
   @override
   String divePlanner_label_depthAxis(Object depthSymbol) {
@@ -9961,6 +9977,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divePlanner_gasOptions_sacFactor => 'RMV 系数';
 
   @override
+  String get divePlanner_gasOptions_sacStressed => '压力 RMV';
+
+  @override
+  String get divePlanner_gasOptions_sacStressedFactor => '压力 RMV 系数';
+
+  @override
   String get divePlanner_gasOptions_problemSolvingMinutes => '问题处理时间';
 
   @override
@@ -9977,6 +9999,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get divePlanner_gasOptions_o2Narcotic => '在此计划中将 O₂ 视为麻醉性气体';
+
+  @override
+  String get divePlanner_label_on => '开';
+
+  @override
+  String get divePlanner_label_off => '关';
 
   @override
   String get divePlanner_label_tanks => '气瓶';
@@ -25522,6 +25550,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_section_decompression_title => '减压';
+
+  @override
+  String get settings_section_plannerDefaults_title => '计划器默认值';
+
+  @override
+  String get settings_section_plannerDefaults_subtitle => '速率、气体、应急方案、DPV 团队';
 
   @override
   String get settings_section_diverProfile_subtitle => '当前潜水员与档案';
@@ -44729,6 +44763,37 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_decompression_header_ascentRate_subtitle =>
       '剖面图中上升速度颜色和事件所用的阈值。安全回顾使用自己固定的限值，因此修改这些值不会改变已回顾的潜水。';
+
+  @override
+  String get settings_decompression_header_plannerRates => '计划器速率';
+
+  @override
+  String get settings_decompression_header_plannerRates_subtitle =>
+      '新计划开始时使用的下潜和上升速率。在计划内更改某一项仅会覆盖该计划，不会更改此默认值。';
+
+  @override
+  String get settings_decompression_header_plannerGas => '计划器气体';
+
+  @override
+  String get settings_decompression_header_plannerGas_subtitle =>
+      '新计划开始时使用的气体消耗默认值。在计划内更改某一项仅会覆盖该计划，不会更改此默认值。';
+
+  @override
+  String get settings_decompression_header_plannerContingency => '计划器应急方案';
+
+  @override
+  String get settings_decompression_header_plannerContingency_subtitle =>
+      '新计划开始时使用的假设偏差。在计划内更改仅会覆盖该计划，不会更改此默认值。';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam => '计划器 DPV 团队';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam_subtitle =>
+      '新 DPV 任务开始时使用的水下推进器电池备用量和步行速度。在任务内更改仅会覆盖该任务，不会更改此默认值。';
+
+  @override
+  String get settings_decompression_rates_finalAscent => '最终上升速率';
 
   @override
   String get settings_decompression_ascentRateThresholds => '上升速度阈值';

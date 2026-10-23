@@ -10527,6 +10527,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divePlanner_label_airBreaksOnO2 => 'على O2 (دقيقة)';
 
   @override
+  String get divePlanner_label_airBreaksCustom => 'مخصص';
+
+  @override
+  String divePlanner_label_airBreaksCycle(int o2Minutes, int breakMinutes) {
+    return '$o2Minutes/$breakMinutes دقيقة';
+  }
+
+  @override
   String get divePlanner_label_altitude => 'الارتفاع:';
 
   @override
@@ -10537,6 +10545,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get divePlanner_label_decompression => 'تخفيف الضغط';
+
+  @override
+  String divePlanner_label_defaultWithValue(Object value) {
+    return 'الافتراضي ($value)';
+  }
+
+  @override
+  String get divePlanner_label_default => 'الافتراضي';
 
   @override
   String divePlanner_label_depthAxis(Object depthSymbol) {
@@ -10586,6 +10602,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divePlanner_gasOptions_sacFactor => 'معامل RMV';
 
   @override
+  String get divePlanner_gasOptions_sacStressed => 'RMV تحت الضغط';
+
+  @override
+  String get divePlanner_gasOptions_sacStressedFactor => 'معامل RMV تحت الضغط';
+
+  @override
   String get divePlanner_gasOptions_problemSolvingMinutes => 'زمن حل المشكلة';
 
   @override
@@ -10603,6 +10625,12 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get divePlanner_gasOptions_o2Narcotic =>
       'اعتبار O₂ مخدرًا في هذه الخطة';
+
+  @override
+  String get divePlanner_label_on => 'تشغيل';
+
+  @override
+  String get divePlanner_label_off => 'إيقاف';
 
   @override
   String get divePlanner_label_tanks => 'الأسطوانات';
@@ -27259,6 +27287,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_section_decompression_title => 'تخفيف الضغط';
+
+  @override
+  String get settings_section_plannerDefaults_title =>
+      'الإعدادات الافتراضية للمخطط';
+
+  @override
+  String get settings_section_plannerDefaults_subtitle =>
+      'المعدلات، الغاز، الخطط الاحتياطية، فريق DPV';
 
   @override
   String get settings_section_diverProfile_subtitle =>
@@ -48164,6 +48200,37 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_decompression_header_ascentRate_subtitle =>
       'الحدود التي تستخدمها ألوان وأحداث سرعة الصعود في الملف. تحتفظ مراجعة السلامة بحدودها الثابتة الخاصة، لذا لا يؤدي تغيير هذه القيم أبدًا إلى تعديل الغطسات التي تمت مراجعتها.';
+
+  @override
+  String get settings_decompression_header_plannerRates => 'معدلات المخطط';
+
+  @override
+  String get settings_decompression_header_plannerRates_subtitle =>
+      'معدلات النزول والصعود التي تبدأ بها خطة جديدة. تغيير أحدها داخل خطة يستبدله هناك فقط، دون تغيير هذا الإعداد الافتراضي.';
+
+  @override
+  String get settings_decompression_header_plannerGas => 'غاز المخطط';
+
+  @override
+  String get settings_decompression_header_plannerGas_subtitle =>
+      'القيم الافتراضية لاستهلاك الغاز التي تبدأ بها خطة جديدة. تغيير أحدها داخل خطة يستبدله هناك فقط، دون تغيير هذا الإعداد الافتراضي.';
+
+  @override
+  String get settings_decompression_header_plannerContingency => 'طوارئ المخطط';
+
+  @override
+  String get settings_decompression_header_plannerContingency_subtitle =>
+      'انحراف \"ماذا لو\" الذي تبدأ به خطة جديدة. تغييره داخل خطة يستبدله هناك فقط، دون تغيير هذا الإعداد الافتراضي.';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam => 'فريق DPV للمخطط';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam_subtitle =>
+      'احتياطي بطارية السكوتر وسرعة المشي التي تبدأ بها مهمة DPV جديدة. تغييرها داخل مهمة يستبدلها هناك فقط، دون تغيير هذا الإعداد الافتراضي.';
+
+  @override
+  String get settings_decompression_rates_finalAscent => 'معدل الصعود النهائي';
 
   @override
   String get settings_decompression_ascentRateThresholds => 'حدود سرعة الصعود';

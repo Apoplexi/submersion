@@ -10436,6 +10436,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get divePlanner_label_airBreaksOnO2 => 'Sous O2 (min)';
 
   @override
+  String get divePlanner_label_airBreaksCustom => 'Personnalisé';
+
+  @override
+  String divePlanner_label_airBreaksCycle(int o2Minutes, int breakMinutes) {
+    return '$o2Minutes/$breakMinutes min';
+  }
+
+  @override
   String get divePlanner_label_altitude => 'Altitude :';
 
   @override
@@ -10446,6 +10454,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get divePlanner_label_decompression => 'Décompression';
+
+  @override
+  String divePlanner_label_defaultWithValue(Object value) {
+    return 'Par défaut ($value)';
+  }
+
+  @override
+  String get divePlanner_label_default => 'Par défaut';
 
   @override
   String divePlanner_label_depthAxis(Object depthSymbol) {
@@ -10495,6 +10511,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get divePlanner_gasOptions_sacFactor => 'Facteur RMV';
 
   @override
+  String get divePlanner_gasOptions_sacStressed => 'RMV sous stress';
+
+  @override
+  String get divePlanner_gasOptions_sacStressedFactor =>
+      'Facteur RMV sous stress';
+
+  @override
   String get divePlanner_gasOptions_problemSolvingMinutes =>
       'Temps de résolution du problème';
 
@@ -10514,6 +10537,12 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get divePlanner_gasOptions_o2Narcotic =>
       'Considérer l\'O₂ comme narcotique pour ce plan';
+
+  @override
+  String get divePlanner_label_on => 'Activé';
+
+  @override
+  String get divePlanner_label_off => 'Désactivé';
 
   @override
   String get divePlanner_label_tanks => 'Bouteilles';
@@ -27112,6 +27141,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_section_decompression_title => 'Décompression';
+
+  @override
+  String get settings_section_plannerDefaults_title =>
+      'Valeurs par défaut du planificateur';
+
+  @override
+  String get settings_section_plannerDefaults_subtitle =>
+      'Vitesses, gaz, imprévus, équipe DPV';
 
   @override
   String get settings_section_diverProfile_subtitle =>
@@ -47684,6 +47721,41 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_decompression_header_ascentRate_subtitle =>
       'Les seuils utilisés par les couleurs et les événements de vitesse de remontée du profil. Le bilan de sécurité garde ses propres limites fixes : les modifier ne change jamais les plongées déjà examinées.';
+
+  @override
+  String get settings_decompression_header_plannerRates =>
+      'Vitesses du planificateur';
+
+  @override
+  String get settings_decompression_header_plannerRates_subtitle =>
+      'Les vitesses de descente et de remontée avec lesquelles un nouveau plan démarre. Modifier l\'une d\'elles dans un plan ne l\'écrase que là, sans changer cette valeur par défaut.';
+
+  @override
+  String get settings_decompression_header_plannerGas => 'Gaz du planificateur';
+
+  @override
+  String get settings_decompression_header_plannerGas_subtitle =>
+      'Les valeurs par défaut de consommation de gaz avec lesquelles un nouveau plan démarre. Modifier l\'une d\'elles dans un plan ne l\'écrase que là, sans changer cette valeur par défaut.';
+
+  @override
+  String get settings_decompression_header_plannerContingency =>
+      'Imprévus du planificateur';
+
+  @override
+  String get settings_decompression_header_plannerContingency_subtitle =>
+      'L\'écart hypothétique avec lequel un nouveau plan démarre. Le modifier dans un plan ne l\'écrase que là, sans changer cette valeur par défaut.';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam =>
+      'Équipe DPV du planificateur';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam_subtitle =>
+      'La réserve de batterie du scooter et la vitesse de marche avec lesquelles une nouvelle mission DPV démarre. Les modifier dans une mission ne les écrase que là, sans changer cette valeur par défaut.';
+
+  @override
+  String get settings_decompression_rates_finalAscent =>
+      'Vitesse de remontée finale';
 
   @override
   String get settings_decompression_ascentRateThresholds =>

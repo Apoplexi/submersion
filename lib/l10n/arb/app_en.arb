@@ -6364,10 +6364,14 @@
   "divePlanner_label_airBreaks": "Air breaks",
   "divePlanner_label_airBreaksBreak": "Break (min)",
   "divePlanner_label_airBreaksOnO2": "On O2 (min)",
+  "divePlanner_label_airBreaksCustom": "Custom",
+  "divePlanner_label_airBreaksCycle": "{o2Minutes}/{breakMinutes} min",
   "divePlanner_label_altitude": "Altitude:",
   "divePlanner_label_deco": "DECO",
   "divePlanner_label_decoSchedule": "Decompression Schedule",
   "divePlanner_label_decompression": "Decompression",
+  "divePlanner_label_defaultWithValue": "Default ({value})",
+  "divePlanner_label_default": "Default",
   "divePlanner_label_depthAxis": "Depth ({depthSymbol})",
   "divePlanner_label_empty": "EMPTY",
   "divePlanner_label_gasConsumption": "Gas Consumption",
@@ -6383,6 +6387,8 @@
   "divePlanner_gasOptions_sacBottom": "Bottom RMV",
   "divePlanner_gasOptions_sacDeco": "Deco RMV",
   "divePlanner_gasOptions_sacFactor": "RMV factor",
+  "divePlanner_gasOptions_sacStressed": "Stressed RMV",
+  "divePlanner_gasOptions_sacStressedFactor": "Stressed RMV factor",
   "divePlanner_gasOptions_problemSolvingMinutes": "Problem solving time",
   "divePlanner_gasOptions_gasSwitchStopSeconds": "Gas switch stop",
   "@divePlanner_gasOptions_gasSwitchStopSeconds": {
@@ -6392,6 +6398,8 @@
   "divePlanner_gasOptions_ppO2Deco": "Deco ppO₂",
   "divePlanner_gasOptions_bestMixEnd": "Best mix END",
   "divePlanner_gasOptions_o2Narcotic": "Treat O₂ as narcotic for this plan",
+  "divePlanner_label_on": "On",
+  "divePlanner_label_off": "Off",
   "divePlanner_label_tanks": "Tanks",
   "divePlanner_label_loopGases": "Loop",
   "@divePlanner_label_loopGases": {
@@ -15389,6 +15397,8 @@
   "settings_section_appearance_title": "Appearance",
   "settings_section_data_title": "Data",
   "settings_section_decompression_title": "Decompression",
+  "settings_section_plannerDefaults_title": "Planner Defaults",
+  "settings_section_plannerDefaults_subtitle": "Rates, gas, contingency, DPV team",
   "settings_section_diverProfile_subtitle": "Active diver & profiles",
   "settings_section_diverProfile_title": "Diver Profile",
   "settings_section_manage_subtitle": "Dive types & tank presets",
@@ -19779,6 +19789,23 @@
     "placeholders": {
       "timestamp": {
         "type": "Object"
+      }
+    }
+  },
+  "@divePlanner_label_defaultWithValue": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "@divePlanner_label_airBreaksCycle": {
+    "placeholders": {
+      "o2Minutes": {
+        "type": "int"
+      },
+      "breakMinutes": {
+        "type": "int"
       }
     }
   },
@@ -27419,6 +27446,15 @@
   "settings_decompression_header_ascent_subtitle": "Which carried cylinders the simulated ascent (TTS, ceiling and stops) may switch to at each depth. Only gases recorded on the dive are considered.",
   "settings_decompression_header_ascentRate": "Ascent rate",
   "settings_decompression_header_ascentRate_subtitle": "The rates the profile's ascent-rate colours and events use. The safety review keeps its own fixed limits, so changing these never alters reviewed dives.",
+  "settings_decompression_header_plannerRates": "Planner Rates",
+  "settings_decompression_header_plannerRates_subtitle": "The descent and ascent rates a new plan starts with. Changing one inside a plan overrides it there only, without changing this default.",
+  "settings_decompression_header_plannerGas": "Planner Gas",
+  "settings_decompression_header_plannerGas_subtitle": "The gas consumption defaults a new plan starts with. Changing one inside a plan overrides it there only, without changing this default.",
+  "settings_decompression_header_plannerContingency": "Planner Contingency",
+  "settings_decompression_header_plannerContingency_subtitle": "The what-if deviation a new plan starts with. Changing it inside a plan overrides it there only, without changing this default.",
+  "settings_decompression_header_plannerDpvTeam": "Planner DPV Team",
+  "settings_decompression_header_plannerDpvTeam_subtitle": "The scooter battery reserve and walking speed a new DPV mission starts with. Changing one inside a mission overrides it there only, without changing this default.",
+  "settings_decompression_rates_finalAscent": "Final ascent rate",
   "settings_decompression_ascentRateThresholds": "Ascent rate thresholds",
   "settings_decompression_ascentRateThresholds_subtitle": "Warning {warning}, critical {critical}",
   "@settings_decompression_ascentRateThresholds_subtitle": {

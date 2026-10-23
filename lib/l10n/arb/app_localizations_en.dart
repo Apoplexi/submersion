@@ -10236,6 +10236,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get divePlanner_label_airBreaksOnO2 => 'On O2 (min)';
 
   @override
+  String get divePlanner_label_airBreaksCustom => 'Custom';
+
+  @override
+  String divePlanner_label_airBreaksCycle(int o2Minutes, int breakMinutes) {
+    return '$o2Minutes/$breakMinutes min';
+  }
+
+  @override
   String get divePlanner_label_altitude => 'Altitude:';
 
   @override
@@ -10246,6 +10254,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get divePlanner_label_decompression => 'Decompression';
+
+  @override
+  String divePlanner_label_defaultWithValue(Object value) {
+    return 'Default ($value)';
+  }
+
+  @override
+  String get divePlanner_label_default => 'Default';
 
   @override
   String divePlanner_label_depthAxis(Object depthSymbol) {
@@ -10295,6 +10311,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get divePlanner_gasOptions_sacFactor => 'RMV factor';
 
   @override
+  String get divePlanner_gasOptions_sacStressed => 'Stressed RMV';
+
+  @override
+  String get divePlanner_gasOptions_sacStressedFactor => 'Stressed RMV factor';
+
+  @override
   String get divePlanner_gasOptions_problemSolvingMinutes =>
       'Problem solving time';
 
@@ -10313,6 +10335,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get divePlanner_gasOptions_o2Narcotic =>
       'Treat O₂ as narcotic for this plan';
+
+  @override
+  String get divePlanner_label_on => 'On';
+
+  @override
+  String get divePlanner_label_off => 'Off';
 
   @override
   String get divePlanner_label_tanks => 'Tanks';
@@ -26578,6 +26606,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_section_decompression_title => 'Decompression';
+
+  @override
+  String get settings_section_plannerDefaults_title => 'Planner Defaults';
+
+  @override
+  String get settings_section_plannerDefaults_subtitle =>
+      'Rates, gas, contingency, DPV team';
 
   @override
   String get settings_section_diverProfile_subtitle =>
@@ -46862,6 +46897,38 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_decompression_header_ascentRate_subtitle =>
       'The rates the profile\'s ascent-rate colours and events use. The safety review keeps its own fixed limits, so changing these never alters reviewed dives.';
+
+  @override
+  String get settings_decompression_header_plannerRates => 'Planner Rates';
+
+  @override
+  String get settings_decompression_header_plannerRates_subtitle =>
+      'The descent and ascent rates a new plan starts with. Changing one inside a plan overrides it there only, without changing this default.';
+
+  @override
+  String get settings_decompression_header_plannerGas => 'Planner Gas';
+
+  @override
+  String get settings_decompression_header_plannerGas_subtitle =>
+      'The gas consumption defaults a new plan starts with. Changing one inside a plan overrides it there only, without changing this default.';
+
+  @override
+  String get settings_decompression_header_plannerContingency =>
+      'Planner Contingency';
+
+  @override
+  String get settings_decompression_header_plannerContingency_subtitle =>
+      'The what-if deviation a new plan starts with. Changing it inside a plan overrides it there only, without changing this default.';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam => 'Planner DPV Team';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam_subtitle =>
+      'The scooter battery reserve and walking speed a new DPV mission starts with. Changing one inside a mission overrides it there only, without changing this default.';
+
+  @override
+  String get settings_decompression_rates_finalAscent => 'Final ascent rate';
 
   @override
   String get settings_decompression_ascentRateThresholds =>

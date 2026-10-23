@@ -10331,6 +10331,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get divePlanner_label_airBreaksOnO2 => 'Op O2 (min)';
 
   @override
+  String get divePlanner_label_airBreaksCustom => 'Aangepast';
+
+  @override
+  String divePlanner_label_airBreaksCycle(int o2Minutes, int breakMinutes) {
+    return '$o2Minutes/$breakMinutes min';
+  }
+
+  @override
   String get divePlanner_label_altitude => 'Hoogte:';
 
   @override
@@ -10341,6 +10349,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get divePlanner_label_decompression => 'Decompressie';
+
+  @override
+  String divePlanner_label_defaultWithValue(Object value) {
+    return 'Standaard ($value)';
+  }
+
+  @override
+  String get divePlanner_label_default => 'Standaard';
 
   @override
   String divePlanner_label_depthAxis(Object depthSymbol) {
@@ -10390,6 +10406,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get divePlanner_gasOptions_sacFactor => 'RMV-factor';
 
   @override
+  String get divePlanner_gasOptions_sacStressed => 'RMV onder stress';
+
+  @override
+  String get divePlanner_gasOptions_sacStressedFactor => 'Gestreste RMV-factor';
+
+  @override
   String get divePlanner_gasOptions_problemSolvingMinutes =>
       'Tijd voor probleemoplossing';
 
@@ -10409,6 +10431,12 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get divePlanner_gasOptions_o2Narcotic =>
       'O₂ als narcotisch behandelen voor dit plan';
+
+  @override
+  String get divePlanner_label_on => 'Aan';
+
+  @override
+  String get divePlanner_label_off => 'Uit';
 
   @override
   String get divePlanner_label_tanks => 'Flessen';
@@ -26855,6 +26883,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_section_decompression_title => 'Decompressie';
+
+  @override
+  String get settings_section_plannerDefaults_title =>
+      'Standaardwaarden planner';
+
+  @override
+  String get settings_section_plannerDefaults_subtitle =>
+      'Snelheden, gas, calamiteiten, DPV-team';
 
   @override
   String get settings_section_diverProfile_subtitle =>
@@ -47268,6 +47304,39 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_decompression_header_ascentRate_subtitle =>
       'De grenzen die de kleuren en gebeurtenissen voor opstijgsnelheid in het profiel gebruiken. De veiligheidscontrole houdt haar eigen vaste grenzen aan, dus deze wijzigen verandert nooit al gecontroleerde duiken.';
+
+  @override
+  String get settings_decompression_header_plannerRates => 'Plannertempo\'s';
+
+  @override
+  String get settings_decompression_header_plannerRates_subtitle =>
+      'De afdaal- en stijgsnelheden waarmee een nieuw plan begint. Een wijziging binnen een plan overschrijft dit alleen daar, zonder deze standaardwaarde te wijzigen.';
+
+  @override
+  String get settings_decompression_header_plannerGas => 'Plannergas';
+
+  @override
+  String get settings_decompression_header_plannerGas_subtitle =>
+      'De standaardwaarden voor gasverbruik waarmee een nieuw plan begint. Een wijziging binnen een plan overschrijft dit alleen daar, zonder deze standaardwaarde te wijzigen.';
+
+  @override
+  String get settings_decompression_header_plannerContingency =>
+      'Plannernoodscenario';
+
+  @override
+  String get settings_decompression_header_plannerContingency_subtitle =>
+      'De wat-als-afwijking waarmee een nieuw plan begint. Een wijziging binnen een plan overschrijft dit alleen daar, zonder deze standaardwaarde te wijzigen.';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam => 'Planner DPV-team';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam_subtitle =>
+      'De scooterbatterijreserve en looptempo waarmee een nieuwe DPV-missie begint. Een wijziging binnen een missie overschrijft dit alleen daar, zonder deze standaardwaarde te wijzigen.';
+
+  @override
+  String get settings_decompression_rates_finalAscent =>
+      'Laatste stijgsnelheid';
 
   @override
   String get settings_decompression_ascentRateThresholds =>

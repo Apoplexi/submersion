@@ -10175,6 +10175,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divePlanner_label_airBreaksOnO2 => 'על O2 (דק\')';
 
   @override
+  String get divePlanner_label_airBreaksCustom => 'מותאם אישית';
+
+  @override
+  String divePlanner_label_airBreaksCycle(int o2Minutes, int breakMinutes) {
+    return '$o2Minutes/$breakMinutes דק׳';
+  }
+
+  @override
   String get divePlanner_label_altitude => 'גובה:';
 
   @override
@@ -10185,6 +10193,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get divePlanner_label_decompression => 'דקומפרסיה';
+
+  @override
+  String divePlanner_label_defaultWithValue(Object value) {
+    return 'ברירת מחדל ($value)';
+  }
+
+  @override
+  String get divePlanner_label_default => 'ברירת מחדל';
 
   @override
   String divePlanner_label_depthAxis(Object depthSymbol) {
@@ -10234,6 +10250,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divePlanner_gasOptions_sacFactor => 'מקדם RMV';
 
   @override
+  String get divePlanner_gasOptions_sacStressed => 'RMV בלחץ';
+
+  @override
+  String get divePlanner_gasOptions_sacStressedFactor => 'מקדם RMV בלחץ';
+
+  @override
   String get divePlanner_gasOptions_problemSolvingMinutes => 'זמן לפתרון תקלה';
 
   @override
@@ -10251,6 +10273,12 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get divePlanner_gasOptions_o2Narcotic =>
       'התייחס ל-O₂ כנרקוטי בתוכנית זו';
+
+  @override
+  String get divePlanner_label_on => 'פעיל';
+
+  @override
+  String get divePlanner_label_off => 'כבוי';
 
   @override
   String get divePlanner_label_tanks => 'מיכלים';
@@ -26355,6 +26383,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_section_decompression_title => 'דקומפרסיה';
+
+  @override
+  String get settings_section_plannerDefaults_title => 'ברירות מחדל למתכנן';
+
+  @override
+  String get settings_section_plannerDefaults_subtitle =>
+      'קצבים, גז, תרחישי חירום, צוות DPV';
 
   @override
   String get settings_section_diverProfile_subtitle => 'צולל פעיל ופרופילים';
@@ -46550,6 +46585,38 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_decompression_header_ascentRate_subtitle =>
       'הספים שבהם משתמשים הצבעים והאירועים של קצב העלייה בפרופיל. סקירת הבטיחות שומרת על מגבלות קבועות משלה, כך ששינוי ערכים אלה אינו משנה צלילות שכבר נסקרו.';
+
+  @override
+  String get settings_decompression_header_plannerRates => 'קצבי מתכנן';
+
+  @override
+  String get settings_decompression_header_plannerRates_subtitle =>
+      'קצבי הירידה והעלייה שאיתם מתחילה תוכנית חדשה. שינוי אחד בתוך תוכנית יחליף אותו רק שם, מבלי לשנות ברירת מחדל זו.';
+
+  @override
+  String get settings_decompression_header_plannerGas => 'גז מתכנן';
+
+  @override
+  String get settings_decompression_header_plannerGas_subtitle =>
+      'ברירות המחדל לצריכת גז שאיתן מתחילה תוכנית חדשה. שינוי אחת בתוך תוכנית יחליף אותה רק שם, מבלי לשנות ברירת מחדל זו.';
+
+  @override
+  String get settings_decompression_header_plannerContingency =>
+      'תרחיש חירום מתכנן';
+
+  @override
+  String get settings_decompression_header_plannerContingency_subtitle =>
+      'סטיית ה\'מה אם\' שאיתה מתחילה תוכנית חדשה. שינוי בתוך תוכנית יחליף אותה רק שם, מבלי לשנות ברירת מחדל זו.';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam => 'צוות DPV מתכנן';
+
+  @override
+  String get settings_decompression_header_plannerDpvTeam_subtitle =>
+      'רזרבת הסקוטר וקצב ההליכה שאיתם מתחילה משימת DPV חדשה. שינוי בתוך משימה יחליף אותו רק שם, מבלי לשנות ברירת מחדל זו.';
+
+  @override
+  String get settings_decompression_rates_finalAscent => 'קצב עלייה סופי';
 
   @override
   String get settings_decompression_ascentRateThresholds => 'ספי קצב עלייה';

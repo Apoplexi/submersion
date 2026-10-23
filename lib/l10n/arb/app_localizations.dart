@@ -16681,6 +16681,18 @@ abstract class AppLocalizations {
   /// **'On O2 (min)'**
   String get divePlanner_label_airBreaksOnO2;
 
+  /// No description provided for @divePlanner_label_airBreaksCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get divePlanner_label_airBreaksCustom;
+
+  /// No description provided for @divePlanner_label_airBreaksCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'{o2Minutes}/{breakMinutes} min'**
+  String divePlanner_label_airBreaksCycle(int o2Minutes, int breakMinutes);
+
   /// No description provided for @divePlanner_label_altitude.
   ///
   /// In en, this message translates to:
@@ -16704,6 +16716,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Decompression'**
   String get divePlanner_label_decompression;
+
+  /// No description provided for @divePlanner_label_defaultWithValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Default ({value})'**
+  String divePlanner_label_defaultWithValue(Object value);
+
+  /// No description provided for @divePlanner_label_default.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get divePlanner_label_default;
 
   /// No description provided for @divePlanner_label_depthAxis.
   ///
@@ -16795,6 +16819,18 @@ abstract class AppLocalizations {
   /// **'RMV factor'**
   String get divePlanner_gasOptions_sacFactor;
 
+  /// No description provided for @divePlanner_gasOptions_sacStressed.
+  ///
+  /// In en, this message translates to:
+  /// **'Stressed RMV'**
+  String get divePlanner_gasOptions_sacStressed;
+
+  /// No description provided for @divePlanner_gasOptions_sacStressedFactor.
+  ///
+  /// In en, this message translates to:
+  /// **'Stressed RMV factor'**
+  String get divePlanner_gasOptions_sacStressedFactor;
+
   /// No description provided for @divePlanner_gasOptions_problemSolvingMinutes.
   ///
   /// In en, this message translates to:
@@ -16830,6 +16866,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Treat O₂ as narcotic for this plan'**
   String get divePlanner_gasOptions_o2Narcotic;
+
+  /// No description provided for @divePlanner_label_on.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get divePlanner_label_on;
+
+  /// No description provided for @divePlanner_label_off.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get divePlanner_label_off;
 
   /// No description provided for @divePlanner_label_tanks.
   ///
@@ -43411,6 +43459,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Decompression'**
   String get settings_section_decompression_title;
+
+  /// No description provided for @settings_section_plannerDefaults_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Planner Defaults'**
+  String get settings_section_plannerDefaults_title;
+
+  /// No description provided for @settings_section_plannerDefaults_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates, gas, contingency, DPV team'**
+  String get settings_section_plannerDefaults_subtitle;
 
   /// No description provided for @settings_section_diverProfile_subtitle.
   ///
@@ -75747,6 +75807,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The rates the profile\'s ascent-rate colours and events use. The safety review keeps its own fixed limits, so changing these never alters reviewed dives.'**
   String get settings_decompression_header_ascentRate_subtitle;
+
+  /// No description provided for @settings_decompression_header_plannerRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Planner Rates'**
+  String get settings_decompression_header_plannerRates;
+
+  /// No description provided for @settings_decompression_header_plannerRates_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The descent and ascent rates a new plan starts with. Changing one inside a plan overrides it there only, without changing this default.'**
+  String get settings_decompression_header_plannerRates_subtitle;
+
+  /// No description provided for @settings_decompression_header_plannerGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Planner Gas'**
+  String get settings_decompression_header_plannerGas;
+
+  /// No description provided for @settings_decompression_header_plannerGas_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The gas consumption defaults a new plan starts with. Changing one inside a plan overrides it there only, without changing this default.'**
+  String get settings_decompression_header_plannerGas_subtitle;
+
+  /// No description provided for @settings_decompression_header_plannerContingency.
+  ///
+  /// In en, this message translates to:
+  /// **'Planner Contingency'**
+  String get settings_decompression_header_plannerContingency;
+
+  /// No description provided for @settings_decompression_header_plannerContingency_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The what-if deviation a new plan starts with. Changing it inside a plan overrides it there only, without changing this default.'**
+  String get settings_decompression_header_plannerContingency_subtitle;
+
+  /// No description provided for @settings_decompression_header_plannerDpvTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Planner DPV Team'**
+  String get settings_decompression_header_plannerDpvTeam;
+
+  /// No description provided for @settings_decompression_header_plannerDpvTeam_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The scooter battery reserve and walking speed a new DPV mission starts with. Changing one inside a mission overrides it there only, without changing this default.'**
+  String get settings_decompression_header_plannerDpvTeam_subtitle;
+
+  /// No description provided for @settings_decompression_rates_finalAscent.
+  ///
+  /// In en, this message translates to:
+  /// **'Final ascent rate'**
+  String get settings_decompression_rates_finalAscent;
 
   /// No description provided for @settings_decompression_ascentRateThresholds.
   ///
