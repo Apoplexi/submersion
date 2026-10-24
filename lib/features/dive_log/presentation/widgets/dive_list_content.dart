@@ -28,6 +28,7 @@ import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/divers/presentation/widgets/misplaced_logbook_banner.dart';
 import 'package:submersion/core/constants/pdf_templates.dart';
 import 'package:submersion/features/transfer/presentation/widgets/pdf_export_dialog.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -1280,6 +1281,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                 onOpenDive: _openDive,
                 onEscape: selection.isActive ? _selection.exit : null,
               ),
+              const MisplacedLogbookBanner(),
               Expanded(child: content),
             ],
           );
@@ -1844,6 +1846,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                 onOpenDive: _openDive,
                 onEscape: selection.isActive ? _selection.exit : null,
               ),
+              const MisplacedLogbookBanner(),
               Expanded(child: content),
             ],
           );
