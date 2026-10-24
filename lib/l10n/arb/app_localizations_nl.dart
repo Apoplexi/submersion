@@ -19487,6 +19487,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get plannerCanvas_chart_removeWaypoint => 'Punt verwijderen';
+
+  @override
   String get plannerCanvas_contingency_title => 'Noodplannen';
 
   @override

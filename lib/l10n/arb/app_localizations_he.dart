@@ -19180,6 +19180,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get plannerCanvas_chart_removeWaypoint => 'הסרת נקודת הציון';
+
+  @override
   String get plannerCanvas_contingency_title => 'תוכניות חירום';
 
   @override
