@@ -10323,6 +10323,17 @@ class AppLocalizationsAr extends AppLocalizations {
       'عرض منظمات التنفس المتقاعدة والمباعة';
 
   @override
+  String get diveLog_tank_addRegulator => 'إضافة منظم تنفس';
+
+  @override
+  String diveLog_tank_regulatorNumbered(int number) {
+    return 'منظم التنفس $number';
+  }
+
+  @override
+  String get diveLog_tank_removeRegulator => 'إزالة منظم التنفس';
+
+  @override
   String get diveLog_tank_tripCylinderLabel => 'أسطوانة الرحلة';
 
   @override
@@ -24462,6 +24473,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_field_sharedComputerIds => 'مشترك مع الحواسيب';
+
+  @override
+  String get settings_conflict_field_extraRegulatorIds => 'منظمات تنفس إضافية';
 
   @override
   String get settings_conflict_field_shoreSwimM => 'السباحة إلى الشاطئ';

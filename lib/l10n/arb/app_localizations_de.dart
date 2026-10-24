@@ -10172,6 +10172,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ausgemusterte und verkaufte Atemregler anzeigen';
 
   @override
+  String get diveLog_tank_addRegulator => 'Atemregler hinzufügen';
+
+  @override
+  String diveLog_tank_regulatorNumbered(int number) {
+    return 'Atemregler $number';
+  }
+
+  @override
+  String get diveLog_tank_removeRegulator => 'Atemregler entfernen';
+
+  @override
   String get diveLog_tank_tripCylinderLabel => 'Flasche der Reise';
 
   @override
@@ -24183,6 +24194,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_conflict_field_sharedComputerIds =>
       'Geteilt mit Computern';
+
+  @override
+  String get settings_conflict_field_extraRegulatorIds =>
+      'Zusätzliche Atemregler';
 
   @override
   String get settings_conflict_field_shoreSwimM => 'Schwimmstrecke zum Ufer';

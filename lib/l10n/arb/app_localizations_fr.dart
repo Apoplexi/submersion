@@ -10213,6 +10213,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Afficher les détendeurs réformés et vendus';
 
   @override
+  String get diveLog_tank_addRegulator => 'Ajouter un détendeur';
+
+  @override
+  String diveLog_tank_regulatorNumbered(int number) {
+    return 'Détendeur $number';
+  }
+
+  @override
+  String get diveLog_tank_removeRegulator => 'Retirer le détendeur';
+
+  @override
   String get diveLog_tank_tripCylinderLabel => 'Bloc du voyage';
 
   @override
@@ -24298,6 +24309,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_conflict_field_sharedComputerIds =>
       'Partagé avec les ordinateurs';
+
+  @override
+  String get settings_conflict_field_extraRegulatorIds =>
+      'Détendeurs supplémentaires';
 
   @override
   String get settings_conflict_field_shoreSwimM => 'Nage jusqu\'au rivage';
