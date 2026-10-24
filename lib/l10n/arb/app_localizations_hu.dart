@@ -21498,6 +21498,21 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get sharedLibrary_syncError_accountMissing =>
+      'A könyvtár fiókja már nincs ezen az eszközön. A Kapcsolat módosítása gombbal válaszd ki újra.';
+
+  @override
+  String get sharedLibrary_syncError_accountSignedOut =>
+      'Ez az eszköz ki van jelentkezve a könyvtár fiókjából. Jelentkezz be újra a Csatlakoztatott fiókok között, vagy használd a Kapcsolat módosítása lehetőséget.';
+
+  @override
+  String get sharedLibrary_syncError_notALibrary =>
+      'Ezen a helyen nincs könyvtár.';
+
+  @override
+  String get sharedLibrary_syncError_failed => 'Valami hiba történt.';
+
+  @override
   String get sharedLibrary_library_addMySites => 'Merülőhelyeim hozzáadása';
 
   @override

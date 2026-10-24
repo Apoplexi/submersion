@@ -21576,6 +21576,21 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get sharedLibrary_syncError_accountMissing =>
+      'La cuenta de esta biblioteca ya no está en este dispositivo. Usa Cambiar conexión para elegirla de nuevo.';
+
+  @override
+  String get sharedLibrary_syncError_accountSignedOut =>
+      'Este dispositivo cerró la sesión de la cuenta de esta biblioteca. Vuelve a iniciar sesión en Cuentas conectadas o usa Cambiar conexión.';
+
+  @override
+  String get sharedLibrary_syncError_notALibrary =>
+      'No hay ninguna biblioteca en esta ubicación.';
+
+  @override
+  String get sharedLibrary_syncError_failed => 'Algo salió mal.';
+
+  @override
   String get sharedLibrary_library_addMySites => 'Añadir mis puntos';
 
   @override

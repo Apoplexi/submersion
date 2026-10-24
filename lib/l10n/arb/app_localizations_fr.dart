@@ -21636,6 +21636,21 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get sharedLibrary_syncError_accountMissing =>
+      'Le compte de cette bibliothèque n\'est plus sur cet appareil. Utilisez Modifier la connexion pour le choisir à nouveau.';
+
+  @override
+  String get sharedLibrary_syncError_accountSignedOut =>
+      'Cet appareil est déconnecté du compte de cette bibliothèque. Reconnectez-vous dans Comptes connectés, ou utilisez Modifier la connexion.';
+
+  @override
+  String get sharedLibrary_syncError_notALibrary =>
+      'Aucune bibliothèque à cet emplacement.';
+
+  @override
+  String get sharedLibrary_syncError_failed => 'Une erreur s\'est produite.';
+
+  @override
   String get sharedLibrary_library_addMySites => 'Ajouter mes sites';
 
   @override

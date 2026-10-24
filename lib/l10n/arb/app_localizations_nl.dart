@@ -21438,6 +21438,21 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get sharedLibrary_syncError_accountMissing =>
+      'Het account van deze bibliotheek staat niet meer op dit apparaat. Gebruik Verbinding wijzigen om het opnieuw te kiezen.';
+
+  @override
+  String get sharedLibrary_syncError_accountSignedOut =>
+      'Dit apparaat is afgemeld bij het account van deze bibliotheek. Meld je opnieuw aan via Gekoppelde accounts, of gebruik Verbinding wijzigen.';
+
+  @override
+  String get sharedLibrary_syncError_notALibrary =>
+      'Geen bibliotheek op deze locatie.';
+
+  @override
+  String get sharedLibrary_syncError_failed => 'Er is iets misgegaan.';
+
+  @override
   String get sharedLibrary_library_addMySites => 'Mijn duikstekken toevoegen';
 
   @override
