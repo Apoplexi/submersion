@@ -8740,6 +8740,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get diveSites_detail_duplicateMenu_label => 'Duplizieren';
+
+  @override
+  String get diveSites_edit_appBar_duplicateSite => 'Tauchplatz duplizieren';
+
+  @override
+  String diveSites_edit_duplicateName(String name) {
+    return '$name (Kopie)';
+  }
+
+  @override
   String get diveSites_edit_group_accessSafety => 'Zugang & Sicherheit';
 
   @override
@@ -8756,6 +8767,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_edit_group_typeTags => 'Typ & Tags';
+
+  @override
+  String get diveSites_edit_snackbar_featuresNotCopied =>
+      'Tauchplatz hinzugefügt, aber seine Kartenmerkmale konnten nicht kopiert werden.';
 
   @override
   String get diveSites_edit_typeTags_manageTypes => 'Typen verwalten';
