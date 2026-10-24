@@ -2493,6 +2493,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backup_history_pinAction_unpin => 'Unpin backup';
 
   @override
+  String get backup_history_pinnedOnAnotherDevice => 'Pinned on another device';
+
+  @override
   String get backup_history_pinError => 'Could not update pin state.';
 
   @override
@@ -2593,6 +2596,92 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get backup_schedule_retention_subtitle =>
       'Older backups are automatically removed';
+
+  @override
+  String get backup_retention_allDevices_title =>
+      'Count backups from all devices';
+
+  @override
+  String get backup_retention_allDevices_off =>
+      'Off: this device removes only the backups it made';
+
+  @override
+  String backup_retention_allDevices_on(int count) {
+    return 'The cloud folder keeps the last $count backups from every device. Pinned backups are kept. If other devices use this too, the smallest number wins. Update the app on every device first so their pins are seen.';
+  }
+
+  @override
+  String backup_retention_cloudFootprint(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count backups in the cloud folder use $size',
+      one: '$count backup in the cloud folder uses $size',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backup_retention_confirm_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remove $count backups?',
+      one: 'Remove $count backup?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backup_retention_confirm_body(int keep, String size) {
+    return 'Keeping the last $keep backups removes these from the cloud folder ($size in all).';
+  }
+
+  @override
+  String backup_retention_confirm_pinnedKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pinned backups are kept.',
+      one: '$count pinned backup is kept.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backup_retention_confirm_action(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remove $count backups',
+      one: 'Remove $count backup',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get backup_retention_source_thisDevice => 'This device';
+
+  @override
+  String get backup_retention_source_anotherDevice => 'Another device';
+
+  @override
+  String get backup_retention_source_unknown => 'Unknown device';
+
+  @override
+  String get backup_retention_listFailed =>
+      'Could not read the cloud backup folder, so nothing was changed.';
+
+  @override
+  String backup_retention_removed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Removed $count backups from the cloud folder',
+      one: 'Removed $count backup from the cloud folder',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get backup_section_history => 'History';

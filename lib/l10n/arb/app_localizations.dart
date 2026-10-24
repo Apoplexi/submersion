@@ -3949,6 +3949,12 @@ abstract class AppLocalizations {
   /// **'Unpin backup'**
   String get backup_history_pinAction_unpin;
 
+  /// No description provided for @backup_history_pinnedOnAnotherDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned on another device'**
+  String get backup_history_pinnedOnAnotherDevice;
+
   /// No description provided for @backup_history_pinError.
   ///
   /// In en, this message translates to:
@@ -4122,6 +4128,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Older backups are automatically removed'**
   String get backup_schedule_retention_subtitle;
+
+  /// No description provided for @backup_retention_allDevices_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Count backups from all devices'**
+  String get backup_retention_allDevices_title;
+
+  /// No description provided for @backup_retention_allDevices_off.
+  ///
+  /// In en, this message translates to:
+  /// **'Off: this device removes only the backups it made'**
+  String get backup_retention_allDevices_off;
+
+  /// No description provided for @backup_retention_allDevices_on.
+  ///
+  /// In en, this message translates to:
+  /// **'The cloud folder keeps the last {count} backups from every device. Pinned backups are kept. If other devices use this too, the smallest number wins. Update the app on every device first so their pins are seen.'**
+  String backup_retention_allDevices_on(int count);
+
+  /// No description provided for @backup_retention_cloudFootprint.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} backup in the cloud folder uses {size}} other{{count} backups in the cloud folder use {size}}}'**
+  String backup_retention_cloudFootprint(int count, String size);
+
+  /// No description provided for @backup_retention_confirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Remove {count} backup?} other{Remove {count} backups?}}'**
+  String backup_retention_confirm_title(int count);
+
+  /// No description provided for @backup_retention_confirm_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeping the last {keep} backups removes these from the cloud folder ({size} in all).'**
+  String backup_retention_confirm_body(int keep, String size);
+
+  /// No description provided for @backup_retention_confirm_pinnedKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} pinned backup is kept.} other{{count} pinned backups are kept.}}'**
+  String backup_retention_confirm_pinnedKept(int count);
+
+  /// No description provided for @backup_retention_confirm_action.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Remove {count} backup} other{Remove {count} backups}}'**
+  String backup_retention_confirm_action(int count);
+
+  /// No description provided for @backup_retention_source_thisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get backup_retention_source_thisDevice;
+
+  /// No description provided for @backup_retention_source_anotherDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Another device'**
+  String get backup_retention_source_anotherDevice;
+
+  /// No description provided for @backup_retention_source_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown device'**
+  String get backup_retention_source_unknown;
+
+  /// No description provided for @backup_retention_listFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the cloud backup folder, so nothing was changed.'**
+  String get backup_retention_listFailed;
+
+  /// No description provided for @backup_retention_removed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Removed {count} backup from the cloud folder} other{Removed {count} backups from the cloud folder}}'**
+  String backup_retention_removed(int count);
 
   /// No description provided for @backup_section_history.
   ///
