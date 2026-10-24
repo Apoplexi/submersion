@@ -2347,8 +2347,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get accessibility_label_resizeMasterPane => 'Fő panel átméretezése';
 
   @override
-  String get accessibility_label_sharedWithAllProfiles =>
-      'Megosztva az összes búvárprofillal';
+  String get accessibility_label_sharedWithProfiles =>
+      'Megosztva más búvárprofilokkal';
 
   @override
   String get accessibility_label_showList => 'Lista megjelenítése';
@@ -35593,29 +35593,20 @@ class AppLocalizationsHu extends AppLocalizations {
       'Új helyszínek és túrák megosztása alapértelmezetten';
 
   @override
-  String get settings_shareAllSites_title => 'Az összes helyszínem megosztása';
+  String get settings_shareAllSites_title =>
+      'Az összes merülőhelyem megosztása...';
 
   @override
-  String get settings_shareAllTrips_title => 'Az összes túrám megosztása';
+  String get settings_shareAllTrips_title => 'Az összes túrám megosztása...';
 
   @override
   String settings_shareAllSites_confirm(int count) {
-    return 'Mind a(z) $count helyszínedet láthatóvá teszed minden búvárprofilnak az alkalmazásban? Később egyesével megszüntetheted a megosztást.';
+    return 'Válaszd ki, ki lássa mind a(z) $count merülőhelyedet. Ha később egy helyet módosítanál, nyisd meg, és koppints a Megosztva elemre.';
   }
 
   @override
   String settings_shareAllTrips_confirm(int count) {
-    return 'Mind a(z) $count túrádat láthatóvá teszed minden búvárprofilnak az alkalmazásban? Később egyesével megszüntetheted a megosztást.';
-  }
-
-  @override
-  String settings_shareAllSites_snackbar(int count) {
-    return '$count helyszín megosztva minden búvárprofillal.';
-  }
-
-  @override
-  String settings_shareAllTrips_snackbar(int count) {
-    return '$count túra megosztva minden búvárprofillal.';
+    return 'Válaszd ki, ki lássa mind a(z) $count túrádat. Ha később egy túrát módosítanál, nyisd meg, és koppints a Megosztva elemre.';
   }
 
   @override
@@ -35652,7 +35643,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String trips_unshareConfirm_body(String name) {
-    return 'Ez eltávolítja a(z) „$name\" elemet a többi búvárprofil nézetéből. Később újra megoszthatod.';
+    return 'Az eltávolított profilok többé nem látják ezt: „$name\". A merüléseik továbbra is hozzá kapcsolódnak, és később újra megoszthatod velük.';
   }
 
   @override
@@ -35661,7 +35652,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String sites_unshareConfirm_body(String name) {
-    return 'Ez eltávolítja a(z) „$name\" elemet a többi búvárprofil nézetéből. Később újra megoszthatod.';
+    return 'Az eltávolított profilok többé nem látják ezt: „$name\". A merüléseik továbbra is hozzá kapcsolódnak, és később újra megoszthatod velük.';
   }
 
   @override
@@ -35736,6 +35727,31 @@ class AppLocalizationsHu extends AppLocalizations {
       one: 'Eltávolítasz $count elemet a profilodból?',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get sharedItems_bulkShare_action => 'Megosztás...';
+
+  @override
+  String sharedItems_bulkShare_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem megosztva',
+      one: '$count elem megosztva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkShare_doneSkipped(int count, int skipped) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem megosztva',
+      one: '$count elem megosztva',
+    );
+    return '$_temp0, $skipped kihagyva, amely nem a tiéd';
   }
 
   @override
@@ -35836,6 +35852,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get sharedItems_removedSnackbar => 'Eltávolítva a profilodból';
 
   @override
+  String get sharedItems_shareDialog_everyoneSubtitle =>
+      'Minden búvárprofil, a később hozzáadottak is';
+
+  @override
+  String get sharedItems_shareDialog_siteBody =>
+      'A kiválasztott profilok látják ezt a merülőhelyet, és rögzíthetik itt a saját merüléseiket. Csak te törölheted, vagy módosíthatod, kivel van megosztva.';
+
+  @override
+  String get sharedItems_shareDialog_title => 'Megosztás';
+
+  @override
+  String get sharedItems_shareDialog_tripBody =>
+      'A kiválasztott profilok látják ezt a túrát, és hozzáadhatják a saját merüléseiket. Csak te törölheted, vagy módosíthatod, kivel van megosztva.';
+
+  @override
   String sharedItems_shareOwnerOnly(String owner) {
     return 'Csak $owner módosíthatja a megosztást';
   }
@@ -35844,6 +35875,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String sharedItems_sharedBy(String owner) {
     return 'Megosztotta: $owner';
   }
+
+  @override
+  String get sharedItems_sharedWith_everyone => 'Mindenki';
+
+  @override
+  String get sharedItems_sharedWith_label => 'Megosztva';
+
+  @override
+  String get sharedItems_sharedWith_none => 'Nincs megosztva';
 
   @override
   String get sharedItems_undo => 'Visszavonás';
@@ -35874,6 +35914,19 @@ class AppLocalizationsHu extends AppLocalizations {
       one: 'helyszín',
     );
     return 'Búvár törölve. $trips megosztott $_temp0 és $sites megosztott $_temp1 átrendelve ehhez: $name.';
+  }
+
+  @override
+  String divers_delete_handedOver(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count megosztott túra és helyszín azokhoz a profilokhoz került, amelyekkel meg voltak osztva.',
+      one:
+          '$count megosztott túra vagy helyszín ahhoz a profilhoz került, amellyel meg volt osztva.',
+    );
+    return '$_temp0';
   }
 
   @override

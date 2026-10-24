@@ -2354,8 +2354,8 @@ class AppLocalizationsIt extends AppLocalizations {
       'Ridimensiona riquadro principale';
 
   @override
-  String get accessibility_label_sharedWithAllProfiles =>
-      'Condiviso con tutti i profili subacquei';
+  String get accessibility_label_sharedWithProfiles =>
+      'Condiviso con altri profili subacquei';
 
   @override
   String get accessibility_label_showList => 'Mostra elenco';
@@ -35799,29 +35799,19 @@ class AppLocalizationsIt extends AppLocalizations {
       'Condividi i nuovi siti e viaggi per impostazione predefinita';
 
   @override
-  String get settings_shareAllSites_title => 'Condividi tutti i miei siti';
+  String get settings_shareAllSites_title => 'Condividi tutti i miei siti...';
 
   @override
-  String get settings_shareAllTrips_title => 'Condividi tutti i miei viaggi';
+  String get settings_shareAllTrips_title => 'Condividi tutti i miei viaggi...';
 
   @override
   String settings_shareAllSites_confirm(int count) {
-    return 'Rendere i tuoi $count siti visibili a tutti i profili subacquei di questa app? Potrai annullare la condivisione dei singoli siti in seguito.';
+    return 'Scegli chi vede tutti i tuoi $count siti. Per cambiare un sito in seguito, aprilo e tocca Condiviso con.';
   }
 
   @override
   String settings_shareAllTrips_confirm(int count) {
-    return 'Rendere i tuoi $count viaggi visibili a tutti i profili subacquei di questa app? Potrai annullare la condivisione dei singoli viaggi in seguito.';
-  }
-
-  @override
-  String settings_shareAllSites_snackbar(int count) {
-    return '$count siti condivisi con tutti i profili subacquei.';
-  }
-
-  @override
-  String settings_shareAllTrips_snackbar(int count) {
-    return '$count viaggi condivisi con tutti i profili subacquei.';
+    return 'Scegli chi vede tutti i tuoi $count viaggi. Per cambiare un viaggio in seguito, aprilo e tocca Condiviso con.';
   }
 
   @override
@@ -35859,7 +35849,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String trips_unshareConfirm_body(String name) {
-    return 'Verrà rimosso «$name» dalle viste degli altri profili subacquei. Potrai condividerlo di nuovo in seguito.';
+    return 'I profili che togli non vedranno più «$name». Le loro immersioni restano collegate e potrai condividerlo di nuovo con loro in seguito.';
   }
 
   @override
@@ -35868,7 +35858,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String sites_unshareConfirm_body(String name) {
-    return 'Verrà rimosso «$name» dalle viste degli altri profili subacquei. Potrai condividerlo di nuovo in seguito.';
+    return 'I profili che togli non vedranno più «$name». Le loro immersioni restano collegate e potrai condividerlo di nuovo con loro in seguito.';
   }
 
   @override
@@ -35943,6 +35933,31 @@ class AppLocalizationsIt extends AppLocalizations {
       one: 'Rimuovere $count elemento dal tuo profilo?',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get sharedItems_bulkShare_action => 'Condividi con...';
+
+  @override
+  String sharedItems_bulkShare_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementi condivisi',
+      one: '$count elemento condiviso',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sharedItems_bulkShare_doneSkipped(int count, int skipped) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementi condivisi',
+      one: '$count elemento condiviso',
+    );
+    return '$_temp0, $skipped saltati perché non tuoi';
   }
 
   @override
@@ -36043,6 +36058,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get sharedItems_removedSnackbar => 'Rimosso dal tuo profilo';
 
   @override
+  String get sharedItems_shareDialog_everyoneSubtitle =>
+      'Tutti i profili subacquei, compresi quelli aggiunti in seguito';
+
+  @override
+  String get sharedItems_shareDialog_siteBody =>
+      'I profili che scegli vedono questo sito e possono registrarvi le proprie immersioni. Solo tu puoi eliminarlo o cambiare con chi è condiviso.';
+
+  @override
+  String get sharedItems_shareDialog_title => 'Condividi con';
+
+  @override
+  String get sharedItems_shareDialog_tripBody =>
+      'I profili che scegli vedono questo viaggio e possono aggiungervi le proprie immersioni. Solo tu puoi eliminarlo o cambiare con chi è condiviso.';
+
+  @override
   String sharedItems_shareOwnerOnly(String owner) {
     return 'Solo $owner può modificare la condivisione';
   }
@@ -36051,6 +36081,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String sharedItems_sharedBy(String owner) {
     return 'Condiviso da $owner';
   }
+
+  @override
+  String get sharedItems_sharedWith_everyone => 'Tutti';
+
+  @override
+  String get sharedItems_sharedWith_label => 'Condiviso con';
+
+  @override
+  String get sharedItems_sharedWith_none => 'Non condiviso';
 
   @override
   String get sharedItems_undo => 'Annulla';
@@ -36081,6 +36120,19 @@ class AppLocalizationsIt extends AppLocalizations {
       one: 'sito condiviso',
     );
     return 'Subacqueo eliminato. $trips $_temp0 e $sites $_temp1 riassegnati a $name.';
+  }
+
+  @override
+  String divers_delete_handedOver(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count viaggi e siti condivisi sono passati ai profili con cui erano condivisi.',
+      one:
+          '$count viaggio o sito condiviso è passato al profilo con cui era condiviso.',
+    );
+    return '$_temp0';
   }
 
   @override
