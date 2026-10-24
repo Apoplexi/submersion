@@ -19988,6 +19988,24 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get plannerCanvas_gas_noTurnRule => 'لم تُحدَّد قاعدة ضغط العودة';
+
+  @override
+  String get plannerCanvas_gas_turnNoStartPressure => 'العودة تتطلب ضغط بدء';
+
+  @override
+  String get plannerCanvas_gas_minGasNoStartPressure =>
+      'الحد الأدنى للغاز يتطلب ضغط بدء';
+
+  @override
+  String get plannerCanvas_gas_minGasNoVolume =>
+      'الحد الأدنى للغاز يتطلب حجم الأسطوانة';
+
+  @override
+  String get plannerCanvas_gas_limitsNoStartPressure =>
+      'العودة والحد الأدنى للغاز يتطلبان ضغط بدء';
+
+  @override
   String plannerCanvas_gas_usedReading(String reading) {
     return 'مستخدم: $reading';
   }
@@ -20156,6 +20174,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get plannerCanvas_slate_turn => 'العودة';
+
+  @override
+  String get plannerCanvas_slate_noTurnRule => 'لا قاعدة';
+
+  @override
+  String get plannerCanvas_slate_noStartPressure => 'لا ضغط بدء';
+
+  @override
+  String get plannerCanvas_slate_noVolume => 'لا حجم';
 
   @override
   String get plannerCanvas_table_depth => 'العمق';

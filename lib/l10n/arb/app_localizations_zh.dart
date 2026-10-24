@@ -18773,6 +18773,21 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get plannerCanvas_gas_noTurnRule => '未设置折返规则';
+
+  @override
+  String get plannerCanvas_gas_turnNoStartPressure => '折返需要起始压力';
+
+  @override
+  String get plannerCanvas_gas_minGasNoStartPressure => '最低气量需要起始压力';
+
+  @override
+  String get plannerCanvas_gas_minGasNoVolume => '最低气量需要气瓶容积';
+
+  @override
+  String get plannerCanvas_gas_limitsNoStartPressure => '折返和最低气量需要起始压力';
+
+  @override
   String plannerCanvas_gas_usedReading(String reading) {
     return '已用: $reading';
   }
@@ -18936,6 +18951,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get plannerCanvas_slate_turn => '折返';
+
+  @override
+  String get plannerCanvas_slate_noTurnRule => '无规则';
+
+  @override
+  String get plannerCanvas_slate_noStartPressure => '无起始压力';
+
+  @override
+  String get plannerCanvas_slate_noVolume => '无容积';
 
   @override
   String get plannerCanvas_table_depth => '深度';

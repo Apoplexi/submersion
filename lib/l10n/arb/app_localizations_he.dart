@@ -19284,6 +19284,24 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get plannerCanvas_gas_noTurnRule => 'לא הוגדר כלל לחץ פנייה';
+
+  @override
+  String get plannerCanvas_gas_turnNoStartPressure =>
+      'נקודת הפנייה דורשת לחץ התחלתי';
+
+  @override
+  String get plannerCanvas_gas_minGasNoStartPressure =>
+      'גז מינימלי דורש לחץ התחלתי';
+
+  @override
+  String get plannerCanvas_gas_minGasNoVolume => 'גז מינימלי דורש גודל מכל';
+
+  @override
+  String get plannerCanvas_gas_limitsNoStartPressure =>
+      'נקודת הפנייה והגז המינימלי דורשים לחץ התחלתי';
+
+  @override
   String plannerCanvas_gas_usedReading(String reading) {
     return 'בשימוש: $reading';
   }
@@ -19451,6 +19469,15 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get plannerCanvas_slate_turn => 'נקודת חזרה';
+
+  @override
+  String get plannerCanvas_slate_noTurnRule => 'אין כלל';
+
+  @override
+  String get plannerCanvas_slate_noStartPressure => 'אין לחץ התחלתי';
+
+  @override
+  String get plannerCanvas_slate_noVolume => 'אין גודל';
 
   @override
   String get plannerCanvas_table_depth => 'עומק';

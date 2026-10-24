@@ -19592,6 +19592,25 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get plannerCanvas_gas_noTurnRule => 'geen keerdruk-regel ingesteld';
+
+  @override
+  String get plannerCanvas_gas_turnNoStartPressure =>
+      'keerpunt vereist een startdruk';
+
+  @override
+  String get plannerCanvas_gas_minGasNoStartPressure =>
+      'min. gas vereist een startdruk';
+
+  @override
+  String get plannerCanvas_gas_minGasNoVolume =>
+      'min. gas vereist een flesgrootte';
+
+  @override
+  String get plannerCanvas_gas_limitsNoStartPressure =>
+      'keerpunt en min. gas vereisen een startdruk';
+
+  @override
   String plannerCanvas_gas_usedReading(String reading) {
     return 'verbruikt: $reading';
   }
@@ -19760,6 +19779,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get plannerCanvas_slate_turn => 'Keerpunt';
+
+  @override
+  String get plannerCanvas_slate_noTurnRule => 'Geen regel';
+
+  @override
+  String get plannerCanvas_slate_noStartPressure => 'Geen startdruk';
+
+  @override
+  String get plannerCanvas_slate_noVolume => 'Geen grootte';
 
   @override
   String get plannerCanvas_table_depth => 'Diepte';

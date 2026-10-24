@@ -19720,6 +19720,25 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get plannerCanvas_gas_noTurnRule => 'sem regra de retorno';
+
+  @override
+  String get plannerCanvas_gas_turnNoStartPressure =>
+      'o retorno precisa de uma pressão inicial';
+
+  @override
+  String get plannerCanvas_gas_minGasNoStartPressure =>
+      'o gás mínimo precisa de uma pressão inicial';
+
+  @override
+  String get plannerCanvas_gas_minGasNoVolume =>
+      'o gás mínimo precisa de um tamanho de cilindro';
+
+  @override
+  String get plannerCanvas_gas_limitsNoStartPressure =>
+      'o retorno e o gás mínimo precisam de uma pressão inicial';
+
+  @override
   String plannerCanvas_gas_usedReading(String reading) {
     return 'usado: $reading';
   }
@@ -19888,6 +19907,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get plannerCanvas_slate_turn => 'Retorno';
+
+  @override
+  String get plannerCanvas_slate_noTurnRule => 'Sem regra';
+
+  @override
+  String get plannerCanvas_slate_noStartPressure => 'Sem pressão inicial';
+
+  @override
+  String get plannerCanvas_slate_noVolume => 'Sem tamanho';
 
   @override
   String get plannerCanvas_table_depth => 'Profundidade';
