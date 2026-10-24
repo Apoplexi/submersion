@@ -554,5 +554,11 @@ extension RungsFromV231 on AppDatabase {
       await _assertMediaAndDocumentTagSchema();
     }
     if (from < 309) await reportProgress();
+
+    // v310: diver_settings.downloads_follow_computer_owner (issue #2050).
+    // Column only, on by default; re-asserted in beforeOpen. Renumbered from
+    // 309 as #3605 shipped 309 first.
+    if (from < 310) await _assertDownloadOwnerColumn();
+    if (from < 310) await reportProgress();
   }
 }
