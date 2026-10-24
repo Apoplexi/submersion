@@ -19207,6 +19207,38 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get media_share_preparingVideo => 'جارٍ تجهيز الفيديو';
+
+  @override
+  String media_share_preparingVideoOf(int current, int total) {
+    return 'جارٍ تجهيز الفيديو $current من $total';
+  }
+
+  @override
+  String get media_share_correctionFailedTitle => 'تعذّر تطبيق تصحيح الألوان';
+
+  @override
+  String media_share_correctionFailedBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'لا يزال من الممكن مشاركة $count مقطع فيديو بدونه.',
+      many: 'لا يزال من الممكن مشاركة $count مقطع فيديو بدونه.',
+      few: 'لا يزال من الممكن مشاركة $count مقاطع فيديو بدونه.',
+      two: 'لا يزال من الممكن مشاركة مقطعي الفيديو بدونه.',
+      one: 'لا يزال من الممكن مشاركة هذا الفيديو بدونه.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_share_shareOriginal => 'مشاركة الأصل';
+
+  @override
+  String get media_share_videoInterrupted =>
+      'توقف تجهيز الفيديو عندما انتقل Submersion إلى الخلفية. شارك مرة أخرى للبدء من جديد.';
+
+  @override
   String get media_photoViewer_failedToWriteMetadata =>
       'فشل في كتابة البيانات الوصفية';
 
