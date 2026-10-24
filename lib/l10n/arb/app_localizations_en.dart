@@ -54415,4 +54415,287 @@ class AppLocalizationsEn extends AppLocalizations {
   String settings_setUpDevice_item_signInBackups(String account) {
     return 'Sign in to $account again. Backups are paused until you do.';
   }
+
+  @override
+  String get settings_setUpDevice_next => 'Next';
+
+  @override
+  String get settings_setUpDevice_notNow => 'Not now';
+
+  @override
+  String get settings_setUpDevice_skip => 'Skip';
+
+  @override
+  String get settings_setUpDevice_account_title =>
+      'Where should Submersion keep your data?';
+
+  @override
+  String get settings_setUpDevice_account_note =>
+      'Your dives are stored only in the account you choose. Submersion has no server of its own.';
+
+  @override
+  String get settings_setUpDevice_account_backupFile =>
+      'I have a backup file instead';
+
+  @override
+  String get settings_setUpDevice_offer_icloud =>
+      'Uses your Apple ID. Nothing to sign in to.';
+
+  @override
+  String get settings_setUpDevice_offer_googleDrive => 'Sign in with Google';
+
+  @override
+  String get settings_setUpDevice_offer_dropbox => 'Sign in with Dropbox';
+
+  @override
+  String get settings_setUpDevice_offer_ownServer =>
+      'S3-compatible storage or a WebDAV server';
+
+  @override
+  String get settings_setUpDevice_sync_title => 'Dives on every device';
+
+  @override
+  String settings_setUpDevice_sync_signedIn(String account) {
+    return 'Signed in to $account';
+  }
+
+  @override
+  String settings_setUpDevice_sync_noLibrary(String account) {
+    return '$account has no Submersion library yet. The dives here will become the library all your devices share.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_found(
+    String account,
+    String when,
+    String device,
+  ) {
+    return 'Found your library in $account, last changed $when on $device.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_foundPlain(String account) {
+    return 'Found your library in $account.';
+  }
+
+  @override
+  String get settings_setUpDevice_sync_foundEmpty =>
+      'There are no dives here yet, so the library is simply downloaded.';
+
+  @override
+  String get settings_setUpDevice_sync_combine => 'Combine them';
+
+  @override
+  String get settings_setUpDevice_sync_combineDetail =>
+      'The dives here join the library. A dive logged separately on both devices will appear twice.';
+
+  @override
+  String get settings_setUpDevice_sync_replace =>
+      'Replace the dives here with the library';
+
+  @override
+  String get settings_setUpDevice_sync_replaceDetail =>
+      'A backup of the dives here is saved first, under Backups.';
+
+  @override
+  String get settings_setUpDevice_sync_keepInStepDetail =>
+      'A few seconds after each change, at launch and when the app returns';
+
+  @override
+  String get settings_setUpDevice_sync_turnOn => 'Turn on sync';
+
+  @override
+  String get settings_setUpDevice_sync_download => 'Download library';
+
+  @override
+  String get settings_setUpDevice_sync_combineAndDownload =>
+      'Combine and download';
+
+  @override
+  String get settings_setUpDevice_sync_replaceAndDownload =>
+      'Replace and download';
+
+  @override
+  String get settings_setUpDevice_sync_noAccount =>
+      'Choose where your data is kept first.';
+
+  @override
+  String get settings_setUpDevice_replace_title => 'Replace the dives here?';
+
+  @override
+  String get settings_setUpDevice_replace_working =>
+      'Setting the dives here aside and downloading the library...';
+
+  @override
+  String get settings_setUpDevice_replace_doneTitle => 'Library downloaded';
+
+  @override
+  String get settings_setUpDevice_replace_stillUploading =>
+      'The library is still being uploaded from another device. Try again once it finishes.';
+
+  @override
+  String get settings_setUpDevice_replace_photosBusy =>
+      'Photo uploads are still finishing. Try again in a moment.';
+
+  @override
+  String get settings_setUpDevice_replace_failed =>
+      'The library could not be downloaded. Nothing was changed.';
+
+  @override
+  String settings_setUpDevice_sync_unreachable(String account) {
+    return 'Could not read $account. Check the connection and try again.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_noLibrary(String account) {
+    return '$account has no library to join yet.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_newerSchema(String devices) {
+    return '$devices use a newer version of Submersion. Update this device first.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_backupNote(String date) {
+    return 'Before joining the library, $date';
+  }
+
+  @override
+  String settings_setUpDevice_replace_body(int count, String account) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'The $count dives here are replaced by the library in $account. A backup of them is saved first and stays under Backups.',
+      one:
+          'The 1 dive here is replaced by the library in $account. A backup of it is saved first and stays under Backups.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_replace_doneBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Your $count dives were set aside and the library was downloaded. Submersion will reload.',
+      one:
+          'Your 1 dive was set aside and the library was downloaded. Submersion will reload.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_backups_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'A backup that survives a lost phone',
+      'tablet': 'A backup that survives a lost tablet',
+      'computer': 'A backup that survives a lost computer',
+      'other': 'A backup that survives a lost device',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_intro =>
+      'Sync keeps devices in step. A backup is a copy from a moment in time that you can go back to.';
+
+  @override
+  String settings_setUpDevice_backups_autoDetail(String frequency, int count) {
+    return '$frequency. The last $count are kept here.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_autoDetailDesktop(
+    String frequency,
+    int count,
+  ) {
+    return '$frequency, while Submersion is open. The last $count are kept here.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_copy(String account) {
+    return 'Also keep a copy in $account';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_noAccount =>
+      'A copy off this device needs an account or a backup folder.';
+
+  @override
+  String get settings_setUpDevice_backups_openBackups => 'Open Backups';
+
+  @override
+  String get settings_setUpDevice_backups_note =>
+      'Schedule, folder, password protection and old backups are under Backups.';
+
+  @override
+  String get settings_setUpDevice_photos_title => 'Photos on every device';
+
+  @override
+  String settings_setUpDevice_photos_firstIntro(String account) {
+    return 'Keep copies of your photos and videos in $account so your other devices can show them. Your originals stay where they are.';
+  }
+
+  @override
+  String settings_setUpDevice_photos_keepCopies(String account) {
+    return 'Keep photo copies in $account';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_firstNote =>
+      'Turn it on later under Photos & videos. Nothing is uploaded until you do.';
+
+  @override
+  String settings_setUpDevice_photos_secondIntro(String account) {
+    return 'Your other devices keep photo and video copies in $account. Show them here too?';
+  }
+
+  @override
+  String settings_setUpDevice_photos_useCopies(String account) {
+    return 'Use the photo copies in $account';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_sameAccount =>
+      'Same account. Nothing to type.';
+
+  @override
+  String settings_setUpDevice_photos_signInFirst(String account) {
+    return 'Signs in to $account first.';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_autoUploadHere =>
+      'Upload photos added here automatically';
+
+  @override
+  String settings_setUpDevice_photos_attachedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos and videos attached',
+      one: '$count photo or video attached',
+      zero: 'No photos or videos attached yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'This phone is set up',
+      'tablet': 'This tablet is set up',
+      'computer': 'This computer is set up',
+      'other': 'This device is set up',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_otherDevices(String account) {
+    return 'On your other devices, open Submersion, choose $account, and the same library appears.';
+  }
 }

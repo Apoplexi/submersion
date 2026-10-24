@@ -55168,4 +55168,289 @@ class AppLocalizationsDe extends AppLocalizations {
   String settings_setUpDevice_item_signInBackups(String account) {
     return 'Melden Sie sich erneut bei $account an. Sicherungen sind bis dahin pausiert.';
   }
+
+  @override
+  String get settings_setUpDevice_next => 'Weiter';
+
+  @override
+  String get settings_setUpDevice_notNow => 'Nicht jetzt';
+
+  @override
+  String get settings_setUpDevice_skip => 'Überspringen';
+
+  @override
+  String get settings_setUpDevice_account_title =>
+      'Wo soll Submersion Ihre Daten aufbewahren?';
+
+  @override
+  String get settings_setUpDevice_account_note =>
+      'Ihre Tauchgänge werden nur in dem Konto gespeichert, das Sie wählen. Submersion hat keinen eigenen Server.';
+
+  @override
+  String get settings_setUpDevice_account_backupFile =>
+      'Ich habe stattdessen eine Sicherungsdatei';
+
+  @override
+  String get settings_setUpDevice_offer_icloud =>
+      'Nutzt Ihre Apple-ID. Keine Anmeldung nötig.';
+
+  @override
+  String get settings_setUpDevice_offer_googleDrive => 'Mit Google anmelden';
+
+  @override
+  String get settings_setUpDevice_offer_dropbox => 'Mit Dropbox anmelden';
+
+  @override
+  String get settings_setUpDevice_offer_ownServer =>
+      'S3-kompatibler Speicher oder ein WebDAV-Server';
+
+  @override
+  String get settings_setUpDevice_sync_title => 'Tauchgänge auf jedem Gerät';
+
+  @override
+  String settings_setUpDevice_sync_signedIn(String account) {
+    return 'Angemeldet bei $account';
+  }
+
+  @override
+  String settings_setUpDevice_sync_noLibrary(String account) {
+    return '$account enthält noch keine Submersion-Bibliothek. Die Tauchgänge hier werden zur Bibliothek, die alle Ihre Geräte teilen.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_found(
+    String account,
+    String when,
+    String device,
+  ) {
+    return 'Ihre Bibliothek in $account gefunden, zuletzt geändert $when auf $device.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_foundPlain(String account) {
+    return 'Ihre Bibliothek in $account gefunden.';
+  }
+
+  @override
+  String get settings_setUpDevice_sync_foundEmpty =>
+      'Hier gibt es noch keine Tauchgänge, daher wird die Bibliothek einfach heruntergeladen.';
+
+  @override
+  String get settings_setUpDevice_sync_combine => 'Zusammenführen';
+
+  @override
+  String get settings_setUpDevice_sync_combineDetail =>
+      'Die Tauchgänge hier kommen zur Bibliothek hinzu. Ein Tauchgang, der auf beiden Geräten getrennt erfasst wurde, erscheint doppelt.';
+
+  @override
+  String get settings_setUpDevice_sync_replace =>
+      'Die Tauchgänge hier durch die Bibliothek ersetzen';
+
+  @override
+  String get settings_setUpDevice_sync_replaceDetail =>
+      'Zuerst wird eine Sicherung der Tauchgänge hier unter Sicherungen gespeichert.';
+
+  @override
+  String get settings_setUpDevice_sync_keepInStepDetail =>
+      'Wenige Sekunden nach jeder Änderung, beim Start und bei der Rückkehr zur App';
+
+  @override
+  String get settings_setUpDevice_sync_turnOn => 'Sync aktivieren';
+
+  @override
+  String get settings_setUpDevice_sync_download => 'Bibliothek herunterladen';
+
+  @override
+  String get settings_setUpDevice_sync_combineAndDownload =>
+      'Zusammenführen und herunterladen';
+
+  @override
+  String get settings_setUpDevice_sync_replaceAndDownload =>
+      'Ersetzen und herunterladen';
+
+  @override
+  String get settings_setUpDevice_sync_noAccount =>
+      'Wählen Sie zuerst, wo Ihre Daten liegen.';
+
+  @override
+  String get settings_setUpDevice_replace_title =>
+      'Die Tauchgänge hier ersetzen?';
+
+  @override
+  String get settings_setUpDevice_replace_working =>
+      'Die Tauchgänge hier werden beiseitegelegt und die Bibliothek heruntergeladen...';
+
+  @override
+  String get settings_setUpDevice_replace_doneTitle =>
+      'Bibliothek heruntergeladen';
+
+  @override
+  String get settings_setUpDevice_replace_stillUploading =>
+      'Die Bibliothek wird noch von einem anderen Gerät hochgeladen. Versuchen Sie es erneut, sobald das abgeschlossen ist.';
+
+  @override
+  String get settings_setUpDevice_replace_photosBusy =>
+      'Foto-Uploads laufen noch. Versuchen Sie es gleich noch einmal.';
+
+  @override
+  String get settings_setUpDevice_replace_failed =>
+      'Die Bibliothek konnte nicht heruntergeladen werden. Es wurde nichts geändert.';
+
+  @override
+  String settings_setUpDevice_sync_unreachable(String account) {
+    return '$account konnte nicht gelesen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_noLibrary(String account) {
+    return '$account enthält noch keine Bibliothek zum Beitreten.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_newerSchema(String devices) {
+    return '$devices nutzen eine neuere Version von Submersion. Aktualisieren Sie zuerst dieses Gerät.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_backupNote(String date) {
+    return 'Vor dem Beitritt zur Bibliothek, $date';
+  }
+
+  @override
+  String settings_setUpDevice_replace_body(int count, String account) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Die $count Tauchgänge hier werden durch die Bibliothek in $account ersetzt. Zuerst wird eine Sicherung davon gespeichert, die unter Sicherungen bleibt.',
+      one:
+          'Der 1 Tauchgang hier wird durch die Bibliothek in $account ersetzt. Zuerst wird eine Sicherung davon gespeichert, die unter Sicherungen bleibt.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_replace_doneBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Ihre $count Tauchgänge wurden beiseitegelegt und die Bibliothek heruntergeladen. Submersion wird neu geladen.',
+      one:
+          'Ihr 1 Tauchgang wurde beiseitegelegt und die Bibliothek heruntergeladen. Submersion wird neu geladen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_backups_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'Eine Sicherung, die ein verlorenes Telefon übersteht',
+      'tablet': 'Eine Sicherung, die ein verlorenes Tablet übersteht',
+      'computer': 'Eine Sicherung, die einen verlorenen Computer übersteht',
+      'other': 'Eine Sicherung, die ein verlorenes Gerät übersteht',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_intro =>
+      'Sync hält Geräte auf demselben Stand. Eine Sicherung ist eine Kopie eines Zeitpunkts, zu dem Sie zurückkehren können.';
+
+  @override
+  String settings_setUpDevice_backups_autoDetail(String frequency, int count) {
+    return '$frequency. Die letzten $count werden hier aufbewahrt.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_autoDetailDesktop(
+    String frequency,
+    int count,
+  ) {
+    return '$frequency, solange Submersion geöffnet ist. Die letzten $count werden hier aufbewahrt.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_copy(String account) {
+    return 'Auch eine Kopie in $account aufbewahren';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_noAccount =>
+      'Eine Kopie außerhalb dieses Geräts braucht ein Konto oder einen Sicherungsordner.';
+
+  @override
+  String get settings_setUpDevice_backups_openBackups => 'Sicherungen öffnen';
+
+  @override
+  String get settings_setUpDevice_backups_note =>
+      'Zeitplan, Ordner, Passwortschutz und ältere Sicherungen finden Sie unter Sicherungen.';
+
+  @override
+  String get settings_setUpDevice_photos_title => 'Fotos auf jedem Gerät';
+
+  @override
+  String settings_setUpDevice_photos_firstIntro(String account) {
+    return 'Bewahren Sie Kopien Ihrer Fotos und Videos in $account auf, damit Ihre anderen Geräte sie anzeigen können. Ihre Originale bleiben, wo sie sind.';
+  }
+
+  @override
+  String settings_setUpDevice_photos_keepCopies(String account) {
+    return 'Fotokopien in $account aufbewahren';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_firstNote =>
+      'Sie können es später unter Fotos & Videos einschalten. Bis dahin wird nichts hochgeladen.';
+
+  @override
+  String settings_setUpDevice_photos_secondIntro(String account) {
+    return 'Ihre anderen Geräte bewahren Foto- und Videokopien in $account auf. Auch hier anzeigen?';
+  }
+
+  @override
+  String settings_setUpDevice_photos_useCopies(String account) {
+    return 'Die Fotokopien in $account verwenden';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_sameAccount =>
+      'Dasselbe Konto. Nichts einzugeben.';
+
+  @override
+  String settings_setUpDevice_photos_signInFirst(String account) {
+    return 'Meldet sich zuerst bei $account an.';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_autoUploadHere =>
+      'Hier hinzugefügte Fotos automatisch hochladen';
+
+  @override
+  String settings_setUpDevice_photos_attachedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos und Videos verknüpft',
+      one: '$count Foto oder Video verknüpft',
+      zero: 'Noch keine Fotos oder Videos verknüpft',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'Dieses Telefon ist eingerichtet',
+      'tablet': 'Dieses Tablet ist eingerichtet',
+      'computer': 'Dieser Computer ist eingerichtet',
+      'other': 'Dieses Gerät ist eingerichtet',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_otherDevices(String account) {
+    return 'Öffnen Sie Submersion auf Ihren anderen Geräten, wählen Sie $account, und dieselbe Bibliothek erscheint.';
+  }
 }

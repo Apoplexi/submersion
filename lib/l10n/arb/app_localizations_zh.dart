@@ -51916,4 +51916,264 @@ class AppLocalizationsZh extends AppLocalizations {
   String settings_setUpDevice_item_signInBackups(String account) {
     return '请重新登录 $account。在此之前，备份已暂停。';
   }
+
+  @override
+  String get settings_setUpDevice_next => '下一步';
+
+  @override
+  String get settings_setUpDevice_notNow => '以后再说';
+
+  @override
+  String get settings_setUpDevice_skip => '跳过';
+
+  @override
+  String get settings_setUpDevice_account_title => 'Submersion 应将你的数据保存在哪里？';
+
+  @override
+  String get settings_setUpDevice_account_note =>
+      '你的潜水记录只保存在你选择的账户中。Submersion 没有自己的服务器。';
+
+  @override
+  String get settings_setUpDevice_account_backupFile => '我有备份文件';
+
+  @override
+  String get settings_setUpDevice_offer_icloud => '使用你的 Apple ID，无需登录。';
+
+  @override
+  String get settings_setUpDevice_offer_googleDrive => '使用 Google 登录';
+
+  @override
+  String get settings_setUpDevice_offer_dropbox => '使用 Dropbox 登录';
+
+  @override
+  String get settings_setUpDevice_offer_ownServer => '兼容 S3 的存储或 WebDAV 服务器';
+
+  @override
+  String get settings_setUpDevice_sync_title => '让每台设备都有潜水记录';
+
+  @override
+  String settings_setUpDevice_sync_signedIn(String account) {
+    return '已登录 $account';
+  }
+
+  @override
+  String settings_setUpDevice_sync_noLibrary(String account) {
+    return '$account 中还没有 Submersion 资料库。这里的潜水记录将成为你所有设备共享的资料库。';
+  }
+
+  @override
+  String settings_setUpDevice_sync_found(
+    String account,
+    String when,
+    String device,
+  ) {
+    return '已在 $account 中找到你的资料库，最后于$when在 $device 上更改。';
+  }
+
+  @override
+  String settings_setUpDevice_sync_foundPlain(String account) {
+    return '已在 $account 中找到你的资料库。';
+  }
+
+  @override
+  String get settings_setUpDevice_sync_foundEmpty => '这里还没有潜水记录，因此只需下载资料库。';
+
+  @override
+  String get settings_setUpDevice_sync_combine => '合并';
+
+  @override
+  String get settings_setUpDevice_sync_combineDetail =>
+      '这里的潜水记录会加入资料库。在两台设备上分别记录的同一次潜水会出现两次。';
+
+  @override
+  String get settings_setUpDevice_sync_replace => '用资料库替换这里的潜水记录';
+
+  @override
+  String get settings_setUpDevice_sync_replaceDetail => '会先在“备份”中保存这里潜水记录的备份。';
+
+  @override
+  String get settings_setUpDevice_sync_keepInStepDetail =>
+      '每次更改后几秒内、启动时以及返回应用时';
+
+  @override
+  String get settings_setUpDevice_sync_turnOn => '开启同步';
+
+  @override
+  String get settings_setUpDevice_sync_download => '下载资料库';
+
+  @override
+  String get settings_setUpDevice_sync_combineAndDownload => '合并并下载';
+
+  @override
+  String get settings_setUpDevice_sync_replaceAndDownload => '替换并下载';
+
+  @override
+  String get settings_setUpDevice_sync_noAccount => '请先选择数据的存放位置。';
+
+  @override
+  String get settings_setUpDevice_replace_title => '替换这里的潜水记录？';
+
+  @override
+  String get settings_setUpDevice_replace_working => '正在搁置这里的潜水记录并下载资料库...';
+
+  @override
+  String get settings_setUpDevice_replace_doneTitle => '资料库已下载';
+
+  @override
+  String get settings_setUpDevice_replace_stillUploading =>
+      '资料库仍在从另一台设备上传。完成后再试。';
+
+  @override
+  String get settings_setUpDevice_replace_photosBusy => '照片上传仍在进行。请稍后再试。';
+
+  @override
+  String get settings_setUpDevice_replace_failed => '无法下载资料库，未做任何更改。';
+
+  @override
+  String settings_setUpDevice_sync_unreachable(String account) {
+    return '无法读取 $account。请检查连接后重试。';
+  }
+
+  @override
+  String settings_setUpDevice_replace_noLibrary(String account) {
+    return '$account 中还没有可加入的资料库。';
+  }
+
+  @override
+  String settings_setUpDevice_replace_newerSchema(String devices) {
+    return '$devices 使用的是较新版本的 Submersion。请先更新此设备。';
+  }
+
+  @override
+  String settings_setUpDevice_replace_backupNote(String date) {
+    return '加入资料库之前，$date';
+  }
+
+  @override
+  String settings_setUpDevice_replace_body(int count, String account) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '这里的 $count 条潜水记录将被 $account 中的资料库替换。会先保存备份，并保留在“备份”中。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_replace_doneBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '你的 $count 条潜水记录已搁置，资料库已下载。Submersion 将重新加载。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_backups_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': '丢了手机也不怕的备份',
+      'tablet': '丢了平板也不怕的备份',
+      'computer': '丢了电脑也不怕的备份',
+      'other': '丢了设备也不怕的备份',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_intro =>
+      '同步让各设备保持一致。备份是某一时刻的副本，你可以随时回到那一刻。';
+
+  @override
+  String settings_setUpDevice_backups_autoDetail(String frequency, int count) {
+    return '$frequency。此处保留最近 $count 份。';
+  }
+
+  @override
+  String settings_setUpDevice_backups_autoDetailDesktop(
+    String frequency,
+    int count,
+  ) {
+    return '$frequency，在 Submersion 打开时进行。此处保留最近 $count 份。';
+  }
+
+  @override
+  String settings_setUpDevice_backups_copy(String account) {
+    return '同时在 $account 中保留一份副本';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_noAccount =>
+      '要在此设备之外保留副本，需要一个账户或备份文件夹。';
+
+  @override
+  String get settings_setUpDevice_backups_openBackups => '打开备份';
+
+  @override
+  String get settings_setUpDevice_backups_note => '计划、文件夹、密码保护和旧备份都在“备份”中。';
+
+  @override
+  String get settings_setUpDevice_photos_title => '让每台设备都有照片';
+
+  @override
+  String settings_setUpDevice_photos_firstIntro(String account) {
+    return '在 $account 中保留照片和视频的副本，让你的其他设备也能显示它们。原件保持原样。';
+  }
+
+  @override
+  String settings_setUpDevice_photos_keepCopies(String account) {
+    return '在 $account 中保留照片副本';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_firstNote =>
+      '之后可在“照片和视频”中开启。在此之前不会上传任何内容。';
+
+  @override
+  String settings_setUpDevice_photos_secondIntro(String account) {
+    return '你的其他设备在 $account 中保存了照片和视频副本。也要在这里显示吗？';
+  }
+
+  @override
+  String settings_setUpDevice_photos_useCopies(String account) {
+    return '使用 $account 中的照片副本';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_sameAccount => '同一账户，无需输入任何内容。';
+
+  @override
+  String settings_setUpDevice_photos_signInFirst(String account) {
+    return '将先登录 $account。';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_autoUploadHere => '自动上传在这里添加的照片';
+
+  @override
+  String settings_setUpDevice_photos_attachedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已关联 $count 张照片和视频',
+      zero: '尚未关联照片或视频',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': '这部手机已设置完成',
+      'tablet': '这台平板已设置完成',
+      'computer': '这台电脑已设置完成',
+      'other': '此设备已设置完成',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_otherDevices(String account) {
+    return '在你的其他设备上打开 Submersion，选择 $account，就会出现同一个资料库。';
+  }
 }

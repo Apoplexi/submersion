@@ -54134,4 +54134,284 @@ class AppLocalizationsHe extends AppLocalizations {
   String settings_setUpDevice_item_signInBackups(String account) {
     return 'יש להתחבר שוב אל $account. הגיבויים מושהים עד אז.';
   }
+
+  @override
+  String get settings_setUpDevice_next => 'הבא';
+
+  @override
+  String get settings_setUpDevice_notNow => 'לא עכשיו';
+
+  @override
+  String get settings_setUpDevice_skip => 'דילוג';
+
+  @override
+  String get settings_setUpDevice_account_title =>
+      'היכן ש-Submersion ישמור את הנתונים שלך?';
+
+  @override
+  String get settings_setUpDevice_account_note =>
+      'הצלילות שלך נשמרות רק בחשבון שבחרת. ל-Submersion אין שרת משלה.';
+
+  @override
+  String get settings_setUpDevice_account_backupFile =>
+      'יש לי קובץ גיבוי במקום';
+
+  @override
+  String get settings_setUpDevice_offer_icloud =>
+      'משתמש ב-Apple ID שלך. אין צורך להתחבר.';
+
+  @override
+  String get settings_setUpDevice_offer_googleDrive => 'התחברות עם Google';
+
+  @override
+  String get settings_setUpDevice_offer_dropbox => 'התחברות עם Dropbox';
+
+  @override
+  String get settings_setUpDevice_offer_ownServer =>
+      'אחסון תואם S3 או שרת WebDAV';
+
+  @override
+  String get settings_setUpDevice_sync_title => 'הצלילות בכל מכשיר';
+
+  @override
+  String settings_setUpDevice_sync_signedIn(String account) {
+    return 'מחובר אל $account';
+  }
+
+  @override
+  String settings_setUpDevice_sync_noLibrary(String account) {
+    return 'ב-$account עדיין אין ספריית Submersion. הצלילות כאן יהפכו לספרייה שכל המכשירים שלך חולקים.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_found(
+    String account,
+    String when,
+    String device,
+  ) {
+    return 'הספרייה שלך נמצאה ב-$account, שונתה לאחרונה $when ב-$device.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_foundPlain(String account) {
+    return 'הספרייה שלך נמצאה ב-$account.';
+  }
+
+  @override
+  String get settings_setUpDevice_sync_foundEmpty =>
+      'עדיין אין כאן צלילות, ולכן הספרייה פשוט מורדת.';
+
+  @override
+  String get settings_setUpDevice_sync_combine => 'לשלב אותן';
+
+  @override
+  String get settings_setUpDevice_sync_combineDetail =>
+      'הצלילות כאן מצטרפות לספרייה. צלילה שתועדה בנפרד בשני המכשירים תופיע פעמיים.';
+
+  @override
+  String get settings_setUpDevice_sync_replace =>
+      'להחליף את הצלילות כאן בספרייה';
+
+  @override
+  String get settings_setUpDevice_sync_replaceDetail =>
+      'קודם נשמר גיבוי של הצלילות כאן, תחת גיבויים.';
+
+  @override
+  String get settings_setUpDevice_sync_keepInStepDetail =>
+      'כמה שניות אחרי כל שינוי, בהפעלה ובחזרה לאפליקציה';
+
+  @override
+  String get settings_setUpDevice_sync_turnOn => 'הפעלת סנכרון';
+
+  @override
+  String get settings_setUpDevice_sync_download => 'הורדת הספרייה';
+
+  @override
+  String get settings_setUpDevice_sync_combineAndDownload => 'שילוב והורדה';
+
+  @override
+  String get settings_setUpDevice_sync_replaceAndDownload => 'החלפה והורדה';
+
+  @override
+  String get settings_setUpDevice_sync_noAccount =>
+      'קודם יש לבחור היכן הנתונים נשמרים.';
+
+  @override
+  String get settings_setUpDevice_replace_title => 'להחליף את הצלילות כאן?';
+
+  @override
+  String get settings_setUpDevice_replace_working =>
+      'מניחים בצד את הצלילות כאן ומורידים את הספרייה...';
+
+  @override
+  String get settings_setUpDevice_replace_doneTitle => 'הספרייה הורדה';
+
+  @override
+  String get settings_setUpDevice_replace_stillUploading =>
+      'הספרייה עדיין מועלית ממכשיר אחר. אפשר לנסות שוב כשזה יסתיים.';
+
+  @override
+  String get settings_setUpDevice_replace_photosBusy =>
+      'העלאות התמונות עדיין מסתיימות. אפשר לנסות שוב בעוד רגע.';
+
+  @override
+  String get settings_setUpDevice_replace_failed =>
+      'לא ניתן היה להוריד את הספרייה. שום דבר לא השתנה.';
+
+  @override
+  String settings_setUpDevice_sync_unreachable(String account) {
+    return 'לא ניתן לקרוא את $account. יש לבדוק את החיבור ולנסות שוב.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_noLibrary(String account) {
+    return 'ב-$account עדיין אין ספרייה להצטרף אליה.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_newerSchema(String devices) {
+    return '$devices משתמשים בגרסה חדשה יותר של Submersion. יש לעדכן קודם את המכשיר הזה.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_backupNote(String date) {
+    return 'לפני ההצטרפות לספרייה, $date';
+  }
+
+  @override
+  String settings_setUpDevice_replace_body(int count, String account) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count הצלילות כאן מוחלפות בספרייה ב-$account. קודם נשמר מהן גיבוי, שנשאר תחת גיבויים.',
+      one:
+          'הצלילה כאן מוחלפת בספרייה ב-$account. קודם נשמר ממנה גיבוי, שנשאר תחת גיבויים.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_replace_doneBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count הצלילות שלך הונחו בצד והספרייה הורדה. Submersion ייטען מחדש.',
+      one: 'הצלילה שלך הונחה בצד והספרייה הורדה. Submersion ייטען מחדש.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_backups_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'גיבוי ששורד אובדן של הטלפון',
+      'tablet': 'גיבוי ששורד אובדן של הטאבלט',
+      'computer': 'גיבוי ששורד אובדן של המחשב',
+      'other': 'גיבוי ששורד אובדן של המכשיר',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_intro =>
+      'סנכרון שומר על המכשירים מתואמים. גיבוי הוא עותק מרגע מסוים שאפשר לחזור אליו.';
+
+  @override
+  String settings_setUpDevice_backups_autoDetail(String frequency, int count) {
+    return '$frequency. $count האחרונים נשמרים כאן.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_autoDetailDesktop(
+    String frequency,
+    int count,
+  ) {
+    return '$frequency, כל עוד Submersion פתוח. $count האחרונים נשמרים כאן.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_copy(String account) {
+    return 'לשמור גם עותק ב-$account';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_noAccount =>
+      'עותק מחוץ למכשיר הזה דורש חשבון או תיקיית גיבוי.';
+
+  @override
+  String get settings_setUpDevice_backups_openBackups => 'פתיחת גיבויים';
+
+  @override
+  String get settings_setUpDevice_backups_note =>
+      'התזמון, התיקייה, ההגנה בסיסמה והגיבויים הישנים נמצאים תחת גיבויים.';
+
+  @override
+  String get settings_setUpDevice_photos_title => 'התמונות בכל מכשיר';
+
+  @override
+  String settings_setUpDevice_photos_firstIntro(String account) {
+    return 'שמירת עותקים של התמונות והסרטונים ב-$account כדי שהמכשירים האחרים שלך יוכלו להציג אותם. המקוריים נשארים במקומם.';
+  }
+
+  @override
+  String settings_setUpDevice_photos_keepCopies(String account) {
+    return 'לשמור עותקים של תמונות ב-$account';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_firstNote =>
+      'אפשר להפעיל זאת אחר כך תחת תמונות וסרטונים. עד אז שום דבר לא מועלה.';
+
+  @override
+  String settings_setUpDevice_photos_secondIntro(String account) {
+    return 'המכשירים האחרים שלך שומרים עותקים של תמונות וסרטונים ב-$account. להציג אותם גם כאן?';
+  }
+
+  @override
+  String settings_setUpDevice_photos_useCopies(String account) {
+    return 'להשתמש בעותקי התמונות ב-$account';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_sameAccount =>
+      'אותו חשבון. אין מה להקליד.';
+
+  @override
+  String settings_setUpDevice_photos_signInFirst(String account) {
+    return 'מתחבר קודם אל $account.';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_autoUploadHere =>
+      'להעלות אוטומטית תמונות שנוספו כאן';
+
+  @override
+  String settings_setUpDevice_photos_attachedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות וסרטונים מקושרים',
+      one: 'תמונה או סרטון אחד מקושר',
+      zero: 'עדיין אין תמונות או סרטונים מקושרים',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'הטלפון הזה מוגדר',
+      'tablet': 'הטאבלט הזה מוגדר',
+      'computer': 'המחשב הזה מוגדר',
+      'other': 'המכשיר הזה מוגדר',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_otherDevices(String account) {
+    return 'במכשירים האחרים שלך, פתחו את Submersion, בחרו $account, ואותה ספרייה תופיע.';
+  }
 }

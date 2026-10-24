@@ -87524,6 +87524,361 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in to {account} again. Backups are paused until you do.'**
   String settings_setUpDevice_item_signInBackups(String account);
+
+  /// Primary button of a setup step that moves to the next step
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get settings_setUpDevice_next;
+
+  /// Leaves the setup flow without finishing the step; nothing is changed
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get settings_setUpDevice_notNow;
+
+  /// Skips the optional photo step of the setup flow
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get settings_setUpDevice_skip;
+
+  /// Title of setup step 1, choosing the account that keeps the data
+  ///
+  /// In en, this message translates to:
+  /// **'Where should Submersion keep your data?'**
+  String get settings_setUpDevice_account_title;
+
+  /// Note under the accounts in setup step 1
+  ///
+  /// In en, this message translates to:
+  /// **'Your dives are stored only in the account you choose. Submersion has no server of its own.'**
+  String get settings_setUpDevice_account_note;
+
+  /// Link in setup step 1 that restores from a backup file instead
+  ///
+  /// In en, this message translates to:
+  /// **'I have a backup file instead'**
+  String get settings_setUpDevice_account_backupFile;
+
+  /// Under iCloud in setup step 1: what adding it takes
+  ///
+  /// In en, this message translates to:
+  /// **'Uses your Apple ID. Nothing to sign in to.'**
+  String get settings_setUpDevice_offer_icloud;
+
+  /// Under Google Drive in setup step 1: what adding it takes
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get settings_setUpDevice_offer_googleDrive;
+
+  /// Under Dropbox in setup step 1: what adding it takes
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Dropbox'**
+  String get settings_setUpDevice_offer_dropbox;
+
+  /// Under My own server in setup step 1: what it is
+  ///
+  /// In en, this message translates to:
+  /// **'S3-compatible storage or a WebDAV server'**
+  String get settings_setUpDevice_offer_ownServer;
+
+  /// Title of setup step 2, syncing dives between devices
+  ///
+  /// In en, this message translates to:
+  /// **'Dives on every device'**
+  String get settings_setUpDevice_sync_title;
+
+  /// Opening line of setup step 2
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in to {account}'**
+  String settings_setUpDevice_sync_signedIn(String account);
+
+  /// Step 2: the account holds no library yet
+  ///
+  /// In en, this message translates to:
+  /// **'{account} has no Submersion library yet. The dives here will become the library all your devices share.'**
+  String settings_setUpDevice_sync_noLibrary(String account);
+
+  /// Step 2: a library exists; when is like 3 hours ago, device is the other device's name
+  ///
+  /// In en, this message translates to:
+  /// **'Found your library in {account}, last changed {when} on {device}.'**
+  String settings_setUpDevice_sync_found(
+    String account,
+    String when,
+    String device,
+  );
+
+  /// Step 2: a library exists, with no device or time known
+  ///
+  /// In en, this message translates to:
+  /// **'Found your library in {account}.'**
+  String settings_setUpDevice_sync_foundPlain(String account);
+
+  /// Step 2: this device has no dives, so the library is downloaded
+  ///
+  /// In en, this message translates to:
+  /// **'There are no dives here yet, so the library is simply downloaded.'**
+  String get settings_setUpDevice_sync_foundEmpty;
+
+  /// Step 2 choice: combine this device's dives with the library
+  ///
+  /// In en, this message translates to:
+  /// **'Combine them'**
+  String get settings_setUpDevice_sync_combine;
+
+  /// Explains combining in step 2
+  ///
+  /// In en, this message translates to:
+  /// **'The dives here join the library. A dive logged separately on both devices will appear twice.'**
+  String get settings_setUpDevice_sync_combineDetail;
+
+  /// Step 2 choice: replace this device's dives with the library
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the dives here with the library'**
+  String get settings_setUpDevice_sync_replace;
+
+  /// Explains replacing in step 2
+  ///
+  /// In en, this message translates to:
+  /// **'A backup of the dives here is saved first, under Backups.'**
+  String get settings_setUpDevice_sync_replaceDetail;
+
+  /// Subtitle of Keep devices in step automatically in step 2
+  ///
+  /// In en, this message translates to:
+  /// **'A few seconds after each change, at launch and when the app returns'**
+  String get settings_setUpDevice_sync_keepInStepDetail;
+
+  /// Step 2 primary button: start syncing (no library yet)
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on sync'**
+  String get settings_setUpDevice_sync_turnOn;
+
+  /// Step 2 primary button: download the library onto an empty device
+  ///
+  /// In en, this message translates to:
+  /// **'Download library'**
+  String get settings_setUpDevice_sync_download;
+
+  /// Step 2 primary button: combine, then download
+  ///
+  /// In en, this message translates to:
+  /// **'Combine and download'**
+  String get settings_setUpDevice_sync_combineAndDownload;
+
+  /// Step 2 primary button: replace, then download
+  ///
+  /// In en, this message translates to:
+  /// **'Replace and download'**
+  String get settings_setUpDevice_sync_replaceAndDownload;
+
+  /// Step 2 opened with no account chosen
+  ///
+  /// In en, this message translates to:
+  /// **'Choose where your data is kept first.'**
+  String get settings_setUpDevice_sync_noAccount;
+
+  /// Title of the typed-word dialog that confirms replacing this device's dives
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the dives here?'**
+  String get settings_setUpDevice_replace_title;
+
+  /// Shown while this device's dives are set aside and the library downloads
+  ///
+  /// In en, this message translates to:
+  /// **'Setting the dives here aside and downloading the library...'**
+  String get settings_setUpDevice_replace_working;
+
+  /// Title once the library replaced this device's dives
+  ///
+  /// In en, this message translates to:
+  /// **'Library downloaded'**
+  String get settings_setUpDevice_replace_doneTitle;
+
+  /// Replace refused: another device has not finished uploading
+  ///
+  /// In en, this message translates to:
+  /// **'The library is still being uploaded from another device. Try again once it finishes.'**
+  String get settings_setUpDevice_replace_stillUploading;
+
+  /// Replace refused: photo uploads are still finishing
+  ///
+  /// In en, this message translates to:
+  /// **'Photo uploads are still finishing. Try again in a moment.'**
+  String get settings_setUpDevice_replace_photosBusy;
+
+  /// Replace failed before anything changed
+  ///
+  /// In en, this message translates to:
+  /// **'The library could not be downloaded. Nothing was changed.'**
+  String get settings_setUpDevice_replace_failed;
+
+  /// Step 2 could not read the account
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read {account}. Check the connection and try again.'**
+  String settings_setUpDevice_sync_unreachable(String account);
+
+  /// Replace refused: the account has no library
+  ///
+  /// In en, this message translates to:
+  /// **'{account} has no library to join yet.'**
+  String settings_setUpDevice_replace_noLibrary(String account);
+
+  /// Replace refused: other devices run a newer version; devices is a list of names
+  ///
+  /// In en, this message translates to:
+  /// **'{devices} use a newer version of Submersion. Update this device first.'**
+  String settings_setUpDevice_replace_newerSchema(String devices);
+
+  /// Note on the backup saved before replacing; date is a short date
+  ///
+  /// In en, this message translates to:
+  /// **'Before joining the library, {date}'**
+  String settings_setUpDevice_replace_backupNote(String date);
+
+  /// Body of the typed-word dialog that confirms replacing this device's dives
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{The 1 dive here is replaced by the library in {account}. A backup of it is saved first and stays under Backups.} other{The {count} dives here are replaced by the library in {account}. A backup of them is saved first and stays under Backups.}}'**
+  String settings_setUpDevice_replace_body(int count, String account);
+
+  /// Shown once this device's dives were set aside and the library downloaded
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your 1 dive was set aside and the library was downloaded. Submersion will reload.} other{Your {count} dives were set aside and the library was downloaded. Submersion will reload.}}'**
+  String settings_setUpDevice_replace_doneBody(int count);
+
+  /// Title of setup step 3, automatic backups
+  ///
+  /// In en, this message translates to:
+  /// **'{device, select, phone{A backup that survives a lost phone} tablet{A backup that survives a lost tablet} computer{A backup that survives a lost computer} other{A backup that survives a lost device}}'**
+  String settings_setUpDevice_backups_title(String device);
+
+  /// Opening sentences of setup step 3
+  ///
+  /// In en, this message translates to:
+  /// **'Sync keeps devices in step. A backup is a copy from a moment in time that you can go back to.'**
+  String get settings_setUpDevice_backups_intro;
+
+  /// Subtitle of Back up automatically in step 3; frequency is like Weekly
+  ///
+  /// In en, this message translates to:
+  /// **'{frequency}. The last {count} are kept here.'**
+  String settings_setUpDevice_backups_autoDetail(String frequency, int count);
+
+  /// Subtitle of Back up automatically in step 3 on a computer; frequency is like Weekly
+  ///
+  /// In en, this message translates to:
+  /// **'{frequency}, while Submersion is open. The last {count} are kept here.'**
+  String settings_setUpDevice_backups_autoDetailDesktop(
+    String frequency,
+    int count,
+  );
+
+  /// Step 3 switch: also copy each backup to an account
+  ///
+  /// In en, this message translates to:
+  /// **'Also keep a copy in {account}'**
+  String settings_setUpDevice_backups_copy(String account);
+
+  /// Step 3 when no account exists for a copy
+  ///
+  /// In en, this message translates to:
+  /// **'A copy off this device needs an account or a backup folder.'**
+  String get settings_setUpDevice_backups_noAccount;
+
+  /// Link in step 3 that opens the Backups page
+  ///
+  /// In en, this message translates to:
+  /// **'Open Backups'**
+  String get settings_setUpDevice_backups_openBackups;
+
+  /// Note at the end of step 3
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule, folder, password protection and old backups are under Backups.'**
+  String get settings_setUpDevice_backups_note;
+
+  /// Title of setup step 4, sharing photo copies
+  ///
+  /// In en, this message translates to:
+  /// **'Photos on every device'**
+  String get settings_setUpDevice_photos_title;
+
+  /// Step 4 intro when no device keeps photo copies yet
+  ///
+  /// In en, this message translates to:
+  /// **'Keep copies of your photos and videos in {account} so your other devices can show them. Your originals stay where they are.'**
+  String settings_setUpDevice_photos_firstIntro(String account);
+
+  /// Step 4 switch on a first device
+  ///
+  /// In en, this message translates to:
+  /// **'Keep photo copies in {account}'**
+  String settings_setUpDevice_photos_keepCopies(String account);
+
+  /// Note in step 4 on a first device
+  ///
+  /// In en, this message translates to:
+  /// **'Turn it on later under Photos & videos. Nothing is uploaded until you do.'**
+  String get settings_setUpDevice_photos_firstNote;
+
+  /// Step 4 intro when the library keeps photo copies in an account
+  ///
+  /// In en, this message translates to:
+  /// **'Your other devices keep photo and video copies in {account}. Show them here too?'**
+  String settings_setUpDevice_photos_secondIntro(String account);
+
+  /// Step 4 switch on a second device
+  ///
+  /// In en, this message translates to:
+  /// **'Use the photo copies in {account}'**
+  String settings_setUpDevice_photos_useCopies(String account);
+
+  /// Subtitle when the photo copies are in the account just chosen
+  ///
+  /// In en, this message translates to:
+  /// **'Same account. Nothing to type.'**
+  String get settings_setUpDevice_photos_sameAccount;
+
+  /// Subtitle when the photo copies are in another account that needs signing in
+  ///
+  /// In en, this message translates to:
+  /// **'Signs in to {account} first.'**
+  String settings_setUpDevice_photos_signInFirst(String account);
+
+  /// Step 4 switch on a second device: upload photos added here
+  ///
+  /// In en, this message translates to:
+  /// **'Upload photos added here automatically'**
+  String get settings_setUpDevice_photos_autoUploadHere;
+
+  /// Subtitle of the step 4 switch: photos and videos attached to dives here
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No photos or videos attached yet} =1{{count} photo or video attached} other{{count} photos and videos attached}}'**
+  String settings_setUpDevice_photos_attachedCount(int count);
+
+  /// Heading of the screen after the last setup step
+  ///
+  /// In en, this message translates to:
+  /// **'{device, select, phone{This phone is set up} tablet{This tablet is set up} computer{This computer is set up} other{This device is set up}}'**
+  String settings_setUpDevice_done_title(String device);
+
+  /// Closing sentence of the setup done screen
+  ///
+  /// In en, this message translates to:
+  /// **'On your other devices, open Submersion, choose {account}, and the same library appears.'**
+  String settings_setUpDevice_done_otherDevices(String account);
 }
 
 class _AppLocalizationsDelegate

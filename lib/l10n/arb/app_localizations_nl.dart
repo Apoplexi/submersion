@@ -54947,4 +54947,287 @@ class AppLocalizationsNl extends AppLocalizations {
   String settings_setUpDevice_item_signInBackups(String account) {
     return 'Log opnieuw in bij $account. Back-ups staan tot dan stil.';
   }
+
+  @override
+  String get settings_setUpDevice_next => 'Volgende';
+
+  @override
+  String get settings_setUpDevice_notNow => 'Niet nu';
+
+  @override
+  String get settings_setUpDevice_skip => 'Overslaan';
+
+  @override
+  String get settings_setUpDevice_account_title =>
+      'Waar moet Submersion je gegevens bewaren?';
+
+  @override
+  String get settings_setUpDevice_account_note =>
+      'Je duiken worden alleen opgeslagen in het account dat je kiest. Submersion heeft geen eigen server.';
+
+  @override
+  String get settings_setUpDevice_account_backupFile =>
+      'Ik heb in plaats daarvan een back-upbestand';
+
+  @override
+  String get settings_setUpDevice_offer_icloud =>
+      'Gebruikt je Apple ID. Je hoeft nergens in te loggen.';
+
+  @override
+  String get settings_setUpDevice_offer_googleDrive => 'Inloggen met Google';
+
+  @override
+  String get settings_setUpDevice_offer_dropbox => 'Inloggen met Dropbox';
+
+  @override
+  String get settings_setUpDevice_offer_ownServer =>
+      'S3-compatibele opslag of een WebDAV-server';
+
+  @override
+  String get settings_setUpDevice_sync_title => 'Duiken op elk apparaat';
+
+  @override
+  String settings_setUpDevice_sync_signedIn(String account) {
+    return 'Ingelogd bij $account';
+  }
+
+  @override
+  String settings_setUpDevice_sync_noLibrary(String account) {
+    return '$account heeft nog geen Submersion-bibliotheek. De duiken hier worden de bibliotheek die al je apparaten delen.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_found(
+    String account,
+    String when,
+    String device,
+  ) {
+    return 'Je bibliotheek gevonden in $account, laatst gewijzigd $when op $device.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_foundPlain(String account) {
+    return 'Je bibliotheek gevonden in $account.';
+  }
+
+  @override
+  String get settings_setUpDevice_sync_foundEmpty =>
+      'Hier staan nog geen duiken, dus de bibliotheek wordt gewoon gedownload.';
+
+  @override
+  String get settings_setUpDevice_sync_combine => 'Samenvoegen';
+
+  @override
+  String get settings_setUpDevice_sync_combineDetail =>
+      'De duiken hier komen bij de bibliotheek. Een duik die op beide apparaten apart is gelogd, verschijnt twee keer.';
+
+  @override
+  String get settings_setUpDevice_sync_replace =>
+      'De duiken hier vervangen door de bibliotheek';
+
+  @override
+  String get settings_setUpDevice_sync_replaceDetail =>
+      'Eerst wordt een back-up van de duiken hier opgeslagen, onder Back-ups.';
+
+  @override
+  String get settings_setUpDevice_sync_keepInStepDetail =>
+      'Een paar seconden na elke wijziging, bij het starten en wanneer je terugkeert naar de app';
+
+  @override
+  String get settings_setUpDevice_sync_turnOn => 'Synchronisatie aanzetten';
+
+  @override
+  String get settings_setUpDevice_sync_download => 'Bibliotheek downloaden';
+
+  @override
+  String get settings_setUpDevice_sync_combineAndDownload =>
+      'Samenvoegen en downloaden';
+
+  @override
+  String get settings_setUpDevice_sync_replaceAndDownload =>
+      'Vervangen en downloaden';
+
+  @override
+  String get settings_setUpDevice_sync_noAccount =>
+      'Kies eerst waar je gegevens staan.';
+
+  @override
+  String get settings_setUpDevice_replace_title => 'De duiken hier vervangen?';
+
+  @override
+  String get settings_setUpDevice_replace_working =>
+      'De duiken hier worden opzijgezet en de bibliotheek wordt gedownload...';
+
+  @override
+  String get settings_setUpDevice_replace_doneTitle => 'Bibliotheek gedownload';
+
+  @override
+  String get settings_setUpDevice_replace_stillUploading =>
+      'De bibliotheek wordt nog geüpload vanaf een ander apparaat. Probeer het opnieuw zodra dat klaar is.';
+
+  @override
+  String get settings_setUpDevice_replace_photosBusy =>
+      'Foto-uploads zijn nog bezig. Probeer het zo meteen opnieuw.';
+
+  @override
+  String get settings_setUpDevice_replace_failed =>
+      'De bibliotheek kon niet worden gedownload. Er is niets gewijzigd.';
+
+  @override
+  String settings_setUpDevice_sync_unreachable(String account) {
+    return '$account kon niet worden gelezen. Controleer de verbinding en probeer het opnieuw.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_noLibrary(String account) {
+    return '$account heeft nog geen bibliotheek om bij aan te sluiten.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_newerSchema(String devices) {
+    return '$devices gebruiken een nieuwere versie van Submersion. Werk eerst dit apparaat bij.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_backupNote(String date) {
+    return 'Voor het aansluiten bij de bibliotheek, $date';
+  }
+
+  @override
+  String settings_setUpDevice_replace_body(int count, String account) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'De $count duiken hier worden vervangen door de bibliotheek in $account. Eerst wordt er een back-up van opgeslagen, die onder Back-ups blijft.',
+      one:
+          'De duik hier wordt vervangen door de bibliotheek in $account. Eerst wordt er een back-up van opgeslagen, die onder Back-ups blijft.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_replace_doneBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Je $count duiken zijn opzijgezet en de bibliotheek is gedownload. Submersion wordt opnieuw geladen.',
+      one:
+          'Je duik is opzijgezet en de bibliotheek is gedownload. Submersion wordt opnieuw geladen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_backups_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'Een back-up die een verloren telefoon overleeft',
+      'tablet': 'Een back-up die een verloren tablet overleeft',
+      'computer': 'Een back-up die een verloren computer overleeft',
+      'other': 'Een back-up die een verloren apparaat overleeft',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_intro =>
+      'Synchronisatie houdt apparaten gelijk. Een back-up is een kopie van een moment waar je naar terug kunt.';
+
+  @override
+  String settings_setUpDevice_backups_autoDetail(String frequency, int count) {
+    return '$frequency. De laatste $count worden hier bewaard.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_autoDetailDesktop(
+    String frequency,
+    int count,
+  ) {
+    return '$frequency, zolang Submersion open is. De laatste $count worden hier bewaard.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_copy(String account) {
+    return 'Ook een kopie in $account bewaren';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_noAccount =>
+      'Een kopie buiten dit apparaat heeft een account of een back-upmap nodig.';
+
+  @override
+  String get settings_setUpDevice_backups_openBackups => 'Back-ups openen';
+
+  @override
+  String get settings_setUpDevice_backups_note =>
+      'Planning, map, wachtwoordbeveiliging en oude back-ups staan onder Back-ups.';
+
+  @override
+  String get settings_setUpDevice_photos_title => 'Foto\'s op elk apparaat';
+
+  @override
+  String settings_setUpDevice_photos_firstIntro(String account) {
+    return 'Bewaar kopieën van je foto\'s en video\'s in $account, zodat je andere apparaten ze kunnen tonen. Je originelen blijven waar ze zijn.';
+  }
+
+  @override
+  String settings_setUpDevice_photos_keepCopies(String account) {
+    return 'Fotokopieën in $account bewaren';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_firstNote =>
+      'Zet het later aan onder Foto\'s en video\'s. Tot dan wordt er niets geüpload.';
+
+  @override
+  String settings_setUpDevice_photos_secondIntro(String account) {
+    return 'Je andere apparaten bewaren kopieën van foto\'s en video\'s in $account. Ook hier tonen?';
+  }
+
+  @override
+  String settings_setUpDevice_photos_useCopies(String account) {
+    return 'De fotokopieën in $account gebruiken';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_sameAccount =>
+      'Hetzelfde account. Niets in te typen.';
+
+  @override
+  String settings_setUpDevice_photos_signInFirst(String account) {
+    return 'Logt eerst in bij $account.';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_autoUploadHere =>
+      'Hier toegevoegde foto\'s automatisch uploaden';
+
+  @override
+  String settings_setUpDevice_photos_attachedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s en video\'s gekoppeld',
+      one: '$count foto of video gekoppeld',
+      zero: 'Nog geen foto\'s of video\'s gekoppeld',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'Deze telefoon is ingesteld',
+      'tablet': 'Deze tablet is ingesteld',
+      'computer': 'Deze computer is ingesteld',
+      'other': 'Dit apparaat is ingesteld',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_otherDevices(String account) {
+    return 'Open Submersion op je andere apparaten, kies $account, en dezelfde bibliotheek verschijnt.';
+  }
 }

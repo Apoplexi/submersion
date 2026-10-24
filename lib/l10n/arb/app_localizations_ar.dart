@@ -56014,4 +56014,301 @@ class AppLocalizationsAr extends AppLocalizations {
   String settings_setUpDevice_item_signInBackups(String account) {
     return 'سجّل الدخول إلى $account مجددًا. النسخ الاحتياطي متوقف مؤقتًا حتى تفعل.';
   }
+
+  @override
+  String get settings_setUpDevice_next => 'التالي';
+
+  @override
+  String get settings_setUpDevice_notNow => 'ليس الآن';
+
+  @override
+  String get settings_setUpDevice_skip => 'تخطٍّ';
+
+  @override
+  String get settings_setUpDevice_account_title =>
+      'أين يحفظ Submersion بياناتك؟';
+
+  @override
+  String get settings_setUpDevice_account_note =>
+      'تُحفظ غطساتك في الحساب الذي تختاره فقط. لا يملك Submersion خادمًا خاصًا به.';
+
+  @override
+  String get settings_setUpDevice_account_backupFile =>
+      'لديّ ملف نسخة احتياطية بدلًا من ذلك';
+
+  @override
+  String get settings_setUpDevice_offer_icloud =>
+      'يستخدم معرّف Apple الخاص بك. لا حاجة لتسجيل الدخول.';
+
+  @override
+  String get settings_setUpDevice_offer_googleDrive =>
+      'سجّل الدخول باستخدام Google';
+
+  @override
+  String get settings_setUpDevice_offer_dropbox =>
+      'سجّل الدخول باستخدام Dropbox';
+
+  @override
+  String get settings_setUpDevice_offer_ownServer =>
+      'تخزين متوافق مع S3 أو خادم WebDAV';
+
+  @override
+  String get settings_setUpDevice_sync_title => 'الغطسات على كل جهاز';
+
+  @override
+  String settings_setUpDevice_sync_signedIn(String account) {
+    return 'تم تسجيل الدخول إلى $account';
+  }
+
+  @override
+  String settings_setUpDevice_sync_noLibrary(String account) {
+    return 'لا تحتوي $account على مكتبة Submersion بعد. ستصبح الغطسات هنا المكتبة التي تتشاركها كل أجهزتك.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_found(
+    String account,
+    String when,
+    String device,
+  ) {
+    return 'عُثر على مكتبتك في $account، آخر تغيير $when على $device.';
+  }
+
+  @override
+  String settings_setUpDevice_sync_foundPlain(String account) {
+    return 'عُثر على مكتبتك في $account.';
+  }
+
+  @override
+  String get settings_setUpDevice_sync_foundEmpty =>
+      'لا توجد غطسات هنا بعد، لذا تُنزَّل المكتبة ببساطة.';
+
+  @override
+  String get settings_setUpDevice_sync_combine => 'دمجها';
+
+  @override
+  String get settings_setUpDevice_sync_combineDetail =>
+      'تنضم الغطسات هنا إلى المكتبة. الغطسة المسجّلة على الجهازين بشكل منفصل ستظهر مرتين.';
+
+  @override
+  String get settings_setUpDevice_sync_replace =>
+      'استبدال الغطسات هنا بالمكتبة';
+
+  @override
+  String get settings_setUpDevice_sync_replaceDetail =>
+      'تُحفظ أولًا نسخة احتياطية من الغطسات هنا ضمن النسخ الاحتياطية.';
+
+  @override
+  String get settings_setUpDevice_sync_keepInStepDetail =>
+      'بعد ثوانٍ من كل تغيير، وعند التشغيل، وعند العودة إلى التطبيق';
+
+  @override
+  String get settings_setUpDevice_sync_turnOn => 'تشغيل المزامنة';
+
+  @override
+  String get settings_setUpDevice_sync_download => 'تنزيل المكتبة';
+
+  @override
+  String get settings_setUpDevice_sync_combineAndDownload => 'الدمج والتنزيل';
+
+  @override
+  String get settings_setUpDevice_sync_replaceAndDownload =>
+      'الاستبدال والتنزيل';
+
+  @override
+  String get settings_setUpDevice_sync_noAccount =>
+      'اختر أولًا مكان حفظ بياناتك.';
+
+  @override
+  String get settings_setUpDevice_replace_title => 'استبدال الغطسات هنا؟';
+
+  @override
+  String get settings_setUpDevice_replace_working =>
+      'جارٍ وضع الغطسات هنا جانبًا وتنزيل المكتبة...';
+
+  @override
+  String get settings_setUpDevice_replace_doneTitle => 'تم تنزيل المكتبة';
+
+  @override
+  String get settings_setUpDevice_replace_stillUploading =>
+      'لا تزال المكتبة تُرفع من جهاز آخر. حاول مجددًا عند الانتهاء.';
+
+  @override
+  String get settings_setUpDevice_replace_photosBusy =>
+      'لا تزال عمليات رفع الصور جارية. حاول مجددًا بعد لحظة.';
+
+  @override
+  String get settings_setUpDevice_replace_failed =>
+      'تعذّر تنزيل المكتبة. لم يتغير شيء.';
+
+  @override
+  String settings_setUpDevice_sync_unreachable(String account) {
+    return 'تعذّرت قراءة $account. تحقّق من الاتصال وحاول مجددًا.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_noLibrary(String account) {
+    return 'لا تحتوي $account على مكتبة للانضمام إليها بعد.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_newerSchema(String devices) {
+    return '$devices تستخدم إصدارًا أحدث من Submersion. حدّث هذا الجهاز أولًا.';
+  }
+
+  @override
+  String settings_setUpDevice_replace_backupNote(String date) {
+    return 'قبل الانضمام إلى المكتبة، $date';
+  }
+
+  @override
+  String settings_setUpDevice_replace_body(int count, String account) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'تُستبدل $count غطسة هنا بالمكتبة في $account. تُحفظ نسخة احتياطية منها أولًا وتبقى ضمن النسخ الاحتياطية.',
+      many:
+          'تُستبدل $count غطسة هنا بالمكتبة في $account. تُحفظ نسخة احتياطية منها أولًا وتبقى ضمن النسخ الاحتياطية.',
+      few:
+          'تُستبدل $count غطسات هنا بالمكتبة في $account. تُحفظ نسخة احتياطية منها أولًا وتبقى ضمن النسخ الاحتياطية.',
+      two:
+          'تُستبدل الغطستان هنا بالمكتبة في $account. تُحفظ نسخة احتياطية منهما أولًا وتبقى ضمن النسخ الاحتياطية.',
+      one:
+          'تُستبدل الغطسة هنا بالمكتبة في $account. تُحفظ نسخة احتياطية منها أولًا وتبقى ضمن النسخ الاحتياطية.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_replace_doneBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'وُضعت $count غطسة جانبًا ونُزّلت المكتبة. سيُعاد تحميل Submersion.',
+      many:
+          'وُضعت $count غطسة جانبًا ونُزّلت المكتبة. سيُعاد تحميل Submersion.',
+      few:
+          'وُضعت غطساتك الـ $count جانبًا ونُزّلت المكتبة. سيُعاد تحميل Submersion.',
+      two: 'وُضعت غطستاك جانبًا ونُزّلت المكتبة. سيُعاد تحميل Submersion.',
+      one: 'وُضعت غطستك جانبًا ونُزّلت المكتبة. سيُعاد تحميل Submersion.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_backups_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'نسخة احتياطية تصمد أمام فقدان الهاتف',
+      'tablet': 'نسخة احتياطية تصمد أمام فقدان الجهاز اللوحي',
+      'computer': 'نسخة احتياطية تصمد أمام فقدان الحاسوب',
+      'other': 'نسخة احتياطية تصمد أمام فقدان الجهاز',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_intro =>
+      'تُبقي المزامنة الأجهزة متطابقة. النسخة الاحتياطية نسخة من لحظة معيّنة يمكنك الرجوع إليها.';
+
+  @override
+  String settings_setUpDevice_backups_autoDetail(String frequency, int count) {
+    return '$frequency. تُحفظ هنا آخر $count.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_autoDetailDesktop(
+    String frequency,
+    int count,
+  ) {
+    return '$frequency، أثناء فتح Submersion. تُحفظ هنا آخر $count.';
+  }
+
+  @override
+  String settings_setUpDevice_backups_copy(String account) {
+    return 'الاحتفاظ أيضًا بنسخة في $account';
+  }
+
+  @override
+  String get settings_setUpDevice_backups_noAccount =>
+      'تحتاج النسخة خارج هذا الجهاز إلى حساب أو مجلد نسخ احتياطي.';
+
+  @override
+  String get settings_setUpDevice_backups_openBackups => 'فتح النسخ الاحتياطية';
+
+  @override
+  String get settings_setUpDevice_backups_note =>
+      'الجدولة والمجلد والحماية بكلمة مرور والنسخ القديمة ضمن النسخ الاحتياطية.';
+
+  @override
+  String get settings_setUpDevice_photos_title => 'الصور على كل جهاز';
+
+  @override
+  String settings_setUpDevice_photos_firstIntro(String account) {
+    return 'احتفظ بنسخ من صورك ومقاطع الفيديو في $account لتعرضها أجهزتك الأخرى. تبقى الأصول في مكانها.';
+  }
+
+  @override
+  String settings_setUpDevice_photos_keepCopies(String account) {
+    return 'الاحتفاظ بنسخ الصور في $account';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_firstNote =>
+      'شغّله لاحقًا ضمن الصور والفيديوهات. لا يُرفع شيء حتى تفعل.';
+
+  @override
+  String settings_setUpDevice_photos_secondIntro(String account) {
+    return 'تحتفظ أجهزتك الأخرى بنسخ من الصور والفيديو في $account. هل تعرضها هنا أيضًا؟';
+  }
+
+  @override
+  String settings_setUpDevice_photos_useCopies(String account) {
+    return 'استخدام نسخ الصور في $account';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_sameAccount =>
+      'الحساب نفسه. لا حاجة لكتابة شيء.';
+
+  @override
+  String settings_setUpDevice_photos_signInFirst(String account) {
+    return 'يسجّل الدخول إلى $account أولًا.';
+  }
+
+  @override
+  String get settings_setUpDevice_photos_autoUploadHere =>
+      'رفع الصور المضافة هنا تلقائيًا';
+
+  @override
+  String settings_setUpDevice_photos_attachedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صورة ومقطع فيديو مرتبط',
+      many: '$count صورة ومقطع فيديو مرتبط',
+      few: '$count صور ومقاطع فيديو مرتبطة',
+      two: 'صورتان أو مقطعا فيديو مرتبطان',
+      one: 'صورة أو فيديو واحد مرتبط',
+      zero: 'لا توجد صور أو مقاطع فيديو مرتبطة بعد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_title(String device) {
+    String _temp0 = intl.Intl.selectLogic(device, {
+      'phone': 'تم إعداد هذا الهاتف',
+      'tablet': 'تم إعداد هذا الجهاز اللوحي',
+      'computer': 'تم إعداد هذا الحاسوب',
+      'other': 'تم إعداد هذا الجهاز',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String settings_setUpDevice_done_otherDevices(String account) {
+    return 'على أجهزتك الأخرى، افتح Submersion واختر $account، وستظهر المكتبة نفسها.';
+  }
 }
