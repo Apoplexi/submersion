@@ -1952,10 +1952,6 @@ class AppLocalizationsZh extends AppLocalizations {
       '此 Submersion 版本不支持 iCloud 同步。请使用 S3 同步或 App Store 版本。';
 
   @override
-  String get settings_cloudSync_provider_icloud_unsupportedSubtitle =>
-      '此版本不可用 — 请使用 S3 或 App Store 版本';
-
-  @override
   String get settings_cloudSync_encryption_title => '端到端加密';
 
   @override
@@ -8421,34 +8417,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_manage_setupAssistant => '设置向导';
 
   @override
-  String get settings_manage_setupAssistant_subtitle => '重新设置单位、外观和备份选项';
-
-  @override
-  String get setup_backup_cloudCopy => '在云端存储备份';
-
-  @override
-  String get setup_backup_frequency => '频率';
-
-  @override
-  String get setup_backup_frequency_daily => '每天';
-
-  @override
-  String get setup_backup_frequency_monthly => '每月';
-
-  @override
-  String get setup_backup_frequency_weekly => '每周';
-
-  @override
-  String get setup_backup_scheduleSubtitle => '按计划备份你的数据';
-
-  @override
-  String get setup_backup_scheduleToggle => '自动备份';
-
-  @override
-  String get setup_backup_subtitle => '从第一天起保护你的数据。';
-
-  @override
-  String get setup_backup_title => '备份与同步';
+  String get settings_manage_setupAssistant_subtitle => '重新设置单位、备份、同步和照片';
 
   @override
   String get setup_common_back => '返回';
@@ -8549,9 +8518,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setup_restore_title => '恢复备份';
 
   @override
-  String get setup_step_backup => '备份';
-
-  @override
   String get setup_step_finish => '完成';
 
   @override
@@ -8559,9 +8525,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setup_step_units => '单位';
-
-  @override
-  String get setup_syncPull_continue => '继续';
 
   @override
   String get setup_syncPull_incomplete_message =>
@@ -8585,50 +8548,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setup_syncPull_noLibrary_title => '未找到资料库';
-
-  @override
-  String get setup_syncPull_success => '已采用资料库';
-
-  @override
-  String get setup_syncPull_syncing => '正在拉取资料库...';
-
-  @override
-  String get setup_sync_changeProvider => '更换服务商';
-
-  @override
-  String setup_sync_connectedTo(String provider) {
-    return '已连接到 $provider';
-  }
-
-  @override
-  String setup_sync_error(Object error) {
-    return '无法连接：$error';
-  }
-
-  @override
-  String get setup_sync_header => '云同步';
-
-  @override
-  String get setup_sync_libraryFound_adopt => '采用现有资料库';
-
-  @override
-  String get setup_sync_libraryFound_keepFresh => '重新开始';
-
-  @override
-  String get setup_sync_libraryFound_message =>
-      '此账户已包含 Submersion 资料库。要采用它而不是重新开始吗？';
-
-  @override
-  String get setup_sync_libraryFound_title => '发现现有资料库';
-
-  @override
-  String get setup_sync_manageInSettings => '在设置中管理';
-
-  @override
-  String get setup_sync_notConnected => '未连接';
-
-  @override
-  String get setup_sync_subtitle => '在多设备间同步数据';
 
   @override
   String get setup_units_advanced => '微调单位';
@@ -52312,4 +52231,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String settings_setUpDevice_done_otherDevices(String account) {
     return '在你的其他设备上打开 Submersion，选择 $account，就会出现同一个资料库。';
   }
+
+  @override
+  String settings_setUpDevice_sync_inStep(String account) {
+    return '此处的潜水记录已与你在 $account 中的资料库保持一致。';
+  }
+
+  @override
+  String get setup_syncPull_startFresh => '开始新的日志';
 }

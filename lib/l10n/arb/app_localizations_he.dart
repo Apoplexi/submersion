@@ -2004,10 +2004,6 @@ class AppLocalizationsHe extends AppLocalizations {
       'סנכרון iCloud אינו זמין בגרסה זו של Submersion. השתמש בסנכרון S3 או בגרסת App Store.';
 
   @override
-  String get settings_cloudSync_provider_icloud_unsupportedSubtitle =>
-      'לא זמין בגרסה זו — השתמש ב-S3 או בגרסת App Store';
-
-  @override
   String get settings_cloudSync_encryption_title => 'הצפנה מקצה לקצה';
 
   @override
@@ -8677,34 +8673,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_manage_setupAssistant_subtitle =>
-      'עיון מחדש ביחידות, במראה ובאפשרויות הגיבוי';
-
-  @override
-  String get setup_backup_cloudCopy => 'אחסון גיבויים בענן';
-
-  @override
-  String get setup_backup_frequency => 'תדירות';
-
-  @override
-  String get setup_backup_frequency_daily => 'יומי';
-
-  @override
-  String get setup_backup_frequency_monthly => 'חודשי';
-
-  @override
-  String get setup_backup_frequency_weekly => 'שבועי';
-
-  @override
-  String get setup_backup_scheduleSubtitle => 'גיבוי הנתונים לפי לוח זמנים';
-
-  @override
-  String get setup_backup_scheduleToggle => 'גיבויים אוטומטיים';
-
-  @override
-  String get setup_backup_subtitle => 'הגנו על הנתונים שלכם מהיום הראשון.';
-
-  @override
-  String get setup_backup_title => 'גיבויים וסנכרון';
+      'עיון מחדש ביחידות, בגיבויים, בסנכרון ובתמונות';
 
   @override
   String get setup_common_back => 'חזרה';
@@ -8812,9 +8781,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get setup_restore_title => 'שחזור גיבוי';
 
   @override
-  String get setup_step_backup => 'גיבוי';
-
-  @override
   String get setup_step_finish => 'סיום';
 
   @override
@@ -8822,9 +8788,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get setup_step_units => 'יחידות';
-
-  @override
-  String get setup_syncPull_continue => 'המשך';
 
   @override
   String get setup_syncPull_incomplete_message =>
@@ -8849,50 +8812,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get setup_syncPull_noLibrary_title => 'לא נמצאה ספרייה';
-
-  @override
-  String get setup_syncPull_success => 'הספרייה אומצה';
-
-  @override
-  String get setup_syncPull_syncing => 'מושך את הספרייה...';
-
-  @override
-  String get setup_sync_changeProvider => 'החלפת ספק';
-
-  @override
-  String setup_sync_connectedTo(String provider) {
-    return 'מחובר אל $provider';
-  }
-
-  @override
-  String setup_sync_error(Object error) {
-    return 'החיבור נכשל: $error';
-  }
-
-  @override
-  String get setup_sync_header => 'סנכרון ענן';
-
-  @override
-  String get setup_sync_libraryFound_adopt => 'אימוץ הספרייה הקיימת';
-
-  @override
-  String get setup_sync_libraryFound_keepFresh => 'התחלה חדשה';
-
-  @override
-  String get setup_sync_libraryFound_message =>
-      'חשבון זה כבר מכיל ספריית Submersion. לאמץ אותה במקום להתחיל מחדש?';
-
-  @override
-  String get setup_sync_libraryFound_title => 'נמצאה ספרייה קיימת';
-
-  @override
-  String get setup_sync_manageInSettings => 'ניהול בהגדרות';
-
-  @override
-  String get setup_sync_notConnected => 'לא מחובר';
-
-  @override
-  String get setup_sync_subtitle => 'סנכרון הנתונים בין מכשירים';
 
   @override
   String get setup_units_advanced => 'כוונון יחידות';
@@ -54558,4 +54477,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String settings_setUpDevice_done_otherDevices(String account) {
     return 'במכשירים האחרים שלך, פתחו את Submersion, בחרו $account, ואותה ספרייה תופיע.';
   }
+
+  @override
+  String settings_setUpDevice_sync_inStep(String account) {
+    return 'הצלילות כאן מתואמות עם הספרייה שלך ב-$account.';
+  }
+
+  @override
+  String get setup_syncPull_startFresh => 'התחלת יומן חדש';
 }

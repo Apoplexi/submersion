@@ -2023,10 +2023,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'iCloud-Synchronisierung ist in diesem Build von Submersion nicht verfügbar. Verwende die S3-Synchronisierung oder die App-Store-Version.';
 
   @override
-  String get settings_cloudSync_provider_icloud_unsupportedSubtitle =>
-      'In diesem Build nicht verfügbar – verwende S3 oder die App-Store-Version';
-
-  @override
   String get settings_cloudSync_encryption_title =>
       'Ende-zu-Ende-Verschlüsselung';
 
@@ -8863,35 +8859,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_manage_setupAssistant_subtitle =>
-      'Einheiten, Darstellung und Backup-Einstellungen erneut durchgehen';
-
-  @override
-  String get setup_backup_cloudCopy => 'Backups in der Cloud speichern';
-
-  @override
-  String get setup_backup_frequency => 'Häufigkeit';
-
-  @override
-  String get setup_backup_frequency_daily => 'Täglich';
-
-  @override
-  String get setup_backup_frequency_monthly => 'Monatlich';
-
-  @override
-  String get setup_backup_frequency_weekly => 'Wöchentlich';
-
-  @override
-  String get setup_backup_scheduleSubtitle => 'Ihre Daten regelmäßig sichern';
-
-  @override
-  String get setup_backup_scheduleToggle => 'Automatische Sicherungen';
-
-  @override
-  String get setup_backup_subtitle =>
-      'Schützen Sie Ihre Daten vom ersten Tag an.';
-
-  @override
-  String get setup_backup_title => 'Sicherung & Synchronisierung';
+      'Einheiten, Sicherungen, Sync und Fotos erneut durchgehen';
 
   @override
   String get setup_common_back => 'Zurück';
@@ -9003,9 +8971,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get setup_restore_title => 'Sicherung wiederherstellen';
 
   @override
-  String get setup_step_backup => 'Sicherung';
-
-  @override
   String get setup_step_finish => 'Fertig';
 
   @override
@@ -9013,9 +8978,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get setup_step_units => 'Einheiten';
-
-  @override
-  String get setup_syncPull_continue => 'Weiter';
 
   @override
   String get setup_syncPull_incomplete_message =>
@@ -9042,52 +9004,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get setup_syncPull_noLibrary_title => 'Keine Bibliothek gefunden';
-
-  @override
-  String get setup_syncPull_success => 'Bibliothek übernommen';
-
-  @override
-  String get setup_syncPull_syncing => 'Bibliothek wird geladen...';
-
-  @override
-  String get setup_sync_changeProvider => 'Anbieter wechseln';
-
-  @override
-  String setup_sync_connectedTo(String provider) {
-    return 'Verbunden mit $provider';
-  }
-
-  @override
-  String setup_sync_error(Object error) {
-    return 'Verbindung fehlgeschlagen: $error';
-  }
-
-  @override
-  String get setup_sync_header => 'Cloud-Synchronisierung';
-
-  @override
-  String get setup_sync_libraryFound_adopt =>
-      'Vorhandene Bibliothek übernehmen';
-
-  @override
-  String get setup_sync_libraryFound_keepFresh => 'Neu beginnen';
-
-  @override
-  String get setup_sync_libraryFound_message =>
-      'Dieses Konto enthält bereits eine Submersion-Bibliothek. Diese übernehmen, statt neu zu beginnen?';
-
-  @override
-  String get setup_sync_libraryFound_title => 'Vorhandene Bibliothek gefunden';
-
-  @override
-  String get setup_sync_manageInSettings => 'In den Einstellungen verwalten';
-
-  @override
-  String get setup_sync_notConnected => 'Nicht verbunden';
-
-  @override
-  String get setup_sync_subtitle =>
-      'Ihre Daten auf allen Geräten synchronisieren';
 
   @override
   String get setup_units_advanced => 'Einheiten anpassen';
@@ -55601,4 +55517,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String settings_setUpDevice_done_otherDevices(String account) {
     return 'Öffnen Sie Submersion auf Ihren anderen Geräten, wählen Sie $account, und dieselbe Bibliothek erscheint.';
   }
+
+  @override
+  String settings_setUpDevice_sync_inStep(String account) {
+    return 'Die Tauchgänge hier sind mit Ihrer Bibliothek in $account abgeglichen.';
+  }
+
+  @override
+  String get setup_syncPull_startFresh => 'Neues Logbuch beginnen';
 }

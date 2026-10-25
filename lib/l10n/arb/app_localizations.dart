@@ -3115,12 +3115,6 @@ abstract class AppLocalizations {
   /// **'iCloud sync isn\'t available in this build of Submersion. Use S3 sync, or the App Store version.'**
   String get settings_cloudSync_error_icloudUnsupported;
 
-  /// No description provided for @settings_cloudSync_provider_icloud_unsupportedSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Not available in this build — use S3 or the App Store version'**
-  String get settings_cloudSync_provider_icloud_unsupportedSubtitle;
-
   /// No description provided for @settings_cloudSync_encryption_title.
   ///
   /// In en, this message translates to:
@@ -14002,62 +13996,8 @@ abstract class AppLocalizations {
   /// No description provided for @settings_manage_setupAssistant_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Revisit units, appearance, and backup choices'**
+  /// **'Revisit units, backups, sync and photos'**
   String get settings_manage_setupAssistant_subtitle;
-
-  /// No description provided for @setup_backup_cloudCopy.
-  ///
-  /// In en, this message translates to:
-  /// **'Store backups in the cloud'**
-  String get setup_backup_cloudCopy;
-
-  /// No description provided for @setup_backup_frequency.
-  ///
-  /// In en, this message translates to:
-  /// **'Frequency'**
-  String get setup_backup_frequency;
-
-  /// No description provided for @setup_backup_frequency_daily.
-  ///
-  /// In en, this message translates to:
-  /// **'Daily'**
-  String get setup_backup_frequency_daily;
-
-  /// No description provided for @setup_backup_frequency_monthly.
-  ///
-  /// In en, this message translates to:
-  /// **'Monthly'**
-  String get setup_backup_frequency_monthly;
-
-  /// No description provided for @setup_backup_frequency_weekly.
-  ///
-  /// In en, this message translates to:
-  /// **'Weekly'**
-  String get setup_backup_frequency_weekly;
-
-  /// No description provided for @setup_backup_scheduleSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Back up your data on a schedule'**
-  String get setup_backup_scheduleSubtitle;
-
-  /// No description provided for @setup_backup_scheduleToggle.
-  ///
-  /// In en, this message translates to:
-  /// **'Automatic backups'**
-  String get setup_backup_scheduleToggle;
-
-  /// No description provided for @setup_backup_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Protect your data from day one.'**
-  String get setup_backup_subtitle;
-
-  /// No description provided for @setup_backup_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Backups & Sync'**
-  String get setup_backup_title;
 
   /// No description provided for @setup_common_back.
   ///
@@ -14251,12 +14191,6 @@ abstract class AppLocalizations {
   /// **'Restore backup'**
   String get setup_restore_title;
 
-  /// No description provided for @setup_step_backup.
-  ///
-  /// In en, this message translates to:
-  /// **'Backup'**
-  String get setup_step_backup;
-
   /// No description provided for @setup_step_finish.
   ///
   /// In en, this message translates to:
@@ -14274,12 +14208,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Units'**
   String get setup_step_units;
-
-  /// No description provided for @setup_syncPull_continue.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue'**
-  String get setup_syncPull_continue;
 
   /// No description provided for @setup_syncPull_incomplete_message.
   ///
@@ -14322,84 +14250,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No library found'**
   String get setup_syncPull_noLibrary_title;
-
-  /// No description provided for @setup_syncPull_success.
-  ///
-  /// In en, this message translates to:
-  /// **'Library adopted'**
-  String get setup_syncPull_success;
-
-  /// No description provided for @setup_syncPull_syncing.
-  ///
-  /// In en, this message translates to:
-  /// **'Pulling your library...'**
-  String get setup_syncPull_syncing;
-
-  /// No description provided for @setup_sync_changeProvider.
-  ///
-  /// In en, this message translates to:
-  /// **'Change provider'**
-  String get setup_sync_changeProvider;
-
-  /// No description provided for @setup_sync_connectedTo.
-  ///
-  /// In en, this message translates to:
-  /// **'Connected to {provider}'**
-  String setup_sync_connectedTo(String provider);
-
-  /// No description provided for @setup_sync_error.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not connect: {error}'**
-  String setup_sync_error(Object error);
-
-  /// No description provided for @setup_sync_header.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud sync'**
-  String get setup_sync_header;
-
-  /// No description provided for @setup_sync_libraryFound_adopt.
-  ///
-  /// In en, this message translates to:
-  /// **'Adopt existing library'**
-  String get setup_sync_libraryFound_adopt;
-
-  /// No description provided for @setup_sync_libraryFound_keepFresh.
-  ///
-  /// In en, this message translates to:
-  /// **'Start fresh'**
-  String get setup_sync_libraryFound_keepFresh;
-
-  /// No description provided for @setup_sync_libraryFound_message.
-  ///
-  /// In en, this message translates to:
-  /// **'This account already contains a Submersion library. Adopt it instead of starting fresh?'**
-  String get setup_sync_libraryFound_message;
-
-  /// No description provided for @setup_sync_libraryFound_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Existing library found'**
-  String get setup_sync_libraryFound_title;
-
-  /// No description provided for @setup_sync_manageInSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage in Settings'**
-  String get setup_sync_manageInSettings;
-
-  /// No description provided for @setup_sync_notConnected.
-  ///
-  /// In en, this message translates to:
-  /// **'Not connected'**
-  String get setup_sync_notConnected;
-
-  /// No description provided for @setup_sync_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync your data across devices'**
-  String get setup_sync_subtitle;
 
   /// No description provided for @setup_units_advanced.
   ///
@@ -88059,6 +87909,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On your other devices, open Submersion, choose {account}, and the same library appears.'**
   String settings_setUpDevice_done_otherDevices(String account);
+
+  /// Step 2 when this device already syncs with the chosen account
+  ///
+  /// In en, this message translates to:
+  /// **'The dives here are in step with your library in {account}.'**
+  String settings_setUpDevice_sync_inStep(String account);
+
+  /// First-run wizard: the account holds no library, so begin a new logbook
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new logbook'**
+  String get setup_syncPull_startFresh;
 }
 
 class _AppLocalizationsDelegate

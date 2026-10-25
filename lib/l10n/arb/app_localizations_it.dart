@@ -2028,10 +2028,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'La sincronizzazione iCloud non è disponibile in questa build di Submersion. Usa la sincronizzazione S3 o la versione dell\'App Store.';
 
   @override
-  String get settings_cloudSync_provider_icloud_unsupportedSubtitle =>
-      'Non disponibile in questa build: usa S3 o la versione dell\'App Store';
-
-  @override
   String get settings_cloudSync_encryption_title => 'Crittografia end-to-end';
 
   @override
@@ -8865,36 +8861,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_manage_setupAssistant_subtitle =>
-      'Rivedi unità, aspetto e opzioni di backup';
-
-  @override
-  String get setup_backup_cloudCopy => 'Archivia i backup nel cloud';
-
-  @override
-  String get setup_backup_frequency => 'Frequenza';
-
-  @override
-  String get setup_backup_frequency_daily => 'Giornaliera';
-
-  @override
-  String get setup_backup_frequency_monthly => 'Mensile';
-
-  @override
-  String get setup_backup_frequency_weekly => 'Settimanale';
-
-  @override
-  String get setup_backup_scheduleSubtitle =>
-      'Esegui il backup dei tuoi dati a intervalli regolari';
-
-  @override
-  String get setup_backup_scheduleToggle => 'Backup automatici';
-
-  @override
-  String get setup_backup_subtitle =>
-      'Proteggi i tuoi dati fin dal primo giorno.';
-
-  @override
-  String get setup_backup_title => 'Backup e sincronizzazione';
+      'Rivedi unità, backup, sincronizzazione e foto';
 
   @override
   String get setup_common_back => 'Indietro';
@@ -9006,9 +8973,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get setup_restore_title => 'Ripristina backup';
 
   @override
-  String get setup_step_backup => 'Backup';
-
-  @override
   String get setup_step_finish => 'Fine';
 
   @override
@@ -9016,9 +8980,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get setup_step_units => 'Unità';
-
-  @override
-  String get setup_syncPull_continue => 'Continua';
 
   @override
   String get setup_syncPull_incomplete_message =>
@@ -9044,51 +9005,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get setup_syncPull_noLibrary_title => 'Nessuna libreria trovata';
-
-  @override
-  String get setup_syncPull_success => 'Libreria adottata';
-
-  @override
-  String get setup_syncPull_syncing => 'Download della libreria...';
-
-  @override
-  String get setup_sync_changeProvider => 'Cambia provider';
-
-  @override
-  String setup_sync_connectedTo(String provider) {
-    return 'Connesso a $provider';
-  }
-
-  @override
-  String setup_sync_error(Object error) {
-    return 'Impossibile connettersi: $error';
-  }
-
-  @override
-  String get setup_sync_header => 'Sincronizzazione cloud';
-
-  @override
-  String get setup_sync_libraryFound_adopt => 'Adotta la libreria esistente';
-
-  @override
-  String get setup_sync_libraryFound_keepFresh => 'Inizia da zero';
-
-  @override
-  String get setup_sync_libraryFound_message =>
-      'Questo account contiene già una libreria Submersion. Adottarla invece di iniziare da zero?';
-
-  @override
-  String get setup_sync_libraryFound_title => 'Trovata libreria esistente';
-
-  @override
-  String get setup_sync_manageInSettings => 'Gestisci nelle impostazioni';
-
-  @override
-  String get setup_sync_notConnected => 'Non connesso';
-
-  @override
-  String get setup_sync_subtitle =>
-      'Sincronizza i tuoi dati su tutti i dispositivi';
 
   @override
   String get setup_units_advanced => 'Regola le unità';
@@ -55724,4 +55640,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String settings_setUpDevice_done_otherDevices(String account) {
     return 'Sugli altri dispositivi, apri Submersion, scegli $account e comparirà la stessa libreria.';
   }
+
+  @override
+  String settings_setUpDevice_sync_inStep(String account) {
+    return 'Le immersioni qui sono allineate con la tua libreria in $account.';
+  }
+
+  @override
+  String get setup_syncPull_startFresh => 'Inizia un nuovo logbook';
 }
