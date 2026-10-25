@@ -58233,6 +58233,30 @@ abstract class AppLocalizations {
   /// **'Temp'**
   String get dive3d_metric_temperature;
 
+  /// No description provided for @navTrack3d_previewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'3D View'**
+  String get navTrack3d_previewTitle;
+
+  /// No description provided for @navTrack3d_metric_speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get navTrack3d_metric_speed;
+
+  /// No description provided for @navTrack3d_metric_batteryVoltage.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get navTrack3d_metric_batteryVoltage;
+
+  /// No description provided for @navTrack3d_noProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'This track doesn\'t have enough data for a 3D preview.'**
+  String get navTrack3d_noProfile;
+
   /// No description provided for @dive3d_metric_ascentRate.
   ///
   /// In en, this message translates to:
@@ -82898,6 +82922,12 @@ abstract class AppLocalizations {
   /// **'Change site'**
   String get navTrack_detail_menuChangeSite;
 
+  /// No description provided for @navTrack_detail_menuChangeDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Change device'**
+  String get navTrack_detail_menuChangeDevice;
+
   /// No description provided for @navTrack_detail_noMapYet.
   ///
   /// In en, this message translates to:
@@ -82927,18 +82957,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End set from the recording\'s GPS fix.'**
   String get navTrack_detail_correctionStatus_gpsFix;
-
-  /// No description provided for @navTrack_detail_device.
-  ///
-  /// In en, this message translates to:
-  /// **'Device: {name}'**
-  String navTrack_detail_device(String name);
-
-  /// No description provided for @navTrack_detail_equipment.
-  ///
-  /// In en, this message translates to:
-  /// **'Equipment: {name}'**
-  String navTrack_detail_equipment(String name);
 
   /// No description provided for @navTrack_detail_distance.
   ///
@@ -82999,6 +83017,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose site'**
   String get navTrack_detail_chooseSite;
+
+  /// No description provided for @navTrack_detail_noEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'No device'**
+  String get navTrack_detail_noEquipment;
+
+  /// No description provided for @navTrack_detail_chooseDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose device'**
+  String get navTrack_detail_chooseDevice;
 
   /// No description provided for @navTrack_review_importTrackTitle.
   ///

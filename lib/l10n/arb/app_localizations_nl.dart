@@ -36690,6 +36690,19 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_metric_temperature => 'Temp';
 
   @override
+  String get navTrack3d_previewTitle => '3D-weergave';
+
+  @override
+  String get navTrack3d_metric_speed => 'Snelheid';
+
+  @override
+  String get navTrack3d_metric_batteryVoltage => 'Batterij';
+
+  @override
+  String get navTrack3d_noProfile =>
+      'Dit traject heeft niet genoeg gegevens voor een 3D-weergave.';
+
+  @override
   String get dive3d_metric_ascentRate => 'Opstijging';
 
   @override
@@ -52029,6 +52042,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get navTrack_detail_menuChangeSite => 'Duikstek wijzigen';
 
   @override
+  String get navTrack_detail_menuChangeDevice => 'Apparaat wijzigen';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'Stel het startpunt in om dit op een kaart te zien.';
 
@@ -52047,16 +52063,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get navTrack_detail_correctionStatus_gpsFix =>
       'Einde ingesteld vanaf de GPS-fix van de opname.';
-
-  @override
-  String navTrack_detail_device(String name) {
-    return 'Apparaat: $name';
-  }
-
-  @override
-  String navTrack_detail_equipment(String name) {
-    return 'Uitrusting: $name';
-  }
 
   @override
   String navTrack_detail_distance(String value) {
@@ -52099,6 +52105,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get navTrack_detail_chooseSite => 'Duikstek kiezen';
+
+  @override
+  String get navTrack_detail_noEquipment => 'Geen apparaat';
+
+  @override
+  String get navTrack_detail_chooseDevice => 'Apparaat kiezen';
 
   @override
   String get navTrack_review_importTrackTitle => 'Onderwatertrack importeren';

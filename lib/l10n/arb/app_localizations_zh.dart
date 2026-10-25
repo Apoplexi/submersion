@@ -34768,6 +34768,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_metric_temperature => '温度';
 
   @override
+  String get navTrack3d_previewTitle => '3D视图';
+
+  @override
+  String get navTrack3d_metric_speed => '速度';
+
+  @override
+  String get navTrack3d_metric_batteryVoltage => '电池';
+
+  @override
+  String get navTrack3d_noProfile => '此轨迹没有足够的数据生成3D视图。';
+
+  @override
   String get dive3d_metric_ascentRate => '上升';
 
   @override
@@ -49110,6 +49122,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navTrack_detail_menuChangeSite => '更改潜点';
 
   @override
+  String get navTrack_detail_menuChangeDevice => '更改设备';
+
+  @override
   String get navTrack_detail_noMapYet => '设置起点以在地图上查看。';
 
   @override
@@ -49123,16 +49138,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get navTrack_detail_correctionStatus_gpsFix => '终点已根据记录的 GPS 定位设置。';
-
-  @override
-  String navTrack_detail_device(String name) {
-    return '设备：$name';
-  }
-
-  @override
-  String navTrack_detail_equipment(String name) {
-    return '装备：$name';
-  }
 
   @override
   String navTrack_detail_distance(String value) {
@@ -49175,6 +49180,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get navTrack_detail_chooseSite => '选择潜点';
+
+  @override
+  String get navTrack_detail_noEquipment => '无设备';
+
+  @override
+  String get navTrack_detail_chooseDevice => '选择设备';
 
   @override
   String get navTrack_review_importTrackTitle => '导入水下轨迹';

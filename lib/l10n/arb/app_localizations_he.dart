@@ -36023,6 +36023,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_metric_temperature => 'טמפ';
 
   @override
+  String get navTrack3d_previewTitle => 'תצוגת תלת־ממד';
+
+  @override
+  String get navTrack3d_metric_speed => 'מהירות';
+
+  @override
+  String get navTrack3d_metric_batteryVoltage => 'סוללה';
+
+  @override
+  String get navTrack3d_noProfile =>
+      'אין מספיק נתונים במסלול הזה לתצוגת תלת-ממד.';
+
+  @override
   String get dive3d_metric_ascentRate => 'עלייה';
 
   @override
@@ -51246,6 +51259,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navTrack_detail_menuChangeSite => 'שינוי אתר';
 
   @override
+  String get navTrack_detail_menuChangeDevice => 'שינוי מכשיר';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'קבע את נקודת ההתחלה כדי לראות זאת על מפה.';
 
@@ -51263,16 +51279,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get navTrack_detail_correctionStatus_gpsFix =>
       'הסיום נקבע מתיקון ה-GPS של ההקלטה.';
-
-  @override
-  String navTrack_detail_device(String name) {
-    return 'מכשיר: $name';
-  }
-
-  @override
-  String navTrack_detail_equipment(String name) {
-    return 'ציוד: $name';
-  }
 
   @override
   String navTrack_detail_distance(String value) {
@@ -51315,6 +51321,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get navTrack_detail_chooseSite => 'בחר אתר';
+
+  @override
+  String get navTrack_detail_noEquipment => 'אין מכשיר';
+
+  @override
+  String get navTrack_detail_chooseDevice => 'בחר מכשיר';
 
   @override
   String get navTrack_review_importTrackTitle => 'ייבוא מסלול תת-ימי';

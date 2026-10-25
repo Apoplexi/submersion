@@ -22562,6 +22562,14 @@
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Temp",
   "@dive3d_metric_temperature": {},
+  "navTrack3d_previewTitle": "3D View",
+  "@navTrack3d_previewTitle": {},
+  "navTrack3d_metric_speed": "Speed",
+  "@navTrack3d_metric_speed": {},
+  "navTrack3d_metric_batteryVoltage": "Battery",
+  "@navTrack3d_metric_batteryVoltage": {},
+  "navTrack3d_noProfile": "This track doesn't have enough data for a 3D preview.",
+  "@navTrack3d_noProfile": {},
   "dive3d_metric_ascentRate": "Ascent",
   "@dive3d_metric_ascentRate": {},
   "dive3d_metric_ppO2": "ppO2",
@@ -31066,27 +31074,12 @@
   "navTrack_detail_defaultTrackTitle": "Underwater track",
   "navTrack_detail_menuRename": "Rename",
   "navTrack_detail_menuChangeSite": "Change site",
+  "navTrack_detail_menuChangeDevice": "Change device",
   "navTrack_detail_noMapYet": "Set the start point to see this on a map.",
   "navTrack_detail_correctionStatus_none": "No correction applied yet.",
   "navTrack_detail_correctionStatus_sameAsStart": "End set to same as start.",
   "navTrack_detail_correctionStatus_point": "End point set on the map.",
   "navTrack_detail_correctionStatus_gpsFix": "End set from the recording's GPS fix.",
-  "navTrack_detail_device": "Device: {name}",
-  "@navTrack_detail_device": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "navTrack_detail_equipment": "Equipment: {name}",
-  "@navTrack_detail_equipment": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "navTrack_detail_distance": "Distance: {value}",
   "@navTrack_detail_distance": {
     "placeholders": {
@@ -31145,6 +31138,8 @@
   "navTrack_detail_chooseDive": "Choose dive",
   "navTrack_detail_noSite": "No site",
   "navTrack_detail_chooseSite": "Choose site",
+  "navTrack_detail_noEquipment": "No device",
+  "navTrack_detail_chooseDevice": "Choose device",
   "navTrack_review_importTrackTitle": "Import Underwater Track",
   "navTrack_review_segmentSummaryNoFix": "{underwater} samples underwater, no GPS fix after the dive.",
   "@navTrack_review_segmentSummaryNoFix": {

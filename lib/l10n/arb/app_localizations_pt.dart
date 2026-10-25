@@ -36927,6 +36927,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_metric_temperature => 'Temp';
 
   @override
+  String get navTrack3d_previewTitle => 'Visualização 3D';
+
+  @override
+  String get navTrack3d_metric_speed => 'Velocidade';
+
+  @override
+  String get navTrack3d_metric_batteryVoltage => 'Bateria';
+
+  @override
+  String get navTrack3d_noProfile =>
+      'Esta trilha não tem dados suficientes para uma visualização 3D.';
+
+  @override
   String get dive3d_metric_ascentRate => 'Subida';
 
   @override
@@ -52362,6 +52375,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_detail_menuChangeSite => 'Alterar ponto de mergulho';
 
   @override
+  String get navTrack_detail_menuChangeDevice => 'Alterar dispositivo';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'Defina o ponto de início para ver isso em um mapa.';
 
@@ -52380,16 +52396,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get navTrack_detail_correctionStatus_gpsFix =>
       'Fim definido a partir do fix de GPS da gravação.';
-
-  @override
-  String navTrack_detail_device(String name) {
-    return 'Dispositivo: $name';
-  }
-
-  @override
-  String navTrack_detail_equipment(String name) {
-    return 'Equipamento: $name';
-  }
 
   @override
   String navTrack_detail_distance(String value) {
@@ -52432,6 +52438,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get navTrack_detail_chooseSite => 'Escolher ponto de mergulho';
+
+  @override
+  String get navTrack_detail_noEquipment => 'Nenhum dispositivo';
+
+  @override
+  String get navTrack_detail_chooseDevice => 'Escolher dispositivo';
 
   @override
   String get navTrack_review_importTrackTitle => 'Importar trilha subaquática';

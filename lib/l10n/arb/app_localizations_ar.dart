@@ -37404,6 +37404,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_metric_temperature => 'الحرارة';
 
   @override
+  String get navTrack3d_previewTitle => 'عرض ثلاثي الأبعاد';
+
+  @override
+  String get navTrack3d_metric_speed => 'السرعة';
+
+  @override
+  String get navTrack3d_metric_batteryVoltage => 'البطارية';
+
+  @override
+  String get navTrack3d_noProfile =>
+      'لا تتوفر بيانات كافية لهذا المسار لعرض ثلاثي الأبعاد.';
+
+  @override
   String get dive3d_metric_ascentRate => 'الصعود';
 
   @override
@@ -53007,6 +53020,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navTrack_detail_menuChangeSite => 'تغيير الموقع';
 
   @override
+  String get navTrack_detail_menuChangeDevice => 'تغيير الجهاز';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'عيّن نقطة البداية لرؤية هذا على خريطة.';
 
@@ -53025,16 +53041,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get navTrack_detail_correctionStatus_gpsFix =>
       'تم تعيين النهاية من إصلاح GPS الخاص بالتسجيل.';
-
-  @override
-  String navTrack_detail_device(String name) {
-    return 'الجهاز: $name';
-  }
-
-  @override
-  String navTrack_detail_equipment(String name) {
-    return 'المعدات: $name';
-  }
 
   @override
   String navTrack_detail_distance(String value) {
@@ -53077,6 +53083,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get navTrack_detail_chooseSite => 'اختيار موقع';
+
+  @override
+  String get navTrack_detail_noEquipment => 'لا يوجد جهاز';
+
+  @override
+  String get navTrack_detail_chooseDevice => 'اختيار جهاز';
 
   @override
   String get navTrack_review_importTrackTitle => 'استيراد مسار تحت الماء';

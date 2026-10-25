@@ -36320,6 +36320,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dive3d_metric_temperature => 'Temp';
 
   @override
+  String get navTrack3d_previewTitle => '3D View';
+
+  @override
+  String get navTrack3d_metric_speed => 'Speed';
+
+  @override
+  String get navTrack3d_metric_batteryVoltage => 'Battery';
+
+  @override
+  String get navTrack3d_noProfile =>
+      'This track doesn\'t have enough data for a 3D preview.';
+
+  @override
   String get dive3d_metric_ascentRate => 'Ascent';
 
   @override
@@ -51536,6 +51549,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navTrack_detail_menuChangeSite => 'Change site';
 
   @override
+  String get navTrack_detail_menuChangeDevice => 'Change device';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'Set the start point to see this on a map.';
 
@@ -51554,16 +51570,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get navTrack_detail_correctionStatus_gpsFix =>
       'End set from the recording\'s GPS fix.';
-
-  @override
-  String navTrack_detail_device(String name) {
-    return 'Device: $name';
-  }
-
-  @override
-  String navTrack_detail_equipment(String name) {
-    return 'Equipment: $name';
-  }
 
   @override
   String navTrack_detail_distance(String value) {
@@ -51606,6 +51612,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navTrack_detail_chooseSite => 'Choose site';
+
+  @override
+  String get navTrack_detail_noEquipment => 'No device';
+
+  @override
+  String get navTrack_detail_chooseDevice => 'Choose device';
 
   @override
   String get navTrack_review_importTrackTitle => 'Import Underwater Track';

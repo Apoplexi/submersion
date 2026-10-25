@@ -36720,6 +36720,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_metric_temperature => 'Hőm';
 
   @override
+  String get navTrack3d_previewTitle => '3D nézet';
+
+  @override
+  String get navTrack3d_metric_speed => 'Sebesség';
+
+  @override
+  String get navTrack3d_metric_batteryVoltage => 'Akku';
+
+  @override
+  String get navTrack3d_noProfile =>
+      'Ehhez a nyomvonalhoz nincs elég adat a 3D nézethez.';
+
+  @override
   String get dive3d_metric_ascentRate => 'Emelkedés';
 
   @override
@@ -52076,6 +52089,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get navTrack_detail_menuChangeSite => 'Merülőhely módosítása';
 
   @override
+  String get navTrack_detail_menuChangeDevice => 'Eszköz módosítása';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'Állítsd be a kezdőpontot, hogy ezt térképen lásd.';
 
@@ -52094,16 +52110,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get navTrack_detail_correctionStatus_gpsFix =>
       'A vég a felvétel GPS-fixéből beállítva.';
-
-  @override
-  String navTrack_detail_device(String name) {
-    return 'Eszköz: $name';
-  }
-
-  @override
-  String navTrack_detail_equipment(String name) {
-    return 'Felszerelés: $name';
-  }
 
   @override
   String navTrack_detail_distance(String value) {
@@ -52146,6 +52152,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get navTrack_detail_chooseSite => 'Merülőhely választása';
+
+  @override
+  String get navTrack_detail_noEquipment => 'Nincs eszköz';
+
+  @override
+  String get navTrack_detail_chooseDevice => 'Eszköz választása';
 
   @override
   String get navTrack_review_importTrackTitle =>
