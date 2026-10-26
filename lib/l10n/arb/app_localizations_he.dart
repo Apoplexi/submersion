@@ -37,6 +37,62 @@ class AppLocalizationsHe extends AppLocalizations {
   String get connections_around_show => 'הצגה';
 
   @override
+  String get connections_caption_circle => 'קו מחבר בין שני שותפים שצללו יחד.';
+
+  @override
+  String get connections_caption_where =>
+      'קו פירושו שצללת באתר הזה עם השותף הזה.';
+
+  @override
+  String get connections_caption_trips => 'קו פירושו שהשותף הזה היה בטיול הזה.';
+
+  @override
+  String get connections_caption_life =>
+      'קו פירושו שראית את המין הזה באתר הזה.';
+
+  @override
+  String get connections_caption_gear => 'קו מחבר בין ציוד ששימש באותה צלילה.';
+
+  @override
+  String get connections_caption_centers =>
+      'קו פירושו שצללת עם השותף הזה דרך מרכז הצלילה הזה.';
+
+  @override
+  String get connections_caption_travel =>
+      'שותפים, טיולים ואתרים; קו פירושו צלילות משותפות.';
+
+  @override
+  String get connections_caption_reef =>
+      'אתרים, חיים ימיים וסוגי צלילה; קו פירושו צלילות משותפות.';
+
+  @override
+  String get connections_caption_gearRoad =>
+      'ציוד, טיולים ומרכזי צלילה; קו פירושו צלילות משותפות.';
+
+  @override
+  String connections_caption_custom(String kinds) {
+    return '$kinds; קו פירושו שהם חולקים צלילה.';
+  }
+
+  @override
+  String get connections_caption_kindSeparator => ', ';
+
+  @override
+  String connections_caption_around(int hops) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hops,
+      locale: localeName,
+      other: 'כל מה שנמצא עד $hops צעדים מהפריט שבמרכז, מחובר בצלילות משותפות.',
+      one: 'כל מה שחולק צלילה עם הפריט שבמרכז.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connections_caption_thicker =>
+      'קווים עבים יותר פירושם יותר צלילות.';
+
+  @override
   String get connections_editor_kinds => 'סוגים';
 
   @override
@@ -5085,6 +5141,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get connections_empty_sites => 'לאף צלילה אין עדיין אתר.';
+
+  @override
+  String get connections_empty_whereNoSites =>
+      'לאף אחת מהצלילות שלך עם שותף עדיין אין אתר. הוסף אתרים לצלילות האלה כדי לראות איפה אתם צוללים יחד.';
 
   @override
   String get connections_empty_filtered => 'אין פריטים שמתאימים לסינון הנוכחי.';

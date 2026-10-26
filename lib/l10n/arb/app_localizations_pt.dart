@@ -37,6 +37,66 @@ class AppLocalizationsPt extends AppLocalizations {
   String get connections_around_show => 'Mostrar';
 
   @override
+  String get connections_caption_circle =>
+      'Uma linha liga dois parceiros que mergulharam juntos.';
+
+  @override
+  String get connections_caption_where =>
+      'Uma linha indica que você mergulhou nesse local com esse parceiro.';
+
+  @override
+  String get connections_caption_trips =>
+      'Uma linha indica que esse parceiro estava nessa viagem.';
+
+  @override
+  String get connections_caption_life =>
+      'Uma linha indica que você viu essa espécie nesse local.';
+
+  @override
+  String get connections_caption_gear =>
+      'Uma linha liga equipamentos usados no mesmo mergulho.';
+
+  @override
+  String get connections_caption_centers =>
+      'Uma linha indica que você mergulhou com esse parceiro por esse centro.';
+
+  @override
+  String get connections_caption_travel =>
+      'Parceiros, viagens e locais; uma linha indica mergulhos em comum.';
+
+  @override
+  String get connections_caption_reef =>
+      'Locais, vida marinha e tipos de mergulho; uma linha indica mergulhos em comum.';
+
+  @override
+  String get connections_caption_gearRoad =>
+      'Equipamento, viagens e centros; uma linha indica mergulhos em comum.';
+
+  @override
+  String connections_caption_custom(String kinds) {
+    return '$kinds; uma linha indica que compartilham um mergulho.';
+  }
+
+  @override
+  String get connections_caption_kindSeparator => ', ';
+
+  @override
+  String connections_caption_around(int hops) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hops,
+      locale: localeName,
+      other:
+          'Tudo a até $hops passos do elemento central, ligado por mergulhos em comum.',
+      one: 'Tudo o que compartilha um mergulho com o elemento central.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connections_caption_thicker =>
+      'Linhas mais grossas indicam mais mergulhos.';
+
+  @override
   String get connections_editor_kinds => 'Tipos';
 
   @override
@@ -5188,6 +5248,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get connections_empty_sites => 'Nenhum mergulho tem ainda um local.';
+
+  @override
+  String get connections_empty_whereNoSites =>
+      'Nenhum dos seus mergulhos com um parceiro tem local ainda. Adicione locais a esses mergulhos para ver onde vocês mergulham juntos.';
 
   @override
   String get connections_empty_filtered => 'Nada corresponde ao filtro atual.';

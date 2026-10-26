@@ -37,6 +37,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connections_around_show => 'Show';
 
   @override
+  String get connections_caption_circle =>
+      'A line joins two buddies who dived together.';
+
+  @override
+  String get connections_caption_where =>
+      'A line means you dived at that site with that buddy.';
+
+  @override
+  String get connections_caption_trips =>
+      'A line means that buddy was on that trip.';
+
+  @override
+  String get connections_caption_life =>
+      'A line means you saw that species at that site.';
+
+  @override
+  String get connections_caption_gear =>
+      'A line joins gear used on the same dive.';
+
+  @override
+  String get connections_caption_centers =>
+      'A line means you dived with that buddy through that center.';
+
+  @override
+  String get connections_caption_travel =>
+      'Buddies, trips and sites; a line means they share dives.';
+
+  @override
+  String get connections_caption_reef =>
+      'Sites, marine life and dive types; a line means they share dives.';
+
+  @override
+  String get connections_caption_gearRoad =>
+      'Gear, trips and centers; a line means they share dives.';
+
+  @override
+  String connections_caption_custom(String kinds) {
+    return '$kinds; a line means they share a dive.';
+  }
+
+  @override
+  String get connections_caption_kindSeparator => ', ';
+
+  @override
+  String connections_caption_around(int hops) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hops,
+      locale: localeName,
+      other:
+          'Everything within $hops steps of this centre, linked by shared dives.',
+      one: 'Everything that shares a dive with this centre.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connections_caption_thicker => 'Thicker lines mean more dives.';
+
+  @override
   String get connections_editor_kinds => 'Kinds';
 
   @override
@@ -5114,6 +5173,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get connections_empty_sites => 'No dives have a site yet.';
+
+  @override
+  String get connections_empty_whereNoSites =>
+      'None of your dives with a buddy has a site yet. Add sites to those dives to see where you dive together.';
 
   @override
   String get connections_empty_filtered =>

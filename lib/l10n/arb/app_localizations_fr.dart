@@ -37,6 +37,66 @@ class AppLocalizationsFr extends AppLocalizations {
   String get connections_around_show => 'Afficher';
 
   @override
+  String get connections_caption_circle =>
+      'Une ligne relie deux binômes qui ont plongé ensemble.';
+
+  @override
+  String get connections_caption_where =>
+      'Une ligne signifie que vous avez plongé sur ce site avec ce binôme.';
+
+  @override
+  String get connections_caption_trips =>
+      'Une ligne signifie que ce binôme était de ce voyage.';
+
+  @override
+  String get connections_caption_life =>
+      'Une ligne signifie que vous avez vu cette espèce sur ce site.';
+
+  @override
+  String get connections_caption_gear =>
+      'Une ligne relie l\'équipement utilisé lors d\'une même plongée.';
+
+  @override
+  String get connections_caption_centers =>
+      'Une ligne signifie que vous avez plongé avec ce binôme via ce centre.';
+
+  @override
+  String get connections_caption_travel =>
+      'Binômes, voyages et sites ; une ligne signifie des plongées en commun.';
+
+  @override
+  String get connections_caption_reef =>
+      'Sites, vie marine et types de plongée ; une ligne signifie des plongées en commun.';
+
+  @override
+  String get connections_caption_gearRoad =>
+      'Équipement, voyages et centres ; une ligne signifie des plongées en commun.';
+
+  @override
+  String connections_caption_custom(String kinds) {
+    return '$kinds ; une ligne signifie qu\'ils partagent une plongée.';
+  }
+
+  @override
+  String get connections_caption_kindSeparator => ', ';
+
+  @override
+  String connections_caption_around(int hops) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hops,
+      locale: localeName,
+      other:
+          'Tout ce qui se trouve à $hops pas au plus de l\'élément central, relié par des plongées en commun.',
+      one: 'Tout ce qui partage une plongée avec l\'élément central.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get connections_caption_thicker =>
+      'Plus la ligne est épaisse, plus il y a de plongées.';
+
+  @override
   String get connections_editor_kinds => 'Types';
 
   @override
@@ -5199,6 +5259,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get connections_empty_sites => 'Aucune plongée n\'a encore de site.';
+
+  @override
+  String get connections_empty_whereNoSites =>
+      'Aucune de vos plongées avec un binôme n\'a encore de site. Ajoutez des sites à ces plongées pour voir où vous plongez ensemble.';
 
   @override
   String get connections_empty_filtered =>
