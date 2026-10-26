@@ -8294,6 +8294,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filterChip_noBuddy => 'Kein Buddy';
 
   @override
+  String get diveLog_filterChip_noRole => 'Keine Rolle';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Bis $date';
   }
@@ -8357,6 +8360,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filter_noBuddyOnly => 'Kein Buddy zugewiesen';
 
   @override
+  String get diveLog_filter_noRoleOnly => 'Keine Rolle zugewiesen';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Noch keine Tags erstellt';
 
   @override
@@ -8416,6 +8422,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyNoBuddy =>
       'Nur Tauchgänge ohne Buddy anzeigen';
+
+  @override
+  String get diveLog_filter_showOnlyNoRole =>
+      'Nur Tauchgänge ohne eigene Rolle anzeigen';
 
   @override
   String get diveLog_filter_startDate => 'Startdatum';
@@ -47301,16 +47311,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filter_speciesSearchHint => 'Arten suchen';
 
   @override
-  String get explore_chip_favorite => 'Favorit';
-
-  @override
   String get explore_chip_deco => 'Dekompressionstauchgang';
 
   @override
   String get explore_chip_noDeco => 'Ohne Dekompression';
-
-  @override
-  String get explore_chip_noBuddy => 'Ohne Buddy';
 
   @override
   String explore_chip_rating(String op, String value) {
@@ -47368,49 +47372,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Das Modell auf dem Gerät versteht diese Sprache nicht.';
 
   @override
-  String get explore_field_airTemp => 'Lufttemperatur';
-
-  @override
-  String get explore_field_avgDepth => 'Durchschnittstiefe';
-
-  @override
   String get explore_field_bottomTime => 'Grundzeit';
 
   @override
-  String get explore_field_currentStrength => 'Strömung';
-
-  @override
-  String get explore_field_depth => 'Tiefe';
-
-  @override
-  String get explore_field_diveMode => 'Tauchmodus';
-
-  @override
-  String get explore_field_diveNumber => 'Tauchgangsnummer';
-
-  @override
-  String get explore_field_diveType => 'Tauchgangsart';
-
-  @override
-  String get explore_field_entryMethod => 'Einstieg';
-
-  @override
   String get explore_field_o2 => 'Sauerstoff';
-
-  @override
-  String get explore_field_rating => 'Bewertung';
-
-  @override
-  String get explore_field_visibility => 'Sicht';
-
-  @override
-  String get explore_field_waterTemp => 'Wassertemperatur';
-
-  @override
-  String get explore_field_waterType => 'Wasserart';
-
-  @override
-  String get explore_field_weekday => 'Wochentag';
 
   @override
   String get explore_handoff_list => 'In Liste öffnen';
@@ -53227,6 +53192,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get query_dives_legacyBuddy => 'Buddy (alter Text)';
+
+  @override
+  String get query_dives_role => 'Meine Rolle';
 
   @override
   String get query_dives_media => 'Medien';

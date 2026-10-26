@@ -8321,6 +8321,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_filterChip_noBuddy => 'Sans binôme';
 
   @override
+  String get diveLog_filterChip_noRole => 'Aucun rôle';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Jusqu\'au $date';
   }
@@ -8385,6 +8388,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_filter_noBuddyOnly => 'Aucun binôme assigné';
 
   @override
+  String get diveLog_filter_noRoleOnly => 'Aucun rôle assigné';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Aucun tag créé pour le moment';
 
   @override
@@ -8447,6 +8453,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyNoBuddy =>
       'Afficher uniquement les plongées sans binôme';
+
+  @override
+  String get diveLog_filter_showOnlyNoRole =>
+      'Afficher uniquement les plongées sans votre rôle';
 
   @override
   String get diveLog_filter_startDate => 'Date de début';
@@ -47509,16 +47519,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_filter_speciesSearchHint => 'Rechercher une espèce';
 
   @override
-  String get explore_chip_favorite => 'Favori';
-
-  @override
   String get explore_chip_deco => 'Plongée avec décompression';
 
   @override
   String get explore_chip_noDeco => 'Sans décompression';
-
-  @override
-  String get explore_chip_noBuddy => 'Sans binôme';
 
   @override
   String explore_chip_rating(String op, String value) {
@@ -47576,49 +47580,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le modèle sur l\'appareil ne comprend pas cette langue.';
 
   @override
-  String get explore_field_airTemp => 'Température de l\'air';
-
-  @override
-  String get explore_field_avgDepth => 'Profondeur moyenne';
-
-  @override
   String get explore_field_bottomTime => 'Temps au fond';
 
   @override
-  String get explore_field_currentStrength => 'Courant';
-
-  @override
-  String get explore_field_depth => 'Profondeur';
-
-  @override
-  String get explore_field_diveMode => 'Mode de plongée';
-
-  @override
-  String get explore_field_diveNumber => 'Numéro de plongée';
-
-  @override
-  String get explore_field_diveType => 'Type de plongée';
-
-  @override
-  String get explore_field_entryMethod => 'Mise à l\'eau';
-
-  @override
   String get explore_field_o2 => 'Oxygène';
-
-  @override
-  String get explore_field_rating => 'Note';
-
-  @override
-  String get explore_field_visibility => 'Visibilité';
-
-  @override
-  String get explore_field_waterTemp => 'Température de l\'eau';
-
-  @override
-  String get explore_field_waterType => 'Type d\'eau';
-
-  @override
-  String get explore_field_weekday => 'Jour de la semaine';
 
   @override
   String get explore_handoff_list => 'Ouvrir dans la liste';
@@ -53462,6 +53427,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get query_dives_legacyBuddy => 'Binôme (ancien texte)';
+
+  @override
+  String get query_dives_role => 'Mon rôle';
 
   @override
   String get query_dives_media => 'Médias';

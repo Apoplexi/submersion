@@ -8278,6 +8278,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filterChip_noBuddy => 'Nincs búvártárs';
 
   @override
+  String get diveLog_filterChip_noRole => 'Nincs szerep';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Eddig: $date';
   }
@@ -8341,6 +8344,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_noBuddyOnly => 'Nincs búvártárs hozzárendelve';
 
   @override
+  String get diveLog_filter_noRoleOnly => 'Nincs szerep hozzárendelve';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Még nincsenek létrehozott címkék';
 
   @override
@@ -8401,6 +8407,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyNoBuddy =>
       'Csak búvártárs nélküli merülések mutatása';
+
+  @override
+  String get diveLog_filter_showOnlyNoRole =>
+      'Csak saját szerep nélküli merülések mutatása';
 
   @override
   String get diveLog_filter_startDate => 'Kezdés dátuma';
@@ -47140,16 +47150,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_speciesSearchHint => 'Fajok keresése';
 
   @override
-  String get explore_chip_favorite => 'Kedvenc';
-
-  @override
   String get explore_chip_deco => 'Dekompressziós merülés';
 
   @override
   String get explore_chip_noDeco => 'Dekompresszió nélkül';
-
-  @override
-  String get explore_chip_noBuddy => 'Társ nélkül';
 
   @override
   String explore_chip_rating(String op, String value) {
@@ -47207,49 +47211,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az eszközön futó modell nem érti ezt a nyelvet.';
 
   @override
-  String get explore_field_airTemp => 'Levegő hőmérséklete';
-
-  @override
-  String get explore_field_avgDepth => 'Átlagos mélység';
-
-  @override
   String get explore_field_bottomTime => 'Fenékidő';
 
   @override
-  String get explore_field_currentStrength => 'Áramlás';
-
-  @override
-  String get explore_field_depth => 'Mélység';
-
-  @override
-  String get explore_field_diveMode => 'Merülési mód';
-
-  @override
-  String get explore_field_diveNumber => 'Merülés száma';
-
-  @override
-  String get explore_field_diveType => 'Merülés típusa';
-
-  @override
-  String get explore_field_entryMethod => 'Beszállás';
-
-  @override
   String get explore_field_o2 => 'Oxigén';
-
-  @override
-  String get explore_field_rating => 'Értékelés';
-
-  @override
-  String get explore_field_visibility => 'Látótávolság';
-
-  @override
-  String get explore_field_waterTemp => 'Vízhőmérséklet';
-
-  @override
-  String get explore_field_waterType => 'Víztípus';
-
-  @override
-  String get explore_field_weekday => 'Hét napja';
 
   @override
   String get explore_handoff_list => 'Megnyitás a listában';
@@ -53058,6 +53023,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get query_dives_legacyBuddy => 'Merülőtárs (régi szöveg)';
+
+  @override
+  String get query_dives_role => 'Saját szerep';
 
   @override
   String get query_dives_media => 'Média';

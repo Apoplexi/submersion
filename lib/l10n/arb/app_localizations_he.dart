@@ -8118,6 +8118,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filterChip_noBuddy => 'ללא שותף';
 
   @override
+  String get diveLog_filterChip_noRole => 'ללא תפקיד';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'עד $date';
   }
@@ -8180,6 +8183,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filter_noBuddyOnly => 'ללא שותף';
 
   @override
+  String get diveLog_filter_noRoleOnly => 'ללא תפקיד';
+
+  @override
   String get diveLog_filter_noTagsYet => 'לא נוצרו תגיות עדיין';
 
   @override
@@ -8235,6 +8241,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyNoBuddy => 'הצגת צלילות ללא שותף בלבד';
+
+  @override
+  String get diveLog_filter_showOnlyNoRole => 'הצגת צלילות ללא התפקיד שלך בלבד';
 
   @override
   String get diveLog_filter_startDate => 'תאריך התחלה';
@@ -46382,16 +46391,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filter_speciesSearchHint => 'חיפוש מינים';
 
   @override
-  String get explore_chip_favorite => 'מועדף';
-
-  @override
   String get explore_chip_deco => 'צלילת דקומפרסיה';
 
   @override
   String get explore_chip_noDeco => 'ללא דקומפרסיה';
-
-  @override
-  String get explore_chip_noBuddy => 'ללא שותף';
 
   @override
   String explore_chip_rating(String op, String value) {
@@ -46447,49 +46450,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'המודל במכשיר אינו מבין שפה זו.';
 
   @override
-  String get explore_field_airTemp => 'טמפרטורת האוויר';
-
-  @override
-  String get explore_field_avgDepth => 'עומק ממוצע';
-
-  @override
   String get explore_field_bottomTime => 'זמן קרקעית';
 
   @override
-  String get explore_field_currentStrength => 'זרם';
-
-  @override
-  String get explore_field_depth => 'עומק';
-
-  @override
-  String get explore_field_diveMode => 'מצב צלילה';
-
-  @override
-  String get explore_field_diveNumber => 'מספר צלילה';
-
-  @override
-  String get explore_field_diveType => 'סוג צלילה';
-
-  @override
-  String get explore_field_entryMethod => 'כניסה';
-
-  @override
   String get explore_field_o2 => 'חמצן';
-
-  @override
-  String get explore_field_rating => 'דירוג';
-
-  @override
-  String get explore_field_visibility => 'ראות';
-
-  @override
-  String get explore_field_waterTemp => 'טמפרטורת המים';
-
-  @override
-  String get explore_field_waterType => 'סוג מים';
-
-  @override
-  String get explore_field_weekday => 'יום בשבוע';
 
   @override
   String get explore_handoff_list => 'פתח ברשימה';
@@ -52214,6 +52178,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get query_dives_legacyBuddy => 'שותף צלילה (טקסט ישן)';
+
+  @override
+  String get query_dives_role => 'התפקיד שלי';
 
   @override
   String get query_dives_media => 'מדיה';

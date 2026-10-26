@@ -8435,6 +8435,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filterChip_noBuddy => 'بدون زميل';
 
   @override
+  String get diveLog_filterChip_noRole => 'بدون دور';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'حتى $date';
   }
@@ -8497,6 +8500,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_noBuddyOnly => 'بدون زميل غوص';
 
   @override
+  String get diveLog_filter_noRoleOnly => 'بدون دور';
+
+  @override
   String get diveLog_filter_noTagsYet => 'لم يتم إنشاء وسوم بعد';
 
   @override
@@ -8552,6 +8558,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyNoBuddy => 'عرض الغوصات بدون زميل غوص فقط';
+
+  @override
+  String get diveLog_filter_showOnlyNoRole =>
+      'عرض الغوصات التي لم يُحدَّد فيها دورك فقط';
 
   @override
   String get diveLog_filter_startDate => 'تاريخ البدء';
@@ -47964,16 +47974,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_speciesSearchHint => 'البحث عن الأنواع';
 
   @override
-  String get explore_chip_favorite => 'مفضل';
-
-  @override
   String get explore_chip_deco => 'غطسة تخفيف ضغط';
 
   @override
   String get explore_chip_noDeco => 'بدون تخفيف ضغط';
-
-  @override
-  String get explore_chip_noBuddy => 'بدون رفيق';
 
   @override
   String explore_chip_rating(String op, String value) {
@@ -48029,49 +48033,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'النموذج على الجهاز لا يفهم هذه اللغة.';
 
   @override
-  String get explore_field_airTemp => 'درجة حرارة الهواء';
-
-  @override
-  String get explore_field_avgDepth => 'متوسط العمق';
-
-  @override
   String get explore_field_bottomTime => 'وقت القاع';
 
   @override
-  String get explore_field_currentStrength => 'التيار';
-
-  @override
-  String get explore_field_depth => 'العمق';
-
-  @override
-  String get explore_field_diveMode => 'وضع الغطس';
-
-  @override
-  String get explore_field_diveNumber => 'رقم الغطسة';
-
-  @override
-  String get explore_field_diveType => 'نوع الغطسة';
-
-  @override
-  String get explore_field_entryMethod => 'الدخول';
-
-  @override
   String get explore_field_o2 => 'الأكسجين';
-
-  @override
-  String get explore_field_rating => 'التقييم';
-
-  @override
-  String get explore_field_visibility => 'الرؤية';
-
-  @override
-  String get explore_field_waterTemp => 'درجة حرارة الماء';
-
-  @override
-  String get explore_field_waterType => 'نوع المياه';
-
-  @override
-  String get explore_field_weekday => 'يوم الأسبوع';
 
   @override
   String get explore_handoff_list => 'فتح في القائمة';
@@ -53997,6 +53962,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get query_dives_legacyBuddy => 'رفيق الغوص (نص قديم)';
+
+  @override
+  String get query_dives_role => 'دوري';
 
   @override
   String get query_dives_media => 'الوسائط';
