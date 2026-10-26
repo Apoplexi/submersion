@@ -40209,6 +40209,20 @@ class AppLocalizationsFr extends AppLocalizations {
       'Décaler toutes les plongées de cet import';
 
   @override
+  String dataQuality_repairLabel_shiftLogbookTime(String offset) {
+    return 'Décaler l\'heure du carnet de $offset';
+  }
+
+  @override
+  String dataQuality_repairLabel_fixSourceClock(String offset) {
+    return 'Corriger l\'horloge de cet ordinateur de $offset';
+  }
+
+  @override
+  String get dataQuality_repairLabel_fixSourceClockAll =>
+      'Corriger aussi cet ordinateur sur les autres plongées ayant le même décalage';
+
+  @override
   String get dataQuality_repairLabel_consolidate => 'Consolider';
 
   @override
