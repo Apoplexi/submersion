@@ -14077,6 +14077,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_deleteDialog_content => '确定要删除此装备吗？此操作无法撤销。';
 
   @override
+  String get equipment_deleteDialog_content_computer =>
+      '删除此潜水电脑？其下载记录也会一并删除，因此下次下载会重新读取所有潜水。你的潜水记录会保留。再次连接该电脑会将其重新添加。';
+
+  @override
+  String get equipment_deleteDialog_content_transmitter =>
+      '删除此发射器？其气瓶设置也会一并删除。之后包含其序列号的下载会将其重新添加。如只想将其搁置，请将其标记为已退役。';
+
+  @override
+  String get equipment_bulkDelete_deviceNote =>
+      '所选内容中的潜水电脑和发射器会连同其下载记录和设置一并删除。你的潜水记录会保留。';
+
+  @override
   String get equipment_deleteDialog_title => '删除装备';
 
   @override
@@ -14870,6 +14882,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equipment_edit_typeLabel => '类型 *';
+
+  @override
+  String get equipment_edit_typeLockedHelper => '已连接的潜水电脑或发射器会保留其类型。';
 
   @override
   String get equipment_edit_useCustomReminders => '使用自定义提醒';
@@ -31858,27 +31873,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveComputer_connections_cloudOther => '云端导入';
 
   @override
-  String diveComputer_detail_deleteDialogContent(String name) {
-    return '确定要移除“$name”吗?这不会删除从此电脑导入的任何潜水记录。';
-  }
-
-  @override
-  String get diveComputer_detail_deleteDialogTitle => '删除电脑?';
-
-  @override
   String get diveComputer_detail_divesImported => '已导入潜水';
 
   @override
   String get diveComputer_detail_downloadDivesButton => '下载潜水记录';
 
   @override
-  String get diveComputer_detail_editDialogTitle => '编辑电脑';
+  String get diveComputer_section_connect => '连接并下载';
 
   @override
-  String get diveComputer_detail_editNameHint => '例如,我的 Perdix';
-
-  @override
-  String get diveComputer_detail_editNotesHint => '可选备注';
+  String get diveComputer_section_notConnected => '此潜水电脑尚未连接。连接后即可下载其潜水记录。';
 
   @override
   String get diveComputer_detail_labelManufacturer => '制造商';
@@ -31887,16 +31891,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveComputer_detail_labelModel => '型号';
 
   @override
-  String get diveComputer_detail_labelName => '名称';
-
-  @override
   String get diveComputer_detail_lastDownload => '上次下载';
-
-  @override
-  String get diveComputer_detail_linkedGear => '装备';
-
-  @override
-  String get diveComputer_detail_notesTitle => '备注';
 
   @override
   String get diveComputer_detail_reimportAllButton => '重新导入所有潜水';
@@ -32123,6 +32118,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveComputer_list_findComputers => '查找潜水电脑';
+
+  @override
+  String get diveComputer_list_addByHand => '手动添加';
+
+  @override
+  String get diveComputer_list_notConnected => '尚未连接';
 
   @override
   String get diveComputer_list_helpBluetooth => '• 低功耗蓝牙（大多数现代电脑）';
@@ -48471,6 +48472,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_merge_gearNote =>
+      '其他记录的装备条目会合并到此条目：其保养记录、文档和照片都会移到这里，清空后的条目将被删除。';
+
+  @override
   String get diveComputer_merge_keepLabel => '保留此记录';
 
   @override
@@ -48684,22 +48689,32 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transmitters_add => '添加发射器';
 
   @override
-  String get transmitters_header_assigned => '已分配的发射器';
+  String get transmitters_emptyItems => '还没有发射器。读取到发射器的下载会将其添加到这里，你也可以手动添加。';
 
   @override
-  String get transmitters_header_unassigned => '下载中出现但未分配';
+  String get transmitters_noCylinder => '未设置气瓶';
 
   @override
-  String get transmitters_empty => '还没有发射器。添加一个，或在下次下载后分配序列号。';
+  String get transmitters_section_noKey => '还没有序列号或通道。请添加你的潜水电脑为此发射器报告的值。';
 
   @override
-  String get transmitters_action_assign => '分配';
+  String get transmitters_key_remove => '移除此标识';
 
   @override
-  String get transmitters_action_edit => '编辑发射器';
+  String get transmitters_key_removeTitle => '移除此标识？';
 
   @override
-  String get transmitters_action_delete => '删除发射器';
+  String get transmitters_key_removeBody =>
+      '发射器条目及其其他标识会保留。适用于错误的通道或输错的序列号：潜水电脑仍在报告的序列号会在下次下载时重新加入，尚未设置。';
+
+  @override
+  String get transmitters_list_noKey => '尚无序列号或通道';
+
+  @override
+  String get transmitters_section_addKey => '添加序列号或通道';
+
+  @override
+  String get transmitters_section_setUp => '设置';
 
   @override
   String get transmitters_action_apply => '应用到现有潜水';
@@ -48721,14 +48736,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transmitters_apply_nothing => '没有气瓶带有此发射器';
 
   @override
-  String get transmitters_delete_title => '删除发射器？';
-
-  @override
-  String transmitters_delete_content(String label) {
-    return '今后从 $label 的下载将重新使用默认预设。';
-  }
-
-  @override
   String transmitters_channel(String computer, int channel) {
     return '$computer，通道 $channel';
   }
@@ -48739,27 +48746,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String transmitters_dives(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 次潜水',
-      one: '1 次潜水',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get transmitters_edit_title => '编辑发射器';
 
   @override
   String get transmitters_new_title => '新发射器';
-
-  @override
-  String get transmitters_field_label => '标签';
-
-  @override
-  String get transmitters_field_label_helper => '一旦此发射器匹配成功，将成为潜水记录中气瓶的名称';
 
   @override
   String get transmitters_field_serial => '发射器序列号';
@@ -48778,12 +48768,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transmitters_field_gear_subtitle => '此发射器报告压力所对应的气瓶';
-
-  @override
-  String get transmitters_field_transmitterGear => '来自装备的无线发射器';
-
-  @override
-  String get transmitters_field_transmitterGear_subtitle => '电池/保养追踪，不用于匹配';
 
   @override
   String get transmitters_field_material => '材质';
@@ -48807,16 +48791,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transmitters_saved => '发射器已保存';
-
-  @override
-  String transmitters_copySerial_title(String gearName) {
-    return '将序列号复制到“$gearName”？';
-  }
-
-  @override
-  String transmitters_copySerial_content(String serial) {
-    return '此条目匹配的序列号（$serial）尚未记录在发射器装备项目上。';
-  }
 
   @override
   String get diveComputer_detail_transmitters => '发射器';
@@ -48880,6 +48854,16 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get universalImport_summary_noticeTransmitterNameRolesBody =>
       '潜水电脑根据发射器的名称识别了部分氧气和稀释气用途：以 O 开头的名称视为氧气，以 D 开头的视为稀释气。请分配发射器以确认或更正这些用途。';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemTitle => '此电脑已在装备中';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemBody =>
+      '你连接的电脑已是另一个装备条目，因此其潜水记录已添加到那里。你开始时所在的条目保持不变。';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemAction => '打开该条目';
 
   @override
   String get universalImport_summary_noticeDiveNumberConflictTitle =>

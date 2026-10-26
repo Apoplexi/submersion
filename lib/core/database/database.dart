@@ -1415,6 +1415,14 @@ class AppDatabase extends _$AppDatabase {
     // v315: diver_settings.omit_unused_oc_gases (issue #3668). Additive, off
     // by default; the floor does not move.
     315,
+    // v316: transmitters.is_configured (issue #3676). Additive with a default
+    // of 1, and an older peer omits it, so the floor stays. The known cost: a
+    // peer still on v315 ignores the column, so it treats an entry this
+    // build created from a download as the diver's own configuration and
+    // names its tanks after it until it updates; and an edit it publishes on
+    // such an entry drops the column, which then arrives here as configured.
+    // Renumbered from 315, which #3668 took.
+    316,
     // v317: the tank inspection dates become VIP and hydro clock baselines
     // (issue #3662). Data only and unsynced, so the floor does not move. 316
     // is held by PR #3685.

@@ -600,6 +600,22 @@ extension RungsFromV231 on AppDatabase {
     if (from < 315) await _assertOmitUnusedOcGasesColumn();
     if (from < 315) await reportProgress();
 
+    // v316: one Equipment entry per dive computer and transmitter (issue
+    // #3676). transmitters.is_configured, re-asserted in beforeOpen; then
+    // every device gets its item (also run on every open), names and notes
+    // are aligned, serials seen in downloads are registered, and transmitter
+    // items join the dives that carry them. The last three are ladder-only:
+    // each acts on history once (device_gear_upgrade.dart). Renumbered from
+    // 315, which #3668 took.
+    if (from < 316) {
+      await _assertTransmitterConfiguredColumn();
+      await ensureDeviceGearLinks(this);
+      await alignComputerNamesAndNotes(this);
+      await registerUnassignedSerials(this);
+      await linkTransmitterGearToDives(this);
+    }
+    if (from < 316) await reportProgress();
+
     // v317: a tank's last visual inspection and last hydro dates become its
     // VIP and hydro clocks' baselines (issue #3662), where the clock has no
     // baseline and no service of its kind. Data only, one time: from here

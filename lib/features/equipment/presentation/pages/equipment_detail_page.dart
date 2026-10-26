@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:submersion/features/transmitters/presentation/widgets/transmitter_section.dart';
+import 'package:submersion/features/dive_computer/presentation/widgets/dive_computer_section.dart';
 import 'package:submersion/features/connections/domain/entities/connection_kind.dart';
 import 'package:submersion/features/connections/domain/entities/node_ref.dart';
 import 'package:submersion/features/connections/presentation/widgets/open_in_connections.dart';
 import 'package:submersion/features/equipment/domain/services/equipment_ownership.dart';
+import 'package:submersion/features/equipment/presentation/widgets/equipment_delete_dialog.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_history_card.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_share_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -228,6 +231,14 @@ class _EquipmentDetailContent extends ConsumerWidget {
           const SizedBox(height: 24),
           _buildDetailsSection(context, ref, equipment, units),
           const SizedBox(height: 24),
+          // The device's controls (issue #3676): this item is its one entry.
+          if (equipment.type == EquipmentType.computer) ...[
+            DiveComputerSection(equipmentId: equipmentId),
+            const SizedBox(height: 24),
+          ] else if (equipment.type == EquipmentType.transmitter) ...[
+            TransmitterSection(equipmentId: equipmentId),
+            const SizedBox(height: 24),
+          ],
           EquipmentLocationCard(equipment: equipment),
           const SizedBox(height: 24),
           if (equipment.type == EquipmentType.tank) ...[
@@ -982,28 +993,11 @@ class _EquipmentDetailContent extends ConsumerWidget {
           }
         }
       case 'delete':
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(context.l10n.equipment_deleteDialog_title),
-            content: Text(context.l10n.equipment_deleteDialog_content),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(context.l10n.equipment_deleteDialog_cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-                child: Text(context.l10n.equipment_deleteDialog_confirm),
-              ),
-            ],
-          ),
-        );
+        // The item this page shows, not a re-read: a reload in flight would
+        // drop the device warning a computer or transmitter needs.
+        final confirmed = await confirmEquipmentDelete(context, equipment.type);
 
-        if (confirmed == true) {
+        if (confirmed) {
           final deleted = await notifier.deleteEquipment(equipmentId);
           if (!deleted) {
             // Delete is owner-only (issue #2046): the item was kept, so stay

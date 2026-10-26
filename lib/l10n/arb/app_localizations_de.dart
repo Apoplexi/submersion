@@ -14746,6 +14746,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sind Sie sicher, dass Sie diese Ausrüstung löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.';
 
   @override
+  String get equipment_deleteDialog_content_computer =>
+      'Diesen Tauchcomputer löschen? Sein Download-Verlauf wird mit gelöscht, daher liest der nächste Download alle Tauchgänge erneut. Ihre Tauchgänge bleiben erhalten. Wenn Sie den Computer erneut verbinden, wird er wieder hinzugefügt.';
+
+  @override
+  String get equipment_deleteDialog_content_transmitter =>
+      'Diesen Sender löschen? Seine Flascheneinrichtung wird mit gelöscht. Ein späterer Download mit seiner Seriennummer fügt ihn wieder hinzu. Um ihn stattdessen aus dem Weg zu räumen, setzen Sie ihn auf Ausgemustert.';
+
+  @override
+  String get equipment_bulkDelete_deviceNote =>
+      'Tauchcomputer und Sender in der Auswahl werden mit ihrem Download-Verlauf und ihrer Einrichtung gelöscht. Ihre Tauchgänge bleiben erhalten.';
+
+  @override
   String get equipment_deleteDialog_title => 'Ausrüstung löschen';
 
   @override
@@ -15577,6 +15589,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get equipment_edit_typeLabel => 'Typ *';
+
+  @override
+  String get equipment_edit_typeLockedHelper =>
+      'Ein verbundener Tauchcomputer oder Sender behält seinen Typ.';
 
   @override
   String get equipment_edit_useCustomReminders =>
@@ -33780,14 +33796,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveComputer_connections_cloudOther => 'Cloud-Import';
 
   @override
-  String diveComputer_detail_deleteDialogContent(String name) {
-    return 'Möchten Sie \"$name\" wirklich entfernen? Dadurch werden keine von diesem Computer importierten Tauchgänge gelöscht.';
-  }
-
-  @override
-  String get diveComputer_detail_deleteDialogTitle => 'Computer löschen?';
-
-  @override
   String get diveComputer_detail_divesImported => 'Importierte Tauchgänge';
 
   @override
@@ -33795,13 +33803,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tauchgänge herunterladen';
 
   @override
-  String get diveComputer_detail_editDialogTitle => 'Computer bearbeiten';
+  String get diveComputer_section_connect => 'Verbinden und herunterladen';
 
   @override
-  String get diveComputer_detail_editNameHint => 'z. B. Mein Perdix';
-
-  @override
-  String get diveComputer_detail_editNotesHint => 'Optionale Notizen';
+  String get diveComputer_section_notConnected =>
+      'Dieser Computer wurde noch nicht verbunden. Verbinden Sie ihn, um seine Tauchgänge herunterzuladen.';
 
   @override
   String get diveComputer_detail_labelManufacturer => 'Hersteller';
@@ -33810,16 +33816,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveComputer_detail_labelModel => 'Modell';
 
   @override
-  String get diveComputer_detail_labelName => 'Name';
-
-  @override
   String get diveComputer_detail_lastDownload => 'Letzter Download';
-
-  @override
-  String get diveComputer_detail_linkedGear => 'Ausrüstungsteil';
-
-  @override
-  String get diveComputer_detail_notesTitle => 'Notizen';
 
   @override
   String get diveComputer_detail_reimportAllButton =>
@@ -34064,6 +34061,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveComputer_list_findComputers => 'Computer suchen';
+
+  @override
+  String get diveComputer_list_addByHand => 'Manuell hinzufügen';
+
+  @override
+  String get diveComputer_list_notConnected => 'Noch nicht verbunden';
 
   @override
   String get diveComputer_list_helpBluetooth =>
@@ -51571,6 +51574,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_merge_gearNote =>
+      'Der Ausrüstungseintrag jedes anderen Datensatzes wird mit diesem zusammengeführt: Wartungsverlauf, Dokumente und Fotos wandern hierher, und der leere Eintrag wird gelöscht.';
+
+  @override
   String get diveComputer_merge_keepLabel => 'Diesen Eintrag behalten';
 
   @override
@@ -51801,24 +51808,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get transmitters_add => 'Sender hinzufügen';
 
   @override
-  String get transmitters_header_assigned => 'Zugewiesene Sender';
+  String get transmitters_emptyItems =>
+      'Noch keine Sender. Ein Download, der einen erkennt, fügt ihn hier hinzu, oder fügen Sie einen manuell hinzu.';
 
   @override
-  String get transmitters_header_unassigned =>
-      'In Downloads gesehen, nicht zugewiesen';
+  String get transmitters_noCylinder => 'Keine Flasche eingerichtet';
 
   @override
-  String get transmitters_empty =>
-      'Noch keine Sender. Füge einen hinzu oder weise nach dem nächsten Download eine Seriennummer zu.';
+  String get transmitters_section_noKey =>
+      'Noch keine Seriennummer und kein Kanal. Fügen Sie den Wert hinzu, den Ihr Tauchcomputer für diesen Sender meldet.';
 
   @override
-  String get transmitters_action_assign => 'Zuweisen';
+  String get transmitters_key_remove => 'Diesen Schlüssel entfernen';
 
   @override
-  String get transmitters_action_edit => 'Sender bearbeiten';
+  String get transmitters_key_removeTitle => 'Diesen Schlüssel entfernen?';
 
   @override
-  String get transmitters_action_delete => 'Sender löschen';
+  String get transmitters_key_removeBody =>
+      'Der Sendereintrag und seine anderen Schlüssel bleiben erhalten. Nutze dies für einen falschen Kanal oder eine vertippte Seriennummer: Eine Seriennummer, die dein Tauchcomputer weiter meldet, fügt der nächste Download wieder hinzu, noch nicht eingerichtet.';
+
+  @override
+  String get transmitters_list_noKey =>
+      'Noch keine Seriennummer und kein Kanal';
+
+  @override
+  String get transmitters_section_addKey =>
+      'Seriennummer oder Kanal hinzufügen';
+
+  @override
+  String get transmitters_section_setUp => 'Einrichten';
 
   @override
   String get transmitters_action_apply => 'Auf vorhandene Tauchgänge anwenden';
@@ -51840,14 +51859,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get transmitters_apply_nothing => 'Keine Flasche trägt diesen Sender';
 
   @override
-  String get transmitters_delete_title => 'Sender löschen?';
-
-  @override
-  String transmitters_delete_content(String label) {
-    return 'Künftige Downloads von $label verwenden wieder die Standardvorlage.';
-  }
-
-  @override
   String transmitters_channel(String computer, int channel) {
     return '$computer, Kanal $channel';
   }
@@ -51858,28 +51869,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String transmitters_dives(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Tauchgänge',
-      one: '1 Tauchgang',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get transmitters_edit_title => 'Sender bearbeiten';
 
   @override
   String get transmitters_new_title => 'Neuer Sender';
-
-  @override
-  String get transmitters_field_label => 'Bezeichnung';
-
-  @override
-  String get transmitters_field_label_helper =>
-      'Sobald dieser Sender zugeordnet ist, wird dies der Name der Flasche im Tauchgang';
 
   @override
   String get transmitters_field_serial => 'Seriennummer des Senders';
@@ -51900,13 +51893,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get transmitters_field_gear_subtitle =>
       'Die Flasche, deren Druck dieser Sender meldet';
-
-  @override
-  String get transmitters_field_transmitterGear => 'Sender aus der Ausrüstung';
-
-  @override
-  String get transmitters_field_transmitterGear_subtitle =>
-      'Batterie-/Wartungs-Tracking, nicht für die Zuordnung';
 
   @override
   String get transmitters_field_material => 'Material';
@@ -51933,16 +51919,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get transmitters_saved => 'Sender gespeichert';
-
-  @override
-  String transmitters_copySerial_title(String gearName) {
-    return 'Seriennummer auf \"$gearName\" übertragen?';
-  }
-
-  @override
-  String transmitters_copySerial_content(String serial) {
-    return 'Die Seriennummer, auf die dieser Eintrag abgleicht ($serial), ist beim Sender-Ausrüstungsgegenstand noch nicht hinterlegt.';
-  }
 
   @override
   String get diveComputer_detail_transmitters => 'Sender';
@@ -52008,6 +51984,18 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get universalImport_summary_noticeTransmitterNameRolesBody =>
       'Der Tauchcomputer hat einige Sauerstoff- und Diluent-Rollen aus den Namen seiner Sender übernommen: Ein Name, der mit O beginnt, gilt als Sauerstoff, einer mit D als Diluent. Weise die Sender zu, um diese Rollen zu bestätigen oder zu korrigieren.';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemTitle =>
+      'Dieser Computer ist bereits in der Ausrüstung';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemBody =>
+      'Der verbundene Computer ist bereits ein anderer Ausrüstungseintrag, daher wurden seine Tauchgänge dort hinzugefügt. Der Eintrag, von dem Sie ausgegangen sind, blieb unverändert.';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemAction =>
+      'Diesen Eintrag öffnen';
 
   @override
   String get universalImport_summary_noticeDiveNumberConflictTitle =>

@@ -448,12 +448,14 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
           executor: executor,
           withUndo: withUndo,
         );
-      case AssignTransmitterRepair(:final serial):
+      case SetUpTransmitterRepair(:final serial):
+        // The same route the cylinders card's Assign chip opens: it finds or
+        // registers the transmitter's item, else starts one (issue #3676).
         if (context.mounted) {
           context.push(
             Uri(
               path: '/transmitters/new',
-              queryParameters: {'serial': serial},
+              queryParameters: {'serial': serial, 'dive': f.diveId},
             ).toString(),
           );
         }

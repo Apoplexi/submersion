@@ -14712,6 +14712,18 @@ class AppLocalizationsHu extends AppLocalizations {
       'Biztosan törli ezt a felszerelést? Ez a művelet nem vonható vissza.';
 
   @override
+  String get equipment_deleteDialog_content_computer =>
+      'Törli ezt a búvárcomputert? A letöltési előzményei is törlődnek, így a következő letöltés újra beolvassa az összes merülést. A merülései megmaradnak. Ha újra csatlakoztatja a számítógépet, ismét felkerül.';
+
+  @override
+  String get equipment_deleteDialog_content_transmitter =>
+      'Törli ezt a jeladót? A palackbeállítása is törlődik. Egy későbbi letöltés, amely tartalmazza a sorozatszámát, ismét felveszi. Ha csak félre szeretné tenni, állítsa Kivonva állapotúra.';
+
+  @override
+  String get equipment_bulkDelete_deviceNote =>
+      'A kijelölt búvárcomputerek és jeladók a letöltési előzményeikkel és a beállításaikkal együtt törlődnek. A merülései megmaradnak.';
+
+  @override
   String get equipment_deleteDialog_title => 'Felszerelés törlése';
 
   @override
@@ -15537,6 +15549,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_edit_typeLabel => 'Típus *';
+
+  @override
+  String get equipment_edit_typeLockedHelper =>
+      'A csatlakoztatott búvárcomputer vagy jeladó megtartja a típusát.';
 
   @override
   String get equipment_edit_useCustomReminders =>
@@ -33663,27 +33679,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveComputer_connections_cloudOther => 'Felhőimportálás';
 
   @override
-  String diveComputer_detail_deleteDialogContent(String name) {
-    return 'Biztosan eltávolítod a(z) \"$name\" eszközt? Ez nem törli az erről a számítógépről importált merüléseket.';
-  }
-
-  @override
-  String get diveComputer_detail_deleteDialogTitle => 'Számítógép törlése?';
-
-  @override
   String get diveComputer_detail_divesImported => 'Importált merülések';
 
   @override
   String get diveComputer_detail_downloadDivesButton => 'Merülések letöltése';
 
   @override
-  String get diveComputer_detail_editDialogTitle => 'Számítógép szerkesztése';
+  String get diveComputer_section_connect => 'Csatlakoztatás és letöltés';
 
   @override
-  String get diveComputer_detail_editNameHint => 'Például Perdixem';
-
-  @override
-  String get diveComputer_detail_editNotesHint => 'Opcionális megjegyzések';
+  String get diveComputer_section_notConnected =>
+      'Ezt a számítógépet még nem csatlakoztatta. Csatlakoztassa a merülései letöltéséhez.';
 
   @override
   String get diveComputer_detail_labelManufacturer => 'Gyártó';
@@ -33692,16 +33698,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveComputer_detail_labelModel => 'Modell';
 
   @override
-  String get diveComputer_detail_labelName => 'Név';
-
-  @override
   String get diveComputer_detail_lastDownload => 'Utolsó letöltés';
-
-  @override
-  String get diveComputer_detail_linkedGear => 'Felszerelés';
-
-  @override
-  String get diveComputer_detail_notesTitle => 'Megjegyzések';
 
   @override
   String get diveComputer_detail_reimportAllButton =>
@@ -33943,6 +33940,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveComputer_list_findComputers => 'Számítógépek keresése';
+
+  @override
+  String get diveComputer_list_addByHand => 'Kézi hozzáadás';
+
+  @override
+  String get diveComputer_list_notConnected => 'Még nincs csatlakoztatva';
 
   @override
   String get diveComputer_list_helpBluetooth =>
@@ -51403,6 +51406,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_merge_gearNote =>
+      'A többi rekord felszerelési eleme ebbe olvad bele: a szervizelési előzmények, a dokumentumok és a fotók ide kerülnek, a kiürült elem pedig törlődik.';
+
+  @override
   String get diveComputer_merge_keepLabel => 'Ezt a bejegyzést megtartom';
 
   @override
@@ -51631,24 +51638,35 @@ class AppLocalizationsHu extends AppLocalizations {
   String get transmitters_add => 'Jeladó hozzáadása';
 
   @override
-  String get transmitters_header_assigned => 'Hozzárendelt jeladók';
+  String get transmitters_emptyItems =>
+      'Még nincsenek jeladók. Egy letöltés, amely beolvas egyet, ide felveszi, vagy adjon hozzá egyet kézzel.';
 
   @override
-  String get transmitters_header_unassigned =>
-      'Letöltésekben látott, nincs hozzárendelve';
+  String get transmitters_noCylinder => 'Nincs palack beállítva';
 
   @override
-  String get transmitters_empty =>
-      'Még nincs jeladó. Adj hozzá egyet, vagy rendelj hozzá sorozatszámot a következő letöltés után.';
+  String get transmitters_section_noKey =>
+      'Még nincs sorozatszám vagy csatorna. Adja meg azt, amelyet a búvárcomputere ehhez a jeladóhoz jelez.';
 
   @override
-  String get transmitters_action_assign => 'Hozzárendelés';
+  String get transmitters_key_remove => 'Kulcs eltávolítása';
 
   @override
-  String get transmitters_action_edit => 'Jeladó szerkesztése';
+  String get transmitters_key_removeTitle => 'Eltávolítod ezt a kulcsot?';
 
   @override
-  String get transmitters_action_delete => 'Jeladó törlése';
+  String get transmitters_key_removeBody =>
+      'A jeladó eleme és többi kulcsa megmarad. Rossz csatornához vagy elgépelt sorozatszámhoz használd: egy sorozatszámot, amelyet a búvárkomputered továbbra is jelent, a következő letöltés újra hozzáad, még beállítás nélkül.';
+
+  @override
+  String get transmitters_list_noKey => 'Még nincs sorozatszám vagy csatorna';
+
+  @override
+  String get transmitters_section_addKey =>
+      'Sorozatszám vagy csatorna hozzáadása';
+
+  @override
+  String get transmitters_section_setUp => 'Beállítás';
 
   @override
   String get transmitters_action_apply => 'Alkalmazás meglévő merülésekre';
@@ -51671,14 +51689,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Egyetlen palack sem viseli ezt a jeladót';
 
   @override
-  String get transmitters_delete_title => 'Törlöd a jeladót?';
-
-  @override
-  String transmitters_delete_content(String label) {
-    return 'A(z) $label jövőbeli letöltései ismét az alapértelmezett sablont használják.';
-  }
-
-  @override
   String transmitters_channel(String computer, int channel) {
     return '$computer, $channel. csatorna';
   }
@@ -51689,28 +51699,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String transmitters_dives(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count merülés',
-      one: '1 merülés',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get transmitters_edit_title => 'Jeladó szerkesztése';
 
   @override
   String get transmitters_new_title => 'Új jeladó';
-
-  @override
-  String get transmitters_field_label => 'Címke';
-
-  @override
-  String get transmitters_field_label_helper =>
-      'A jeladó párosítása után ez lesz a palack neve a merülésben';
 
   @override
   String get transmitters_field_serial => 'Jeladó sorozatszáma';
@@ -51731,13 +51723,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get transmitters_field_gear_subtitle =>
       'A palack, amelynek nyomását ez a jeladó jelenti';
-
-  @override
-  String get transmitters_field_transmitterGear => 'Jeladó a felszerelésből';
-
-  @override
-  String get transmitters_field_transmitterGear_subtitle =>
-      'Akkumulátor-/szervizkövetés, nem használt a párosításhoz';
 
   @override
   String get transmitters_field_material => 'Anyag';
@@ -51764,16 +51749,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get transmitters_saved => 'Jeladó mentve';
-
-  @override
-  String transmitters_copySerial_title(String gearName) {
-    return 'Átmásolja a sorozatszámot ide: „$gearName”?';
-  }
-
-  @override
-  String transmitters_copySerial_content(String serial) {
-    return 'A sorozatszám, amellyel ez a bejegyzés egyezik ($serial), még nincs rögzítve a jeladó felszerelési elemén.';
-  }
 
   @override
   String get diveComputer_detail_transmitters => 'Jeladók';
@@ -51839,6 +51814,18 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get universalImport_summary_noticeTransmitterNameRolesBody =>
       'A merülőkomputer néhány oxigén- és hígítógáz-szerepet a jeladóknak adott nevekből vett át: az O-val kezdődő név oxigénnek, a D-vel kezdődő hígítógáznak számít. Rendeld hozzá a jeladókat, hogy megerősítsd vagy javítsd ezeket a szerepeket.';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemTitle =>
+      'Ez a számítógép már szerepel a Felszerelésben';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemBody =>
+      'A csatlakoztatott számítógép már egy másik felszerelés-tétel, ezért a merülései oda kerültek. A tétel, amelyből kiindult, változatlan maradt.';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemAction =>
+      'A tétel megnyitása';
 
   @override
   String get universalImport_summary_noticeDiveNumberConflictTitle =>

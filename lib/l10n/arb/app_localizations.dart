@@ -23815,6 +23815,24 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to delete this equipment? This action cannot be undone.'**
   String get equipment_deleteDialog_content;
 
+  /// No description provided for @equipment_deleteDialog_content_computer.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this dive computer? Its download history goes with it, so the next download from it reads every dive again. Your dives stay. Connecting the computer again adds it back.'**
+  String get equipment_deleteDialog_content_computer;
+
+  /// No description provided for @equipment_deleteDialog_content_transmitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this transmitter? Its cylinder setup goes with it. A later download that carries its serial adds it back. To keep it out of the way instead, mark it Retired.'**
+  String get equipment_deleteDialog_content_transmitter;
+
+  /// No description provided for @equipment_bulkDelete_deviceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive computers and transmitters in the selection are deleted with their download history and setup. Your dives stay.'**
+  String get equipment_bulkDelete_deviceNote;
+
   /// No description provided for @equipment_deleteDialog_title.
   ///
   /// In en, this message translates to:
@@ -25059,6 +25077,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Type *'**
   String get equipment_edit_typeLabel;
+
+  /// No description provided for @equipment_edit_typeLockedHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'A connected dive computer or transmitter keeps its type.'**
+  String get equipment_edit_typeLockedHelper;
 
   /// No description provided for @equipment_edit_useCustomReminders.
   ///
@@ -53485,18 +53509,6 @@ abstract class AppLocalizations {
   /// **'Cloud import'**
   String get diveComputer_connections_cloudOther;
 
-  /// No description provided for @diveComputer_detail_deleteDialogContent.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to remove \"{name}\"? This will not delete any dives that were imported from this computer.'**
-  String diveComputer_detail_deleteDialogContent(String name);
-
-  /// No description provided for @diveComputer_detail_deleteDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Computer?'**
-  String get diveComputer_detail_deleteDialogTitle;
-
   /// No description provided for @diveComputer_detail_divesImported.
   ///
   /// In en, this message translates to:
@@ -53509,23 +53521,17 @@ abstract class AppLocalizations {
   /// **'Download Dives'**
   String get diveComputer_detail_downloadDivesButton;
 
-  /// No description provided for @diveComputer_detail_editDialogTitle.
+  /// No description provided for @diveComputer_section_connect.
   ///
   /// In en, this message translates to:
-  /// **'Edit Computer'**
-  String get diveComputer_detail_editDialogTitle;
+  /// **'Connect and download'**
+  String get diveComputer_section_connect;
 
-  /// No description provided for @diveComputer_detail_editNameHint.
+  /// No description provided for @diveComputer_section_notConnected.
   ///
   /// In en, this message translates to:
-  /// **'e.g., My Perdix'**
-  String get diveComputer_detail_editNameHint;
-
-  /// No description provided for @diveComputer_detail_editNotesHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Optional notes'**
-  String get diveComputer_detail_editNotesHint;
+  /// **'This computer has not been connected yet. Connect it to download its dives.'**
+  String get diveComputer_section_notConnected;
 
   /// No description provided for @diveComputer_detail_labelManufacturer.
   ///
@@ -53539,29 +53545,11 @@ abstract class AppLocalizations {
   /// **'Model'**
   String get diveComputer_detail_labelModel;
 
-  /// No description provided for @diveComputer_detail_labelName.
-  ///
-  /// In en, this message translates to:
-  /// **'Name'**
-  String get diveComputer_detail_labelName;
-
   /// No description provided for @diveComputer_detail_lastDownload.
   ///
   /// In en, this message translates to:
   /// **'Last Download'**
   String get diveComputer_detail_lastDownload;
-
-  /// No description provided for @diveComputer_detail_linkedGear.
-  ///
-  /// In en, this message translates to:
-  /// **'Gear item'**
-  String get diveComputer_detail_linkedGear;
-
-  /// No description provided for @diveComputer_detail_notesTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Notes'**
-  String get diveComputer_detail_notesTitle;
 
   /// No description provided for @diveComputer_detail_reimportAllButton.
   ///
@@ -53919,6 +53907,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Find Computers'**
   String get diveComputer_list_findComputers;
+
+  /// No description provided for @diveComputer_list_addByHand.
+  ///
+  /// In en, this message translates to:
+  /// **'Add by hand'**
+  String get diveComputer_list_addByHand;
+
+  /// No description provided for @diveComputer_list_notConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected yet'**
+  String get diveComputer_list_notConnected;
 
   /// No description provided for @diveComputer_list_helpBluetooth.
   ///
@@ -81934,6 +81934,12 @@ abstract class AppLocalizations {
   /// **'{count} records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.'**
   String diveComputer_merge_intro(int count);
 
+  /// No description provided for @diveComputer_merge_gearNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Each other record\'s Equipment item is folded into this one: its service history, documents and photos move here, and the emptied item is deleted.'**
+  String get diveComputer_merge_gearNote;
+
   /// No description provided for @diveComputer_merge_keepLabel.
   ///
   /// In en, this message translates to:
@@ -82209,41 +82215,59 @@ abstract class AppLocalizations {
   /// **'Add transmitter'**
   String get transmitters_add;
 
-  /// No description provided for @transmitters_header_assigned.
+  /// No description provided for @transmitters_emptyItems.
   ///
   /// In en, this message translates to:
-  /// **'Assigned transmitters'**
-  String get transmitters_header_assigned;
+  /// **'No transmitters yet. A download that reads one adds it here, or add one by hand.'**
+  String get transmitters_emptyItems;
 
-  /// No description provided for @transmitters_header_unassigned.
+  /// No description provided for @transmitters_noCylinder.
   ///
   /// In en, this message translates to:
-  /// **'Seen in downloads, not assigned'**
-  String get transmitters_header_unassigned;
+  /// **'No cylinder set up'**
+  String get transmitters_noCylinder;
 
-  /// No description provided for @transmitters_empty.
+  /// No description provided for @transmitters_section_noKey.
   ///
   /// In en, this message translates to:
-  /// **'No transmitters yet. Add one, or assign a serial after your next download.'**
-  String get transmitters_empty;
+  /// **'No serial or channel yet. Add the one your dive computer reports for this transmitter.'**
+  String get transmitters_section_noKey;
 
-  /// No description provided for @transmitters_action_assign.
+  /// No description provided for @transmitters_key_remove.
   ///
   /// In en, this message translates to:
-  /// **'Assign'**
-  String get transmitters_action_assign;
+  /// **'Remove this key'**
+  String get transmitters_key_remove;
 
-  /// No description provided for @transmitters_action_edit.
+  /// No description provided for @transmitters_key_removeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit transmitter'**
-  String get transmitters_action_edit;
+  /// **'Remove this key?'**
+  String get transmitters_key_removeTitle;
 
-  /// No description provided for @transmitters_action_delete.
+  /// No description provided for @transmitters_key_removeBody.
   ///
   /// In en, this message translates to:
-  /// **'Delete transmitter'**
-  String get transmitters_action_delete;
+  /// **'The transmitter item and its other keys stay. Use this for a wrong channel or a mistyped serial: a serial your dive computer keeps reporting is added back by the next download, not yet set up.'**
+  String get transmitters_key_removeBody;
+
+  /// No description provided for @transmitters_list_noKey.
+  ///
+  /// In en, this message translates to:
+  /// **'No serial or channel yet'**
+  String get transmitters_list_noKey;
+
+  /// No description provided for @transmitters_section_addKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Add serial or channel'**
+  String get transmitters_section_addKey;
+
+  /// No description provided for @transmitters_section_setUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get transmitters_section_setUp;
 
   /// No description provided for @transmitters_action_apply.
   ///
@@ -82275,18 +82299,6 @@ abstract class AppLocalizations {
   /// **'No cylinders carry this transmitter'**
   String get transmitters_apply_nothing;
 
-  /// No description provided for @transmitters_delete_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete transmitter?'**
-  String get transmitters_delete_title;
-
-  /// No description provided for @transmitters_delete_content.
-  ///
-  /// In en, this message translates to:
-  /// **'Future downloads from {label} will use the default preset again.'**
-  String transmitters_delete_content(String label);
-
   /// No description provided for @transmitters_channel.
   ///
   /// In en, this message translates to:
@@ -82299,12 +82311,6 @@ abstract class AppLocalizations {
   /// **'Transmitter {serial}'**
   String transmitters_serial(String serial);
 
-  /// No description provided for @transmitters_dives.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 dive} other{{count} dives}}'**
-  String transmitters_dives(int count);
-
   /// No description provided for @transmitters_edit_title.
   ///
   /// In en, this message translates to:
@@ -82316,18 +82322,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New transmitter'**
   String get transmitters_new_title;
-
-  /// No description provided for @transmitters_field_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Label'**
-  String get transmitters_field_label;
-
-  /// No description provided for @transmitters_field_label_helper.
-  ///
-  /// In en, this message translates to:
-  /// **'Becomes the cylinder\'s name on the dive once this transmitter is matched'**
-  String get transmitters_field_label_helper;
 
   /// No description provided for @transmitters_field_serial.
   ///
@@ -82364,18 +82358,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The cylinder this transmitter reports pressure for'**
   String get transmitters_field_gear_subtitle;
-
-  /// No description provided for @transmitters_field_transmitterGear.
-  ///
-  /// In en, this message translates to:
-  /// **'Transmitter from gear'**
-  String get transmitters_field_transmitterGear;
-
-  /// No description provided for @transmitters_field_transmitterGear_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Battery/service tracking, not matching'**
-  String get transmitters_field_transmitterGear_subtitle;
 
   /// No description provided for @transmitters_field_material.
   ///
@@ -82418,18 +82400,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Transmitter saved'**
   String get transmitters_saved;
-
-  /// No description provided for @transmitters_copySerial_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Copy the serial to \"{gearName}\"?'**
-  String transmitters_copySerial_title(String gearName);
-
-  /// No description provided for @transmitters_copySerial_content.
-  ///
-  /// In en, this message translates to:
-  /// **'The serial this entry matches on ({serial}) is not recorded on the transmitter gear item yet.'**
-  String transmitters_copySerial_content(String serial);
 
   /// No description provided for @diveComputer_detail_transmitters.
   ///
@@ -82526,6 +82496,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The dive computer took some oxygen and diluent roles from the names given to its transmitters: a name starting with O reads as oxygen, one starting with D as diluent. Assign the transmitters to confirm or correct those roles.'**
   String get universalImport_summary_noticeTransmitterNameRolesBody;
+
+  /// No description provided for @universalImport_summary_noticeDeviceOtherItemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This computer is already in Equipment'**
+  String get universalImport_summary_noticeDeviceOtherItemTitle;
+
+  /// No description provided for @universalImport_summary_noticeDeviceOtherItemBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The computer you connected is already another Equipment item, so its dives were added there. The item you started from was left as it was.'**
+  String get universalImport_summary_noticeDeviceOtherItemBody;
+
+  /// No description provided for @universalImport_summary_noticeDeviceOtherItemAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open that item'**
+  String get universalImport_summary_noticeDeviceOtherItemAction;
 
   /// No description provided for @universalImport_summary_noticeDiveNumberConflictTitle.
   ///

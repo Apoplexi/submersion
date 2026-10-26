@@ -14451,6 +14451,18 @@ class AppLocalizationsHe extends AppLocalizations {
       'האם אתה בטוח שברצונך למחוק ציוד זה? פעולה זו אינה ניתנת לביטול.';
 
   @override
+  String get equipment_deleteDialog_content_computer =>
+      'למחוק את מחשב הצלילה הזה? היסטוריית ההורדות שלו תימחק יחד איתו, כך שההורדה הבאה ממנו תקרא שוב את כל הצלילות. הצלילות שלך נשמרות. חיבור המחשב מחדש יוסיף אותו שוב.';
+
+  @override
+  String get equipment_deleteDialog_content_transmitter =>
+      'למחוק את המשדר הזה? הגדרת המיכל שלו תימחק יחד איתו. הורדה מאוחרת יותר שמכילה את המספר הסידורי שלו תוסיף אותו שוב. כדי להזיז אותו הצידה במקום זאת, סמן אותו כהוצא משימוש.';
+
+  @override
+  String get equipment_bulkDelete_deviceNote =>
+      'מחשבי צלילה ומשדרים שבבחירה נמחקים יחד עם היסטוריית ההורדות וההגדרות שלהם. הצלילות שלך נשמרות.';
+
+  @override
   String get equipment_deleteDialog_title => 'מחק ציוד';
 
   @override
@@ -15270,6 +15282,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_edit_typeLabel => 'סוג *';
+
+  @override
+  String get equipment_edit_typeLockedHelper =>
+      'מחשב צלילה או משדר מחוברים שומרים על הסוג שלהם.';
 
   @override
   String get equipment_edit_useCustomReminders => 'השתמש בתזכורות מותאמות';
@@ -33012,27 +33028,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveComputer_connections_cloudOther => 'ייבוא מהענן';
 
   @override
-  String diveComputer_detail_deleteDialogContent(String name) {
-    return 'האם אתה בטוח שברצונך להסיר את \"$name\"? פעולה זו לא תמחק צלילות שיובאו ממחשב זה.';
-  }
-
-  @override
-  String get diveComputer_detail_deleteDialogTitle => 'למחוק את המחשב?';
-
-  @override
   String get diveComputer_detail_divesImported => 'צלילות שיובאו';
 
   @override
   String get diveComputer_detail_downloadDivesButton => 'הורד צלילות';
 
   @override
-  String get diveComputer_detail_editDialogTitle => 'ערוך מחשב';
+  String get diveComputer_section_connect => 'חבר והורד';
 
   @override
-  String get diveComputer_detail_editNameHint => 'לדוגמה, ה-Perdix שלי';
-
-  @override
-  String get diveComputer_detail_editNotesHint => 'הערות אופציונליות';
+  String get diveComputer_section_notConnected =>
+      'מחשב זה עדיין לא חובר. חבר אותו כדי להוריד את הצלילות שלו.';
 
   @override
   String get diveComputer_detail_labelManufacturer => 'יצרן';
@@ -33041,16 +33047,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveComputer_detail_labelModel => 'דגם';
 
   @override
-  String get diveComputer_detail_labelName => 'שם';
-
-  @override
   String get diveComputer_detail_lastDownload => 'הורדה אחרונה';
-
-  @override
-  String get diveComputer_detail_linkedGear => 'פריט ציוד';
-
-  @override
-  String get diveComputer_detail_notesTitle => 'הערות';
 
   @override
   String get diveComputer_detail_reimportAllButton => 'ייבא מחדש את כל הצלילות';
@@ -33283,6 +33280,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveComputer_list_findComputers => 'חפש מחשבים';
+
+  @override
+  String get diveComputer_list_addByHand => 'הוסף ידנית';
+
+  @override
+  String get diveComputer_list_notConnected => 'עדיין לא חובר';
 
   @override
   String get diveComputer_list_helpBluetooth =>
@@ -50585,6 +50588,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_merge_gearNote =>
+      'פריט הציוד של כל רשומה אחרת מתמזג לפריט זה: היסטוריית השירות, המסמכים והתמונות עוברים לכאן, והפריט הריק נמחק.';
+
+  @override
   String get diveComputer_merge_keepLabel => 'לשמור רשומה זו';
 
   @override
@@ -50808,23 +50815,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transmitters_add => 'הוספת משדר';
 
   @override
-  String get transmitters_header_assigned => 'משדרים משויכים';
+  String get transmitters_emptyItems =>
+      'עדיין אין משדרים. הורדה שקוראת משדר תוסיף אותו כאן, או הוסף משדר ידנית.';
 
   @override
-  String get transmitters_header_unassigned => 'נראו בהורדות, לא משויכים';
+  String get transmitters_noCylinder => 'לא הוגדר מיכל';
 
   @override
-  String get transmitters_empty =>
-      'אין משדרים עדיין. הוסיפו אחד, או שייכו מספר סידורי אחרי ההורדה הבאה.';
+  String get transmitters_section_noKey =>
+      'עדיין אין מספר סידורי או ערוץ. הוסף את מה שמחשב הצלילה שלך מדווח עבור משדר זה.';
 
   @override
-  String get transmitters_action_assign => 'שיוך';
+  String get transmitters_key_remove => 'הסרת מפתח זה';
 
   @override
-  String get transmitters_action_edit => 'עריכת משדר';
+  String get transmitters_key_removeTitle => 'להסיר מפתח זה?';
 
   @override
-  String get transmitters_action_delete => 'מחיקת משדר';
+  String get transmitters_key_removeBody =>
+      'פריט המשדר ושאר המפתחות שלו יישארו. השתמש בזה לערוץ שגוי או למספר סידורי שהוקלד שגוי: מספר סידורי שמחשב הצלילה ממשיך לדווח עליו יתווסף שוב בהורדה הבאה, עדיין לא מוגדר.';
+
+  @override
+  String get transmitters_list_noKey => 'עדיין אין מספר סידורי או ערוץ';
+
+  @override
+  String get transmitters_section_addKey => 'הוסף מספר סידורי או ערוץ';
+
+  @override
+  String get transmitters_section_setUp => 'הגדר';
 
   @override
   String get transmitters_action_apply => 'החלה על צלילות קיימות';
@@ -50846,14 +50864,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transmitters_apply_nothing => 'אף מיכל אינו נושא משדר זה';
 
   @override
-  String get transmitters_delete_title => 'למחוק את המשדר?';
-
-  @override
-  String transmitters_delete_content(String label) {
-    return 'הורדות עתידיות מ-$label ישתמשו שוב בהגדרה המוגדרת כברירת מחדל.';
-  }
-
-  @override
   String transmitters_channel(String computer, int channel) {
     return '$computer, ערוץ $channel';
   }
@@ -50864,28 +50874,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String transmitters_dives(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count צלילות',
-      one: 'צלילה אחת',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get transmitters_edit_title => 'עריכת משדר';
 
   @override
   String get transmitters_new_title => 'משדר חדש';
-
-  @override
-  String get transmitters_field_label => 'תווית';
-
-  @override
-  String get transmitters_field_label_helper =>
-      'הופך לשם המיכל בצלילה ברגע שהמשדר הזה משויך';
 
   @override
   String get transmitters_field_serial => 'מספר סידורי של המשדר';
@@ -50906,13 +50898,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get transmitters_field_gear_subtitle =>
       'המיכל שעבורו משדר זה מדווח על הלחץ';
-
-  @override
-  String get transmitters_field_transmitterGear => 'משדר מהציוד';
-
-  @override
-  String get transmitters_field_transmitterGear_subtitle =>
-      'מעקב סוללה/תחזוקה, לא משמש להתאמה';
 
   @override
   String get transmitters_field_material => 'חומר';
@@ -50938,16 +50923,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transmitters_saved => 'המשדר נשמר';
-
-  @override
-  String transmitters_copySerial_title(String gearName) {
-    return 'להעתיק את המספר הסידורי אל \"$gearName\"?';
-  }
-
-  @override
-  String transmitters_copySerial_content(String serial) {
-    return 'המספר הסידורי שעליו רשומה זו מתאימה ($serial) אינו רשום עדיין בפריט הציוד של המשדר.';
-  }
 
   @override
   String get diveComputer_detail_transmitters => 'משדרים';
@@ -51012,6 +50987,18 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get universalImport_summary_noticeTransmitterNameRolesBody =>
       'מחשב הצלילה לקח חלק מתפקידי החמצן והמדלל משמות המשדרים: שם שמתחיל ב-O נקרא כחמצן, ושם שמתחיל ב-D כמדלל. שייכו את המשדרים כדי לאשר או לתקן תפקידים אלה.';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemTitle =>
+      'מחשב זה כבר נמצא בציוד';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemBody =>
+      'המחשב שחיברת הוא כבר פריט ציוד אחר, ולכן הצלילות שלו נוספו לשם. הפריט שממנו התחלת נשאר כפי שהיה.';
+
+  @override
+  String get universalImport_summary_noticeDeviceOtherItemAction =>
+      'פתח את הפריט הזה';
 
   @override
   String get universalImport_summary_noticeDiveNumberConflictTitle =>

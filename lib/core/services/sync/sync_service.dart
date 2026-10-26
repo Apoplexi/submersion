@@ -6,10 +6,11 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 import 'package:flutter/foundation.dart' show visibleForTesting;
-import 'package:drift/drift.dart' show Variable;
+import 'package:drift/drift.dart' show TableUpdate, Variable;
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/computer_tissue_scalar_move.dart';
+import 'package:submersion/core/database/device_gear_heal.dart';
 import 'package:submersion/core/database/database.dart'
     show AppDatabase, SyncRecord, DeletionLogData;
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
@@ -885,6 +886,29 @@ class SyncService {
         } catch (e) {
           _log.warning('Keyslot self-heal failed (non-fatal): $e');
         }
+      }
+
+      // A peer's computer or transmitter may have arrived without its
+      // Equipment item, or an older peer may have deleted one as "unlink
+      // only" (issue #3676). Give each its item back BEFORE the tombstone GC
+      // below, while the deleted id's tombstone still steers the re-mint.
+      // Ids are deterministic; what it writes keeps a NULL hlc, so the next
+      // sync publishes it.
+      try {
+        final db = DatabaseService.instance.database;
+        final healed = await ensureDeviceGearLinks(db);
+        // The heal writes raw SQL, which Drift's streams do not see; tell
+        // open screens, so a computer that just got its item appears.
+        if (healed.computersLinked + healed.transmittersLinked > 0) {
+          db.notifyUpdates({
+            TableUpdate.onTable(db.equipment),
+            TableUpdate.onTable(db.diveComputers),
+            TableUpdate.onTable(db.transmitters),
+            TableUpdate.onTable(db.diveEquipment),
+          });
+        }
+      } catch (e) {
+        _log.warning('Device gear heal failed (non-fatal): $e');
       }
 
       // Advance state only on a clean apply (idempotent re-pull otherwise).

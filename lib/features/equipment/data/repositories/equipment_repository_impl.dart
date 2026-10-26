@@ -12,6 +12,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/text/text_sort.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_location_move_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_share_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_tag_repository.dart';
@@ -158,6 +159,12 @@ class EquipmentRepository {
   /// EquipmentComponentRepository.watchComponentEdgeChanges instead.
   Stream<void> watchEquipmentChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.equipment));
+
+  /// Ticks when a dive computer or transmitter record changes, which can
+  /// make an item a device's entry or stop it being one (issue #3676).
+  Stream<void> watchDeviceRecordChanges() => _db.tableUpdates(
+    TableUpdateQuery.onAllTables([_db.diveComputers, _db.transmitters]),
+  );
 
   /// Ticks when any item's attributes change (a cell slot, an install
   /// date). `saveAttributes` and a sync pull write only
@@ -532,6 +539,9 @@ class EquipmentRepository {
           ),
           notify: false,
         );
+        // Inside the save: the device's name and notes move with the item's
+        // (issue #3676).
+        await _mirrorNameToDevices(equipment, now);
       });
       if (notify) SyncEventBus.notifyLocalChange();
       _log.info('Updated equipment: ${equipment.id}');
@@ -542,6 +552,74 @@ class EquipmentRepository {
         stackTrace: stackTrace,
       );
       rethrow;
+    }
+  }
+
+  /// Whether item [id] is a dive computer's or a transmitter's one entry
+  /// (issue #3676): a device record names it.
+  Future<bool> hasDeviceRecord(String id) async {
+    final computer =
+        await (_db.select(_db.diveComputers)
+              ..where((t) => t.equipmentId.equals(id))
+              ..limit(1))
+            .getSingleOrNull();
+    if (computer != null) return true;
+    final key =
+        await (_db.select(_db.transmitters)
+              ..where((t) => t.transmitterEquipmentId.equals(id))
+              ..limit(1))
+            .getSingleOrNull();
+    return key != null;
+  }
+
+  /// A device's item is its one entry (issue #3676): its name and notes are
+  /// the dive computer's, and its name is the transmitter rows' label, so
+  /// anything that still reads those columns (a data-source label, a tank
+  /// name the registry stamps) shows the same text. Only rows that differ
+  /// are written, and each is staged.
+  Future<void> _mirrorNameToDevices(EquipmentItem item, int now) async {
+    final computers =
+        await (_db.select(_db.diveComputers)..where(
+              (t) =>
+                  t.equipmentId.equals(item.id) &
+                  (t.name.equals(item.name).not() |
+                      t.notes.equals(item.notes).not()),
+            ))
+            .get();
+    for (final c in computers) {
+      await (_db.update(
+        _db.diveComputers,
+      )..where((t) => t.id.equals(c.id))).write(
+        DiveComputersCompanion(
+          name: Value(item.name),
+          notes: Value(item.notes),
+          updatedAt: Value(now),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'diveComputers',
+        recordId: c.id,
+        localUpdatedAt: now,
+      );
+    }
+    final keys =
+        await (_db.select(_db.transmitters)..where(
+              (t) =>
+                  t.transmitterEquipmentId.equals(item.id) &
+                  t.label.equals(item.name).not(),
+            ))
+            .get();
+    for (final k in keys) {
+      await (_db.update(
+        _db.transmitters,
+      )..where((t) => t.id.equals(k.id))).write(
+        TransmittersCompanion(label: Value(item.name), updatedAt: Value(now)),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'transmitters',
+        recordId: k.id,
+        localUpdatedAt: now,
+      );
     }
   }
 
@@ -605,6 +683,23 @@ class EquipmentRepository {
     }
   }
 
+  /// The dive computer and transmitter records an item is the one entry
+  /// for (issue #3676), deleted with it through their own repositories.
+  Future<void> _deleteDevicesOf(String itemId) async {
+    final computers = await (_db.select(
+      _db.diveComputers,
+    )..where((t) => t.equipmentId.equals(itemId))).get();
+    for (final c in computers) {
+      await DiveComputerRepository().deleteComputer(c.id);
+    }
+    final keys = await (_db.select(
+      _db.transmitters,
+    )..where((t) => t.transmitterEquipmentId.equals(itemId))).get();
+    for (final k in keys) {
+      await TransmitterRepository().delete(k.id);
+    }
+  }
+
   /// Delete equipment. Service schedules, service records, assembly
   /// component rows, tag links, shares and share events are first-class
   /// synced children
@@ -619,6 +714,10 @@ class EquipmentRepository {
       // and every step is individually idempotent/tombstoned. Same shape and
       // same reasoning as SiteRepository's media cascade.
       await _cascadeMediaForEquipmentDeletion([id]);
+      // One delete for a device and its item (issue #3676): the dive
+      // computer or transmitter rows behind it go first, each through its
+      // own repository so it is tombstoned and its dives are kept.
+      await _deleteDevicesOf(id);
       await _db.transaction(() async {
         // Its documents go with it, tombstoned (issue #2613).
         await DocumentRepository().deleteForOwner(
