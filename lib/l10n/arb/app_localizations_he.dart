@@ -19350,6 +19350,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get nav_media => 'מדיה';
 
   @override
+  String get nav_mediaDocumentsSubtitle => 'תמונות, סרטונים ומסמכים';
+
+  @override
+  String get nav_photosVideos => 'תמונות/סרטונים';
+
+  @override
   String get nav_more => 'עוד';
 
   @override
@@ -24278,9 +24284,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get nav_documents => 'מסמכים';
-
-  @override
-  String get documents_title => 'מסמכים';
 
   @override
   String get documents_type_insurance => 'ביטוח';

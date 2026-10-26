@@ -20080,6 +20080,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nav_media => 'الوسائط';
 
   @override
+  String get nav_mediaDocumentsSubtitle => 'الصور ومقاطع الفيديو والمستندات';
+
+  @override
+  String get nav_photosVideos => 'صور/فيديو';
+
+  @override
   String get nav_more => 'المزيد';
 
   @override
@@ -25131,9 +25137,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get nav_documents => 'المستندات';
-
-  @override
-  String get documents_title => 'المستندات';
 
   @override
   String get documents_type_insurance => 'التأمين';
