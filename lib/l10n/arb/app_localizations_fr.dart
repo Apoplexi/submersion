@@ -5137,6 +5137,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get common_placeholder_noValue => '--';
 
   @override
+  String get notesEditor_action_heading => 'Titre';
+
+  @override
+  String get notesEditor_action_bold => 'Gras';
+
+  @override
+  String get notesEditor_action_italic => 'Italique';
+
+  @override
+  String get notesEditor_action_bulletList => 'Liste à puces';
+
+  @override
+  String get notesEditor_action_numberedList => 'Liste numérotée';
+
+  @override
+  String get notesEditor_action_preview => 'Aperçu';
+
+  @override
   String get common_error_tryAgain =>
       'Une erreur s\'est produite. Veuillez réessayer.';
 

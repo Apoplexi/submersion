@@ -5229,6 +5229,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get common_placeholder_noValue => '--';
 
   @override
+  String get notesEditor_action_heading => 'عنوان';
+
+  @override
+  String get notesEditor_action_bold => 'غامق';
+
+  @override
+  String get notesEditor_action_italic => 'مائل';
+
+  @override
+  String get notesEditor_action_bulletList => 'قائمة نقطية';
+
+  @override
+  String get notesEditor_action_numberedList => 'قائمة مرقمة';
+
+  @override
+  String get notesEditor_action_preview => 'معاينة';
+
+  @override
   String get common_error_tryAgain => 'حدث خطأ ما. يُرجى المحاولة مرة أخرى.';
 
   @override

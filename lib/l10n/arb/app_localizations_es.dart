@@ -5127,6 +5127,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get common_placeholder_noValue => '--';
 
   @override
+  String get notesEditor_action_heading => 'Encabezado';
+
+  @override
+  String get notesEditor_action_bold => 'Negrita';
+
+  @override
+  String get notesEditor_action_italic => 'Cursiva';
+
+  @override
+  String get notesEditor_action_bulletList => 'Lista con viñetas';
+
+  @override
+  String get notesEditor_action_numberedList => 'Lista numerada';
+
+  @override
+  String get notesEditor_action_preview => 'Vista previa';
+
+  @override
   String get common_error_tryAgain => 'Algo salió mal. Inténtalo de nuevo.';
 
   @override

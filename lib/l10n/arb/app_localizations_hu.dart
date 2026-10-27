@@ -5111,6 +5111,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get common_placeholder_noValue => '--';
 
   @override
+  String get notesEditor_action_heading => 'Címsor';
+
+  @override
+  String get notesEditor_action_bold => 'Félkövér';
+
+  @override
+  String get notesEditor_action_italic => 'Dőlt';
+
+  @override
+  String get notesEditor_action_bulletList => 'Felsorolás';
+
+  @override
+  String get notesEditor_action_numberedList => 'Számozott lista';
+
+  @override
+  String get notesEditor_action_preview => 'Előnézet';
+
+  @override
   String get common_error_tryAgain =>
       'Valami hiba történt. Kérjük, próbáld újra.';
 
