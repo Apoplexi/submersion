@@ -431,7 +431,7 @@ class _ProfileEditorPageState extends ConsumerState<ProfileEditorPage> {
               onDeleteProfile: canDeleteProfile
                   ? () => _handleDeleteProfileSeries(
                       diveId: widget.diveId,
-                      seriesId: activeRevision!.seriesId,
+                      seriesId: activeRevision.seriesId,
                       isComputerImport:
                           activeRevision.revisionKind == 'computer_import',
                     )
