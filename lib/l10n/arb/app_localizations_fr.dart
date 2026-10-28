@@ -20167,6 +20167,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_noUsableGas(String minGas, String fill) {
+    return 'Le minimum rock bottom de $minGas ne laisse aucun gaz utilisable dans un gonflage de $fill';
+  }
+
+  @override
   String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
     return 'Le diluant dépasse sa MOD Dil à $depth (ppO₂ $value bar)';
   }
@@ -52170,6 +52175,17 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get backup_history_device_anotherDevice => 'Autre appareil';
+
+  @override
+  String get backup_history_device_thisDevice => 'Cet appareil';
+
+  @override
+  String backup_history_subtitleWithDevice(String summary, String device) {
+    return '$summary · $device';
+  }
+
+  @override
   String backup_history_manualSubtitle(
     int diveCount,
     int siteCount,
@@ -55690,6 +55706,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tags_manage_cannotUndo => 'Cette action est irréversible.';
+
+  @override
+  String tags_manage_rowScopes(String scopes) {
+    return 'Pour : $scopes';
+  }
+
+  @override
+  String tags_manage_rowUsage(String counts) {
+    return 'Utilisée sur : $counts';
+  }
 
   @override
   String get tags_action_edit => 'Modifier les étiquettes';

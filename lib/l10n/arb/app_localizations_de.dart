@@ -20089,6 +20089,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_noUsableGas(String minGas, String fill) {
+    return 'Rock-Bottom-Minimum von $minGas lässt bei einer Füllung von $fill kein nutzbares Gas übrig';
+  }
+
+  @override
   String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
     return 'Diluent überschreitet seine Dil-MOD-Grenze bei $depth (ppO₂ $value bar)';
   }
@@ -51941,6 +51946,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get backup_history_device_anotherDevice => 'Anderes Gerät';
+
+  @override
+  String get backup_history_device_thisDevice => 'Dieses Gerät';
+
+  @override
+  String backup_history_subtitleWithDevice(String summary, String device) {
+    return '$summary · $device';
+  }
+
+  @override
   String backup_history_manualSubtitle(
     int diveCount,
     int siteCount,
@@ -55455,6 +55471,16 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get tags_manage_cannotUndo =>
       'Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String tags_manage_rowScopes(String scopes) {
+    return 'Für: $scopes';
+  }
+
+  @override
+  String tags_manage_rowUsage(String counts) {
+    return 'Verwendung: $counts';
+  }
 
   @override
   String get tags_action_edit => 'Tags bearbeiten';

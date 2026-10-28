@@ -19670,6 +19670,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_noUsableGas(String minGas, String fill) {
+    return 'מינימום rock bottom של $minGas לא משאיר גז שמיש במילוי של $fill';
+  }
+
+  @override
   String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
     return 'המדלל חורג מ-MOD מדלל ב-$depth (ppO₂ $value bar)';
   }
@@ -50942,6 +50947,17 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get backup_history_device_anotherDevice => 'מכשיר אחר';
+
+  @override
+  String get backup_history_device_thisDevice => 'מכשיר זה';
+
+  @override
+  String backup_history_subtitleWithDevice(String summary, String device) {
+    return '$summary · $device';
+  }
+
+  @override
   String backup_history_manualSubtitle(
     int diveCount,
     int siteCount,
@@ -54408,6 +54424,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tags_manage_cannotUndo => 'לא ניתן לבטל פעולה זו.';
+
+  @override
+  String tags_manage_rowScopes(String scopes) {
+    return 'עבור: $scopes';
+  }
+
+  @override
+  String tags_manage_rowUsage(String counts) {
+    return 'בשימוש: $counts';
+  }
 
   @override
   String get tags_action_edit => 'עריכת תגיות';

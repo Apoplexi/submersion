@@ -20043,6 +20043,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_noUsableGas(String minGas, String fill) {
+    return 'A rock-bottom minimum ($minGas) nem hagy felhasználható gázt egy $fill töltésben';
+  }
+
+  @override
   String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
     return 'A hígítógáz meghaladja a Dil-MOD-ot $depth mélységben (ppO₂ $value bar)';
   }
@@ -51769,6 +51774,17 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get backup_history_device_anotherDevice => 'Másik eszköz';
+
+  @override
+  String get backup_history_device_thisDevice => 'Ez az eszköz';
+
+  @override
+  String backup_history_subtitleWithDevice(String summary, String device) {
+    return '$summary · $device';
+  }
+
+  @override
   String backup_history_manualSubtitle(
     int diveCount,
     int siteCount,
@@ -55258,6 +55274,16 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tags_manage_cannotUndo => 'Ez nem vonható vissza.';
+
+  @override
+  String tags_manage_rowScopes(String scopes) {
+    return 'Használható: $scopes';
+  }
+
+  @override
+  String tags_manage_rowUsage(String counts) {
+    return 'Használatban: $counts';
+  }
 
   @override
   String get tags_action_edit => 'Címkék szerkesztése';

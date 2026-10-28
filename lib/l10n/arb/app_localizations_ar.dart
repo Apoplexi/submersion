@@ -20408,6 +20408,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String plannerCanvas_issue_noUsableGas(String minGas, String fill) {
+    return 'الحد الأدنى الآمن $minGas لا يترك غازًا قابلًا للاستخدام في تعبئة $fill';
+  }
+
+  @override
   String plannerCanvas_issue_diluentModExceeded(String depth, String value) {
     return 'يتجاوز غاز التخفيف حد MOD الخاص به عند $depth (ppO₂ $value bar)';
   }
@@ -52680,6 +52685,17 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get backup_history_device_anotherDevice => 'جهاز آخر';
+
+  @override
+  String get backup_history_device_thisDevice => 'هذا الجهاز';
+
+  @override
+  String backup_history_subtitleWithDevice(String summary, String device) {
+    return '$summary · $device';
+  }
+
+  @override
   String backup_history_manualSubtitle(
     int diveCount,
     int siteCount,
@@ -56315,6 +56331,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tags_manage_cannotUndo => 'لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String tags_manage_rowScopes(String scopes) {
+    return 'متاح لـ: $scopes';
+  }
+
+  @override
+  String tags_manage_rowUsage(String counts) {
+    return 'مستخدم في: $counts';
+  }
 
   @override
   String get tags_action_edit => 'تعديل الوسوم';
