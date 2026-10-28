@@ -22924,6 +22924,63 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ungenutzte Bailout-Gase auslassen';
 
   @override
+  String get settings_conflict_field_diveListSort => 'Tauchgänge: Sortierung';
+
+  @override
+  String get settings_conflict_field_divePlanListSort =>
+      'Gespeicherte Pläne: Sortierung';
+
+  @override
+  String get settings_conflict_field_tripListSort => 'Reisen: Sortierung';
+
+  @override
+  String get settings_conflict_field_courseListSort => 'Kurse: Sortierung';
+
+  @override
+  String get settings_conflict_field_buddyListSort =>
+      'Tauchpartner: Sortierung';
+
+  @override
+  String get settings_conflict_field_diveCenterListSort =>
+      'Tauchbasen: Sortierung';
+
+  @override
+  String get settings_conflict_field_siteListSort => 'Tauchplätze: Sortierung';
+
+  @override
+  String get settings_conflict_field_certificationListSort =>
+      'Brevets: Sortierung';
+
+  @override
+  String get settings_conflict_field_equipmentListSort =>
+      'Ausrüstung: Sortierung';
+
+  @override
+  String get settings_conflict_field_siteListGroupBy =>
+      'Tauchplätze: Gruppierung';
+
+  @override
+  String get settings_conflict_field_certificationListGroupBy =>
+      'Brevets: Gruppierung';
+
+  @override
+  String get settings_conflict_field_equipmentArrangement =>
+      'Ausrüstungsanordnung';
+
+  @override
+  String get settings_conflict_field_equipmentGroupByLocation =>
+      'Ausrüstung nach Ort gruppiert';
+
+  @override
+  String get settings_conflict_field_listArrangementHlc =>
+      'Protokoll der Listenanordnung';
+
+  @override
+  String settings_conflict_sortValue(String field, String direction) {
+    return '$field, $direction';
+  }
+
+  @override
   String get settings_conflict_field_avgSpeed => 'Durchschnittsgeschwindigkeit';
 
   @override
