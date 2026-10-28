@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:drift/drift.dart' show GeneratedDatabase;
 import 'package:submersion/features/demo_mode/data/demo_database_preparer.dart';
 import 'package:submersion/features/demo_mode/data/demo_downloader.dart';
+import 'package:submersion/features/demo_mode/data/demo_manifest_client.dart';
 import 'package:submersion/features/demo_mode/data/demo_mode_gate.dart';
 import 'package:submersion/features/demo_mode/data/demo_mode_service.dart';
 import 'package:submersion/features/demo_mode/data/demo_paths.dart';
@@ -56,11 +57,12 @@ void main() {
     FakeDownloader? downloader,
     FakeSwitcher? sw,
     bool hasPackage = true,
+    DemoManifestClient? manifest,
   }) => DemoModeService(
     paths: paths,
     prefs: prefs,
     store: store,
-    manifest: FakeManifestClient(hasPackage ? testPackage : null),
+    manifest: manifest ?? FakeManifestClient(hasPackage ? testPackage : null),
     downloader: downloader ?? FakeDownloader(),
     extractor: FakeExtractor(),
     preparer: DemoDatabasePreparer(),
@@ -76,7 +78,7 @@ void main() {
   test(
     'enter switches to the demo database, snapshots prefs and restarts once',
     () async {
-      await service().enter(fromFirstRun: false);
+      await service().enter(fromFirstRun: false, package: testPackage);
 
       expect(switcher.openPath, paths.databaseFile);
       expect(prefs.getString('current_diver_id'), 'demo-diver');
@@ -88,11 +90,79 @@ void main() {
     },
   );
 
+  test('enter reads the manifest again and downloads its current entry when '
+      'the size is unchanged', () async {
+    // A rebuild republished at the same size: new URL and checksum, so the
+    // package the user agreed to would fail the download.
+    final republished = DemoPackage(
+      schemaVersion: testPackage.schemaVersion,
+      url: Uri.parse('https://example.com/republished.zip'),
+      sha256: 'b' * 64,
+      size: testPackage.size,
+      generatedAt: DateTime.utc(2026, 10, 21),
+    );
+    final manifest = _CountingManifest(republished);
+    final downloader = _RecordingDownloader();
+
+    await service(
+      manifest: manifest,
+      downloader: downloader,
+    ).enter(fromFirstRun: false, package: testPackage);
+
+    expect(manifest.calls, 1);
+    expect(downloader.downloaded, [republished]);
+  });
+
+  test('enter downloads nothing and names the new package when its size '
+      'changed', () async {
+    final bigger = DemoPackage(
+      schemaVersion: testPackage.schemaVersion,
+      url: Uri.parse('https://example.com/bigger.zip'),
+      sha256: 'c' * 64,
+      size: testPackage.size * 4,
+      generatedAt: DateTime.utc(2026, 10, 22),
+    );
+    final downloader = _RecordingDownloader();
+
+    await expectLater(
+      service(
+        manifest: _CountingManifest(bigger),
+        downloader: downloader,
+      ).enter(fromFirstRun: false, package: testPackage),
+      throwsA(
+        isA<DemoPackageChangedException>().having(
+          (e) => e.current,
+          'current',
+          bigger,
+        ),
+      ),
+    );
+
+    expect(downloader.downloaded, isEmpty);
+    expect(Directory(paths.root).existsSync(), isFalse);
+    expect(switcher.openPath, realPath);
+    expect(restarts, 0);
+  });
+
+  test('enter tries the agreed package when the manifest cannot be '
+      'reached', () async {
+    final downloader = _RecordingDownloader();
+
+    await service(
+      hasPackage: false,
+      downloader: downloader,
+    ).enter(fromFirstRun: false, package: testPackage);
+
+    expect(downloader.downloaded, [testPackage]);
+    expect(switcher.openPath, paths.databaseFile);
+  });
+
   test('enter reports downloading, preparing and opening in order', () async {
     final stages = <DemoEnterStage>[];
 
     await service().enter(
       fromFirstRun: false,
+      package: testPackage,
       onProgress: (p) {
         if (stages.isEmpty || stages.last != p.stage) stages.add(p.stage);
       },
@@ -111,7 +181,7 @@ void main() {
       await expectLater(
         service(
           downloader: FakeDownloader(failWith: DemoDownloadFailure.network),
-        ).enter(fromFirstRun: false),
+        ).enter(fromFirstRun: false, package: testPackage),
         throwsA(isA<DemoDownloadException>()),
       );
 
@@ -128,9 +198,11 @@ void main() {
       var cancelled = false;
 
       await expectLater(
-        service(
-          downloader: _CancelOnLastChunk(() => cancelled = true),
-        ).enter(fromFirstRun: false, isCancelled: () => cancelled),
+        service(downloader: _CancelOnLastChunk(() => cancelled = true)).enter(
+          fromFirstRun: false,
+          package: testPackage,
+          isCancelled: () => cancelled,
+        ),
         throwsA(
           isA<DemoDownloadException>().having(
             (e) => e.reason,
@@ -145,20 +217,6 @@ void main() {
     },
   );
 
-  test('enter with no compatible package fails as a network failure', () async {
-    await expectLater(
-      service(hasPackage: false).enter(fromFirstRun: false),
-      throwsA(
-        isA<DemoDownloadException>().having(
-          (e) => e.reason,
-          'reason',
-          DemoDownloadFailure.network,
-        ),
-      ),
-    );
-    expect(Directory(paths.root).existsSync(), isFalse);
-  });
-
   test(
     'enter failing after the commit point reopens the real database and restores prefs',
     () async {
@@ -167,7 +225,7 @@ void main() {
       addTearDown(failing.close);
 
       await expectLater(
-        service(sw: failing).enter(fromFirstRun: false),
+        service(sw: failing).enter(fromFirstRun: false, package: testPackage),
         throwsA(isA<StateError>()),
       );
 
@@ -205,7 +263,7 @@ void main() {
         deviceId: () => 'device-1',
         cancelDeviceNotifications: () async {},
         restart: () => restarts++,
-      ).enter(fromFirstRun: false);
+      ).enter(fromFirstRun: false, package: testPackage);
 
       // A kill while preparing relaunches as entering, which cleans up,
       // rather than as active over a half-prepared logbook.
@@ -217,7 +275,7 @@ void main() {
   );
 
   test('exit with an unreadable preferences snapshot still finishes', () async {
-    await service().enter(fromFirstRun: false);
+    await service().enter(fromFirstRun: false, package: testPackage);
     File(paths.prefsSnapshotFile).writeAsStringSync('not a snapshot');
 
     await service().exit();
@@ -231,7 +289,7 @@ void main() {
   test(
     'exit when the real logbook cannot reopen leaves exiting for startup and restarts',
     () async {
-      await service().enter(fromFirstRun: false);
+      await service().enter(fromFirstRun: false, package: testPackage);
       final failing = FakeSwitcher(failOpenOf: realPath);
       await failing.openAt(paths.databaseFile, keyHex: null);
       addTearDown(failing.close);
@@ -248,7 +306,7 @@ void main() {
   test(
     'enter never applies the real encryption key to the demo file; exit restores it',
     () async {
-      await service().enter(fromFirstRun: false);
+      await service().enter(fromFirstRun: false, package: testPackage);
       expect(switcher.keys.last, isNull);
 
       await service().exit();
@@ -260,7 +318,7 @@ void main() {
   test(
     'exit restores current_diver_id, sync and storage prefs exactly',
     () async {
-      await service().enter(fromFirstRun: false);
+      await service().enter(fromFirstRun: false, package: testPackage);
       await prefs.setBool('sync_auto_enabled', false);
       await prefs.setString('demo_only', 'x');
 
@@ -295,7 +353,7 @@ void main() {
       cancelDeviceNotifications: () async {},
       restart: () => restarts++,
     );
-    await svc.enter(fromFirstRun: false);
+    await svc.enter(fromFirstRun: false, package: testPackage);
     await prefs.setString('db_custom_path', '/moved-during-demo');
 
     await svc.exit();
@@ -322,7 +380,7 @@ void main() {
       restart: () => restarts++,
       forgetPhotos: (photoPaths) async => forgotten.addAll(photoPaths),
     );
-    await svc.enter(fromFirstRun: false);
+    await svc.enter(fromFirstRun: false, package: testPackage);
 
     await svc.exit();
 
@@ -331,7 +389,7 @@ void main() {
   });
 
   test('exit deletes the demo database, package, photos and state', () async {
-    await service().enter(fromFirstRun: false);
+    await service().enter(fromFirstRun: false, package: testPackage);
 
     await service().exit();
 
@@ -345,7 +403,7 @@ void main() {
   test('the real database is untouched by a full enter and exit', () async {
     final before = File(realPath).readAsBytesSync();
 
-    await service().enter(fromFirstRun: false);
+    await service().enter(fromFirstRun: false, package: testPackage);
     await service().exit();
     await switcher.close();
 
@@ -395,5 +453,38 @@ class _CancelOnLastChunk extends FakeDownloader {
     final file = await super.download(pkg, dest, onProgress: onProgress);
     cancel();
     return file;
+  }
+}
+
+class _CountingManifest extends FakeManifestClient {
+  _CountingManifest(super.package);
+
+  int calls = 0;
+
+  @override
+  Future<DemoPackage?> fetchBest(int appSchemaVersion) {
+    calls++;
+    return super.fetchBest(appSchemaVersion);
+  }
+}
+
+/// Records which package each download was asked for.
+class _RecordingDownloader extends FakeDownloader {
+  final downloaded = <DemoPackage>[];
+
+  @override
+  Future<File> download(
+    DemoPackage pkg,
+    File dest, {
+    void Function(int received, int total)? onProgress,
+    bool Function()? isCancelled,
+  }) {
+    downloaded.add(pkg);
+    return super.download(
+      pkg,
+      dest,
+      onProgress: onProgress,
+      isCancelled: isCancelled,
+    );
   }
 }
