@@ -61,6 +61,18 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
+			<string>Suunto JSON Export</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.json</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
 			<string>SQLite Database</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
@@ -142,9 +154,9 @@
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Submersion uses Bluetooth to connect to dive computers and import dive data.</string>
+	<string>Submersion uses Bluetooth to connect to dive computers and to sync with your other devices nearby.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Submersion uses Bluetooth to connect to dive computers and import dive data.</string>
+	<string>Submersion uses Bluetooth to connect to dive computers and to sync with your other devices nearby.</string>
 	<key>NFCReaderUsageDescription</key>
 	<string>Submersion reads and writes the NFC tags on your cylinders.</string>
 	<key>NSCameraUsageDescription</key>

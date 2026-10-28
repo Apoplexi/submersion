@@ -39,6 +39,7 @@ import 'package:submersion/core/services/suunto_cloud/suunto_json_file_reader.da
 import 'package:submersion/features/import_wizard/presentation/suunto_file_import_navigation.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/nearby_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/adopt_replaced_library_dialog.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_providers.dart';
@@ -51,6 +52,11 @@ import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
 import 'package:submersion/features/shared_library/presentation/providers/shared_library_sync_notifier.dart';
+import 'package:submersion/features/import_wizard/presentation/providers/import_job_provider.dart';
+import 'package:submersion/features/import_wizard/presentation/widgets/background_import_notice.dart';
+import 'package:submersion/features/demo_mode/data/demo_mode_gate.dart';
+import 'package:submersion/features/demo_mode/domain/demo_sealed_feature.dart';
+import 'package:submersion/features/demo_mode/presentation/demo_seal_guard.dart';
 
 const Locale _defaultFallbackLocale = Locale('en');
 const Set<String> _invalidSystemLocaleLanguageCodes = {'c', 'posix'};
@@ -155,8 +161,15 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
     // gear.serviceDue). The keeper runs the cache writer while a filter
     // names it, and leaves the clocks idle otherwise (#2365).
     ref.listenManual(serviceStatusKeeperProvider, (_, _) {});
+    // Nearby Bluetooth sync (issue #3731): the switch re-decides whether the
+    // radio is on.
+    ref.listenManual<bool>(
+      syncBehaviorProvider.select((s) => s.nearbyAutoEnabled),
+      (_, _) => unawaited(ref.read(nearbyLinkManagerProvider).refresh()),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _runStorageCleanupAfter(_maybeSyncOnLaunch(), StorageGcTrigger.launch);
+      _setNearbyForeground(true);
       _resumeMediaTransfers();
       _republishOwnedMedia();
       _convertGearFiles();
@@ -221,6 +234,18 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
       case LifecycleMeaning.none:
         break;
     }
+    // Nearby follows whether the app is on screen, not whether it has the
+    // focus: an inactive window (another app in front on a desktop, Control
+    // Center or an alert over it on iOS) must not end a transfer, though
+    // App Lock counts it as leaving.
+    switch (state) {
+      case AppLifecycleState.hidden || AppLifecycleState.paused:
+        _setNearbyForeground(false);
+      case AppLifecycleState.resumed:
+        _setNearbyForeground(true);
+      case AppLifecycleState.inactive || AppLifecycleState.detached:
+        break;
+    }
   }
 
   /// Restarts an outstanding media transfer queue (issue #1270).
@@ -277,6 +302,21 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
     unawaited(ref.read(equipmentFileConversionProvider)());
   }
 
+  /// The nearby link scans and advertises only while the app is on screen
+  /// (issue #3731); a failure there never reaches the app.
+  void _setNearbyForeground(bool inForeground) {
+    unawaited(
+      ref
+          .read(nearbyLinkManagerProvider)
+          .setForeground(inForeground)
+          .catchError((Object e) {
+            LoggerService.forClass(
+              SubmersionApp,
+            ).warning('Nearby link did not follow the app: $e');
+          }),
+    );
+  }
+
   Future<void> _maybeSyncOnLaunch() async {
     final settings = ref.read(syncBehaviorProvider);
     if (!settings.autoSyncEnabled || !settings.syncOnLaunch) return;
@@ -309,6 +349,22 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
         ref.read(syncStateProvider.notifier).performSync(auto: true),
         ref.read(sharedLibrarySyncProvider.notifier).syncAll(auto: true),
       ].map((sync) => sync.catchError((Object _) {})),
+    );
+  }
+
+  void _onBackgroundImportEnded(
+    ImportJobOutcome? previous,
+    ImportJobOutcome? outcome,
+  ) {
+    if (outcome == null || identical(outcome, previous)) return;
+    final ctx = _scaffoldMessengerKey.currentContext;
+    if (ctx == null) return;
+    _scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(
+          backgroundImportNotice(AppLocalizations.of(ctx), outcome),
+        ),
+      ),
     );
   }
 
@@ -415,6 +471,14 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
   /// reported here, by the root that opened it: the share handler that
   /// received it may belong to a root since replaced.
   Future<bool> _openShare(IncomingShare share) async {
+    // Demo mode (issue #3708): nothing comes in. The share is consumed with
+    // a note, so it is not imported into the sample logbook or held for later.
+    final messengerContext = _scaffoldMessengerKey.currentContext;
+    if (messengerContext != null &&
+        !demoSealGuard(messengerContext, DemoSealedFeature.fileImport)) {
+      return true;
+    }
+    if (DemoModeGate.instance.isActive) return true;
     try {
       return switch (share) {
         SharedFile(:final bytes, :final fileName) => await _handleIncomingFile(
@@ -461,6 +525,7 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
       currentPath: location,
       notifier: ref.read(universalImportNotifierProvider.notifier),
       messenger: _scaffoldMessengerKey.currentState,
+      isImportRunning: () => ref.read(importJobProvider).isRunning,
       wizardActiveMessage: l10n?.dropTarget_error_wizardActive,
       unsupportedFileMessage: l10n?.dropTarget_error_unsupportedFile,
     );
@@ -543,6 +608,7 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
       currentPath: location,
       notifier: ref.read(universalImportNotifierProvider.notifier),
       messenger: _scaffoldMessengerKey.currentState,
+      isImportRunning: () => ref.read(importJobProvider).isRunning,
       wizardActiveMessage: l10n?.dropTarget_error_wizardActive,
     );
 
@@ -588,6 +654,13 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
     ref.listen<BackupOperationState>(
       backupOperationProvider,
       _onBackupOperationChanged,
+    );
+
+    // An import that ran on after its wizard closed (#3554) has no summary
+    // page to end on, so its outcome is told here, whatever screen is up.
+    ref.listen<ImportJobOutcome?>(
+      importJobProvider.select((job) => job.backgroundOutcome),
+      _onBackgroundImportEnded,
     );
 
     return MaterialApp.router(

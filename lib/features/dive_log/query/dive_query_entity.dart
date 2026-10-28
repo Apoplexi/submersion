@@ -1,4 +1,5 @@
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/query/domain/query_node.dart';
 import 'package:submersion/core/query/domain/query_subject.dart';
 import 'package:submersion/core/query/registry/query_entity.dart';
 import 'package:submersion/core/query/registry/query_field.dart';
@@ -8,6 +9,7 @@ import 'package:submersion/features/dive_log/data/sql/multi_cylinder_sac_sql.dar
 import 'package:submersion/features/dive_log/domain/entities/derived_metrics.dart';
 import 'package:submersion/features/dive_log/query/dive_child_query_entities.dart';
 import 'package:submersion/features/dive_types/query/dive_type_text_search.dart';
+import 'package:submersion/features/equipment/data/repositories/tank_regulator_sql.dart';
 import 'package:submersion/features/insights/data/dive_filter_sql.dart';
 
 /// Every field and relation a dive query can name (#2365). This file is
@@ -34,13 +36,15 @@ const kDiveNoWeightSql =
     '(SELECT 1 FROM dive_weights w WHERE w.dive_id = {r}.id))';
 
 /// The gear union the equipment axes have always used: items linked
-/// through `dive_equipment` plus cylinders the transmitter registry matched
-/// through `dive_tanks.equipment_id`.
-const kDiveGearJoinSql =
+/// through `dive_equipment`, cylinders the transmitter registry matched
+/// through `dive_tanks.equipment_id`, and the regulators on the dive's
+/// tanks, first and extra (issue #3375).
+final kDiveGearJoinSql =
     '{to}.id IN (SELECT de.equipment_id FROM dive_equipment de '
     'WHERE de.dive_id = {from}.id '
     'UNION SELECT dt.equipment_id FROM dive_tanks dt '
-    'WHERE dt.dive_id = {from}.id AND dt.equipment_id IS NOT NULL)';
+    'WHERE dt.dive_id = {from}.id AND dt.equipment_id IS NOT NULL '
+    'UNION ${tankRegulatorIdsOfDiveSql('{from}.id')})';
 
 /// A dive's effective water type: its own, else its site's (issue #3196).
 /// The SQL twin of `Dive.effectiveWaterType`, matching the insights water
@@ -163,7 +167,8 @@ String _derived(String column) =>
 /// chart plots (`InsightsRepository.getSacPressurePerDive`): every breathed
 /// cylinder's drop in bar of the back gas (issue #3109) over the runtime,
 /// normalised by the average depth, so a search and the chart agree. Empty
-/// with no back-gas drop, no runtime or no average depth.
+/// with no back-gas drop, no runtime or no average depth, and on a CCR or
+/// SCR dive (issue #3673).
 final String kDiveSacSql =
     '(CASE WHEN COALESCE({r}.runtime, {r}.bottom_time) > 0 '
     'AND {r}.avg_depth > 0 THEN ${diveSacPressureSql('{r}')} END)';
@@ -339,7 +344,10 @@ final QueryEntity diveQueryEntity = QueryEntity(
       '(${diveSurfaceIntervalSecondsSql('{r}')} / 60)',
       dimension: FieldDimension.minutes,
       emptySql: '(${diveSurfaceIntervalSecondsSql('{r}')}) IS NULL',
-      tables: const ['dive_profile_series'],
+      // The profile span fallback also reads the series history, which is
+      // only written alongside a dive_profile_series row, so that tick
+      // covers it (issue #3537).
+      tables: const ['dive_profile_series', 'dive_data_sources'],
     ),
     _num(
       'cnsEnd',
@@ -420,6 +428,20 @@ final QueryEntity diveQueryEntity = QueryEntity(
     // The legacy free-text buddy column (#757): the dive editor writes only
     // dive_buddies, but old data still carries names here.
     _text('legacyBuddy', 'buddy'),
+    // The diver's own role (#3622), present or not. A null or blank
+    // diver_role is no role whatever dive_diver_roles holds, as
+    // DiveRoleSet.resolve reads it. Matching a named role would need that
+    // resolution in SQL and a name subject for custom roles, so only the
+    // presence operators are offered.
+    QueryField(
+      key: 'role',
+      aliases: const ['myRole'],
+      type: FieldType.text,
+      sql: '{r}.diver_role',
+      emptySql: "({r}.diver_role IS NULL OR {r}.diver_role = '')",
+      labelKey: _label('role'),
+      ops: const {QueryOp.isEmpty, QueryOp.isSet},
+    ),
     _text('diveMaster', 'dive_master'),
     _text('boatName', 'boat_name'),
     _text('boatCaptain', 'boat_captain'),
