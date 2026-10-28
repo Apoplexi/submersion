@@ -5947,6 +5947,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_homeChips_sync => 'Estado de sincronização';
 
   @override
+  String get settings_homeChips_nearby => 'Dispositivos próximos';
+
+  @override
   String get settings_homeChips_dataQuality => 'Qualidade dos dados';
 
   @override
@@ -5997,6 +6000,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboard_gauges_synced => 'Sincronizado';
+
+  @override
+  String dashboard_gauges_nearby(String name) {
+    return 'Próximo: $name precisa de atenção';
+  }
+
+  @override
+  String dashboard_gauges_nearbyMore(String name) {
+    return 'Próximos: $name e outros precisam de atenção';
+  }
 
   @override
   String dashboard_gauges_dataIssues(int count) {
@@ -37467,6 +37480,142 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_sync_keepInStep =>
       'Manter os dispositivos sincronizados automaticamente';
+
+  @override
+  String get settings_nearby_title => 'Dispositivos próximos';
+
+  @override
+  String get settings_nearby_auto_title =>
+      'Sincronizar automaticamente com dispositivos próximos';
+
+  @override
+  String get settings_nearby_auto_subtitle =>
+      'Quando um dispositivo emparelhado está aberto por perto, via Bluetooth';
+
+  @override
+  String get settings_nearby_linuxNote =>
+      'Outros dispositivos não conseguem encontrar este computador, por isso ele sincroniza com qualquer dispositivo próximo, exceto outro computador Linux';
+
+  @override
+  String get settings_nearby_pair => 'Emparelhar um dispositivo';
+
+  @override
+  String settings_nearby_status_synced(String when) {
+    return 'Sincronizado $when';
+  }
+
+  @override
+  String settings_nearby_status_syncing(String done, String total) {
+    return 'Sincronizando: $done de $total';
+  }
+
+  @override
+  String get settings_nearby_status_never => 'Ainda não sincronizado';
+
+  @override
+  String settings_nearby_status_notSeen(String date) {
+    return 'Não visto desde $date';
+  }
+
+  @override
+  String get settings_nearby_error_newerApp =>
+      'Este dispositivo precisa de uma versão mais recente do app';
+
+  @override
+  String get settings_nearby_error_peerOlderApp =>
+      'Aquele dispositivo precisa de uma versão mais recente do app';
+
+  @override
+  String get settings_nearby_error_differentLibrary =>
+      'Não é a mesma biblioteca';
+
+  @override
+  String get settings_nearby_error_notPaired =>
+      'Desemparelhado no outro dispositivo';
+
+  @override
+  String get settings_nearby_error_applyFailed =>
+      'Não foi possível aplicar as alterações dele';
+
+  @override
+  String get settings_nearby_error_bluetoothOff =>
+      'O Bluetooth está desligado ou não permitido';
+
+  @override
+  String get settings_nearby_error_unreachable => 'Não foi possível conectar';
+
+  @override
+  String get settings_nearby_sheet_rename => 'Renomear';
+
+  @override
+  String get settings_nearby_sheet_unpair => 'Desemparelhar';
+
+  @override
+  String settings_nearby_unpair_confirm(String name) {
+    return 'Desemparelhar $name? Será preciso emparelhar de novo para sincronizar por perto.';
+  }
+
+  @override
+  String get settings_nearby_rename_title => 'Renomear dispositivo';
+
+  @override
+  String settings_nearby_notInRange(String name) {
+    return '$name não está por perto agora';
+  }
+
+  @override
+  String get nearbyPair_looking => 'Procurando dispositivos…';
+
+  @override
+  String get nearbyPair_hint =>
+      'Abra o Submersion no outro dispositivo e toque também em Emparelhar um dispositivo.';
+
+  @override
+  String nearbyPair_found(String name) {
+    return '$name encontrado. Verifique se mostra este código e confirme nos dois.';
+  }
+
+  @override
+  String get nearbyPair_sameCode => 'Mesmo código';
+
+  @override
+  String get nearbyPair_notMine => 'Não é meu';
+
+  @override
+  String get nearbyPair_waiting =>
+      'Aguardando a confirmação do outro dispositivo…';
+
+  @override
+  String get nearbyPair_bothPopulated =>
+      'Os dois dispositivos têm mergulhos. Emparelhar junta-os num único logbook.';
+
+  @override
+  String get nearbyPair_differentLibrary =>
+      'Esse dispositivo usa outra biblioteca, por isso não pode ser emparelhado com este.';
+
+  @override
+  String get nearbyPair_permissionDenied =>
+      'O Submersion precisa da permissão de Bluetooth para encontrar dispositivos próximos.';
+
+  @override
+  String get nearbyPair_bluetoothOff =>
+      'Ligue o Bluetooth para encontrar dispositivos próximos.';
+
+  @override
+  String get nearbyPair_unsupported =>
+      'Este dispositivo não tem um Bluetooth que o Submersion possa usar.';
+
+  @override
+  String get nearbyPair_openSettings => 'Abrir configurações';
+
+  @override
+  String nearbyPair_done(String name) {
+    return 'Emparelhado com $name';
+  }
+
+  @override
+  String get nearbyPair_failed =>
+      'O emparelhamento não terminou. Tente de novo nos dois dispositivos.';
 
   @override
   String get settings_sync_alsoAtLaunch => 'Sincronizar também ao abrir';

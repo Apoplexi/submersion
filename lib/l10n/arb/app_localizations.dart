@@ -9318,6 +9318,12 @@ abstract class AppLocalizations {
   /// **'Sync status'**
   String get settings_homeChips_sync;
 
+  /// No description provided for @settings_homeChips_nearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby devices'**
+  String get settings_homeChips_nearby;
+
   /// No description provided for @settings_homeChips_dataQuality.
   ///
   /// In en, this message translates to:
@@ -9383,6 +9389,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Synced'**
   String get dashboard_gauges_synced;
+
+  /// No description provided for @dashboard_gauges_nearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby: {name} needs attention'**
+  String dashboard_gauges_nearby(String name);
+
+  /// No description provided for @dashboard_gauges_nearbyMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby: {name} and others need attention'**
+  String dashboard_gauges_nearbyMore(String name);
 
   /// No description provided for @dashboard_gauges_dataIssues.
   ///
@@ -59120,6 +59138,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep devices in step automatically'**
   String get settings_sync_keepInStep;
+
+  /// No description provided for @settings_nearby_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby devices'**
+  String get settings_nearby_title;
+
+  /// No description provided for @settings_nearby_auto_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync nearby automatically'**
+  String get settings_nearby_auto_title;
+
+  /// No description provided for @settings_nearby_auto_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When a paired device is open nearby, over Bluetooth'**
+  String get settings_nearby_auto_subtitle;
+
+  /// No description provided for @settings_nearby_linuxNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Other devices cannot find this computer, so it syncs with any nearby device except another Linux computer'**
+  String get settings_nearby_linuxNote;
+
+  /// No description provided for @settings_nearby_pair.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair a device'**
+  String get settings_nearby_pair;
+
+  /// No description provided for @settings_nearby_status_synced.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced {when}'**
+  String settings_nearby_status_synced(String when);
+
+  /// No description provided for @settings_nearby_status_syncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing: {done} of {total}'**
+  String settings_nearby_status_syncing(String done, String total);
+
+  /// No description provided for @settings_nearby_status_never.
+  ///
+  /// In en, this message translates to:
+  /// **'Not synced yet'**
+  String get settings_nearby_status_never;
+
+  /// No description provided for @settings_nearby_status_notSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Not seen since {date}'**
+  String settings_nearby_status_notSeen(String date);
+
+  /// No description provided for @settings_nearby_error_newerApp.
+  ///
+  /// In en, this message translates to:
+  /// **'This device needs a newer app version'**
+  String get settings_nearby_error_newerApp;
+
+  /// No description provided for @settings_nearby_error_peerOlderApp.
+  ///
+  /// In en, this message translates to:
+  /// **'That device needs a newer app version'**
+  String get settings_nearby_error_peerOlderApp;
+
+  /// No description provided for @settings_nearby_error_differentLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Not the same library'**
+  String get settings_nearby_error_differentLibrary;
+
+  /// No description provided for @settings_nearby_error_notPaired.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpaired on the other device'**
+  String get settings_nearby_error_notPaired;
+
+  /// No description provided for @settings_nearby_error_applyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not apply its changes'**
+  String get settings_nearby_error_applyFailed;
+
+  /// No description provided for @settings_nearby_error_bluetoothOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is off or not allowed'**
+  String get settings_nearby_error_bluetoothOff;
+
+  /// No description provided for @settings_nearby_error_unreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect'**
+  String get settings_nearby_error_unreachable;
+
+  /// No description provided for @settings_nearby_sheet_rename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get settings_nearby_sheet_rename;
+
+  /// No description provided for @settings_nearby_sheet_unpair.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpair'**
+  String get settings_nearby_sheet_unpair;
+
+  /// No description provided for @settings_nearby_unpair_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpair {name}? It will need pairing again to sync nearby.'**
+  String settings_nearby_unpair_confirm(String name);
+
+  /// No description provided for @settings_nearby_rename_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename device'**
+  String get settings_nearby_rename_title;
+
+  /// No description provided for @settings_nearby_notInRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is not nearby right now'**
+  String settings_nearby_notInRange(String name);
+
+  /// No description provided for @nearbyPair_looking.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking for devices…'**
+  String get nearbyPair_looking;
+
+  /// No description provided for @nearbyPair_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Submersion on the other device and tap Pair a device there too.'**
+  String get nearbyPair_hint;
+
+  /// No description provided for @nearbyPair_found.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {name}. Check that it shows this code, then confirm on both.'**
+  String nearbyPair_found(String name);
+
+  /// No description provided for @nearbyPair_sameCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Same code'**
+  String get nearbyPair_sameCode;
+
+  /// No description provided for @nearbyPair_notMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Not mine'**
+  String get nearbyPair_notMine;
+
+  /// No description provided for @nearbyPair_waiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the other device to confirm…'**
+  String get nearbyPair_waiting;
+
+  /// No description provided for @nearbyPair_bothPopulated.
+  ///
+  /// In en, this message translates to:
+  /// **'Both devices have dives. Pairing merges them into one logbook.'**
+  String get nearbyPair_bothPopulated;
+
+  /// No description provided for @nearbyPair_differentLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'That device is on a different library, so it cannot pair with this one.'**
+  String get nearbyPair_differentLibrary;
+
+  /// No description provided for @nearbyPair_permissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion needs Bluetooth permission to find nearby devices.'**
+  String get nearbyPair_permissionDenied;
+
+  /// No description provided for @nearbyPair_bluetoothOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on Bluetooth to find nearby devices.'**
+  String get nearbyPair_bluetoothOff;
+
+  /// No description provided for @nearbyPair_unsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This device has no Bluetooth that Submersion can use.'**
+  String get nearbyPair_unsupported;
+
+  /// No description provided for @nearbyPair_openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get nearbyPair_openSettings;
+
+  /// No description provided for @nearbyPair_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Paired with {name}'**
+  String nearbyPair_done(String name);
+
+  /// No description provided for @nearbyPair_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing did not finish. Try again on both devices.'**
+  String get nearbyPair_failed;
 
   /// No description provided for @settings_sync_alsoAtLaunch.
   ///

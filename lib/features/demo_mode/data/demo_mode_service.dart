@@ -61,6 +61,7 @@ class DemoModeService {
     required this.cancelDeviceNotifications,
     required this.restart,
     this.forgetPhotos,
+    this.endNearbySync,
     this.clock = DateTime.now,
   });
 
@@ -81,6 +82,10 @@ class DemoModeService {
   /// Drops whatever the app cached for the sample photos at these paths,
   /// such as their thumbnails, so nothing of demo mode outlives it.
   final Future<void> Function(List<String> photoPaths)? forgetPhotos;
+
+  /// Ends any nearby Bluetooth session still running, and returns once it
+  /// has, so no session reads or writes across the database switch.
+  final Future<void> Function()? endNearbySync;
   final DateTime Function() clock;
 
   /// Downloads and opens [package], the one whose size the user agreed to.
@@ -134,6 +139,7 @@ class DemoModeService {
     try {
       onProgress?.call(const DemoEnterProgress(DemoEnterStage.opening));
       await cancelDeviceNotifications();
+      await endNearbySync?.call();
       await switcher.openAt(paths.databaseFile, keyHex: null);
       await preparer.prepare(
         switcher.current,

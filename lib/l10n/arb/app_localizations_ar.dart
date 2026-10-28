@@ -6060,6 +6060,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_homeChips_sync => 'حالة المزامنة';
 
   @override
+  String get settings_homeChips_nearby => 'الأجهزة القريبة';
+
+  @override
   String get settings_homeChips_dataQuality => 'جودة البيانات';
 
   @override
@@ -6112,6 +6115,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dashboard_gauges_synced => 'متزامن';
+
+  @override
+  String dashboard_gauges_nearby(String name) {
+    return 'قريب: $name يحتاج إلى انتباه';
+  }
+
+  @override
+  String dashboard_gauges_nearbyMore(String name) {
+    return 'قريب: $name وأجهزة أخرى تحتاج إلى انتباه';
+  }
 
   @override
   String dashboard_gauges_dataIssues(int count) {
@@ -37943,6 +37956,139 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_sync_keepInStep => 'إبقاء الأجهزة متزامنة تلقائيًا';
+
+  @override
+  String get settings_nearby_title => 'الأجهزة القريبة';
+
+  @override
+  String get settings_nearby_auto_title =>
+      'المزامنة مع الأجهزة القريبة تلقائيًا';
+
+  @override
+  String get settings_nearby_auto_subtitle =>
+      'عندما يكون جهاز مقترن مفتوحًا بالقرب، عبر البلوتوث';
+
+  @override
+  String get settings_nearby_linuxNote =>
+      'لا يمكن للأجهزة الأخرى العثور على هذا الكمبيوتر، لذا يتزامن مع أي جهاز قريب باستثناء كمبيوتر لينكس آخر';
+
+  @override
+  String get settings_nearby_pair => 'إقران جهاز';
+
+  @override
+  String settings_nearby_status_synced(String when) {
+    return 'تمت المزامنة $when';
+  }
+
+  @override
+  String settings_nearby_status_syncing(String done, String total) {
+    return 'جارٍ المزامنة: $done من $total';
+  }
+
+  @override
+  String get settings_nearby_status_never => 'لم تتم المزامنة بعد';
+
+  @override
+  String settings_nearby_status_notSeen(String date) {
+    return 'لم يُشاهَد منذ $date';
+  }
+
+  @override
+  String get settings_nearby_error_newerApp =>
+      'يحتاج هذا الجهاز إلى إصدار أحدث من التطبيق';
+
+  @override
+  String get settings_nearby_error_peerOlderApp =>
+      'يحتاج ذلك الجهاز إلى إصدار أحدث من التطبيق';
+
+  @override
+  String get settings_nearby_error_differentLibrary => 'ليست المكتبة نفسها';
+
+  @override
+  String get settings_nearby_error_notPaired =>
+      'أُلغي الإقران على الجهاز الآخر';
+
+  @override
+  String get settings_nearby_error_applyFailed => 'تعذّر تطبيق تغييراته';
+
+  @override
+  String get settings_nearby_error_bluetoothOff =>
+      'البلوتوث متوقف أو غير مسموح به';
+
+  @override
+  String get settings_nearby_error_unreachable => 'تعذّر الاتصال';
+
+  @override
+  String get settings_nearby_sheet_rename => 'إعادة تسمية';
+
+  @override
+  String get settings_nearby_sheet_unpair => 'إلغاء الإقران';
+
+  @override
+  String settings_nearby_unpair_confirm(String name) {
+    return 'إلغاء إقران $name؟ سيحتاج إلى إقران جديد للمزامنة القريبة.';
+  }
+
+  @override
+  String get settings_nearby_rename_title => 'إعادة تسمية الجهاز';
+
+  @override
+  String settings_nearby_notInRange(String name) {
+    return '$name ليس قريبًا الآن';
+  }
+
+  @override
+  String get nearbyPair_looking => 'جارٍ البحث عن أجهزة…';
+
+  @override
+  String get nearbyPair_hint =>
+      'افتح Submersion على الجهاز الآخر واضغط على إقران جهاز هناك أيضًا.';
+
+  @override
+  String nearbyPair_found(String name) {
+    return 'تم العثور على $name. تحقّق من أنه يعرض هذا الرمز، ثم أكّد على الجهازين.';
+  }
+
+  @override
+  String get nearbyPair_sameCode => 'الرمز نفسه';
+
+  @override
+  String get nearbyPair_notMine => 'ليس جهازي';
+
+  @override
+  String get nearbyPair_waiting => 'في انتظار تأكيد الجهاز الآخر…';
+
+  @override
+  String get nearbyPair_bothPopulated =>
+      'يحتوي الجهازان على غطسات. يدمجها الإقران في سجل واحد.';
+
+  @override
+  String get nearbyPair_differentLibrary =>
+      'ذلك الجهاز على مكتبة مختلفة، لذا لا يمكن إقرانه بهذا الجهاز.';
+
+  @override
+  String get nearbyPair_permissionDenied =>
+      'يحتاج Submersion إلى إذن البلوتوث للعثور على الأجهزة القريبة.';
+
+  @override
+  String get nearbyPair_bluetoothOff =>
+      'شغّل البلوتوث للعثور على الأجهزة القريبة.';
+
+  @override
+  String get nearbyPair_unsupported =>
+      'لا يحتوي هذا الجهاز على بلوتوث يمكن لـ Submersion استخدامه.';
+
+  @override
+  String get nearbyPair_openSettings => 'فتح الإعدادات';
+
+  @override
+  String nearbyPair_done(String name) {
+    return 'تم الإقران مع $name';
+  }
+
+  @override
+  String get nearbyPair_failed =>
+      'لم يكتمل الإقران. حاول مرة أخرى على الجهازين.';
 
   @override
   String get settings_sync_alsoAtLaunch => 'المزامنة أيضًا عند التشغيل';

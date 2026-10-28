@@ -3715,6 +3715,7 @@
   "settings_homeChips_uploads": "Media uploads",
   "settings_homeChips_backup": "Backup age",
   "settings_homeChips_sync": "Sync status",
+  "settings_homeChips_nearby": "Nearby devices",
   "settings_homeChips_dataQuality": "Data quality",
   "dashboard_gauges_certsNeedAttention": "{count, plural, =1{{count} certification needs attention} other{{count} certifications need attention}}",
   "@dashboard_gauges_certsNeedAttention": {
@@ -3778,6 +3779,22 @@
     }
   },
   "dashboard_gauges_synced": "Synced",
+  "dashboard_gauges_nearby": "Nearby: {name} needs attention",
+  "@dashboard_gauges_nearby": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_nearbyMore": "Nearby: {name} and others need attention",
+  "@dashboard_gauges_nearbyMore": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "dashboard_gauges_dataIssues": "{count, plural, =1{1 data issue} other{{count} data issues}}",
   "@dashboard_gauges_dataIssues": {
     "placeholders": {
@@ -22919,6 +22936,93 @@
   "settings_sync_notSetUp": "Not set up",
   "settings_sync_offCustomFolder": "Off while the database is in a custom folder",
   "settings_sync_keepInStep": "Keep devices in step automatically",
+  "settings_nearby_title": "Nearby devices",
+  "settings_nearby_auto_title": "Sync nearby automatically",
+  "settings_nearby_auto_subtitle": "When a paired device is open nearby, over Bluetooth",
+  "settings_nearby_linuxNote": "Other devices cannot find this computer, so it syncs with any nearby device except another Linux computer",
+  "settings_nearby_pair": "Pair a device",
+  "settings_nearby_status_synced": "Synced {when}",
+  "@settings_nearby_status_synced": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_nearby_status_syncing": "Syncing: {done} of {total}",
+  "@settings_nearby_status_syncing": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_nearby_status_never": "Not synced yet",
+  "settings_nearby_status_notSeen": "Not seen since {date}",
+  "@settings_nearby_status_notSeen": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_nearby_error_newerApp": "This device needs a newer app version",
+  "settings_nearby_error_peerOlderApp": "That device needs a newer app version",
+  "settings_nearby_error_differentLibrary": "Not the same library",
+  "settings_nearby_error_notPaired": "Unpaired on the other device",
+  "settings_nearby_error_applyFailed": "Could not apply its changes",
+  "settings_nearby_error_bluetoothOff": "Bluetooth is off or not allowed",
+  "settings_nearby_error_unreachable": "Could not connect",
+  "settings_nearby_sheet_rename": "Rename",
+  "settings_nearby_sheet_unpair": "Unpair",
+  "settings_nearby_unpair_confirm": "Unpair {name}? It will need pairing again to sync nearby.",
+  "@settings_nearby_unpair_confirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_nearby_rename_title": "Rename device",
+  "settings_nearby_notInRange": "{name} is not nearby right now",
+  "@settings_nearby_notInRange": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nearbyPair_looking": "Looking for devices…",
+  "nearbyPair_hint": "Open Submersion on the other device and tap Pair a device there too.",
+  "nearbyPair_found": "Found {name}. Check that it shows this code, then confirm on both.",
+  "@nearbyPair_found": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nearbyPair_sameCode": "Same code",
+  "nearbyPair_notMine": "Not mine",
+  "nearbyPair_waiting": "Waiting for the other device to confirm…",
+  "nearbyPair_bothPopulated": "Both devices have dives. Pairing merges them into one logbook.",
+  "nearbyPair_differentLibrary": "That device is on a different library, so it cannot pair with this one.",
+  "nearbyPair_permissionDenied": "Submersion needs Bluetooth permission to find nearby devices.",
+  "nearbyPair_bluetoothOff": "Turn on Bluetooth to find nearby devices.",
+  "nearbyPair_unsupported": "This device has no Bluetooth that Submersion can use.",
+  "nearbyPair_openSettings": "Open settings",
+  "nearbyPair_done": "Paired with {name}",
+  "@nearbyPair_done": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nearbyPair_failed": "Pairing did not finish. Try again on both devices.",
   "settings_sync_alsoAtLaunch": "Also sync at launch",
   "settings_sync_alsoOnReturn": "Also sync when the app returns",
   "settings_sync_encryption": "Encryption",
