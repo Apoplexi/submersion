@@ -30594,6 +30594,81 @@ class AppLocalizationsFr extends AppLocalizations {
   String get insights_timePatterns_seasonal_title => 'Tendances saisonnières';
 
   @override
+  String get insights_timePatterns_calendarDays_title => 'Jours du calendrier';
+
+  @override
+  String get insights_timePatterns_calendarDays_subtitle =>
+      'Plongées à chaque date de l\'année (toutes les années)';
+
+  @override
+  String insights_timePatterns_calendarDays_coverage(
+    int covered,
+    int total,
+    String percent,
+  ) {
+    return '$covered jours du calendrier sur $total ($percent)';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_busiestMonth(String months) {
+    return 'Mois le plus actif : $months';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_busiestDay(String days) {
+    return 'Jour du mois le plus actif : $days';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_cellSemantics(
+    String date,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées',
+      one: '$count plongée',
+      zero: 'aucune plongée',
+    );
+    return '$date, $_temp0';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_totalSemantics(
+    String label,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées',
+      one: '$count plongée',
+      zero: 'aucune plongée',
+    );
+    return '$label, $_temp0 au total';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_dayLabel(int day) {
+    return 'Jour $day';
+  }
+
+  @override
+  String get insights_timePatterns_calendarDays_total => 'Toutes les dates';
+
+  @override
+  String get insights_timePatterns_calendarDays_listSeparator => ', ';
+
+  @override
+  String get insights_timePatterns_calendarDays_empty =>
+      'Aucune plongée à placer sur le calendrier pour l\'instant';
+
+  @override
+  String get insights_timePatterns_calendarDays_error =>
+      'Impossible de charger les jours du calendrier';
+
+  @override
   String get insights_timePatterns_surfaceInterval_average => 'Moyenne';
 
   @override
@@ -54301,6 +54376,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get query_dives_year => 'Année';
+
+  @override
+  String get query_dives_month => 'Mois';
+
+  @override
+  String get query_dives_day => 'Jour du mois';
 
   @override
   String get query_entity_buddies => 'Binômes';

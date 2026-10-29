@@ -30491,6 +30491,81 @@ class AppLocalizationsPt extends AppLocalizations {
   String get insights_timePatterns_seasonal_title => 'Padrões Sazonais';
 
   @override
+  String get insights_timePatterns_calendarDays_title => 'Dias do Calendário';
+
+  @override
+  String get insights_timePatterns_calendarDays_subtitle =>
+      'Mergulhos em cada data do ano (todos os anos)';
+
+  @override
+  String insights_timePatterns_calendarDays_coverage(
+    int covered,
+    int total,
+    String percent,
+  ) {
+    return '$covered de $total dias do calendário ($percent)';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_busiestMonth(String months) {
+    return 'Mês com mais mergulhos: $months';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_busiestDay(String days) {
+    return 'Dia do mês com mais mergulhos: $days';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_cellSemantics(
+    String date,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos',
+      one: '$count mergulho',
+      zero: 'nenhum mergulho',
+    );
+    return '$date, $_temp0';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_totalSemantics(
+    String label,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos',
+      one: '$count mergulho',
+      zero: 'nenhum mergulho',
+    );
+    return '$label, $_temp0 no total';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_dayLabel(int day) {
+    return 'Dia $day';
+  }
+
+  @override
+  String get insights_timePatterns_calendarDays_total => 'Todas as datas';
+
+  @override
+  String get insights_timePatterns_calendarDays_listSeparator => ', ';
+
+  @override
+  String get insights_timePatterns_calendarDays_empty =>
+      'Ainda não há mergulhos para mostrar no calendário';
+
+  @override
+  String get insights_timePatterns_calendarDays_error =>
+      'Falha ao carregar os dias do calendário';
+
+  @override
   String get insights_timePatterns_surfaceInterval_average => 'Média';
 
   @override
@@ -54181,6 +54256,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get query_dives_year => 'Ano';
+
+  @override
+  String get query_dives_month => 'Mês';
+
+  @override
+  String get query_dives_day => 'Dia do mês';
 
   @override
   String get query_entity_buddies => 'Duplas';

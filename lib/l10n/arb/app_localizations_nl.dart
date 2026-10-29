@@ -30289,6 +30289,81 @@ class AppLocalizationsNl extends AppLocalizations {
   String get insights_timePatterns_seasonal_title => 'Seizoenspatronen';
 
   @override
+  String get insights_timePatterns_calendarDays_title => 'Kalenderdagen';
+
+  @override
+  String get insights_timePatterns_calendarDays_subtitle =>
+      'Duiken op elke datum van het jaar (alle jaren)';
+
+  @override
+  String insights_timePatterns_calendarDays_coverage(
+    int covered,
+    int total,
+    String percent,
+  ) {
+    return '$covered van $total kalenderdagen ($percent)';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_busiestMonth(String months) {
+    return 'Drukste maand: $months';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_busiestDay(String days) {
+    return 'Drukste dag van de maand: $days';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_cellSemantics(
+    String date,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken',
+      one: '$count duik',
+      zero: 'geen duiken',
+    );
+    return '$date, $_temp0';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_totalSemantics(
+    String label,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken',
+      one: '$count duik',
+      zero: 'geen duiken',
+    );
+    return '$label, $_temp0 in totaal';
+  }
+
+  @override
+  String insights_timePatterns_calendarDays_dayLabel(int day) {
+    return 'Dag $day';
+  }
+
+  @override
+  String get insights_timePatterns_calendarDays_total => 'Alle datums';
+
+  @override
+  String get insights_timePatterns_calendarDays_listSeparator => ', ';
+
+  @override
+  String get insights_timePatterns_calendarDays_empty =>
+      'Nog geen duiken om op de kalender te zetten';
+
+  @override
+  String get insights_timePatterns_calendarDays_error =>
+      'Kalenderdagen konden niet worden geladen';
+
+  @override
   String get insights_timePatterns_surfaceInterval_average => 'Gemiddeld';
 
   @override
@@ -53836,6 +53911,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get query_dives_year => 'Jaar';
+
+  @override
+  String get query_dives_month => 'Maand';
+
+  @override
+  String get query_dives_day => 'Dag van de maand';
 
   @override
   String get query_entity_buddies => 'Buddy\'s';
