@@ -11185,6 +11185,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divePlanner_gasOptions_ppO2Deco => 'ppO₂ تخفيف الضغط';
 
   @override
+  String get divePlanner_gasOptions_ppO2DecoBand1 =>
+      'ppO₂ تخفيف الضغط حتى 28% أكسجين';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand2 =>
+      'ppO₂ تخفيف الضغط 28-45% أكسجين';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand3 =>
+      'ppO₂ تخفيف الضغط 45-99% أكسجين';
+
+  @override
+  String get divePlanner_gasOptions_maxO2DepthMeters =>
+      'أقصى عمق لـ 100% أكسجين';
+
+  @override
+  String get divePlanner_gasOptions_hypercapniaAmv =>
+      'RMV فرط ثاني أكسيد الكربون';
+
+  @override
+  String get divePlanner_gasOptions_hypercapniaMinutes => 'المدة';
+
+  @override
   String get divePlanner_gasOptions_bestMixEnd => 'END لأفضل خليط';
 
   @override
@@ -15585,6 +15608,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String tankMod_default(String ppO2, String limit) {
     return 'الافتراضي عند ppO2 $ppO2 ($limit)';
+  }
+
+  @override
+  String tankMod_defaultDepth(String depth, String limit) {
+    return 'الافتراضي عند $depth ($limit)';
   }
 
   @override
@@ -20841,6 +20869,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get plannerCanvas_chartMode_ccr => 'CCR';
 
   @override
+  String get plannerCanvas_chartMode_scr => 'SCR';
+
+  @override
   String plannerCanvas_scrub_tts(String minutes) {
     return 'TTS $minutes′';
   }
@@ -24782,6 +24813,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_field_ppO2Deco => 'ppO2 لتخفيف الضغط';
 
   @override
+  String get settings_conflict_field_ppO2DecoBand1 =>
+      'ppO2 تخفيف الضغط حتى 28% أكسجين';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBand2 =>
+      'ppO2 تخفيف الضغط 28-45% أكسجين';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBand3 =>
+      'ppO2 تخفيف الضغط 45-99% أكسجين';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBandsEnabled =>
+      'حدود ppO2 للديكو حسب نطاق الأكسجين';
+
+  @override
+  String get settings_conflict_field_maxO2DepthEnabled =>
+      'عمق أقصى صريح لـ 100% أكسجين';
+
+  @override
+  String get settings_conflict_field_maxO2DepthMeters =>
+      'العمق الأقصى لـ 100% أكسجين';
+
+  @override
   String get settings_conflict_field_ppO2MaxDeco => 'أقصى ppO2 لتخفيف الضغط';
 
   @override
@@ -26932,6 +26987,62 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_decompression_ppO2Dialog_title =>
       'حدود الضغط الجزئي للأكسجين OC';
+
+  @override
+  String get settings_decompression_ppO2BandsTitle =>
+      'حدود الديكو حسب نطاق الأكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsSubtitle =>
+      'حدود ppO2 اختيارية وأدق لمخطط الغوص';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_title =>
+      'ppO2 للديكو: حسب نطاق الأكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_bandsToggle =>
+      'استخدام حدود الديكو حسب نطاق الأكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band1 => 'حتى 28% أكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band2 => '28–45% أكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band3 => '45–99% أكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthToggle =>
+      'استخدام عمق أقصى صريح لـ 100% أكسجين';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthLabel =>
+      'العمق الأقصى لـ 100% أكسجين';
+
+  @override
+  String get settings_decompression_hypercapniaTitle =>
+      'مرحلة فرط ثاني أكسيد الكربون أثناء الخروج الطارئ';
+
+  @override
+  String get settings_decompression_hypercapniaSubtitle =>
+      'معدل تنفس مرتفع اختياري في بداية الخروج الطارئ OC لأنظمة CCR/SCR';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_title =>
+      'مرحلة فرط ثاني أكسيد الكربون أثناء الخروج الطارئ';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_enabledToggle =>
+      'استخدام مرحلة فرط ثاني أكسيد الكربون للخروج الطارئ OC';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_factorLabel =>
+      'معامل RMV';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_minutesLabel => 'المدة';
 
   @override
   String get settings_decompression_ccrPpO2LimitsTitle =>

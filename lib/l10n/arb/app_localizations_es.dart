@@ -11041,6 +11041,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get divePlanner_gasOptions_ppO2Deco => 'ppO₂ de descompresión';
 
   @override
+  String get divePlanner_gasOptions_ppO2DecoBand1 => 'ppO₂ deco hasta 28% O2';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand2 => 'ppO₂ deco 28-45% O2';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand3 => 'ppO₂ deco 45-99% O2';
+
+  @override
+  String get divePlanner_gasOptions_maxO2DepthMeters =>
+      'Profundidad máx. 100% O2';
+
+  @override
+  String get divePlanner_gasOptions_hypercapniaAmv => 'RMV de hipercapnia';
+
+  @override
+  String get divePlanner_gasOptions_hypercapniaMinutes => 'Duración';
+
+  @override
   String get divePlanner_gasOptions_bestMixEnd => 'END de la mejor mezcla';
 
   @override
@@ -15378,6 +15397,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String tankMod_default(String ppO2, String limit) {
     return 'Predeterminada a ppO2 $ppO2 ($limit)';
+  }
+
+  @override
+  String tankMod_defaultDepth(String depth, String limit) {
+    return 'Predeterminada a $depth ($limit)';
   }
 
   @override
@@ -20545,6 +20569,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get plannerCanvas_chartMode_ccr => 'CCR';
 
   @override
+  String get plannerCanvas_chartMode_scr => 'SCR';
+
+  @override
   String plannerCanvas_scrub_tts(String minutes) {
     return 'TTS $minutes′';
   }
@@ -24550,6 +24577,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_conflict_field_ppO2Deco => 'ppO2 de descompresión';
 
   @override
+  String get settings_conflict_field_ppO2DecoBand1 => 'ppO2 deco hasta 28% O2';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBand2 => 'ppO2 deco 28-45% O2';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBand3 => 'ppO2 deco 45-99% O2';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBandsEnabled =>
+      'Límites de ppO2 de deco por banda de O2';
+
+  @override
+  String get settings_conflict_field_maxO2DepthEnabled =>
+      'Profundidad máxima explícita para 100% O2';
+
+  @override
+  String get settings_conflict_field_maxO2DepthMeters =>
+      'Profundidad máxima para 100% O2';
+
+  @override
   String get settings_conflict_field_ppO2MaxDeco =>
       'ppO2 máxima de descompresión';
 
@@ -26703,6 +26751,63 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_decompression_ppO2Dialog_title => 'Límites de ppO2 OC';
+
+  @override
+  String get settings_decompression_ppO2BandsTitle =>
+      'Límites de deco por banda de O2';
+
+  @override
+  String get settings_decompression_ppO2BandsSubtitle =>
+      'Límites de ppO2 de deco opcionales y más precisos para el Dive Planner';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_title =>
+      'ppO2 de deco: por banda de O2';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_bandsToggle =>
+      'Usar límites de deco por banda de O2';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band1 => 'Hasta 28% O2';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band2 => '28–45% O2';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band3 => '45–99% O2';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthToggle =>
+      'Usar una profundidad máxima explícita para 100% O2';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthLabel =>
+      'Profundidad máxima para 100% O2';
+
+  @override
+  String get settings_decompression_hypercapniaTitle =>
+      'Fase de hipercapnia del bailout';
+
+  @override
+  String get settings_decompression_hypercapniaSubtitle =>
+      'Frecuencia respiratoria elevada opcional al inicio de un bailout OC en CCR/SCR';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_title =>
+      'Fase de hipercapnia del bailout';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_enabledToggle =>
+      'Usar una fase de hipercapnia para el bailout OC';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_factorLabel =>
+      'Factor de RMV';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_minutesLabel =>
+      'Duración';
 
   @override
   String get settings_decompression_ccrPpO2LimitsTitle => 'Límites de ppO2 CCR';

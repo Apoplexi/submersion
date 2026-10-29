@@ -17617,6 +17617,42 @@ abstract class AppLocalizations {
   /// **'Deco ppO₂'**
   String get divePlanner_gasOptions_ppO2Deco;
 
+  /// No description provided for @divePlanner_gasOptions_ppO2DecoBand1.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco ppO₂ <=28% O2'**
+  String get divePlanner_gasOptions_ppO2DecoBand1;
+
+  /// No description provided for @divePlanner_gasOptions_ppO2DecoBand2.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco ppO₂ 28-45% O2'**
+  String get divePlanner_gasOptions_ppO2DecoBand2;
+
+  /// No description provided for @divePlanner_gasOptions_ppO2DecoBand3.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco ppO₂ 45-99% O2'**
+  String get divePlanner_gasOptions_ppO2DecoBand3;
+
+  /// No description provided for @divePlanner_gasOptions_maxO2DepthMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'Max depth 100% O2'**
+  String get divePlanner_gasOptions_maxO2DepthMeters;
+
+  /// No description provided for @divePlanner_gasOptions_hypercapniaAmv.
+  ///
+  /// In en, this message translates to:
+  /// **'Hypercapnia RMV'**
+  String get divePlanner_gasOptions_hypercapniaAmv;
+
+  /// No description provided for @divePlanner_gasOptions_hypercapniaMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get divePlanner_gasOptions_hypercapniaMinutes;
+
   /// No description provided for @divePlanner_gasOptions_bestMixEnd.
   ///
   /// In en, this message translates to:
@@ -24814,6 +24850,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Default at ppO2 {ppO2} ({limit})'**
   String tankMod_default(String ppO2, String limit);
+
+  /// Under the MOD field when the diver has not set one, for a gas under the explicit max-depth-for-100%-O2 setting (issue #3580): the depth the default comes from, instead of a ppO2 (tankMod_default). {limit} is tankMod_limitBottom or tankMod_limitDeco.
+  ///
+  /// In en, this message translates to:
+  /// **'Default at {depth} ({limit})'**
+  String tankMod_defaultDepth(String depth, String limit);
 
   /// Name of the bottom (working) ppO2 limit, used inside other MOD strings.
   ///
@@ -32688,6 +32730,12 @@ abstract class AppLocalizations {
   /// **'CCR'**
   String get plannerCanvas_chartMode_ccr;
 
+  /// No description provided for @plannerCanvas_chartMode_scr.
+  ///
+  /// In en, this message translates to:
+  /// **'SCR'**
+  String get plannerCanvas_chartMode_scr;
+
   /// No description provided for @plannerCanvas_scrub_tts.
   ///
   /// In en, this message translates to:
@@ -39111,6 +39159,42 @@ abstract class AppLocalizations {
   /// **'Deco ppO2'**
   String get settings_conflict_field_ppO2Deco;
 
+  /// No description provided for @settings_conflict_field_ppO2DecoBand1.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco ppO2 up to 28% O2'**
+  String get settings_conflict_field_ppO2DecoBand1;
+
+  /// No description provided for @settings_conflict_field_ppO2DecoBand2.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco ppO2 28-45% O2'**
+  String get settings_conflict_field_ppO2DecoBand2;
+
+  /// No description provided for @settings_conflict_field_ppO2DecoBand3.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco ppO2 45-99% O2'**
+  String get settings_conflict_field_ppO2DecoBand3;
+
+  /// No description provided for @settings_conflict_field_ppO2DecoBandsEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Per-O2-band deco ppO2 limits'**
+  String get settings_conflict_field_ppO2DecoBandsEnabled;
+
+  /// No description provided for @settings_conflict_field_maxO2DepthEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Explicit maximum depth for 100% O2'**
+  String get settings_conflict_field_maxO2DepthEnabled;
+
+  /// No description provided for @settings_conflict_field_maxO2DepthMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum depth for 100% O2'**
+  String get settings_conflict_field_maxO2DepthMeters;
+
   /// No description provided for @settings_conflict_field_ppO2MaxDeco.
   ///
   /// In en, this message translates to:
@@ -42662,6 +42746,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ppO2 limits OC'**
   String get settings_decompression_ppO2Dialog_title;
+
+  /// No description provided for @settings_decompression_ppO2BandsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Per-O2-band deco limits'**
+  String get settings_decompression_ppO2BandsTitle;
+
+  /// No description provided for @settings_decompression_ppO2BandsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional, finer deco ppO2 limits for the Dive Planner'**
+  String get settings_decompression_ppO2BandsSubtitle;
+
+  /// No description provided for @settings_decompression_ppO2BandsDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco ppO2: per O2 band'**
+  String get settings_decompression_ppO2BandsDialog_title;
+
+  /// No description provided for @settings_decompression_ppO2BandsDialog_bandsToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use per-O2-band deco limits'**
+  String get settings_decompression_ppO2BandsDialog_bandsToggle;
+
+  /// No description provided for @settings_decompression_ppO2BandsDialog_band1.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 28% O2'**
+  String get settings_decompression_ppO2BandsDialog_band1;
+
+  /// No description provided for @settings_decompression_ppO2BandsDialog_band2.
+  ///
+  /// In en, this message translates to:
+  /// **'28-45% O2'**
+  String get settings_decompression_ppO2BandsDialog_band2;
+
+  /// No description provided for @settings_decompression_ppO2BandsDialog_band3.
+  ///
+  /// In en, this message translates to:
+  /// **'45-99% O2'**
+  String get settings_decompression_ppO2BandsDialog_band3;
+
+  /// No description provided for @settings_decompression_ppO2BandsDialog_maxO2DepthToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use an explicit maximum depth for 100% O2'**
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthToggle;
+
+  /// No description provided for @settings_decompression_ppO2BandsDialog_maxO2DepthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum depth for 100% O2'**
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthLabel;
+
+  /// No description provided for @settings_decompression_hypercapniaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hypercapnia bailout phase'**
+  String get settings_decompression_hypercapniaTitle;
+
+  /// No description provided for @settings_decompression_hypercapniaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional elevated breathing rate at the start of a CCR/SCR OC bailout'**
+  String get settings_decompression_hypercapniaSubtitle;
+
+  /// No description provided for @settings_decompression_hypercapniaDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Hypercapnia bailout phase'**
+  String get settings_decompression_hypercapniaDialog_title;
+
+  /// No description provided for @settings_decompression_hypercapniaDialog_enabledToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a hypercapnia phase for OC bailout'**
+  String get settings_decompression_hypercapniaDialog_enabledToggle;
+
+  /// No description provided for @settings_decompression_hypercapniaDialog_factorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'RMV factor'**
+  String get settings_decompression_hypercapniaDialog_factorLabel;
+
+  /// No description provided for @settings_decompression_hypercapniaDialog_minutesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get settings_decompression_hypercapniaDialog_minutesLabel;
 
   /// No description provided for @settings_decompression_ccrPpO2LimitsTitle.
   ///

@@ -99,6 +99,12 @@ class SettingsKeys {
   static const String gfHigh = 'gf_high';
   static const String ppO2MaxWorking = 'ppo2_max_working';
   static const String ppO2MaxDeco = 'ppo2_max_deco';
+  static const String ppO2DecoBandsEnabled = 'ppo2_deco_bands_enabled';
+  static const String ppO2DecoBand1 = 'ppo2_deco_band1';
+  static const String ppO2DecoBand2 = 'ppo2_deco_band2';
+  static const String ppO2DecoBand3 = 'ppo2_deco_band3';
+  static const String maxO2DepthEnabled = 'max_o2_depth_enabled';
+  static const String maxO2DepthMeters = 'max_o2_depth_meters';
   static const String cnsWarningThreshold = 'cns_warning_threshold';
   static const String ascentRateWarning = 'ascent_rate_warning';
   static const String ascentRateCritical = 'ascent_rate_critical';
@@ -253,6 +259,26 @@ class AppSettings {
 
   /// Maximum ppO2 for deco gas (typically 1.6 bar)
   final double ppO2MaxDeco;
+
+  /// Per-O2-band deco ppO2 limits (issue #3580), Dive Planner only: an
+  /// optional, finer-grained alternative to [ppO2MaxDeco]. Off by default.
+  final bool ppO2DecoBandsEnabled;
+
+  /// Deco ppO2 ceiling for a gas up to 28% O2.
+  final double ppO2DecoBand1;
+
+  /// Deco ppO2 ceiling for a gas from 28% up to 45% O2.
+  final double ppO2DecoBand2;
+
+  /// Deco ppO2 ceiling for a gas above 45% O2.
+  final double ppO2DecoBand3;
+
+  /// Explicit MOD for 100% O2 (issue #3580), Dive Planner only: bypasses
+  /// the ppO2 formula for a pure-O2 deco gas when on. Off by default.
+  final bool maxO2DepthEnabled;
+
+  /// MOD in meters for pure O2 when [maxO2DepthEnabled] is on.
+  final double maxO2DepthMeters;
 
   /// CCR default low setpoint in bar (issue #2342).
   final double ccrSetpointLow;
@@ -584,6 +610,14 @@ class AppSettings {
   /// diverging from it.
   final double plannerSacStressedFactor;
   final double plannerBuddyFactor;
+
+  /// Hypercapnia-bailout phase (issue #3743): an elevated RMV for a
+  /// configurable duration at the start of an OC bailout, layered over
+  /// [plannerSacStressedFactor] rather than replacing it. Gated together,
+  /// matching [ppO2DecoBandsEnabled]'s shape.
+  final bool plannerHypercapniaEnabled;
+  final double plannerHypercapniaFactor;
+  final int plannerHypercapniaMinutes;
   final int plannerProblemSolvingMinutes;
   final double plannerBestMixEndMeters;
   final double plannerDeviationDepthDelta;
@@ -716,6 +750,12 @@ class AppSettings {
     this.gfHigh = 85,
     this.ppO2MaxWorking = 1.4,
     this.ppO2MaxDeco = 1.6,
+    this.ppO2DecoBandsEnabled = false,
+    this.ppO2DecoBand1 = 1.6,
+    this.ppO2DecoBand2 = 1.6,
+    this.ppO2DecoBand3 = 1.6,
+    this.maxO2DepthEnabled = false,
+    this.maxO2DepthMeters = 6.0,
     this.ccrSetpointLow = 0.7,
     this.ccrSetpointHigh = 1.3,
     this.ccrDiluentModPpO2 = 1.6,
@@ -826,6 +866,9 @@ class AppSettings {
     this.plannerSacDeco = 15.0,
     this.plannerSacStressedFactor = 2.5,
     this.plannerBuddyFactor = 2.0,
+    this.plannerHypercapniaEnabled = false,
+    this.plannerHypercapniaFactor = 4.0,
+    this.plannerHypercapniaMinutes = 5,
     this.plannerProblemSolvingMinutes = 2,
     this.plannerBestMixEndMeters = 30.0,
     this.plannerDeviationDepthDelta = 5.0,
@@ -936,6 +979,12 @@ class AppSettings {
     int? gfHigh,
     double? ppO2MaxWorking,
     double? ppO2MaxDeco,
+    bool? ppO2DecoBandsEnabled,
+    double? ppO2DecoBand1,
+    double? ppO2DecoBand2,
+    double? ppO2DecoBand3,
+    bool? maxO2DepthEnabled,
+    double? maxO2DepthMeters,
     double? ccrSetpointLow,
     double? ccrSetpointHigh,
     double? ccrDiluentModPpO2,
@@ -1044,6 +1093,9 @@ class AppSettings {
     double? plannerSacDeco,
     double? plannerSacStressedFactor,
     double? plannerBuddyFactor,
+    bool? plannerHypercapniaEnabled,
+    double? plannerHypercapniaFactor,
+    int? plannerHypercapniaMinutes,
     int? plannerProblemSolvingMinutes,
     double? plannerBestMixEndMeters,
     double? plannerDeviationDepthDelta,
@@ -1131,6 +1183,12 @@ class AppSettings {
       gfHigh: gfHigh ?? this.gfHigh,
       ppO2MaxWorking: ppO2MaxWorking ?? this.ppO2MaxWorking,
       ppO2MaxDeco: ppO2MaxDeco ?? this.ppO2MaxDeco,
+      ppO2DecoBandsEnabled: ppO2DecoBandsEnabled ?? this.ppO2DecoBandsEnabled,
+      ppO2DecoBand1: ppO2DecoBand1 ?? this.ppO2DecoBand1,
+      ppO2DecoBand2: ppO2DecoBand2 ?? this.ppO2DecoBand2,
+      ppO2DecoBand3: ppO2DecoBand3 ?? this.ppO2DecoBand3,
+      maxO2DepthEnabled: maxO2DepthEnabled ?? this.maxO2DepthEnabled,
+      maxO2DepthMeters: maxO2DepthMeters ?? this.maxO2DepthMeters,
       ccrSetpointLow: ccrSetpointLow ?? this.ccrSetpointLow,
       ccrSetpointHigh: ccrSetpointHigh ?? this.ccrSetpointHigh,
       ccrDiluentModPpO2: ccrDiluentModPpO2 ?? this.ccrDiluentModPpO2,
@@ -1274,6 +1332,12 @@ class AppSettings {
       plannerSacStressedFactor:
           plannerSacStressedFactor ?? this.plannerSacStressedFactor,
       plannerBuddyFactor: plannerBuddyFactor ?? this.plannerBuddyFactor,
+      plannerHypercapniaEnabled:
+          plannerHypercapniaEnabled ?? this.plannerHypercapniaEnabled,
+      plannerHypercapniaFactor:
+          plannerHypercapniaFactor ?? this.plannerHypercapniaFactor,
+      plannerHypercapniaMinutes:
+          plannerHypercapniaMinutes ?? this.plannerHypercapniaMinutes,
       plannerProblemSolvingMinutes:
           plannerProblemSolvingMinutes ?? this.plannerProblemSolvingMinutes,
       plannerBestMixEndMeters:
@@ -2253,6 +2317,74 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  /// Per-O2-band deco ppO2 limits (issue #3580): a wider range than the
+  /// [ppO2MaxDeco] ceiling alone, in 0.1 bar steps down to [ppO2WorkingMin]
+  /// rather than [ppO2MaxMin]. Each band is independent: unlike
+  /// [setPpO2Limits], there is no enforced ordering between them.
+  static const double ppO2DecoBandStep = 0.1;
+
+  /// [value] snapped to the grid of [step]: divides by the step count per
+  /// unit rather than multiplying by [step], so a grid point is the exact
+  /// nearest double (1.4, not 1.4000000000000001).
+  static double onStepGrid(double value, double step) =>
+      (value / step).round() / (1 / step);
+
+  /// [value] rounded DOWN onto the grid of [step], for a limit seeded from
+  /// another one: the seed is never more permissive than its source. The
+  /// 1e-9 keeps a value float noise put just under a grid line on it.
+  static double onStepGridFloor(double value, double step) =>
+      (value / step + 1e-9).floorToDouble() / (1 / step);
+
+  /// [ppO2DecoBandOnGrid], rounding down instead of to the nearest step.
+  static double ppO2DecoBandFloorOnGrid(double value) => onStepGridFloor(
+    value.clamp(ppO2WorkingMin, ppO2Ceiling),
+    ppO2DecoBandStep,
+  );
+
+  /// [value] clamped to [ppO2WorkingMin]..[ppO2Ceiling] and snapped to the
+  /// [ppO2DecoBandStep] grid.
+  static double ppO2DecoBandOnGrid(double value) =>
+      onStepGrid(value.clamp(ppO2WorkingMin, ppO2Ceiling), ppO2DecoBandStep);
+
+  /// Explicit MOD for 100% O2 (issue #3580): 3-9 m in 0.5 m steps.
+  static const double maxO2DepthMin = 3.0;
+  static const double maxO2DepthMax = 9.0;
+  static const double maxO2DepthStep = 0.5;
+
+  /// [value] clamped to [maxO2DepthMin]..[maxO2DepthMax] and snapped to the
+  /// [maxO2DepthStep] grid.
+  static double maxO2DepthOnGrid(double value) =>
+      onStepGrid(value.clamp(maxO2DepthMin, maxO2DepthMax), maxO2DepthStep);
+
+  /// [maxO2DepthOnGrid], rounding down instead of to the nearest step.
+  static double maxO2DepthFloorOnGrid(double value) => onStepGridFloor(
+    value.clamp(maxO2DepthMin, maxO2DepthMax),
+    maxO2DepthStep,
+  );
+
+  /// Set both optional deco layers at once, in a single persisted write
+  /// (issue #3580): the per-O2-band toggle/values and the explicit-100%-O2-
+  /// depth toggle/value. Mirrors [setPpO2Limits]/[setGradientFactors],
+  /// which batch their pair of related values the same way.
+  Future<void> setPpO2DecoBandsConfig({
+    required bool bandsEnabled,
+    required double band1,
+    required double band2,
+    required double band3,
+    required bool maxO2DepthEnabled,
+    required double maxO2DepthMeters,
+  }) async {
+    state = state.copyWith(
+      ppO2DecoBandsEnabled: bandsEnabled,
+      ppO2DecoBand1: ppO2DecoBandOnGrid(band1),
+      ppO2DecoBand2: ppO2DecoBandOnGrid(band2),
+      ppO2DecoBand3: ppO2DecoBandOnGrid(band3),
+      maxO2DepthEnabled: maxO2DepthEnabled,
+      maxO2DepthMeters: maxO2DepthOnGrid(maxO2DepthMeters),
+    );
+    await _saveSettings();
+  }
+
   /// Selectable range of the CCR ppO2 limits (issue #2342), on a 0.1 bar
   /// grid like the OC limits.
   static const double ccrPpO2Min = 0.5;
@@ -2536,6 +2668,36 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setPlannerBuddyFactor(double value) async {
     state = state.copyWith(plannerBuddyFactor: value);
+    await _saveSettings();
+  }
+
+  /// Hypercapnia-bailout phase (issue #3743): an RMV factor of 1-10x bottom
+  /// RMV in 0.5 steps, held for 1-15 minutes.
+  static const double plannerHypercapniaFactorMin = 1.0;
+  static const double plannerHypercapniaFactorMax = 10.0;
+  static const double plannerHypercapniaFactorStep = 0.5;
+  static const int plannerHypercapniaMinutesMin = 1;
+  static const int plannerHypercapniaMinutesMax = 15;
+
+  /// Set the hypercapnia-bailout toggle/factor/duration at once, in a
+  /// single persisted write (issue #3743), mirroring
+  /// [setPpO2DecoBandsConfig]'s shape, including its clamping and snapping.
+  Future<void> setPlannerHypercapniaConfig({
+    required bool enabled,
+    required double factor,
+    required int minutes,
+  }) async {
+    state = state.copyWith(
+      plannerHypercapniaEnabled: enabled,
+      plannerHypercapniaFactor: onStepGrid(
+        factor.clamp(plannerHypercapniaFactorMin, plannerHypercapniaFactorMax),
+        plannerHypercapniaFactorStep,
+      ),
+      plannerHypercapniaMinutes: minutes.clamp(
+        plannerHypercapniaMinutesMin,
+        plannerHypercapniaMinutesMax,
+      ),
+    );
     await _saveSettings();
   }
 
@@ -3440,6 +3602,30 @@ final ppO2MaxDecoProvider = Provider<double>((ref) {
   return ref.watch(settingsProvider.select((s) => s.ppO2MaxDeco));
 });
 
+final ppO2DecoBandsEnabledProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.ppO2DecoBandsEnabled));
+});
+
+final ppO2DecoBand1Provider = Provider<double>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.ppO2DecoBand1));
+});
+
+final ppO2DecoBand2Provider = Provider<double>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.ppO2DecoBand2));
+});
+
+final ppO2DecoBand3Provider = Provider<double>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.ppO2DecoBand3));
+});
+
+final maxO2DepthEnabledProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.maxO2DepthEnabled));
+});
+
+final maxO2DepthMetersProvider = Provider<double>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.maxO2DepthMeters));
+});
+
 final ccrSetpointLowProvider = Provider<double>((ref) {
   return ref.watch(settingsProvider.select((s) => s.ccrSetpointLow));
 });
@@ -3557,6 +3743,18 @@ final plannerSacStressedFactorProvider = Provider<double>((ref) {
 
 final plannerBuddyFactorProvider = Provider<double>((ref) {
   return ref.watch(settingsProvider.select((s) => s.plannerBuddyFactor));
+});
+
+final plannerHypercapniaEnabledProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.plannerHypercapniaEnabled));
+});
+
+final plannerHypercapniaFactorProvider = Provider<double>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.plannerHypercapniaFactor));
+});
+
+final plannerHypercapniaMinutesProvider = Provider<int>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.plannerHypercapniaMinutes));
 });
 
 final plannerProblemSolvingMinutesProvider = Provider<int>((ref) {

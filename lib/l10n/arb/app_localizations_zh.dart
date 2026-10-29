@@ -10500,6 +10500,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divePlanner_gasOptions_ppO2Deco => '减压 ppO₂';
 
   @override
+  String get divePlanner_gasOptions_ppO2DecoBand1 => '减压 ppO₂ 不超过28% O2';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand2 => '减压 ppO₂ 28-45% O2';
+
+  @override
+  String get divePlanner_gasOptions_ppO2DecoBand3 => '减压 ppO₂ 45-99% O2';
+
+  @override
+  String get divePlanner_gasOptions_maxO2DepthMeters => '100% O2 最大深度';
+
+  @override
+  String get divePlanner_gasOptions_hypercapniaAmv => '高碳酸血症 RMV';
+
+  @override
+  String get divePlanner_gasOptions_hypercapniaMinutes => '时长';
+
+  @override
   String get divePlanner_gasOptions_bestMixEnd => '最佳混合气 END';
 
   @override
@@ -14679,6 +14697,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String tankMod_default(String ppO2, String limit) {
     return '默认值，ppO2 $ppO2（$limit）';
+  }
+
+  @override
+  String tankMod_defaultDepth(String depth, String limit) {
+    return '默认值，$depth（$limit）';
   }
 
   @override
@@ -19554,6 +19577,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get plannerCanvas_chartMode_ccr => 'CCR';
 
   @override
+  String get plannerCanvas_chartMode_scr => 'SCR';
+
+  @override
   String plannerCanvas_scrub_tts(String minutes) {
     return 'TTS $minutes′';
   }
@@ -23195,6 +23221,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_conflict_field_ppO2Deco => '减压 ppO2';
 
   @override
+  String get settings_conflict_field_ppO2DecoBand1 => '减压 ppO2 不超过28% O2';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBand2 => '减压 ppO2 28-45% O2';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBand3 => '减压 ppO2 45-99% O2';
+
+  @override
+  String get settings_conflict_field_ppO2DecoBandsEnabled => '按氧气分段的减压 ppO2 限值';
+
+  @override
+  String get settings_conflict_field_maxO2DepthEnabled => '100% 氧气的明确最大深度';
+
+  @override
+  String get settings_conflict_field_maxO2DepthMeters => '100% 氧气的最大深度';
+
+  @override
   String get settings_conflict_field_ppO2MaxDeco => '最高减压 ppO2';
 
   @override
@@ -25198,6 +25242,57 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_decompression_ppO2Dialog_title => '氧分压上限 OC';
+
+  @override
+  String get settings_decompression_ppO2BandsTitle => '按氧气分段的减压限值';
+
+  @override
+  String get settings_decompression_ppO2BandsSubtitle =>
+      '为潜水计划器提供可选的、更精细的减压氧分压限值';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_title => '减压氧分压：按氧气分段';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_bandsToggle =>
+      '使用按氧气分段的减压限值';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band1 => '氧气含量不超过28%';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band2 => '氧气含量28-45%';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_band3 => '氧气含量45-99%';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthToggle =>
+      '为100%氧气使用明确的最大深度';
+
+  @override
+  String get settings_decompression_ppO2BandsDialog_maxO2DepthLabel =>
+      '100%氧气的最大深度';
+
+  @override
+  String get settings_decompression_hypercapniaTitle => '高碳酸血症应急上升阶段';
+
+  @override
+  String get settings_decompression_hypercapniaSubtitle =>
+      'CCR/SCR 开放循环应急上升开始时可选的提高呼吸率';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_title => '高碳酸血症应急上升阶段';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_enabledToggle =>
+      '为开放循环应急上升启用高碳酸血症阶段';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_factorLabel => 'RMV 系数';
+
+  @override
+  String get settings_decompression_hypercapniaDialog_minutesLabel => '时长';
 
   @override
   String get settings_decompression_ccrPpO2LimitsTitle => '氧分压上限 CCR';

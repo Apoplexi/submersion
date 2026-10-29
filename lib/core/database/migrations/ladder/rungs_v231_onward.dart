@@ -634,11 +634,35 @@ extension RungsFromV231 on AppDatabase {
     if (from < 318) await _moveComputerTissueScalars();
     if (from < 318) await reportProgress();
 
+    // v319: per-O2-band deco ppO2 limits and the explicit MOD for 100% O2
+    // (issue #3580), Dive Planner only. diver_settings gains the toggles
+    // and band/depth values; dive_plans gains the matching per-plan
+    // overrides. Column only, both off by default; re-asserted in
+    // beforeOpen, which also covers a database already at 320.
+    if (from < 319) await _assertPpO2DecoBandColumns();
+    if (from < 319) await reportProgress();
+
     // v320: the device-local nearby_peers table and the publish state's
     // relay floor (issue #3731). 319 is held
     // by PR #3726.
     if (from < 320) await _assertNearbySchema();
     if (from < 320) await reportProgress();
+
+    // v321: per-plan "explicitly off" flags for the bands and the
+    // explicit-depth override (issue #3580), so a plan can force either off
+    // regardless of the diver's Settings toggle. Column only, both off by
+    // default; re-asserted in beforeOpen, which also covers a database
+    // already at 323 (v321 and v322 sit below main's v323).
+    if (from < 321) await _assertPpO2DecoBandsExplicitlyOffColumns();
+    if (from < 321) await reportProgress();
+
+    // v322: hypercapnia-bailout phase for OC bailout during a CCR/SCR dive
+    // (issue #3743). diver_settings gains the toggle/factor/duration;
+    // dive_plans gains the matching per-plan overrides and "explicitly
+    // off" flag. Column only, both off by default; re-asserted in
+    // beforeOpen.
+    if (from < 322) await _assertHypercapniaBailoutColumns();
+    if (from < 322) await reportProgress();
 
     // v323: diver_settings list arrangement columns and their sync clock
     // (issue #3748); re-asserted in beforeOpen. 321 and 322 are held by

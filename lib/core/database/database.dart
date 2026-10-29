@@ -1441,11 +1441,24 @@ class AppDatabase extends _$AppDatabase {
     // old shape gets the same move once applied here (SyncService). 317 is
     // #3662 (tank inspection baselines); 316 is held by PR #3685.
     318,
+    // v319: per-O2-band deco ppO2 limits and the explicit MOD for 100% O2
+    // (issue #3580). Column only, both off by default, so the floor does
+    // not move. Sits below 320; the beforeOpen backstop covers a database
+    // already at 320.
+    319,
     // v320: the device-local nearby_peers table and the publish state's
     // relay floor for nearby Bluetooth sync (issue #3731). Never synced, so
     // the floor does not move. 319 is held
     // by PR #3726.
     320,
+    // v321: per-plan "explicitly off" flags for the bands and the
+    // explicit-depth override (issue #3580). Column only, both off by
+    // default, so the floor does not move.
+    321,
+    // v322: hypercapnia-bailout phase for OC bailout during a CCR/SCR dive
+    // (issue #3743). Column only, both off by default, so the floor does
+    // not move.
+    322,
     // v323: diver_settings list arrangement columns and their sync clock
     // (issue #3748). Additive and nullable, and an older peer omits them,
     // so the floor does not move. 321 and 322 are held by PR #3726.
