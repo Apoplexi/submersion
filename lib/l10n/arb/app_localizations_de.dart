@@ -25221,6 +25221,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_conflict_field_verifyFactsHlc => 'Prüfprotokoll';
 
   @override
+  String get settings_conflict_field_videoPositionMs => 'Zeit im Video (ms)';
+
+  @override
   String get settings_conflict_field_vesselName => 'Schiff';
 
   @override
@@ -51013,6 +51016,97 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_species_chipsLabel => 'Artenmarkierungen';
+
+  @override
+  String get media_people_me => 'Ich';
+
+  @override
+  String get media_people_chipsLabel => 'Personenmarkierungen';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => 'Personen markieren';
+
+  @override
+  String get media_people_tagModeHint =>
+      'Tippen Sie auf eine Person, um sie zu markieren';
+
+  @override
+  String get media_people_noSpotHint =>
+      'Hier lässt sich keine Stelle markieren';
+
+  @override
+  String get media_people_withoutSpot => 'Ohne Stelle markieren';
+
+  @override
+  String get media_people_done => 'Fertig';
+
+  @override
+  String get media_people_pickerTitle => 'Wer ist das?';
+
+  @override
+  String get media_people_searchHint => 'Tauchpartner suchen';
+
+  @override
+  String get media_people_onThisDive => 'Bei diesem Tauchgang';
+
+  @override
+  String get media_people_everyoneElse => 'Alle anderen';
+
+  @override
+  String get media_people_newBuddy => 'Neuer Tauchpartner';
+
+  @override
+  String get media_people_newBuddyName => 'Name';
+
+  @override
+  String get media_people_newBuddyAdd => 'Hinzufügen';
+
+  @override
+  String get media_people_changePerson => 'Person ändern';
+
+  @override
+  String get media_people_removeTag => 'Markierung entfernen';
+
+  @override
+  String get media_people_resizeHint => 'Ziehen Sie die Ecken zum Anpassen';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return '$name als Tauchpartner zu diesem Tauchgang hinzufügen?';
+  }
+
+  @override
+  String get media_people_addToDiveAction => 'Hinzufügen';
+
+  @override
+  String get media_people_buddyPhotosTitle => 'Fotos und Videos';
+
+  @override
+  String get media_people_buddyThumbnailLabel =>
+      'Foto oder Video mit diesem Tauchpartner';
+
+  @override
+  String get media_people_filterSection => 'Personen';
+
+  @override
+  String get media_people_removedBuddy => 'Entfernter Tauchpartner';
+
+  @override
+  String get media_people_saveFailed =>
+      'Die Markierung konnte nicht gespeichert werden. Versuchen Sie es erneut.';
+
+  @override
+  String get media_people_addToDiveFailed =>
+      'Der Tauchpartner konnte diesem Tauchgang nicht hinzugefügt werden. Versuchen Sie es erneut.';
+
+  @override
+  String get media_people_createBuddyFailed =>
+      'Der Tauchpartner konnte nicht angelegt werden. Versuchen Sie es erneut.';
 
   @override
   String get media_info_fileSection => 'Datei';

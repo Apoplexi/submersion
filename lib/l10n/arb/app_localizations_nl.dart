@@ -25106,6 +25106,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_conflict_field_verifyFactsHlc => 'Controlelog';
 
   @override
+  String get settings_conflict_field_videoPositionMs => 'Tijd in video (ms)';
+
+  @override
   String get settings_conflict_field_vesselName => 'Schip';
 
   @override
@@ -50804,6 +50807,94 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_species_chipsLabel => 'Soorttags';
+
+  @override
+  String get media_people_me => 'Ik';
+
+  @override
+  String get media_people_chipsLabel => 'Personentags';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => 'Personen taggen';
+
+  @override
+  String get media_people_tagModeHint => 'Tik op een persoon om die te taggen';
+
+  @override
+  String get media_people_noSpotHint => 'Hier kan geen plek worden gemarkeerd';
+
+  @override
+  String get media_people_withoutSpot => 'Taggen zonder plek';
+
+  @override
+  String get media_people_done => 'Gereed';
+
+  @override
+  String get media_people_pickerTitle => 'Wie is dit?';
+
+  @override
+  String get media_people_searchHint => 'Buddies zoeken';
+
+  @override
+  String get media_people_onThisDive => 'Bij deze duik';
+
+  @override
+  String get media_people_everyoneElse => 'Alle anderen';
+
+  @override
+  String get media_people_newBuddy => 'Nieuwe buddy';
+
+  @override
+  String get media_people_newBuddyName => 'Naam';
+
+  @override
+  String get media_people_newBuddyAdd => 'Toevoegen';
+
+  @override
+  String get media_people_changePerson => 'Persoon wijzigen';
+
+  @override
+  String get media_people_removeTag => 'Tag verwijderen';
+
+  @override
+  String get media_people_resizeHint => 'Sleep de hoeken om aan te passen';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return '$name toevoegen aan de buddies van deze duik?';
+  }
+
+  @override
+  String get media_people_addToDiveAction => 'Toevoegen';
+
+  @override
+  String get media_people_buddyPhotosTitle => 'Foto\'s en video\'s';
+
+  @override
+  String get media_people_buddyThumbnailLabel => 'Foto of video met deze buddy';
+
+  @override
+  String get media_people_filterSection => 'Personen';
+
+  @override
+  String get media_people_removedBuddy => 'Verwijderde buddy';
+
+  @override
+  String get media_people_saveFailed =>
+      'De tag kon niet worden opgeslagen. Probeer het opnieuw.';
+
+  @override
+  String get media_people_addToDiveFailed =>
+      'De buddy kon niet aan deze duik worden toegevoegd. Probeer het opnieuw.';
+
+  @override
+  String get media_people_createBuddyFailed =>
+      'De buddy kon niet worden aangemaakt. Probeer het opnieuw.';
 
   @override
   String get media_info_fileSection => 'Bestand';

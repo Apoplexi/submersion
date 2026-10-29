@@ -25284,6 +25284,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Registro de verificación';
 
   @override
+  String get settings_conflict_field_videoPositionMs =>
+      'Tiempo en el vídeo (ms)';
+
+  @override
   String get settings_conflict_field_vesselName => 'Embarcación';
 
   @override
@@ -51180,6 +51184,95 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_species_chipsLabel => 'Etiquetas de especies';
+
+  @override
+  String get media_people_me => 'Yo';
+
+  @override
+  String get media_people_chipsLabel => 'Etiquetas de personas';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => 'Etiquetar personas';
+
+  @override
+  String get media_people_tagModeHint => 'Toca a una persona para etiquetarla';
+
+  @override
+  String get media_people_noSpotHint => 'Aquí no se puede marcar un punto';
+
+  @override
+  String get media_people_withoutSpot => 'Etiquetar sin punto';
+
+  @override
+  String get media_people_done => 'Listo';
+
+  @override
+  String get media_people_pickerTitle => '¿Quién es?';
+
+  @override
+  String get media_people_searchHint => 'Buscar compañeros';
+
+  @override
+  String get media_people_onThisDive => 'En esta inmersión';
+
+  @override
+  String get media_people_everyoneElse => 'Todos los demás';
+
+  @override
+  String get media_people_newBuddy => 'Nuevo compañero';
+
+  @override
+  String get media_people_newBuddyName => 'Nombre';
+
+  @override
+  String get media_people_newBuddyAdd => 'Agregar';
+
+  @override
+  String get media_people_changePerson => 'Cambiar persona';
+
+  @override
+  String get media_people_removeTag => 'Quitar etiqueta';
+
+  @override
+  String get media_people_resizeHint => 'Arrastra las esquinas para ajustar';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return '¿Agregar a $name a los compañeros de esta inmersión?';
+  }
+
+  @override
+  String get media_people_addToDiveAction => 'Agregar';
+
+  @override
+  String get media_people_buddyPhotosTitle => 'Fotos y vídeos';
+
+  @override
+  String get media_people_buddyThumbnailLabel =>
+      'Foto o vídeo con este compañero';
+
+  @override
+  String get media_people_filterSection => 'Personas';
+
+  @override
+  String get media_people_removedBuddy => 'Compañero eliminado';
+
+  @override
+  String get media_people_saveFailed =>
+      'No se pudo guardar la etiqueta. Inténtalo de nuevo.';
+
+  @override
+  String get media_people_addToDiveFailed =>
+      'No se pudo agregar el compañero a esta inmersión. Inténtalo de nuevo.';
+
+  @override
+  String get media_people_createBuddyFailed =>
+      'No se pudo crear el compañero. Inténtalo de nuevo.';
 
   @override
   String get media_info_fileSection => 'Archivo';

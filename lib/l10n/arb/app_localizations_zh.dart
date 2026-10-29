@@ -23839,6 +23839,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_conflict_field_verifyFactsHlc => '验证记录';
 
   @override
+  String get settings_conflict_field_videoPositionMs => '视频中的时间（毫秒）';
+
+  @override
   String get settings_conflict_field_vesselName => '船只';
 
   @override
@@ -47937,6 +47940,91 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_species_chipsLabel => '物种标签';
+
+  @override
+  String get media_people_me => '我';
+
+  @override
+  String get media_people_chipsLabel => '人物标签';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => '标记人物';
+
+  @override
+  String get media_people_tagModeHint => '点按人物以进行标记';
+
+  @override
+  String get media_people_noSpotHint => '此处无法标记位置';
+
+  @override
+  String get media_people_withoutSpot => '无位置标记';
+
+  @override
+  String get media_people_done => '完成';
+
+  @override
+  String get media_people_pickerTitle => '这是谁？';
+
+  @override
+  String get media_people_searchHint => '搜索潜伴';
+
+  @override
+  String get media_people_onThisDive => '本次潜水';
+
+  @override
+  String get media_people_everyoneElse => '其他人';
+
+  @override
+  String get media_people_newBuddy => '新潜伴';
+
+  @override
+  String get media_people_newBuddyName => '姓名';
+
+  @override
+  String get media_people_newBuddyAdd => '添加';
+
+  @override
+  String get media_people_changePerson => '更换人物';
+
+  @override
+  String get media_people_removeTag => '移除标记';
+
+  @override
+  String get media_people_resizeHint => '拖动四角进行调整';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return '将$name添加为本次潜水的潜伴？';
+  }
+
+  @override
+  String get media_people_addToDiveAction => '添加';
+
+  @override
+  String get media_people_buddyPhotosTitle => '照片和视频';
+
+  @override
+  String get media_people_buddyThumbnailLabel => '与此潜伴的照片或视频';
+
+  @override
+  String get media_people_filterSection => '人物';
+
+  @override
+  String get media_people_removedBuddy => '已删除的潜伴';
+
+  @override
+  String get media_people_saveFailed => '无法保存标记，请重试。';
+
+  @override
+  String get media_people_addToDiveFailed => '无法将潜伴添加到本次潜水，请重试。';
+
+  @override
+  String get media_people_createBuddyFailed => '无法创建潜伴，请重试。';
 
   @override
   String get media_info_fileSection => '文件';

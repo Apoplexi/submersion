@@ -24616,6 +24616,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_conflict_field_verifyFactsHlc => 'יומן אימות';
 
   @override
+  String get settings_conflict_field_videoPositionMs =>
+      'זמן בסרטון (אלפיות שנייה)';
+
+  @override
   String get settings_conflict_field_vesselName => 'ספינה';
 
   @override
@@ -50035,6 +50039,94 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_species_chipsLabel => 'תגיות מינים';
+
+  @override
+  String get media_people_me => 'אני';
+
+  @override
+  String get media_people_chipsLabel => 'תגיות אנשים';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => 'תיוג אנשים';
+
+  @override
+  String get media_people_tagModeHint => 'הקש על אדם כדי לתייג אותו';
+
+  @override
+  String get media_people_noSpotHint => 'לא ניתן לסמן מיקום כאן';
+
+  @override
+  String get media_people_withoutSpot => 'תיוג ללא מיקום';
+
+  @override
+  String get media_people_done => 'סיום';
+
+  @override
+  String get media_people_pickerTitle => 'מי זה?';
+
+  @override
+  String get media_people_searchHint => 'חיפוש חברי צוללים';
+
+  @override
+  String get media_people_onThisDive => 'בצלילה הזו';
+
+  @override
+  String get media_people_everyoneElse => 'כל השאר';
+
+  @override
+  String get media_people_newBuddy => 'חבר צוללים חדש';
+
+  @override
+  String get media_people_newBuddyName => 'שם';
+
+  @override
+  String get media_people_newBuddyAdd => 'הוסף';
+
+  @override
+  String get media_people_changePerson => 'החלף אדם';
+
+  @override
+  String get media_people_removeTag => 'הסר תיוג';
+
+  @override
+  String get media_people_resizeHint => 'גרור את הפינות להתאמה';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return 'להוסיף את $name לחברי הצוללים של צלילה זו?';
+  }
+
+  @override
+  String get media_people_addToDiveAction => 'הוסף';
+
+  @override
+  String get media_people_buddyPhotosTitle => 'תמונות וסרטונים';
+
+  @override
+  String get media_people_buddyThumbnailLabel =>
+      'תמונה או סרטון עם חבר הצוללים הזה';
+
+  @override
+  String get media_people_filterSection => 'אנשים';
+
+  @override
+  String get media_people_removedBuddy => 'חבר צוללים שהוסר';
+
+  @override
+  String get media_people_saveFailed => 'לא ניתן לשמור את התיוג. נסה שוב.';
+
+  @override
+  String get media_people_addToDiveFailed =>
+      'לא ניתן להוסיף את חבר הצוללים לצלילה זו. נסה שוב.';
+
+  @override
+  String get media_people_createBuddyFailed =>
+      'לא ניתן ליצור את חבר הצוללים. נסה שוב.';
 
   @override
   String get media_info_fileSection => 'קובץ';

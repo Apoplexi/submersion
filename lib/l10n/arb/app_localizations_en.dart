@@ -24836,6 +24836,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_conflict_field_verifyFactsHlc => 'Verification record';
 
   @override
+  String get settings_conflict_field_videoPositionMs => 'Time in video (ms)';
+
+  @override
   String get settings_conflict_field_vesselName => 'Vessel';
 
   @override
@@ -50324,6 +50327,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_species_chipsLabel => 'Species tags';
+
+  @override
+  String get media_people_me => 'Me';
+
+  @override
+  String get media_people_chipsLabel => 'People tags';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => 'Tag people';
+
+  @override
+  String get media_people_tagModeHint => 'Tap a person to tag them';
+
+  @override
+  String get media_people_noSpotHint => 'Spots can\'t be marked on this one';
+
+  @override
+  String get media_people_withoutSpot => 'Tag without a spot';
+
+  @override
+  String get media_people_done => 'Done';
+
+  @override
+  String get media_people_pickerTitle => 'Who is this?';
+
+  @override
+  String get media_people_searchHint => 'Search buddies';
+
+  @override
+  String get media_people_onThisDive => 'On this dive';
+
+  @override
+  String get media_people_everyoneElse => 'Everyone else';
+
+  @override
+  String get media_people_newBuddy => 'New buddy';
+
+  @override
+  String get media_people_newBuddyName => 'Name';
+
+  @override
+  String get media_people_newBuddyAdd => 'Add';
+
+  @override
+  String get media_people_changePerson => 'Change person';
+
+  @override
+  String get media_people_removeTag => 'Remove tag';
+
+  @override
+  String get media_people_resizeHint => 'Drag the corners to fit';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return 'Add $name to this dive\'s buddies?';
+  }
+
+  @override
+  String get media_people_addToDiveAction => 'Add';
+
+  @override
+  String get media_people_buddyPhotosTitle => 'Photos and videos';
+
+  @override
+  String get media_people_buddyThumbnailLabel =>
+      'Photo or video with this buddy';
+
+  @override
+  String get media_people_filterSection => 'People';
+
+  @override
+  String get media_people_removedBuddy => 'Removed buddy';
+
+  @override
+  String get media_people_saveFailed => 'Couldn\'t save the tag. Try again.';
+
+  @override
+  String get media_people_addToDiveFailed =>
+      'Couldn\'t add the buddy to this dive. Try again.';
+
+  @override
+  String get media_people_createBuddyFailed =>
+      'Couldn\'t create the buddy. Try again.';
 
   @override
   String get media_info_fileSection => 'File';

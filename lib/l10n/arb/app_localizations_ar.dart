@@ -25475,6 +25475,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_field_verifyFactsHlc => 'سجل التحقق';
 
   @override
+  String get settings_conflict_field_videoPositionMs =>
+      'الوقت في الفيديو (مللي ثانية)';
+
+  @override
   String get settings_conflict_field_vesselName => 'السفينة';
 
   @override
@@ -51753,6 +51757,93 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_species_chipsLabel => 'وسوم الأنواع';
+
+  @override
+  String get media_people_me => 'أنا';
+
+  @override
+  String get media_people_chipsLabel => 'وسوم الأشخاص';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => 'وسم الأشخاص';
+
+  @override
+  String get media_people_tagModeHint => 'اضغط على شخص لوسمه';
+
+  @override
+  String get media_people_noSpotHint => 'لا يمكن تحديد موضع هنا';
+
+  @override
+  String get media_people_withoutSpot => 'وسم دون موضع';
+
+  @override
+  String get media_people_done => 'تم';
+
+  @override
+  String get media_people_pickerTitle => 'من هذا؟';
+
+  @override
+  String get media_people_searchHint => 'البحث عن رفاق';
+
+  @override
+  String get media_people_onThisDive => 'في هذه الغطسة';
+
+  @override
+  String get media_people_everyoneElse => 'الآخرون';
+
+  @override
+  String get media_people_newBuddy => 'رفيق جديد';
+
+  @override
+  String get media_people_newBuddyName => 'الاسم';
+
+  @override
+  String get media_people_newBuddyAdd => 'إضافة';
+
+  @override
+  String get media_people_changePerson => 'تغيير الشخص';
+
+  @override
+  String get media_people_removeTag => 'إزالة الوسم';
+
+  @override
+  String get media_people_resizeHint => 'اسحب الزوايا للضبط';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return 'هل تريد إضافة $name إلى رفاق هذه الغطسة؟';
+  }
+
+  @override
+  String get media_people_addToDiveAction => 'إضافة';
+
+  @override
+  String get media_people_buddyPhotosTitle => 'الصور ومقاطع الفيديو';
+
+  @override
+  String get media_people_buddyThumbnailLabel => 'صورة أو فيديو مع هذا الرفيق';
+
+  @override
+  String get media_people_filterSection => 'الأشخاص';
+
+  @override
+  String get media_people_removedBuddy => 'رفيق محذوف';
+
+  @override
+  String get media_people_saveFailed => 'تعذر حفظ الوسم. حاول مرة أخرى.';
+
+  @override
+  String get media_people_addToDiveFailed =>
+      'تعذرت إضافة الرفيق إلى هذه الغطسة. حاول مرة أخرى.';
+
+  @override
+  String get media_people_createBuddyFailed =>
+      'تعذر إنشاء الرفيق. حاول مرة أخرى.';
 
   @override
   String get media_info_fileSection => 'الملف';

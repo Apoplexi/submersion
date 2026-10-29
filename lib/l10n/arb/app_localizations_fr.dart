@@ -25338,6 +25338,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Journal de vérification';
 
   @override
+  String get settings_conflict_field_videoPositionMs =>
+      'Temps dans la vidéo (ms)';
+
+  @override
   String get settings_conflict_field_vesselName => 'Navire';
 
   @override
@@ -51241,6 +51245,97 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_species_chipsLabel => 'Étiquettes d\'espèces';
+
+  @override
+  String get media_people_me => 'Moi';
+
+  @override
+  String get media_people_chipsLabel => 'Étiquettes de personnes';
+
+  @override
+  String media_people_momentChip(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String get media_people_actionTooltip => 'Identifier des personnes';
+
+  @override
+  String get media_people_tagModeHint =>
+      'Touchez une personne pour l\'identifier';
+
+  @override
+  String get media_people_noSpotHint =>
+      'Impossible de marquer un emplacement ici';
+
+  @override
+  String get media_people_withoutSpot => 'Identifier sans emplacement';
+
+  @override
+  String get media_people_done => 'Terminé';
+
+  @override
+  String get media_people_pickerTitle => 'Qui est-ce ?';
+
+  @override
+  String get media_people_searchHint => 'Rechercher des binômes';
+
+  @override
+  String get media_people_onThisDive => 'Sur cette plongée';
+
+  @override
+  String get media_people_everyoneElse => 'Tous les autres';
+
+  @override
+  String get media_people_newBuddy => 'Nouveau binôme';
+
+  @override
+  String get media_people_newBuddyName => 'Nom';
+
+  @override
+  String get media_people_newBuddyAdd => 'Ajouter';
+
+  @override
+  String get media_people_changePerson => 'Changer de personne';
+
+  @override
+  String get media_people_removeTag => 'Retirer l\'identification';
+
+  @override
+  String get media_people_resizeHint => 'Faites glisser les coins pour ajuster';
+
+  @override
+  String media_people_addToDiveOffer(String name) {
+    return 'Ajouter $name aux binômes de cette plongée ?';
+  }
+
+  @override
+  String get media_people_addToDiveAction => 'Ajouter';
+
+  @override
+  String get media_people_buddyPhotosTitle => 'Photos et vidéos';
+
+  @override
+  String get media_people_buddyThumbnailLabel =>
+      'Photo ou vidéo avec ce binôme';
+
+  @override
+  String get media_people_filterSection => 'Personnes';
+
+  @override
+  String get media_people_removedBuddy => 'Binôme supprimé';
+
+  @override
+  String get media_people_saveFailed =>
+      'Impossible d\'enregistrer l\'identification. Réessayez.';
+
+  @override
+  String get media_people_addToDiveFailed =>
+      'Impossible d\'ajouter le binôme à cette plongée. Réessayez.';
+
+  @override
+  String get media_people_createBuddyFailed =>
+      'Impossible de créer le binôme. Réessayez.';
 
   @override
   String get media_info_fileSection => 'Fichier';
